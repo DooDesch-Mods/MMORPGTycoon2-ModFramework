@@ -6,6 +6,8 @@ Help modders make something useful. A good issue describes the intended result, 
 
 Start with the [build guide](docs/contributing/build.md). Source lives in `src/core`, `src/loader` and `adapters/mt2`. Public native declarations are in `include/mt2fw/plugin.h`; Lua contracts are in `api/contract.json`.
 
+[Nexus release automation](integrations/nexus/README.md) documents the two upload destinations, existing-version checks and manual validation runs. Published documentation is deployed by the separate **Publish documentation** workflow.
+
 ## API and example changes
 
 1. Update the public contract and the corresponding implementation or complete example.

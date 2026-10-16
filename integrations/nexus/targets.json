@@ -1,0 +1,26 @@
+{
+  "framework": {
+    "name": "MT2 Mod Framework",
+    "domain": "mmorpgtycoon2",
+    "game_id": 4452,
+    "page_id": 25,
+    "mod_uid": "19121194401817",
+    "file_id": "8170305",
+    "file_variable": "NEXUS_FRAMEWORK_FILE_ID",
+    "mod_variable": "NEXUS_FRAMEWORK_MOD_ID",
+    "asset_pattern": "MT2Framework-*-windows-x64.zip",
+    "description": "The framework runtime, portable helper, CLI, SDK, templates and offline documentation. Extract outside the game directory and run mt2fw/MT2FW-Helper.exe, or import the full ZIP through the MMORPG Tycoon 2 Vortex Extension. Requires Windows x64 and a supported Steam game build."
+  },
+  "vortex": {
+    "name": "MMORPG Tycoon 2 Vortex Extension",
+    "domain": "site",
+    "game_id": 2295,
+    "page_id": 2465,
+    "mod_uid": "9856949946785",
+    "file_id": "8170257",
+    "file_variable": "NEXUS_VORTEX_FILE_ID",
+    "mod_variable": "NEXUS_VORTEX_MOD_ID",
+    "asset_pattern": "MMORPGTycoon2-Vortex-*.zip",
+    "description": "Adds MMORPG Tycoon 2 support to Vortex for MT2 Mod Framework and its mods. Install through Vortex's Extensions view and restart Vortex. Download the framework runtime separately. Requires Windows x64, Vortex 2.8.2 or newer and a supported Steam game build."
+  }
+}

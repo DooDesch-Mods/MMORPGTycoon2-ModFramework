@@ -1,0 +1,99 @@
+name: Publish Nexus files
+on:
+  release:
+    types: [published]
+  workflow_dispatch:
+    inputs:
+      release_tag:
+        description: Published GitHub release tag
+        required: true
+        type: string
+      target:
+        description: Nexus destination
+        type: choice
+        options: [all, framework, vortex]
+        default: all
+      publish:
+        description: Upload a newer version after validation
+        type: boolean
+        default: false
+permissions:
+  contents: read
+jobs:
+  plan:
+    runs-on: ubuntu-latest
+    outputs:
+      matrix: ${{ steps.targets.outputs.matrix }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+      - id: targets
+        env:
+          TARGET: ${{ inputs.target || 'all' }}
+        run: python tools/nexus_release.py matrix --target "$TARGET"
+  nexus:
+    needs: plan
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    strategy:
+      fail-fast: false
+      matrix: ${{ fromJSON(needs.plan.outputs.matrix) }}
+    concurrency:
+      group: nexus-${{ matrix.product }}
+      cancel-in-progress: false
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+      - name: Validate release and Nexus destination
+        id: prepare
+        env:
+          GH_TOKEN: ${{ github.token }}
+          NEXUSMODS_API_KEY: ${{ secrets.NEXUSMODS_API_KEY }}
+          NEXUS_FILE_ID: ${{ vars[matrix.file_variable] }}
+          NEXUS_MOD_ID: ${{ vars[matrix.mod_variable] }}
+          RELEASE_TAG: ${{ github.event.release.tag_name || inputs.release_tag }}
+          TARGET: ${{ inputs.target || 'all' }}
+        run: |
+          optional=()
+          if [[ "$TARGET" == all ]]; then optional+=(--optional); fi
+          python tools/nexus_release.py prepare --product "${{ matrix.product }}" --tag "$RELEASE_TAG" --directory "artifacts/nexus/${{ matrix.product }}" "${optional[@]}"
+      - name: Upload file version
+        id: upload
+        if: steps.prepare.outputs.status == 'ready' && (github.event_name == 'release' || inputs.publish)
+        uses: Nexus-Mods/upload-action@98532f7670c27cbecc78fae03fa3e278147827e2 # v1.0.0-beta.11
+        with:
+          api_key: ${{ secrets.NEXUSMODS_API_KEY }}
+          file_id: ${{ steps.prepare.outputs.file_id }}
+          mod_id: ${{ steps.prepare.outputs.mod_uid }}
+          filename: ${{ steps.prepare.outputs.filename }}
+          version: ${{ steps.prepare.outputs.version }}
+          display_name: ${{ steps.prepare.outputs.display_name }}
+          description: ${{ steps.prepare.outputs.description }}
+          category: main
+          archive_existing_version: true
+          update_mod_version: true
+          primary_mod_manager_download: true
+          allow_mod_manager_download: true
+      - name: Confirm Nexus file version
+        if: steps.upload.outcome == 'success'
+        env:
+          NEXUSMODS_API_KEY: ${{ secrets.NEXUSMODS_API_KEY }}
+          VERSION_ID: ${{ steps.upload.outputs.version_id }}
+        run: python tools/nexus_release.py verify --directory "artifacts/nexus/${{ matrix.product }}" --version-id "$VERSION_ID"
+      - name: Retain release receipts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: nexus-${{ matrix.product }}-${{ github.run_id }}-${{ github.run_attempt }}
+          path: artifacts/nexus/**/*.json
+          if-no-files-found: warn

@@ -6,7 +6,7 @@
 
 Build mods for **MMORPG Tycoon 2**. Start with Lua and a text editor, extend with C++, or bring your own static GLB scenery into the game.
 
-**[Create your first mod](docs/quickstart.md)** · [Explore the API](docs/reference/index.md) · [Use an AI agent](docs/agents/start.md)
+**[Create your first mod](https://doodesch-mods.github.io/MMORPGTycoon2-ModFramework/quickstart.html)** · [Explore the API](https://doodesch-mods.github.io/MMORPGTycoon2-ModFramework/reference/index.html) · [Use an AI agent](https://doodesch-mods.github.io/MMORPGTycoon2-ModFramework/agents/start.html)
 
 ![Lua and C++ mods running beside custom scenery](docs/public/media/mods-menu.png)
 

@@ -21,6 +21,7 @@ const entryLinks = [
 ]
 
 const guideLinks = [
+  { text: 'Install with Vortex', href: '/guides/vortex.html' },
   { text: 'Settings and storage', href: '/guides/config-storage.html' },
   { text: 'Events and input', href: '/guides/events-input.html' },
   { text: 'World actions', href: '/guides/world-actions.html' },
@@ -119,7 +120,7 @@ onContentUpdated(() => {
       </div>
       <div class="sidebar-note">
         <strong>Framework 0.1.0</strong>
-        <p>Local development candidate</p>
+        <p>Lua API 1.0.0 - native ABI 1</p>
         <a :href="withBase('/contributing/build.html')">Build from source <span aria-hidden="true">↗</span></a>
       </div>
     </aside>
@@ -136,7 +137,7 @@ onContentUpdated(() => {
       <p class="footer-support">🛟 <strong>Need help or found a bug?</strong> Get support at <a href="https://support.doodesch.de/modframework">support.doodesch.de/modframework</a>.</p>
     </div>
     <div class="footer-status">
-      <p>Version 0.1.0 - local development candidate.</p>
+      <p>Lua, C++ and custom scenery.</p>
       <p>Original framework, documentation and icons: MIT.<br>Game imagery belongs to its respective owners.</p>
       <a :href="withBase('/compatibility.html')">Compatibility and current limits <span aria-hidden="true">↗</span></a>
     </div>
