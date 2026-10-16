@@ -60,10 +60,14 @@ class OfflineHTML(HTMLParser):
     def handle_decl(self,data):self.parts.append('<!'+data+'>')
 
 def export_docs(pages,site,offline,markdown):
+    # GitHub source links include public/; VitePress copies that directory's contents to the site root.
+    for path in site.rglob('*.html'):
+        text=path.read_text(encoding='utf-8').replace('href="./public/media/','href="/media/')
+        path.write_text(text,encoding='utf-8')
     shutil.copytree(site,offline,dirs_exist_ok=True)
     for path in source_pages():
         relative=path.relative_to(ROOT/'docs')
-        text=re.sub(r'^---\n.*?\n---\n','',path.read_text(encoding='utf-8'),flags=re.S)
+        text=re.sub(r'^---\n.*?\n---\n','',path.read_text(encoding='utf-8'),flags=re.S).replace('public/media/','media/')
         for base in (site,offline,markdown):
             for name in (relative,Path('versions/1.0.0')/relative):
                 target=base/name;target.parent.mkdir(parents=True,exist_ok=True);target.write_text(text,encoding='utf-8')

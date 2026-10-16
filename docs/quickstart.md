@@ -6,13 +6,13 @@ title: Create your first mod
 
 Put a greeting in the game. Change it. Reload it.
 
-Use the portable helper and **Hello MT2**. You need the supported Windows Steam game and a text editor. Lua needs no compiler. Use the local product package, or follow the [contributor build guide](contributing/build.md) to build it. This candidate has no public download.
+Use the portable helper and **Hello MT2**. You need the supported Windows Steam game and a text editor. Lua needs no compiler. Download the [framework package](https://github.com/DooDesch-Mods/MMORPGTycoon2-ModFramework/releases/tag/v0.1.0), or follow the [contributor build guide](contributing/build.md) to build it.
 
 ## Install into your profile
 
 Open `mt2fw/MT2FW-Helper.exe` in the extracted package. Select your Steam game and a mod profile, then choose **Install framework**. Keep the helper package outside the game directory so it remains available for removal. Unknown existing loaders are preserved and reported.
 
-![The portable helper with installation and profile controls](/media/helper-install.png)
+![The portable helper with installation and profile controls](public/media/helper-install.png)
 
 The capture shows the real helper. The profile gives your mods their own settings and game data. Existing multiplayer test profiles are not moved. Import a save only through the explicit copy action.
 
@@ -20,13 +20,13 @@ The capture shows the real helper. The profile gives your mods their own setting
 
 Select **Create a mod**, choose **Hello MT2**, and enter `yourname.hello`. Select your profile's `mods` folder as the parent. The helper creates the manifest, script, editor types and agent guide.
 
-![The helper's mod creation controls](/media/helper-create.png)
+![The helper's mod creation controls](public/media/helper-create.png)
 
 ## Open the game
 
 Start through Steam. The **Hello MT2** window appears. Load a world to see its name. F10 opens **Mods**.
 
-![The first Lua mod visible in the actual game](/media/first-mod.png)
+![The first Lua mod visible in the actual game](public/media/first-mod.png)
 
 ## Make it yours
 
@@ -42,7 +42,7 @@ Save the file. Keep the rest of the generated script.
 
 In **Mods**, choose **Reload** beside your mod. The new greeting appears without restarting the game.
 
-![A changed greeting after reloading in the same running game](/media/edited-mod.png)
+![A changed greeting after reloading in the same running game](public/media/edited-mod.png)
 
 If replacement code has a syntax or activation error, the previous instance stays active. Read the displayed file, line and original cause, fix the script, then reload again. Other mods keep running. Content packages and native DLLs need restart.
 

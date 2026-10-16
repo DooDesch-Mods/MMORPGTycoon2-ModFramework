@@ -6,7 +6,7 @@ title: Import static scenery
 
 Bring an original static GLB into the native Scenery catalog. Start with the **Scenery Pack** template to learn the package layout, then use **Import GLB** for your own model.
 
-![Two authored models, including a textured model, rendered by the game](/media/scenery.png)
+![Two authored models, including a textured model, rendered by the game](../public/media/scenery.png)
 
 ## Preview and convert
 
@@ -24,6 +24,6 @@ Content IDs use the mod namespace, for example `yourname.scenery:pyramid`. Dupli
 
 The framework records required content versions and hashes with confirmed saves. A missing required pack is named before loading, while the save remains unchanged. Keep the pack installed for worlds using its objects.
 
-![An authored scenery building restored after a full game restart](/media/restored.png)
+![An authored scenery building restored after a full game restart](../public/media/restored.png)
 
 These real captures come from retained game acceptance. Original game artwork in the captures has separate rights. See [content.register](../reference/functions/content-register.md), [content schema](../reference/manifests.md) and the complete `examples/content` project.
