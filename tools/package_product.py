@@ -31,6 +31,7 @@ for source_root,folder in ((offline,'docs'),(ROOT/'sdk','sdk'),(ROOT/'include','
         if folder=='include' and source.is_file() and source.relative_to(source_root).as_posix()!='mt2fw/plugin.h':continue
         if source.is_file() and not any(part in ('__pycache__','build') for part in source.relative_to(source_root).parts):copy(source,destination/'mt2fw'/folder/source.relative_to(source_root))
 for name in ('LICENSE','README.md','THIRD_PARTY_NOTICES.md'):copy(ROOT/name,destination/'mt2fw'/name)
+copy(ROOT/'integrations/vortex/README.md',destination/'mt2fw/integrations/vortex/README.md')
 readme=destination/'mt2fw/README.md'
 text=readme.read_text(encoding='utf-8').replace('docs/public/media/','docs/media/')
 text=text.replace('[CONTRIBUTING.md](CONTRIBUTING.md)', '[the contributor guide](docs/contributing/build.md)')
@@ -38,6 +39,7 @@ text=re.sub(r'\]\((docs/[^)]+)\.md\)',r'](\1.html)',text)
 readme.write_text(text,encoding='utf-8')
 copy(ROOT/'evidence/runtime-acceptance.json',destination/'mt2fw/evidence/runtime-acceptance.json')
 copy(ROOT/'evidence/repository-acceptance.json',destination/'mt2fw/evidence/repository-acceptance.json')
+copy(ROOT/'evidence/vortex-acceptance.json',destination/'mt2fw/evidence/vortex-acceptance.json')
 notices=destination/'mt2fw/licenses'
 for folder,name in [('imgui','LICENSE.txt'),('minhook','LICENSE.txt'),('nlohmann','LICENSE.MIT'),('SDL3','LICENSE.txt')]:
     copy(ROOT/'third_party/vendor'/folder/name,notices/(folder+'-'+name))
