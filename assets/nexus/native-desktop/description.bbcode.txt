@@ -1,0 +1,78 @@
+[size=6][b]MT2 Mod Framework[/b][/size]
+[size=4]Make room for your ideas.[/size]
+
+🛟 [b]Need help or found a bug?[/b] Get support at [url=https://support.doodesch.de/modframework]support.doodesch.de/modframework[/url].
+
+[url=https://github.com/DooDesch-Mods/MMORPGTycoon2-ModFramework/blob/main/docs/quickstart.md]Create your first mod[/url] | [url=https://github.com/DooDesch-Mods/MMORPGTycoon2-ModFramework/blob/main/docs/reference/index.md]API reference[/url] | [url=https://github.com/DooDesch-Mods/MMORPGTycoon2-ModFramework]GitHub[/url]
+
+[img]https://raw.githubusercontent.com/DooDesch-Mods/MMORPGTycoon2-ModFramework/main/assets/nexus/native-desktop/thumbnail.png[/img]
+
+Add your own windows, tools and scenery to MMORPG Tycoon 2. Write Lua mods in a text editor, build native C++ plugins, or import a static GLB model for the scenery catalog.
+
+Players need only the small [b]Runtime[/b] download on this page. Modders can get the separate [url=https://github.com/DooDesch-Mods/MMORPGTycoon2-ModFramework/releases][b]MT2Framework-SDK on GitHub[/b][/url], with the helper, GLB importer, templates and offline documentation. Lua needs no compiler.
+
+[size=5][b]What you can make[/b][/size]
+[list]
+[*][b]In-game tools[/b] - Add windows, buttons, settings and keyboard shortcuts. Read world events and inspect selected objects.
+[*][b]World changes[/b] - Control the camera and game speed, or place, move and remove supported objects through the game API.
+[*][b]Custom scenery[/b] - Import static GLB models and package them as scenery for the build catalog.
+[*][b]Native plugins[/b] - Use the C++ template and SDK when your mod needs native code.
+[/list]
+
+[img]https://raw.githubusercontent.com/DooDesch-Mods/MMORPGTycoon2-ModFramework/main/assets/nexus/native-desktop/gallery/03-mods-menu.png[/img]
+
+Open [b]Mods[/b] from the game desktop or press [b]F10[/b]. Manage installed mods, change their settings and open the developer tools from one place. Lua errors include the file and line; if a replacement script fails to load, the previous instance keeps running.
+
+[size=5][b]Requirements[/b][/size]
+[list]
+[*]Windows x64 and the Steam version of MMORPG Tycoon 2.
+[*]A supported game build. Vortex checks it before deployment; see [url=https://github.com/DooDesch-Mods/MMORPGTycoon2-ModFramework/blob/main/docs/compatibility.md]supported builds and compatibility[/url].
+[*]The [url=https://www.nexusmods.com/site/mods/2465]MMORPG Tycoon 2 Vortex Extension[/url] for installation through Vortex. Manual installation is also supported.
+[/list]
+
+[size=5][b]Install[/b][/size]
+[list=1]
+[*]Close the game. Install the [url=https://www.nexusmods.com/site/mods/2465][b]MMORPG Tycoon 2 Vortex Extension[/b][/url] and restart Vortex.
+[*]Manage MMORPG Tycoon 2, then import the [b]Runtime ZIP[/b] from this page. Enable it and deploy.
+[*]Install your mods through Vortex, enable them and deploy with the game closed.
+[*]Start through Steam. Open [b]Mods[/b] from the game desktop or press [b]F10[/b].
+[/list]
+Use Vortex to update or remove its managed packages. Your profile holds its own mods, settings and worlds. Existing saves are not imported automatically.
+
+[b]Manual installation:[/b] Follow the [url=https://github.com/DooDesch-Mods/MMORPGTycoon2-ModFramework/blob/main/packaging/runtime/README.md]included runtime guide[/url]. The SDK is optional. If you previously installed through the helper, use [b]Remove framework[/b] there before switching to Vortex; keep your profile and saves.
+
+[size=5][b]Your first Lua mod[/b][/size]
+Download [b]MT2Framework-SDK[/b] from [url=https://github.com/DooDesch-Mods/MMORPGTycoon2-ModFramework/releases]GitHub Releases[/url] and extract it outside the game folder. Open [b]mt2fw/MT2FW-Helper.exe[/b]. The SDK includes its matching runtime. A text editor is enough for Lua; native C++ development also needs Visual Studio C++ tools and CMake.
+[img]https://raw.githubusercontent.com/DooDesch-Mods/MMORPGTycoon2-ModFramework/main/assets/nexus/native-desktop/gallery/01-create.png[/img]
+[list=1]
+[*]In the helper, open [b]Create a mod[/b], choose [b]Hello MT2[/b] and create the project in your profile's mods folder.
+[*]Start the game. Open the generated [b]main.lua[/b] in a text editor, change the message on its first line and save. Keep the rest of the script.
+[*]Open [b]Mods[/b] from the game desktop or with [b]F10[/b], select your mod and choose [b]Reload Lua[/b]. Its window shows the new message without restarting the game.
+[/list]
+
+[img]https://raw.githubusercontent.com/DooDesch-Mods/MMORPGTycoon2-ModFramework/main/assets/nexus/native-desktop/gallery/02-reload.png[/img]
+
+Ready to share it? Use [b]Check mod[/b], then [b]Pack mod ZIP[/b]. The package can be installed through the helper or Vortex. Editor autocomplete, templates, examples and the API reference are included in the SDK. The documentation also works offline, and includes an [url=https://github.com/DooDesch-Mods/MMORPGTycoon2-ModFramework/blob/main/docs/agents/start.md]agent guide[/url].
+
+For Vortex development, keep your source project outside the managed deployment folders. Pack it as a ZIP and import that into Vortex so later deployment does not replace your edits.
+
+[size=5][b]Bring your own scenery[/b][/size]
+Choose [b]Import GLB[/b] in the helper, check the model's size and orientation, then export a scenery package. Install it through the helper or Vortex and restart the game.
+
+[img]https://raw.githubusercontent.com/DooDesch-Mods/MMORPGTycoon2-ModFramework/main/assets/nexus/native-desktop/gallery/04-scenery.png[/img]
+
+The importer supports static geometry, materials and embedded PNG/JPEG textures. Animated and skinned models are not supported. See the [url=https://github.com/DooDesch-Mods/MMORPGTycoon2-ModFramework/blob/main/docs/guides/scenery.md]scenery guide[/url] for model requirements.
+
+[size=5][b]Compatibility[/b][/size]
+[list]
+[*]Game updates can require a framework update. An unsupported build is reported before installation.
+[*]Lua scripts can be reloaded in game. Native plugins and scenery changes require a restart.
+[*]Keep scenery packs installed while using worlds that contain their objects.
+[*]Multiplayer compatibility has not been confirmed.
+[/list]
+
+[size=5][b]Remove[/b][/size]
+Close the game. For a Vortex installation, use Vortex to purge deployment and remove the packages. For a manual runtime installation, follow the removal steps in its [url=https://github.com/DooDesch-Mods/MMORPGTycoon2-ModFramework/blob/main/packaging/runtime/README.md]included guide[/url]. Previous helper installations can be removed with their original helper. Keep your profile data and saves.
+
+[size=5][b]Credits[/b][/size]
+Framework, SDK, templates and documentation by [b]DooDesch[/b], under the MIT License. Dependencies retain their own notices. MMORPG Tycoon 2 is by VectorStorm; game names and artwork belong to their respective owners and are not covered by the framework's MIT license.

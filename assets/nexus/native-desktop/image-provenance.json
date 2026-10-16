@@ -1,0 +1,162 @@
+{
+  "version": "0.1.3",
+  "composition_license": "MIT, Copyright 2026 DooDesch",
+  "game_artwork": "Game artwork belongs to its respective owners and is excluded from MIT.",
+  "private_reference_icon": "Not included or used in these compositions.",
+  "sources": [
+    {
+      "id": "helper-create",
+      "path": "public/media/helper-create.png",
+      "locale": "en",
+      "origin": "Owned helper HWND capture",
+      "framework_version": "0.1.0",
+      "rights": "Framework UI MIT; native operating system controls retain their respective rights.",
+      "case": "helper-create",
+      "alt": "English helper helper create",
+      "caption": "Real owned English helper capture.",
+      "sha256": "1ad2994a6a53826a9ffce8e20f20f49689ca4d51dece2ee51f4c3bcfe9e5e1d8",
+      "source": "docs/public/media/helper-create.png",
+      "kit_path": "assets/helper-create.png"
+    },
+    {
+      "id": "first-mod",
+      "source": "assets/nexus/native-desktop/sources/first-mod.png",
+      "locale": "en",
+      "framework_version": "0.1.2-local",
+      "origin": "Owned game window capture from the native Mods app acceptance session",
+      "source_sha256": "be8ed51de6677517a9985504ffd91ba8c3cbf582a4a4928842da4832471ce96c",
+      "sha256": "a860bad55add0c2cd514584ce094214b1e803e36cd53b288cd11793ef2e22827",
+      "crop": [
+        24,
+        64,
+        400,
+        245
+      ],
+      "rights": "Game artwork belongs to its respective owners; excluded from MIT."
+    },
+    {
+      "id": "edited-mod",
+      "source": "assets/nexus/native-desktop/sources/edited-mod.png",
+      "locale": "en",
+      "framework_version": "0.1.2-local",
+      "origin": "Owned game window capture from the native Mods app acceptance session",
+      "source_sha256": "71353ead2b10b419fc4bf56a8c96f90de52a27a65c65a10aeaf0e47bb2c20ad1",
+      "sha256": "9b2580222dc8206cefb569cd0e8ab8215026b7c890328f58f23262cad7840c5f",
+      "crop": [
+        24,
+        64,
+        400,
+        245
+      ],
+      "rights": "Game artwork belongs to its respective owners; excluded from MIT."
+    },
+    {
+      "id": "mods-menu",
+      "path": "public/media/mods-menu.png",
+      "locale": "en",
+      "framework_version": "0.1.2-local",
+      "source_sha256": "b1781c8cb25de9b00395df2e60b69059e9da73f41fbe3cfbe9b0ffe8e92561ea",
+      "case": "Native Mods desktop app with two Lua mods",
+      "origin": "Owned game window capture with PID/start-time and module-hash receipt",
+      "rights": "Original game artwork belongs to its respective owners; not licensed under framework MIT.",
+      "build_identity": {
+        "MT2.exe": "bbab2dc68babcc644d0a1679548bf1e334b6c52aea669c3f61f6cb9d45c1aaf6",
+        "steam_api64.dll": "e082bf5c9f881c822b1540a76b74f9d15e18019a73ebd206a559595badcb7f65",
+        "WSOCK32.dll": "51eb58afe99c66c9a3ccca0f91cb349c6889d0edee4c9b698e166a07bf3adabb",
+        "MT2Framework.dll": "9caf504a80b4299a19cc1438745fa64749a1354a690c32b25a1c3a38c9f3f9c4"
+      },
+      "alt": "Native Mods app opened from the game desktop",
+      "caption": "Native Mods app in a local development build. Open it from the game desktop or with F10.",
+      "sha256": "60f84770769f83d5e54e9225db663dbdf3a40c56725da1f9d0e43c54de104bbb",
+      "crop": [
+        238,
+        48,
+        1280,
+        660
+      ],
+      "source": "docs/public/media/mods-menu.png",
+      "ui_scope": "Native Mods UI retained unchanged in public release 0.1.3."
+    },
+    {
+      "id": "scenery",
+      "path": "public/media/scenery.png",
+      "locale": "en",
+      "framework_version": "0.1.0",
+      "source_sha256": "daa72beac1489ccf4f59085ca4341bec640390da5537b691cd606a56b76d0f6d",
+      "case": "Two authored static GLB packs",
+      "origin": "Retained receipt-bound real MT2 game capture",
+      "rights": "Original game artwork belongs to its respective owners; not licensed under framework MIT.",
+      "build_identity": {
+        "MT2.exe": "bbab2dc68babcc644d0a1679548bf1e334b6c52aea669c3f61f6cb9d45c1aaf6"
+      },
+      "alt": "scenery in the actual game",
+      "caption": "Retained original framework 0.1.0 game acceptance; current public API and pictured workflow unchanged.",
+      "sha256": "daa72beac1489ccf4f59085ca4341bec640390da5537b691cd606a56b76d0f6d",
+      "source": "docs/public/media/scenery.png",
+      "kit_path": "assets/scenery.png"
+    },
+    {
+      "id": "restored",
+      "path": "public/media/restored.png",
+      "locale": "en",
+      "framework_version": "0.1.0",
+      "source_sha256": "c7a7778d07549d7085461bad206a81b54acb4c61375e896a1de1129565872600",
+      "case": "Authored building after full process restart",
+      "origin": "Retained receipt-bound real MT2 game capture",
+      "rights": "Original game artwork belongs to its respective owners; not licensed under framework MIT.",
+      "build_identity": {
+        "MT2.exe": "bbab2dc68babcc644d0a1679548bf1e334b6c52aea669c3f61f6cb9d45c1aaf6"
+      },
+      "alt": "restored in the actual game",
+      "caption": "Retained original framework 0.1.0 game acceptance; current public API and pictured workflow unchanged.",
+      "sha256": "c7a7778d07549d7085461bad206a81b54acb4c61375e896a1de1129565872600",
+      "source": "docs/public/media/restored.png",
+      "kit_path": "assets/restored.png"
+    },
+    {
+      "source": "assets/brand/icon.svg",
+      "kit_path": "assets/icon.svg",
+      "rights": "Original framework icon, MIT, Copyright 2026 DooDesch",
+      "sha256": "4004451a8e4c492d1dd346dfe1600a16747a1a1a60e3e75a367941c01e9e45c5"
+    }
+  ],
+  "outputs": [
+    {
+      "path": "native-desktop/thumbnail.svg",
+      "source_images": [
+        "restored.png"
+      ],
+      "edits": "Approved Astra framing, labels, scaling and clipping only. Screenshot UI is unchanged."
+    },
+    {
+      "path": "native-desktop/gallery/01-create.svg",
+      "source_images": [
+        "helper-create.png"
+      ],
+      "edits": "Approved Astra framing, labels, scaling and clipping only. Screenshot UI is unchanged."
+    },
+    {
+      "path": "native-desktop/gallery/02-reload.svg",
+      "source_images": [
+        "first-mod.png",
+        "edited-mod.png"
+      ],
+      "edits": "Approved Astra framing, labels, scaling and clipping only. Screenshot UI is unchanged."
+    },
+    {
+      "path": "native-desktop/gallery/03-mods-menu.svg",
+      "source_images": [
+        "mods-menu.png"
+      ],
+      "edits": "Approved Astra framing, labels, scaling and clipping only. Screenshot UI is unchanged."
+    },
+    {
+      "path": "native-desktop/gallery/04-scenery.svg",
+      "source_images": [
+        "scenery.png"
+      ],
+      "edits": "Approved Astra framing, labels, scaling and clipping only. Screenshot UI is unchanged."
+    }
+  ],
+  "artwork_revision": "native-desktop"
+}
