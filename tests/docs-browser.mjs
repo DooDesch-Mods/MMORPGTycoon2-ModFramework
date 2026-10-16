@@ -85,6 +85,16 @@ async function settlePage() {
   await page.waitForLoadState('networkidle')
 }
 
+async function switchMode(nextMode) {
+  await settlePage()
+  if (mode === nextMode) return
+  // Detach the previous document while its file or HTTP policy still applies.
+  // Clipboard restoration also crosses this boundary after the offline checks.
+  await page.goto('about:blank', { waitUntil: 'load' })
+  await page.waitForLoadState('networkidle')
+  mode = nextMode
+}
+
 try {
   browser = await chromium.launch({ executablePath, headless: true })
   context = await browser.newContext({ permissions: ['clipboard-read', 'clipboard-write'] })
@@ -107,11 +117,7 @@ try {
   for (const outputMode of ['site', 'offline']) {
     // A skip-link scroll can reveal new prefetch links in the previous output.
     // Drain those under its existing network policy before switching modes.
-    await settlePage()
-    // Resizing the next viewport must not expose links in the previous page.
-    // Detach that document before applying the next output's network policy.
-    if (mode !== outputMode) await page.goto('about:blank', { waitUntil: 'load' })
-    mode = outputMode
+    await switchMode(outputMode)
     for (const width of [1440, 390]) {
       await page.setViewportSize({ width, height: width === 390 ? 844 : 1000 })
       for (const file of pages) {
@@ -185,8 +191,7 @@ try {
 } finally {
   if (page && originalClipboard !== undefined) {
     try {
-      mode = 'site'
-      await settlePage()
+      await switchMode('site')
       await page.goto(`${origin}/index.html`, { waitUntil: 'load' })
       await page.evaluate(text => navigator.clipboard.writeText(text), originalClipboard)
       await settlePage()
