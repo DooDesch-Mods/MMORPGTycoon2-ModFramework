@@ -14,7 +14,11 @@ on:
         options: [all, framework, vortex]
         default: all
       publish:
-        description: Upload a newer version after validation
+        description: Upload or complete Nexus changelog metadata after validation
+        type: boolean
+        default: false
+      announce:
+        description: Send the release announcement to Discord (once per product/version)
         type: boolean
         default: false
 permissions:
@@ -38,6 +42,8 @@ jobs:
         run: python tools/nexus_release.py matrix --target "$TARGET"
   nexus:
     needs: plan
+    permissions:
+      contents: write # Persist Discord delivery receipts on the existing GitHub release.
     runs-on: ubuntu-latest
     timeout-minutes: 20
     strategy:
@@ -90,6 +96,17 @@ jobs:
           NEXUSMODS_API_KEY: ${{ secrets.NEXUSMODS_API_KEY }}
           VERSION_ID: ${{ steps.upload.outputs.version_id }}
         run: python tools/nexus_release.py verify --directory "artifacts/nexus/${{ matrix.product }}" --version-id "$VERSION_ID"
+      - name: Complete Nexus changelog and announce on Discord
+        if: (steps.prepare.outputs.status == 'already-present' || steps.upload.outcome == 'success') && (github.event_name == 'release' || inputs.publish)
+        env:
+          GH_TOKEN: ${{ github.token }}
+          NEXUSMODS_API_KEY: ${{ secrets.NEXUSMODS_API_KEY }}
+          DISCORD_RELEASE_WEBHOOK: ${{ secrets.DISCORD_RELEASE_WEBHOOK }}
+          ANNOUNCE: ${{ github.event_name == 'release' || inputs.announce }}
+        run: |
+          options=()
+          if [[ "$ANNOUNCE" == true ]]; then options+=(--announce); fi
+          python tools/release_delivery.py --directory "artifacts/nexus/${{ matrix.product }}" "${options[@]}"
       - name: Retain release receipts
         if: always()
         uses: actions/upload-artifact@v4

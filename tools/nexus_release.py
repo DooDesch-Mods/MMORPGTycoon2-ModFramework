@@ -11,10 +11,12 @@ import sys
 import urllib.error
 import urllib.request
 import zipfile
+import uuid
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0,str(ROOT/'tools'))
 from package_runtime import verify_runtime
+from release_notes import section, plain, bbcode
 REPOSITORY = 'DooDesch-Mods/MMORPGTycoon2-ModFramework'
 API = 'https://api.nexusmods.com/v3'
 
@@ -82,7 +84,7 @@ def gh(*args):
     result = subprocess.run(['gh', *args, '--repo', REPOSITORY], capture_output=True, text=True, timeout=600)
     if result.returncode:
         cause = result.stderr.strip()
-        for name in ('GH_TOKEN', 'GITHUB_TOKEN', 'NEXUSMODS_API_KEY'):
+        for name in ('GH_TOKEN', 'GITHUB_TOKEN', 'NEXUSMODS_API_KEY', 'DISCORD_RELEASE_WEBHOOK'):
             if value := os.environ.get(name):cause = cause.replace(value, '[redacted]')
         raise RuntimeError(f'GitHub release {args[1]} failed (exit {result.returncode}): {cause[:2000]}')
     return result.stdout
@@ -159,9 +161,8 @@ def outputs(values):
     if destination := os.environ.get('GITHUB_OUTPUT'):
         with open(destination, 'a', encoding='utf-8') as stream:
             for name, value in values.items():
-                if '\n' in str(value) or '\r' in str(value):
-                    raise ValueError('Unexpected newline in workflow output: ' + name)
-                stream.write(f'{name}={value}\n')
+                delimiter = 'output_' + uuid.uuid4().hex
+                stream.write(f'{name}<<{delimiter}\n{value}\n{delimiter}\n')
 
 
 def prepare(args):
@@ -176,12 +177,14 @@ def prepare(args):
     else:
         plan.update({'status': check_destination(target, plan['version']), 'file_id': target['file_id'],
                      'mod_uid': target['mod_uid'], 'nexus_url': f"https://www.nexusmods.com/{target['domain']}/mods/{target['page_id']}"})
+        notes = section((ROOT / 'CHANGELOG.md').read_text(encoding='utf-8'), args.product, plan['version'])
+        plan.update(notes=notes, notes_plain=plain(notes), notes_bbcode=bbcode(notes))
     directory.mkdir(parents=True, exist_ok=True)
     (directory / 'plan.json').write_text(json.dumps(plan, indent=2) + '\n', encoding='utf-8')
     result = {'status': plan['status']}
     if 'version' in plan:
         result.update({name: plan[name] for name in ('filename', 'version', 'file_id', 'mod_uid')})
-        result.update({'display_name': target['name'], 'description': target['description']})
+        result.update({'display_name': target['name'], 'description': plan['notes_bbcode']})
     outputs(result)
     print(json.dumps(plan))
     if summary := os.environ.get('GITHUB_STEP_SUMMARY'):
