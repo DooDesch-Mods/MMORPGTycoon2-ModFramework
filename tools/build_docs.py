@@ -9,6 +9,13 @@ sys.path.insert(0,str(ROOT/'tools'))
 from mt2fw import packages
 
 def source_pages():return sorted(p for p in (ROOT/'docs').rglob('*.md') if '.vitepress' not in p.parts)
+
+def markdown_assets(text,relative):
+    def replace(match):
+        url=urlsplit(match[2]);asset=re.sub(r'^(?:\.{1,2}/)*public/','',url.path)
+        target=os.path.relpath(Path(asset),relative.parent).replace('\\','/')
+        return match[1]+urlunsplit(('', '', target, url.query, url.fragment))+match[3]
+    return re.sub(r'(!?\[[^\]]*\]\()((?:\.{1,2}/)*public/[^\s)]+)(\))',replace,text)
 def prepare():
     result=subprocess.run([sys.executable,str(ROOT/'tools/generate_docs.py')],cwd=ROOT)
     if result.returncode:raise RuntimeError('API generation failed')
@@ -34,7 +41,7 @@ def prepare():
         text=re.sub(r'<[^>]+>',' ',re.sub(r'^---\n.*?\n---\n','',source,flags=re.S))
         pages.append({'title':title,'href':path.relative_to(ROOT/'docs').with_suffix('.html').as_posix(),'text':re.sub(r'\s+',' ',text)})
     (ROOT/'docs/public/search-index.js').write_text('window.MT2FW_SEARCH_INDEX = '+json.dumps(pages,ensure_ascii=False).replace('</','<\\/')+';\n',encoding='utf-8')
-    llms='# MT2 Mod Framework\n\n> Framework 0.1.2, Lua API 1.0.0, native ABI 1. Windows x64 Steam. Multiplayer compatibility is not established.\n\nUse the version matching the installed framework. World mutations need confirmed acknowledgement; never automatically retry unknown results.\n\n## Start\n\n- [First mod](quickstart.md): create, edit, reload and package Lua.\n- [Agent guide](agents/start.md): lifecycle rules and validation.\n- [API reference](reference/index.md): generated public functions.\n- [Events](reference/events.md): exact event payload types.\n- [Native C ABI](reference/native.md): authoritative header and ownership.\n- [Compatibility](compatibility.md): supported executable and current limits.\n\n## Machine contracts\n\n- [API JSON](api/1.0.0/api.json): functions, types, capabilities, errors and examples.\n- [Mod schema](api/1.0.0/mod.schema.json): structure; mt2fw check adds semantic validation.\n- [Versioned Markdown](versions/1.0.0/reference/index.md): documentation snapshot for this API.\n'
+    llms='# MT2 Mod Framework\n\n> Framework 0.1.3, Lua API 1.0.0, native ABI 1. Windows x64 Steam. Multiplayer compatibility is not established.\n\nUse the version matching the installed framework. World mutations need confirmed acknowledgement; never automatically retry unknown results.\n\n## Start\n\n- [First mod](quickstart.md): create, edit, reload and package Lua.\n- [Agent guide](agents/start.md): lifecycle rules and validation.\n- [API reference](reference/index.md): generated public functions.\n- [Events](reference/events.md): exact event payload types.\n- [Native C ABI](reference/native.md): authoritative header and ownership.\n- [Compatibility](compatibility.md): supported executable and current limits.\n\n## Machine contracts\n\n- [API JSON](api/1.0.0/api.json): functions, types, capabilities, errors and examples.\n- [Mod schema](api/1.0.0/mod.schema.json): structure; mt2fw check adds semantic validation.\n- [Versioned Markdown](versions/1.0.0/reference/index.md): documentation snapshot for this API.\n'
     (ROOT/'docs/public/llms.txt').write_text(llms,encoding='utf-8')
     (ROOT/'docs/public/media/LICENSE.txt').write_text('Framework UI and original branding: Copyright (c) 2026 DooDesch, MIT.\nOriginal game artwork shown in real MMORPG Tycoon 2 captures retains its respective rights and is not licensed under the framework MIT license.\nNo original game files or private reference icon are redistributed here. See media.json for individual capture cases.\n',encoding='utf-8')
     return pages
@@ -74,7 +81,7 @@ def export_docs(pages,site,offline,markdown):
         text=re.sub(r'^---\n.*?\n---\n','',path.read_text(encoding='utf-8'),flags=re.S).replace('public/media/','media/')
         for base in (site,offline,markdown):
             for name in (relative,Path('versions/1.0.0')/relative):
-                target=base/name;target.parent.mkdir(parents=True,exist_ok=True);target.write_text(text,encoding='utf-8')
+                target=base/name;target.parent.mkdir(parents=True,exist_ok=True);target.write_text(markdown_assets(text,name),encoding='utf-8')
     for base in (site,offline):
         shutil.copytree(ROOT/'sdk',base/'sdk',dirs_exist_ok=True)
         shutil.copy2(ROOT/'include/mt2fw/plugin.h',base/'sdk/plugin.h')

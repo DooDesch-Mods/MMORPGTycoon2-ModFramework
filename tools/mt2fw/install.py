@@ -105,7 +105,7 @@ def classic_mods(game: Path | None,profile: Path | None) -> list[dict]:
 
 
 def doctor(game: Path | None = None, profile: Path | None = None) -> dict:
-    result = {'version': '0.1.2', 'steam_installations': [str(p) for p in steam_games()], 'issues': []}
+    result = {'version': '0.1.3', 'steam_installations': [str(p) for p in steam_games()], 'issues': []}
     if game is not None:
         if not (game / 'MT2.exe').is_file():
             result['issues'].append('MT2.exe not found')

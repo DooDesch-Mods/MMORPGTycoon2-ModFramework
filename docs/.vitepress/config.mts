@@ -19,5 +19,16 @@ export default defineConfig({
     theme: 'github-dark',
     lineNumbers: false,
     externalLinks: { target: '_blank', rel: 'noopener noreferrer' },
+    config(md) {
+      const render = md.renderer.rules.link_open || ((tokens, index, options, env, self) => self.renderToken(tokens, index, options))
+      md.renderer.rules.link_open = (tokens, index, options, env, self) => {
+        const href = tokens[index].attrGet('href')
+        // Committed Markdown targets docs/public; published assets live at the site root.
+        if (href && /^(?:\.{1,2}\/)*public\//.test(href)) {
+          tokens[index].attrSet('href', href.replace(/^(?:\.{1,2}\/)*public\//, '/'))
+        }
+        return render(tokens, index, options, env, self)
+      }
+    },
   },
 })

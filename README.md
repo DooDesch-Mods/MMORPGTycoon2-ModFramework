@@ -8,7 +8,7 @@ Build mods for **MMORPG Tycoon 2**. Start with Lua and a text editor, extend wit
 
 **[Create your first mod](https://doodesch-mods.github.io/MMORPGTycoon2-ModFramework/quickstart.html)** · [Explore the API](https://doodesch-mods.github.io/MMORPGTycoon2-ModFramework/reference/index.html) · [Use an AI agent](https://doodesch-mods.github.io/MMORPGTycoon2-ModFramework/agents/start.html)
 
-![Lua and C++ mods running beside custom scenery](docs/public/media/mods-menu.png)
+![The native Mods app with mod selection and reload controls](docs/public/media/mods-menu.png)
 
 | I want to... | Start here |
 | --- | --- |
@@ -21,7 +21,7 @@ Build mods for **MMORPG Tycoon 2**. Start with Lua and a text editor, extend wit
 
 This is a **development preview** for Windows x64 and the verified Steam game build. Multiplayer compatibility is not established. See [compatibility and acceptance](docs/compatibility.md). Players need only the **Runtime** from [Nexus](https://www.nexusmods.com/mmorpgtycoon2/mods/25) or [GitHub Releases](https://github.com/DooDesch-Mods/MMORPGTycoon2-ModFramework/releases). Modders download the separate **MT2Framework-SDK** from GitHub. The SDK includes the runtime, portable helper, full CLI, GLB importer, templates, editor types and offline documentation. Install the separate [Vortex extension](https://www.nexusmods.com/site/mods/2465) to manage runtime and mod ZIPs. [GitHub Actions](https://github.com/DooDesch-Mods/MMORPGTycoon2-ModFramework/actions/workflows/checks.yml) builds and verifies the packages and offline documentation.
 
-The portable helper installs the framework, creates projects and installs mod ZIPs. Lua needs no compiler or Python on an end user's machine. F10 opens **Mods** in the game.
+The portable helper installs the framework, creates projects and installs mod ZIPs. Lua needs no compiler or Python on an end user's machine. Open **Mods** on the game's desktop, or press F10. Its native window lists installed mods, dependencies and errors, with activation controls and Lua reload. Select a mod to open its settings; developer tools remain available from the same window.
 
 ## For contributors
 

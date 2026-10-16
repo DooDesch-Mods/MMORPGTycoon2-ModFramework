@@ -23,6 +23,6 @@ Required keys are ID, name, SemVer version, API version, type, entry and capabil
 
 The default multiplayer class is `singleplayer`. `local` is for UI, input and local camera, and cannot request world/content/time writes. `shared` requires matching packages and the future accepted multiplayer bridge; it does not enable shared writes in this candidate.
 
-Machine schemas: [mod.schema.json](/api/1.0.0/mod.schema.json) and [content.schema.json](/api/1.0.0/content.schema.json). They describe structure. `mt2fw check` additionally checks SemVer rules, Windows-confined paths, existing resources and package limits. Custom schema formats are `semver`, `supported-mt2-api` and `mt2-relative-path`; generic validators must register them or use the CLI for semantic validation.
+Machine schemas: [mod.schema.json](../public/api/1.0.0/mod.schema.json) and [content.schema.json](../public/api/1.0.0/content.schema.json). They describe structure. `mt2fw check` additionally checks SemVer rules, Windows-confined paths, existing resources and package limits. Custom schema formats are `semver`, `supported-mt2-api` and `mt2-relative-path`; generic validators must register them or use the CLI for semantic validation.
 
 Content definitions require `id`, `variant`, `model` and `material`. Resource paths remain inside the package. Use the converter instead of editing binary files by hand. See [capabilities](capabilities.md) and [scenery](../guides/scenery.md).

@@ -24,7 +24,9 @@ Select **Create a mod**, choose **Hello MT2**, and enter `yourname.hello`. Selec
 
 ## Open the game
 
-Start through Steam. The **Hello MT2** window appears. Load a world to see its name. F10 opens **Mods**.
+Start through Steam. The **Hello MT2** window appears. Load a world to see its name. Open **Mods** on the game's desktop, or press F10.
+
+![The native Mods app, with the selected mod and reload controls](public/media/mods-menu.png)
 
 ![The first Lua mod visible in the actual game](public/media/first-mod.png)
 
@@ -40,7 +42,7 @@ Save the file. Keep the rest of the generated script.
 
 ## Reload and see the change
 
-In **Mods**, choose **Reload** beside your mod. The new greeting appears without restarting the game.
+In **Mods**, select your mod and choose **Reload Lua**. Close Mods with Escape or F10 to see the new greeting without restarting the game.
 
 ![A changed greeting after reloading in the same running game](public/media/edited-mod.png)
 

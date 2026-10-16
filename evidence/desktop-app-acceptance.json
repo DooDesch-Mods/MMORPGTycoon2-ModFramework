@@ -1,0 +1,55 @@
+{
+  "status": "passed",
+  "published": false,
+  "framework_version": "0.1.2-local",
+  "lua_api": "1.0.0",
+  "native_abi": 1,
+  "game_executable_sha256": "bbab2dc68babcc644d0a1679548bf1e334b6c52aea669c3f61f6cb9d45c1aaf6",
+  "runtime_sha256": "9caf504a80b4299a19cc1438745fa64749a1354a690c32b25a1c3a38c9f3f9c4",
+  "base_commit": "fe0b43e2782297b6ecfbe985c5719f2b26fc3e76",
+  "desktop_overlay": {
+    "adapters/mt2/CMakeLists.txt": "885f79c11c6a3bedb4ce708b4d79165a39ee776bfbeecbf12487a681e0ef1eea",
+    "adapters/mt2/desktop_ui.cpp": "3e20bab9f0fe3e79fa220e9400651946b7a047560f42fe06ea7128fc641af26e",
+    "adapters/mt2/desktop_ui.h": "97b4664ceec636b3f3477d21b8354ec81b05126e9d2115b35b9cd376e5bc666b",
+    "adapters/mt2/runtime.cpp": "94af60d770851a664596671932835ac93b88e7d5c4cc63680d326322e88b9903",
+    "tools/build_desktop_assets.py": "91184aa137a5ce812d615245e029ddf7a8255dff7bca9dd88d976a775b170344",
+    "adapters/mt2/ui/entry.win": "87ecb9c5241ad769c72f6e8836e646356ba4c439b5d1e2864196665dcce4af42",
+    "adapters/mt2/ui/mods.png": "f2310e6acf9f53da50275c6845e838fc4f6f52fac50c9fdcb2c3580ecd423f0d",
+    "adapters/mt2/ui/mods.win": "71f227def6cb14e479aafb0e5ca5fef52e7b5be90d79a3b1780bff502e05ac3a",
+    "adapters/mt2/ui/mt2fw_desktop_mods.mat": "310ecb8736330c8fc8169c624e0c7cb9ec7bb82ec45018568537903134beae50",
+    "adapters/mt2/ui/resources.rc.in": "e2f3fc5e91c98284e2985294a611955778235934dab59f8d41bd941e2f1ede14",
+    "adapters/mt2/ui/mt2fw_ui_base.mat": "7f541d28c198165f24936c7fbea624d63943382f17d2eac172ebe84434345833",
+    "adapters/mt2/ui/mt2fw_ui_details.mat": "688ae74cee6edaa339a3588030bf8ef7cd405c44e61fe7ffecc679a7158cdbf9",
+    "adapters/mt2/ui/mt2fw_ui_library.mat": "d72fb152e345d23ef25f2240a10d70639ffa3a6bc9429f4c8c15712d57f9a2d1",
+    "adapters/mt2/ui/mt2fw_ui_rule.mat": "1a81c735882c2325e0df3d6675c519836d461dbda4fc0f841cb8bd2492ab8f87",
+    "adapters/mt2/ui/mt2fw_ui_selected.mat": "59070ded3717e6c360a3f360666419dbe50c106216fc0f341c4846fcb74d04ef"
+  },
+  "checks": {
+    "native_desktop_icon_and_mode_owned_window": true,
+    "empty_and_two_lua_mod_profiles": true,
+    "selection_disable_enable_language_settings_tools": true,
+    "f10_and_escape": true,
+    "changed_lua_greeting_visible_without_restart": true,
+    "syntax_error_retains_previous_instance_and_other_mod": true,
+    "reload_error_in_native_window_with_file_and_line": true,
+    "world_title_world_title_ownership": true,
+    "actual_window_captures": true,
+    "web_offline_browser_checks": 30,
+    "isolated_source_build_and_core_tests": true,
+    "runtime_inventory_and_module_hashes": true,
+    "content_expansion_absent_from_isolated_build": true,
+    "test_process_exit": "exited:0"
+  },
+  "controls_candidate": "fd605372942d91bc76f76424312e143eb77e365edb174e78e9c6cdc5f0a26ee9",
+  "controls_reuse": "Final candidate changes material drawing layers only; control and runtime code are unchanged.",
+  "limits": [
+    "Game callbacks and SDL test events were used; no physical mouse or keyboard takeover.",
+    "No new multiplayer coexistence or extended-content acceptance is claimed.",
+    "The existing initial test-world save-metadata warning remains separately recorded."
+  ],
+  "package": {
+    "bytes": 1084764,
+    "sha256": "b5653ebdfd3672842cea39f5305b3dadf6eff90dd44945c7ace0a700c389effe",
+    "kind": "runtime"
+  }
+}

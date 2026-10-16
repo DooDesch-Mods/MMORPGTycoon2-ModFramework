@@ -10,7 +10,7 @@ Run Lua mods, native plugins and custom scenery in the supported Windows Steam v
 2. Manage MMORPG Tycoon 2 and select the Steam installation.
 3. Import this runtime ZIP, enable it and deploy with the game closed.
 4. Install your mods through Vortex, enable them and deploy.
-5. Start through Steam. F10 opens **Mods**.
+5. Start through Steam. Open **Mods** on the game's desktop, or press F10.
 
 Keep one enabled framework version. Vortex provides separate profiles and checks the supported game build, file ownership and mod packages. Use Vortex to update, disable or remove its managed runtime. Existing saves and multiplayer test profiles are not imported automatically.
 

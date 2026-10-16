@@ -1,0 +1,10 @@
+#include <windows.h>
+201 RCDATA "@CMAKE_CURRENT_SOURCE_DIR@/ui/mods.png"
+202 RCDATA "@CMAKE_CURRENT_SOURCE_DIR@/ui/entry.win"
+203 RCDATA "@CMAKE_CURRENT_SOURCE_DIR@/ui/mods.win"
+204 RCDATA "@CMAKE_CURRENT_SOURCE_DIR@/ui/mt2fw_desktop_mods.mat"
+205 RCDATA "@CMAKE_CURRENT_SOURCE_DIR@/ui/mt2fw_ui_base.mat"
+206 RCDATA "@CMAKE_CURRENT_SOURCE_DIR@/ui/mt2fw_ui_library.mat"
+207 RCDATA "@CMAKE_CURRENT_SOURCE_DIR@/ui/mt2fw_ui_details.mat"
+208 RCDATA "@CMAKE_CURRENT_SOURCE_DIR@/ui/mt2fw_ui_rule.mat"
+209 RCDATA "@CMAKE_CURRENT_SOURCE_DIR@/ui/mt2fw_ui_selected.mat"

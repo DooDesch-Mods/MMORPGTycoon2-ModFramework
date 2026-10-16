@@ -1,5 +1,6 @@
 #include "bootstrap.h"
 #include "adapter.h"
+#include "desktop_ui.h"
 #include "crypto.h"
 #include <MinHook.h>
 #include <SDL3/SDL.h>
@@ -46,6 +47,7 @@ DWORD engine_thread=0;
 std::string process_started;
 uint64_t frames=0;
 std::string pending_capture,last_request,last_error,log_filter;
+std::string details_mod;
 char filter[128]{};
 char console_input[2048]="{\"mod\":\"example.hello\",\"operation\":\"world.status\",\"arguments\":{}}";
 std::deque<Json> console_requests;
@@ -60,6 +62,7 @@ using MoveFile=BOOL(WINAPI*)(LPCWSTR,LPCWSTR,DWORD);
 MoveFile original_move=nullptr;
 using TitleCommand=void(*)(void*,const void*);
 TitleCommand original_title_command=nullptr;
+TitleCommand original_ingame_command=nullptr;
 using SaveCommand=void(*)(void*,const void*,bool);
 SaveCommand original_save_command=nullptr;
 OpenFile original_open_read=nullptr,original_open_write=nullptr;
@@ -105,6 +108,7 @@ void* open_read(const char* name) {
     return original_open_read(name);
 }
 void title_command(void* title,const void* command) {
+    {std::lock_guard lock(gate);if(runtime&&mt2::desktop::command(title,command))return;}
     try {
         struct NativeString{const char* data;size_t size;};auto& text=*static_cast<const NativeString*>(command);
         if(text.data&&text.size<=4096){std::string value(text.data,text.size);
@@ -118,6 +122,10 @@ void title_command(void* title,const void* command) {
         }
     }catch(const std::exception& error){std::lock_guard lock(gate);report(std::string("Save load blocked: ")+error.what());menu_state(true);return;}
     original_title_command(title,command);
+}
+void ingame_command(void* mode,const void* command) {
+    {std::lock_guard lock(gate);if(runtime&&mt2::desktop::command(mode,command))return;}
+    original_ingame_command(mode,command);
 }
 void save_command(void* mode,const void* filename,bool asynchronous) {
     try{std::lock_guard lock(gate);mt2::refresh_saved_bindings();}
@@ -181,7 +189,8 @@ void drain_saves() {
     }
 }
 Json status() {
-    auto value=runtime->status();value["pid"]=GetCurrentProcessId();value["frames"]=frames;value["running"]=running;value["ui_ready"]=ui_ready;value["menu_open"]=show_menu;
+    auto value=runtime->status();value["pid"]=GetCurrentProcessId();value["frames"]=frames;value["running"]=running;value["ui_ready"]=ui_ready;value["menu_open"]=show_menu||mt2::desktop::visible();
+    value["desktop_app"]=mt2::desktop::status();
     value["error"]=last_error;value["process_start_time"]=process_started;value["confirmed_saves"]=confirmed_saves;value["last_save"]=last_save;
     value["menu_input_active"]=menu_input_active;
     if(window){value["relative_mouse"]=SDL_GetWindowRelativeMouseMode(window);value["text_input_active"]=SDL_TextInputActive(window);value["cursor_visible"]=SDL_CursorVisible();}
@@ -208,7 +217,8 @@ Json ui_request(const std::string& op,const Json& args) {
         auto display=ImGui::GetIO().DisplaySize;int columns=(std::max)(1,int((display.x-40)/400));
         ImGui::SetNextWindowPos(ImVec2(24+float(index%columns)*400,64+float(index/columns)*210),ImGuiCond_FirstUseEver);
         ImGui::SetNextWindowSize(ImVec2(376,180),ImGuiCond_FirstUseEver);
-        return ImGui::Begin((title+"###"+id+":"+title).c_str());
+        auto flags=(show_menu||mt2::desktop::visible())?ImGuiWindowFlags_NoInputs:ImGuiWindowFlags_None;
+        return ImGui::Begin((title+"###"+id+":"+title).c_str(),nullptr,flags);
     }
     if(op=="ui.end"){ImGui::End();return true;}
     ImGui::PushID(id.c_str());Json result;
@@ -223,13 +233,15 @@ void render_menu() {
     if(!show_menu)return;
     ImGui::SetNextWindowSize(ImVec2(850,590),ImGuiCond_FirstUseEver);
     bool opened=show_menu;
-    if(ImGui::Begin("MT2 Mod Framework - Mods",&opened)) {
+    std::string title=details_mod.empty()?"MT2 Mod Framework - Developer tools":"Mod settings - "+details_mod;
+    if(ImGui::Begin(title.c_str(),&opened)) {
         ImGui::TextUnformatted(tr("Mods und Einstellungen","Mods and settings"));ImGui::SameLine();
         if(ImGui::Button(german?"English":"Deutsch"))german=!german;
         ImGui::SameLine();ImGui::Checkbox(tr("Entwicklerfenster","Developer tools"),&developer);
         ImGui::Separator();
         if(!last_error.empty()){ImGui::TextWrapped("%s",last_error.c_str());if(ImGui::SmallButton(tr("Meldung schließen","Dismiss message")))last_error.clear();ImGui::Separator();}
         for(auto& p:runtime->plugins()) {
+            if(!details_mod.empty()&&p->manifest.id!=details_mod)continue;
             ImGui::PushID(p->manifest.id.c_str());
             bool active=runtime->enabled(p->manifest.id);
             if(ImGui::Checkbox(p->manifest.name.c_str(),&active))runtime->set_enabled(p->manifest.id,active);
@@ -298,7 +310,9 @@ void diagnostics() {
         if(op=="status")result=status();
         else if(op=="benchmark_reset"){timings.clear();original_timings.clear();total_timings.clear();result={{"reset",true},{"mode",benchmark_mode}};}
         else if(op=="reload"){runtime->request_reload(args.at("id"));result={{"accepted",true}};}
-        else if(op=="menu"){menu_state(args.value("visible",true));developer=args.value("developer",true);result={{"visible",show_menu}};}
+        else if(op=="menu"){details_mod.clear();menu_state(args.value("visible",true));developer=args.value("developer",true);result={{"visible",show_menu}};}
+        else if(op=="desktop_status")result=mt2::desktop::status();
+        else if(op=="desktop_activate")result=mt2::desktop::activate(args);
         else if(op=="capture"){if(!pending_capture.empty())throw std::runtime_error("Screenshot already pending");pending_capture=id;result={{"accepted",true},{"id",id}};}
         else if(op=="key") {
             auto code=args.at("scancode").get<int>();if(code<=0||code>=SDL_SCANCODE_COUNT)throw std::runtime_error("Invalid diagnostic scancode");
@@ -330,7 +344,10 @@ void update(void* game,float dt) {
     try {
         if(!engine_thread)engine_thread=GetCurrentThreadId();
         if(engine_thread!=GetCurrentThreadId())throw std::runtime_error("Game update changed thread identity");
-        if(benchmark_mode=="baseline")mt2::measurement_frame();else {mt2::frame(*runtime,dt);drain_saves();runtime->end_frame();}++frames;
+        if(benchmark_mode=="baseline")mt2::measurement_frame();else {
+            mt2::frame(*runtime,dt);drain_saves();runtime->end_frame();mt2::desktop::end_frame();
+            try{mt2::desktop::frame(german);}catch(const std::exception& error){report(std::string("Mods desktop failed: ")+error.what());}
+        }++frames;
         auto commands=std::move(console_requests);console_requests.clear();
         for(auto& command:commands){try{
             auto id=command.at("mod").get<std::string>();auto found=std::find_if(runtime->plugins().begin(),runtime->plugins().end(),[&](auto& p){return p->active&&p->manifest.id==id;});
@@ -360,10 +377,12 @@ bool swap(SDL_Window* target) {
             }
             WindowFramebuffer framebuffer;
             ImGui_ImplOpenGL3_NewFrame();ImGui_ImplSDL3_NewFrame();ImGui::NewFrame();
-            ImGui::SetNextWindowPos(ImVec2(16,16),ImGuiCond_Once);ImGui::SetNextWindowBgAlpha(0.88f);
-            ImGui::Begin("##mt2fw-entry",nullptr,ImGuiWindowFlags_NoDecoration|ImGuiWindowFlags_AlwaysAutoResize|ImGuiWindowFlags_NoSavedSettings);
-            if(ImGui::Button("Mods (F10)"))menu_state(!show_menu);ImGui::End();
-            render_menu();runtime->rendering=true;runtime->emit("render");runtime->rendering=false;ImGui::Render();ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());capture();
+            // Keep render callbacks running while management owns the visible UI and input.
+            bool management=show_menu||mt2::desktop::visible();
+            if(management)ImGui::PushStyleVar(ImGuiStyleVar_Alpha,0.f);
+            runtime->rendering=true;runtime->emit("render");runtime->rendering=false;
+            if(management)ImGui::PopStyleVar();
+            render_menu();ImGui::Render();ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());capture();
         }
     }catch(const std::exception& error){if(runtime)runtime->rendering=false;report(std::string("Framework render failed: ")+error.what());}
     auxiliary_ms+=std::chrono::duration<double,std::milli>(std::chrono::steady_clock::now()-begin).count();return original_swap(target);
@@ -374,11 +393,13 @@ bool poll(SDL_Event* event) {
         if(!event)return true;
         std::lock_guard lock(gate);
         if(!runtime||!running)return true;
-        if(event->type==SDL_EVENT_KEY_DOWN&&event->key.scancode==SDL_SCANCODE_F10&&!event->key.repeat){menu_state(!show_menu);continue;}
+        if(event->type==SDL_EVENT_KEY_DOWN&&event->key.scancode==SDL_SCANCODE_F10&&!event->key.repeat){
+            if(show_menu)menu_state(false);else mt2::desktop::request_toggle();continue;
+        }
         if(event->type==SDL_EVENT_KEY_UP&&event->key.scancode==SDL_SCANCODE_F10)continue;
-        bool overlay_visible=show_menu||!runtime->plugins().empty()||!pending_capture.empty();
+        bool overlay_visible=show_menu||(!mt2::desktop::visible()&&!runtime->plugins().empty())||!pending_capture.empty();
         if(ui_ready&&overlay_visible)ImGui_ImplSDL3_ProcessEvent(event);
-        if(event->type==SDL_EVENT_KEY_DOWN&&!event->key.repeat&&!show_menu) {
+        if(event->type==SDL_EVENT_KEY_DOWN&&!event->key.repeat&&!show_menu&&!mt2::desktop::visible()) {
             std::vector<Json> owned;
             for(auto& p:runtime->plugins())if(p->active)for(auto& [name,scancode]:p->hotkeys)if(scancode==event->key.scancode) {
                 owned.push_back({{"name",name},{"owner",p->manifest.id},{"scancode",scancode}});
@@ -408,6 +429,7 @@ extern "C" __declspec(dllexport) bool MT2FW_InitInstalled(const MT2FW_Bootstrap*
         FILETIME created{},exited{},kernel{},user{};if(!GetProcessTimes(GetCurrentProcess(),&created,&exited,&kernel,&user))throw std::runtime_error("Process creation time unavailable");
         process_started=std::to_string((uint64_t(created.dwHighDateTime)<<32)|created.dwLowDateTime);
         runtime=std::make_unique<Runtime>(root,[](const std::string& op,const Json& args){if(op.starts_with("ui."))return ui_request(op,args);return mt2::request(op,args);});
+        mt2::desktop::configure(*runtime,root,[](const std::string& id,bool tools){details_mod=id;developer=tools;menu_state(true);},[]{german=!german;});
         if(fs::exists(root/"benchmark.json"))benchmark_mode=read_json(root/"benchmark.json").at("mode");
         if(benchmark_mode!="reference"&&benchmark_mode!="empty"&&benchmark_mode!="baseline")throw std::runtime_error("Unknown measurement mode");
         if(benchmark_mode=="reference")runtime->load();auto result=MH_Initialize();if(result!=MH_OK)throw std::runtime_error(std::string("MinHook initialization failed: ")+MH_StatusToString(result));
@@ -415,10 +437,15 @@ extern "C" __declspec(dllexport) bool MT2FW_InitInstalled(const MT2FW_Bootstrap*
         hook(mt2::game_update(),reinterpret_cast<void*>(update),reinterpret_cast<void**>(&original_update));
         if(benchmark_mode=="baseline"){result=MH_EnableHook(MH_ALL_HOOKS);if(result!=MH_OK)throw std::runtime_error(MH_StatusToString(result));running=true;return true;}
         for(auto& item:mt2::observation_hooks())hook(item.target,item.replacement,item.original);
+        for(auto& item:mt2::desktop::hooks())hook(item.target,item.replacement,item.original);
         auto command=reinterpret_cast<unsigned char*>(GetModuleHandleW(nullptr))+0x4b9be0;
         constexpr unsigned char command_guard[]={0x41,0x57,0x41,0x56,0x41,0x55,0x41,0x54,0x55,0x57,0x56,0x53,0x48,0x81,0xec,0xd8,0x03,0,0};
         if(std::memcmp(command,command_guard,sizeof(command_guard)))throw std::runtime_error("Native title command prolog differs");
         hook(command,reinterpret_cast<void*>(title_command),reinterpret_cast<void**>(&original_title_command));
+        auto ingame=reinterpret_cast<unsigned char*>(GetModuleHandleW(nullptr))+0x4a2f90;
+        constexpr unsigned char ingame_guard[]={0x41,0x57,0x41,0x56,0x41,0x55,0x41,0x54,0x55,0x57,0x56,0x53};
+        if(std::memcmp(ingame,ingame_guard,sizeof(ingame_guard)))throw std::runtime_error("Native in-game command prolog differs");
+        hook(ingame,reinterpret_cast<void*>(ingame_command),reinterpret_cast<void**>(&original_ingame_command));
         auto save=reinterpret_cast<unsigned char*>(GetModuleHandleW(nullptr))+0x4a0490;
         constexpr unsigned char save_guard[]={0x55,0x57,0x56,0x53,0x48,0x83,0xec,0x28,0x48,0x89,0xce,0x48,0x89,0xd7};
         if(std::memcmp(save,save_guard,sizeof(save_guard)))throw std::runtime_error("Native save command prolog differs");

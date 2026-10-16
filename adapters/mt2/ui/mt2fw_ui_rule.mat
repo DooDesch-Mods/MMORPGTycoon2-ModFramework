@@ -1,0 +1,9 @@
+Material {
+    mode normal
+    color 0.150 0.330 0.420 1
+    layer -4
+    culling none
+    zread false
+    zwrite false
+    glow false
+}

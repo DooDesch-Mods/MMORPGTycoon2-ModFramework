@@ -4,8 +4,28 @@ import jsonschema
 ROOT=Path(__file__).resolve().parents[1]
 sys.path.insert(0,str(ROOT/'tools'))
 import generate_docs
+import build_docs
 from mt2fw import packages
 class DocumentationContractTests(unittest.TestCase):
+    def test_source_machine_links_resolve_in_repository(self):
+        import re
+        from urllib.parse import urlsplit
+        for name in ('agents/start.md','reference/manifests.md'):
+            page=ROOT/'docs'/name
+            for href in re.findall(r'\]\(([^)]+)\)',page.read_text(encoding='utf-8')):
+                url=urlsplit(href)
+                if url.scheme or url.netloc or not url.path:continue
+                with self.subTest(page=name,href=href):
+                    self.assertFalse(url.path.startswith('/'))
+                    self.assertTrue((page.parent/url.path).is_file())
+
+    def test_exported_machine_links_work_in_nested_and_versioned_markdown(self):
+        text='[API](../public/api/1.0.0/api.json) [Index](../public/llms.txt)'
+        self.assertEqual(build_docs.markdown_assets(text,Path('agents/start.md')),
+                         '[API](../api/1.0.0/api.json) [Index](../llms.txt)')
+        self.assertEqual(build_docs.markdown_assets(text,Path('versions/1.0.0/agents/start.md')),
+                         '[API](../../../api/1.0.0/api.json) [Index](../../../llms.txt)')
+
     def test_contract_requires_effects_and_known_capabilities(self):
         contract=generate_docs.read(ROOT/'api/contract.json')
         for field in ('returns','thread','lifecycle','side_effects','errors','example'):

@@ -1,0 +1,10 @@
+Material {
+    mode normal
+    color 1 1 1 1
+    culling none
+    zread false
+    zwrite false
+    glow false
+    texture "mt2fw_ui/mods.png" clampUV
+    shader "default_v.glsl" "icon_f.glsl"
+}

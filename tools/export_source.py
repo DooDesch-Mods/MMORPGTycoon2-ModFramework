@@ -17,7 +17,7 @@ def main():
             normalized=text.replace('\\\\','/').replace('\\','/').casefold()
             if any(value in normalized for value in private_roots):raise RuntimeError('Machine-specific path in source: '+name)
     output=ROOT/'dist/source';output.mkdir(parents=True,exist_ok=True)
-    archive=output/('MT2-ModFramework-0.1.2-source-'+datetime.now(timezone.utc).strftime('%Y%m%dT%H%M%SZ')+'.zip')
+    archive=output/('MT2-ModFramework-0.1.3-source-'+datetime.now(timezone.utc).strftime('%Y%m%dT%H%M%SZ')+'.zip')
     with zipfile.ZipFile(archive,'x',zipfile.ZIP_DEFLATED) as stream:
         for name in files:stream.write(ROOT/name,name)
     with zipfile.ZipFile(archive) as stream:

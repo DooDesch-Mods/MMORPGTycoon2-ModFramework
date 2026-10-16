@@ -1,5 +1,20 @@
 # Changelog
 
+## 0.1.3
+
+### Added
+
+- Open Mods from its new icon on the game desktop, or press F10. The native window puts installed mods, settings and Lua reload in one place.
+- See reload errors with their file and line directly in Mods. A failed replacement keeps the previous instance running.
+
+### Changed
+
+- A cleaner Mods window with a dark theme, clear selection and mod details. Mod windows stay out of the way while you manage your mods.
+
+### Fixed
+
+- Machine-contract and schema links now work when reading the documentation on GitHub, on the website and offline.
+
 ## 0.1.2
 
 ### Fixed

@@ -4,13 +4,13 @@ title: Build a mod with an agent
 
 # Build a mod with an agent
 
-Use the same public contract and complete examples as a human modder. The current Lua API is **1.0.0**; the framework is **0.1.2** and native C ABI is **1**. The [compatibility page](../compatibility.md) identifies the supported game build.
+Use the same public contract and complete examples as a human modder. The current Lua API is **1.0.0**; the framework is **0.1.3** and native C ABI is **1**. The [compatibility page](../compatibility.md) identifies the supported game build.
 
 ## Context to give your agent
 
-Read this page, the [quickstart](../quickstart.md), [API reference](../reference/index.md) and [machine contract](/api/1.0.0/api.json). A generated project includes `AGENTS.md`, `.mt2fw/mt2.lua` and `.mt2fw/api.json` for offline use. Source examples are under `examples/` in the SDK documentation bundle and repository.
+Read this page, the [quickstart](../quickstart.md), [API reference](../reference/index.md) and [machine contract](../public/api/1.0.0/api.json). A generated project includes `AGENTS.md`, `.mt2fw/mt2.lua` and `.mt2fw/api.json` for offline use. Source examples are under `examples/` in the SDK documentation bundle and repository.
 
-Use `.md` counterparts of the HTML pages for compact reading, or follow [llms.txt](/llms.txt). Discovery by an agent is not automatic; provide the entry file or link explicitly. Documentation exports include a versioned Markdown copy under `versions/1.0.0/`.
+Use `.md` counterparts of the HTML pages for compact reading, or follow [llms.txt](../public/llms.txt). Discovery by an agent is not automatic; provide the entry file or link explicitly. Documentation exports include a versioned Markdown copy under `versions/1.0.0/`.
 
 ## Author and validate
 

@@ -1,0 +1,30 @@
+mmoDesktopIcon {
+    id "mt2fw_mods_entry";
+    dims 100 82;
+    anchorType TopLeft;
+    clickable true;
+    label 100;
+    icon 101;
+    content {
+        mmoPane {
+            linkId 101;
+            id "mt2fw_mods_picture";
+            dims 48 48;
+            anchorType Top;
+            material "mt2fw_desktop_mods";
+            clickable true;
+        }
+        mmoTextEditPane {
+            linkId 100;
+            id "title";
+            dims 120 32;
+            anchorType Top;
+            anchorPos 0 50;
+            text "Mods";
+            textSize 14;
+            selectableUnfocused true;
+            clickable true;
+            justify topcenter;
+        }
+    }
+}

@@ -4,13 +4,15 @@ title: Compatibility and status
 
 # Compatibility and status
 
-This is a public development preview: framework **0.1.2**, Lua API **1.0.0**, native ABI **1**. It supports only Windows x64 with Steam and the exact verified MT2 executable:
+This is a public development preview: framework **0.1.3**, Lua API **1.0.0**, native ABI **1**. It supports only Windows x64 with Steam and the exact verified MT2 executable:
 
 ```text
 bbab2dc68babcc644d0a1679548bf1e334b6c52aea669c3f61f6cb9d45c1aaf6
 ```
 
 Unsupported game builds leave the adapter and mods disabled and report the cause. A signature match alone never establishes compatibility. The installer preserves unknown loaders and original game archives.
+
+The runtime does not resolve internal game functions through the executable's symbol table. The adapter uses addresses and byte checks for the verified build. Symbols have helped with reverse engineering, so removing them makes future adapter work harder. A changed executable, including one with only its symbol table removed, still needs compatibility checks and an adapter update before support is enabled.
 
 ## Accepted behavior
 

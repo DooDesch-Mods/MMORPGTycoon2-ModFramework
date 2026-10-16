@@ -1,0 +1,626 @@
+mmoWindow {
+    id "mt2fw_mods";
+    dims 880 560;
+    anchorType Window;
+    anchorPos 90 40;
+    hasTitlebar true;
+    title "Mods";
+    material "mt2fw_ui_base";
+    corners "BottomRight";
+    cornerSize 12;
+    hideOnEscape true;
+    transitionType rez;
+    rezSpeed normal;
+    content {
+        mmoPane
+        {
+            id "brand_icon";
+            anchorType TopLeft;
+            anchorPos 24 18;
+            dims 40 40;
+            material "mt2fw_desktop_mods";
+            color 1 1 1 1;
+            clickable false;
+            border false;
+        }
+        mmoTextPane
+        {
+            id "brand";
+            anchorType TopLeft;
+            anchorPos 80 14;
+            dims 600 34;
+            text "MT2 Mod Framework";
+            size 24;
+            textColor 0.89 0.95 0.98 1;
+            bold true;
+            justify topleft;
+            editable false;
+            clickable false;
+            border false;
+        }
+        mmoTextPane
+        {
+            id "summary";
+            anchorType TopLeft;
+            anchorPos 80 48;
+            dims 600 24;
+            text "Installed mods";
+            size 14;
+            textColor 0.63 0.79 0.86 1;
+            bold false;
+            justify topleft;
+            editable false;
+            clickable false;
+            border false;
+        }
+        mmoButtonPane
+        {
+            id "language";
+            anchorType TopLeft;
+            anchorPos 742 20;
+            dims 114 34;
+            text "";
+            textSize 14;
+            clickable true;
+            border true;
+            edges All;
+            corners "TopLeft BottomRight";
+            cornerSize 7;
+            command "MessageTo Mode MT2FWLanguage";
+        }
+        mmoTextPane
+        {
+            id "language_label";
+            anchorType TopLeft;
+            anchorPos 746 28;
+            dims 106 24;
+            text "Deutsch";
+            size 14;
+            textColor 0.89 0.95 0.98 1;
+            bold false;
+            justify topcenter;
+            editable false;
+            clickable false;
+            border false;
+        }
+        mmoPane
+        {
+            id "header_rule";
+            anchorType TopLeft;
+            anchorPos 24 82;
+            dims 832 1;
+            material "mt2fw_ui_rule";
+            color 0.150 0.330 0.420 1;
+            clickable false;
+            border false;
+        }
+        mmoPane
+        {
+            id "library_background";
+            anchorType TopLeft;
+            anchorPos 18 100;
+            dims 274 368;
+            material "mt2fw_ui_library";
+            color 0.025 0.070 0.100 1;
+            clickable false;
+            border false;
+        }
+        mmoPane
+        {
+            id "details_background";
+            anchorType TopLeft;
+            anchorPos 306 100;
+            dims 550 318;
+            material "mt2fw_ui_details";
+            color 0.035 0.095 0.130 1;
+            clickable false;
+            border false;
+        }
+        mmoTextPane
+        {
+            id "library_title";
+            anchorType TopLeft;
+            anchorPos 30 112;
+            dims 242 28;
+            text "Installed mods";
+            size 16;
+            textColor 0.89 0.95 0.98 1;
+            bold true;
+            justify topleft;
+            editable false;
+            clickable false;
+            border false;
+        }
+        mmoButtonPane
+        {
+            id "mod0";
+            anchorType TopLeft;
+            anchorPos 30 146;
+            dims 250 38;
+            text "";
+            textSize 14;
+            clickable true;
+            border true;
+            edges All;
+            corners "TopLeft BottomRight";
+            cornerSize 7;
+            command "MessageTo Mode MT2FWSelect0";
+        }
+        mmoTextPane
+        {
+            id "mod0_label";
+            anchorType TopLeft;
+            anchorPos 44 154;
+            dims 222 24;
+            text "";
+            size 16;
+            textColor 0.89 0.95 0.98 1;
+            bold false;
+            justify topleft;
+            editable false;
+            clickable false;
+            border false;
+        }
+        mmoButtonPane
+        {
+            id "mod1";
+            anchorType TopLeft;
+            anchorPos 30 192;
+            dims 250 38;
+            text "";
+            textSize 14;
+            clickable true;
+            border true;
+            edges All;
+            corners "TopLeft BottomRight";
+            cornerSize 7;
+            command "MessageTo Mode MT2FWSelect1";
+        }
+        mmoTextPane
+        {
+            id "mod1_label";
+            anchorType TopLeft;
+            anchorPos 44 200;
+            dims 222 24;
+            text "";
+            size 16;
+            textColor 0.89 0.95 0.98 1;
+            bold false;
+            justify topleft;
+            editable false;
+            clickable false;
+            border false;
+        }
+        mmoButtonPane
+        {
+            id "mod2";
+            anchorType TopLeft;
+            anchorPos 30 238;
+            dims 250 38;
+            text "";
+            textSize 14;
+            clickable true;
+            border true;
+            edges All;
+            corners "TopLeft BottomRight";
+            cornerSize 7;
+            command "MessageTo Mode MT2FWSelect2";
+        }
+        mmoTextPane
+        {
+            id "mod2_label";
+            anchorType TopLeft;
+            anchorPos 44 246;
+            dims 222 24;
+            text "";
+            size 16;
+            textColor 0.89 0.95 0.98 1;
+            bold false;
+            justify topleft;
+            editable false;
+            clickable false;
+            border false;
+        }
+        mmoButtonPane
+        {
+            id "mod3";
+            anchorType TopLeft;
+            anchorPos 30 284;
+            dims 250 38;
+            text "";
+            textSize 14;
+            clickable true;
+            border true;
+            edges All;
+            corners "TopLeft BottomRight";
+            cornerSize 7;
+            command "MessageTo Mode MT2FWSelect3";
+        }
+        mmoTextPane
+        {
+            id "mod3_label";
+            anchorType TopLeft;
+            anchorPos 44 292;
+            dims 222 24;
+            text "";
+            size 16;
+            textColor 0.89 0.95 0.98 1;
+            bold false;
+            justify topleft;
+            editable false;
+            clickable false;
+            border false;
+        }
+        mmoButtonPane
+        {
+            id "mod4";
+            anchorType TopLeft;
+            anchorPos 30 330;
+            dims 250 38;
+            text "";
+            textSize 14;
+            clickable true;
+            border true;
+            edges All;
+            corners "TopLeft BottomRight";
+            cornerSize 7;
+            command "MessageTo Mode MT2FWSelect4";
+        }
+        mmoTextPane
+        {
+            id "mod4_label";
+            anchorType TopLeft;
+            anchorPos 44 338;
+            dims 222 24;
+            text "";
+            size 16;
+            textColor 0.89 0.95 0.98 1;
+            bold false;
+            justify topleft;
+            editable false;
+            clickable false;
+            border false;
+        }
+        mmoButtonPane
+        {
+            id "mod5";
+            anchorType TopLeft;
+            anchorPos 30 376;
+            dims 250 38;
+            text "";
+            textSize 14;
+            clickable true;
+            border true;
+            edges All;
+            corners "TopLeft BottomRight";
+            cornerSize 7;
+            command "MessageTo Mode MT2FWSelect5";
+        }
+        mmoTextPane
+        {
+            id "mod5_label";
+            anchorType TopLeft;
+            anchorPos 44 384;
+            dims 222 24;
+            text "";
+            size 16;
+            textColor 0.89 0.95 0.98 1;
+            bold false;
+            justify topleft;
+            editable false;
+            clickable false;
+            border false;
+        }
+        mmoButtonPane
+        {
+            id "previous";
+            anchorType TopLeft;
+            anchorPos 30 426;
+            dims 82 34;
+            text "";
+            textSize 14;
+            clickable true;
+            border true;
+            edges All;
+            corners "TopLeft BottomRight";
+            cornerSize 7;
+            command "MessageTo Mode MT2FWPrevious";
+        }
+        mmoTextPane
+        {
+            id "previous_label";
+            anchorType TopLeft;
+            anchorPos 34 434;
+            dims 74 24;
+            text "Previous";
+            size 14;
+            textColor 0.89 0.95 0.98 1;
+            bold false;
+            justify topcenter;
+            editable false;
+            clickable false;
+            border false;
+        }
+        mmoTextPane
+        {
+            id "page";
+            anchorType TopLeft;
+            anchorPos 120 435;
+            dims 72 24;
+            text "1 / 1";
+            size 14;
+            textColor 0.89 0.95 0.98 1;
+            bold false;
+            justify topcenter;
+            editable false;
+            clickable false;
+            border false;
+        }
+        mmoButtonPane
+        {
+            id "next";
+            anchorType TopLeft;
+            anchorPos 198 426;
+            dims 82 34;
+            text "";
+            textSize 14;
+            clickable true;
+            border true;
+            edges All;
+            corners "TopLeft BottomRight";
+            cornerSize 7;
+            command "MessageTo Mode MT2FWNext";
+        }
+        mmoTextPane
+        {
+            id "next_label";
+            anchorType TopLeft;
+            anchorPos 202 434;
+            dims 74 24;
+            text "Next";
+            size 14;
+            textColor 0.89 0.95 0.98 1;
+            bold false;
+            justify topcenter;
+            editable false;
+            clickable false;
+            border false;
+        }
+        mmoTextPane
+        {
+            id "name";
+            anchorType TopLeft;
+            anchorPos 324 116;
+            dims 510 38;
+            text "No mods installed";
+            size 26;
+            textColor 0.89 0.95 0.98 1;
+            bold true;
+            justify topleft;
+            editable false;
+            clickable false;
+            border false;
+        }
+        mmoTextPane
+        {
+            id "identity";
+            anchorType TopLeft;
+            anchorPos 324 158;
+            dims 510 24;
+            text "";
+            size 13;
+            textColor 0.63 0.79 0.86 1;
+            bold false;
+            justify topleft;
+            editable false;
+            clickable false;
+            border false;
+        }
+        mmoTextPane
+        {
+            id "state";
+            anchorType TopLeft;
+            anchorPos 324 190;
+            dims 510 26;
+            text "";
+            size 16;
+            textColor 0.38 0.89 0.80 1;
+            bold false;
+            justify topleft;
+            editable false;
+            clickable false;
+            border false;
+        }
+        mmoTextPane
+        {
+            id "description";
+            anchorType TopLeft;
+            anchorPos 324 228;
+            dims 510 60;
+            text "Install a mod ZIP through Vortex or the MT2FW helper.";
+            size 16;
+            textColor 0.89 0.95 0.98 1;
+            bold false;
+            justify topleft;
+            editable false;
+            clickable false;
+            border false;
+        }
+        mmoTextPane
+        {
+            id "dependencies";
+            anchorType TopLeft;
+            anchorPos 324 302;
+            dims 510 48;
+            text "";
+            size 14;
+            textColor 0.63 0.79 0.86 1;
+            bold false;
+            justify topleft;
+            editable false;
+            clickable false;
+            border false;
+        }
+        mmoTextPane
+        {
+            id "error";
+            anchorType TopLeft;
+            anchorPos 324 358;
+            dims 510 52;
+            text "";
+            size 14;
+            textColor 1 0.79 0.42 1;
+            bold false;
+            justify topleft;
+            editable false;
+            clickable false;
+            border false;
+        }
+        mmoButtonPane
+        {
+            id "toggle";
+            anchorType TopLeft;
+            anchorPos 306 432;
+            dims 146 34;
+            text "";
+            textSize 14;
+            clickable true;
+            border true;
+            edges All;
+            corners "TopLeft BottomRight";
+            cornerSize 7;
+            command "MessageTo Mode MT2FWToggle";
+        }
+        mmoTextPane
+        {
+            id "toggle_label";
+            anchorType TopLeft;
+            anchorPos 310 440;
+            dims 138 24;
+            text "Enable";
+            size 14;
+            textColor 0.89 0.95 0.98 1;
+            bold false;
+            justify topcenter;
+            editable false;
+            clickable false;
+            border false;
+        }
+        mmoButtonPane
+        {
+            id "reload";
+            anchorType TopLeft;
+            anchorPos 464 432;
+            dims 180 34;
+            text "";
+            textSize 14;
+            clickable true;
+            border true;
+            edges All;
+            corners "TopLeft BottomRight";
+            cornerSize 7;
+            command "MessageTo Mode MT2FWReload";
+        }
+        mmoTextPane
+        {
+            id "reload_label";
+            anchorType TopLeft;
+            anchorPos 468 440;
+            dims 172 24;
+            text "Reload Lua";
+            size 14;
+            textColor 0.89 0.95 0.98 1;
+            bold false;
+            justify topcenter;
+            editable false;
+            clickable false;
+            border false;
+        }
+        mmoButtonPane
+        {
+            id "settings";
+            anchorType TopLeft;
+            anchorPos 656 432;
+            dims 200 34;
+            text "";
+            textSize 14;
+            clickable true;
+            border true;
+            edges All;
+            corners "TopLeft BottomRight";
+            cornerSize 7;
+            command "MessageTo Mode MT2FWSettings";
+        }
+        mmoTextPane
+        {
+            id "settings_label";
+            anchorType TopLeft;
+            anchorPos 660 440;
+            dims 192 24;
+            text "Settings";
+            size 14;
+            textColor 0.89 0.95 0.98 1;
+            bold false;
+            justify topcenter;
+            editable false;
+            clickable false;
+            border false;
+        }
+        mmoPane
+        {
+            id "footer_rule";
+            anchorType TopLeft;
+            anchorPos 24 486;
+            dims 832 1;
+            material "mt2fw_ui_rule";
+            color 0.150 0.330 0.420 1;
+            clickable false;
+            border false;
+        }
+        mmoTextPane
+        {
+            id "notice";
+            anchorType TopLeft;
+            anchorPos 24 506;
+            dims 596 42;
+            text "Lua changes can be reloaded. Native plugins and content need a restart.";
+            size 13;
+            textColor 0.63 0.79 0.86 1;
+            bold false;
+            justify topleft;
+            editable false;
+            clickable false;
+            border false;
+        }
+        mmoButtonPane
+        {
+            id "tools";
+            anchorType TopLeft;
+            anchorPos 650 504;
+            dims 206 34;
+            text "";
+            textSize 14;
+            clickable true;
+            border true;
+            edges All;
+            corners "TopLeft BottomRight";
+            cornerSize 7;
+            command "MessageTo Mode MT2FWTools";
+        }
+        mmoTextPane
+        {
+            id "tools_label";
+            anchorType TopLeft;
+            anchorPos 654 512;
+            dims 198 24;
+            text "Developer tools";
+            size 14;
+            textColor 0.89 0.95 0.98 1;
+            bold false;
+            justify topcenter;
+            editable false;
+            clickable false;
+            border false;
+        }
+    }
+}
