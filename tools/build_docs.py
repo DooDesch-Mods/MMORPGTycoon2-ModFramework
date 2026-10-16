@@ -63,6 +63,10 @@ def export_docs(pages,site,offline,markdown):
     # GitHub source links include public/; VitePress copies that directory's contents to the site root.
     for path in site.rglob('*.html'):
         text=path.read_text(encoding='utf-8').replace('href="./public/media/','href="/media/')
+        if path==site/'index.html':
+            for page in pages:
+                source=Path(page['href']).with_suffix('.md').as_posix()
+                text=text.replace('href="./'+source+'"','href="'+page['href']+'"')
         path.write_text(text,encoding='utf-8')
     shutil.copytree(site,offline,dirs_exist_ok=True)
     for path in source_pages():
