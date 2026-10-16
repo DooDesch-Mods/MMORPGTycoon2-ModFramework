@@ -10,7 +10,7 @@ The [MMORPG Tycoon 2 Vortex Extension](https://www.nexusmods.com/site/mods/2465)
 
 - Windows x64 and Vortex 2.8.2 or newer.
 - The [supported Steam game build](../compatibility.md).
-- The full framework ZIP from [Nexus](https://www.nexusmods.com/mmorpgtycoon2/mods/25) or [GitHub Releases](https://github.com/DooDesch-Mods/MMORPGTycoon2-ModFramework/releases/tag/v0.1.0).
+- The player runtime ZIP from [Nexus](https://www.nexusmods.com/mmorpgtycoon2/mods/25) or [GitHub Releases](https://github.com/DooDesch-Mods/MMORPGTycoon2-ModFramework/releases).
 - A staging folder on the same volume as the game.
 
 ## Install
@@ -18,7 +18,7 @@ The [MMORPG Tycoon 2 Vortex Extension](https://www.nexusmods.com/site/mods/2465)
 1. Close the game. Remove an existing manual framework installation with its original helper.
 2. Open **Extensions** in Vortex, drop in the extension ZIP and restart Vortex.
 3. Manage **MMORPG Tycoon 2** and select the Steam installation.
-4. Import the full framework ZIP as a mod, enable it and deploy.
+4. Import the player runtime ZIP as a mod, enable it and deploy. The developer SDK is a separate GitHub download and stays outside the game folder.
 5. Import and enable your mod ZIPs, deploy, then start the game through Steam. **F10** opens Mods.
 
 Vortex manages deployment and removal for this installation. Keep the game closed while switching profiles or changing deployment. Original game archives are not replaced. Unknown loaders or modified managed files produce a named conflict.

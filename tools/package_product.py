@@ -14,15 +14,19 @@ ROOT=Path(__file__).resolve().parents[1]
 sys.path.insert(0,str(ROOT/'tools'))
 from mt2fw import packages
 from mt2fw.install import sha
+from package_runtime import build as build_runtime
 
-destination=ROOT/'dist'/('MT2Framework-0.1.0-'+datetime.now(timezone.utc).strftime('%Y%m%dT%H%M%SZ'))
+version=packages.read_json(ROOT/'api/contract.json')['framework_version']
+runtime=build_runtime(ROOT,version)
+destination=ROOT/'dist'/('MT2Framework-SDK-'+version+'-'+datetime.now(timezone.utc).strftime('%Y%m%dT%H%M%SZ'))
 destination.mkdir(parents=True)
 
 def copy(source,target):
     if not source.is_file():raise RuntimeError('Required product input missing: '+str(source))
     target.parent.mkdir(parents=True,exist_ok=True);shutil.copy2(source,target)
 
-for name in ('WSOCK32.dll','MT2Framework.dll'):copy(ROOT/'build/bin/Release'/name,destination/name)
+for source in sorted(runtime.rglob('*')):
+    if source.is_file():copy(source,destination/'runtime'/source.relative_to(runtime))
 for name in ('mt2fw.exe','MT2FW-Helper.exe'):copy(ROOT/'dist/helper'/name,destination/'mt2fw'/name)
 offline=ROOT/'dist/docs/offline'
 if not (offline/'quickstart.html').is_file():raise RuntimeError('Build offline documentation first')
@@ -59,14 +63,14 @@ copy(ROOT/'licenses/Tcl-8.6.15-license.terms',notices/'Tcl-8.6.15-license.terms'
 copy(ROOT/'licenses/sources.json',notices/'sources.json')
 copy(base/'tcl/tk8.6/license.terms',notices/'Tk-license.terms')
 files={p.relative_to(destination).as_posix():sha(p) for p in sorted(destination.rglob('*')) if p.is_file()}
-packages.atomic_json(destination/'framework-package.json',{'version':'0.1.0','files':files,'channel':'development','acceptance':'See framework evidence; not a public release'})
-packages.atomic_json(ROOT/'artifacts/product-candidate.json',{'directory':str(destination),'files':len(files),'manifest_sha256':sha(destination/'framework-package.json')})
-archive=destination.parent/(destination.name+'.zip')
-with zipfile.ZipFile(archive,'x',zipfile.ZIP_DEFLATED) as stream:
+packages.atomic_json(destination/'developer-package.json',{'version':version,'kind':'sdk','files':files})
+archive=ROOT/'dist/sdk'/f'MT2Framework-SDK-{version}-windows-x64.zip'
+archive.parent.mkdir(parents=True,exist_ok=True)
+with zipfile.ZipFile(archive,'w',zipfile.ZIP_DEFLATED) as stream:
     for source in sorted(destination.rglob('*')):
         if source.is_file():stream.write(source,source.relative_to(destination).as_posix())
 with zipfile.ZipFile(archive) as stream:
     if stream.testzip():raise RuntimeError('Product ZIP CRC failed')
-delivery={'directory':str(destination),'archive':str(archive),'files':len(files),'sha256':sha(archive),'local_only':True}
-packages.atomic_json(ROOT/'artifacts/product-delivery.json',delivery)
+delivery={'directory':str(destination),'archive':str(archive),'files':len(files),'sha256':sha(archive),'bytes':archive.stat().st_size,'kind':'sdk','version':version}
+packages.atomic_json(ROOT/'artifacts/sdk-delivery.json',delivery)
 print(json.dumps(delivery,indent=2))

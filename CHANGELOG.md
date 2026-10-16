@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.1.1
+
+- Separate the player runtime from the developer SDK. Nexus distributes only the runtime; the complete SDK remains a separate GitHub download.
+- Replace the bundled Python CLI in the runtime with a small native package validator. Existing Vortex deployment keeps the same check command.
+- Keep the portable helper, full CLI, GLB importer, examples and offline documentation in the SDK. The helper installs its bundled runtime without deploying developer files.
+- Validate the runtime file inventory before packaging and before Nexus upload. Lua API 1.0.0 and native ABI 1 are unchanged.
+
+
 ## 0.1.0 development preview
 
 - Standalone core, loader and MT2 adapter source with vendored native dependencies.

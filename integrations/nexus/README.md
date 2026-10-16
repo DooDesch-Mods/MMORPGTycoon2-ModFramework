@@ -32,6 +32,8 @@ The workflow rejects variables that differ from the tracked destinations. Keys a
 
 Framework and Vortex versions come from their archives, not from the shared release tag. A release can contain either or both. Missing targets are skipped only when `all` is selected; an explicitly selected missing archive fails.
 
+Starting with 0.1.1, Nexus accepts only the allowlisted player runtime. The separate `MT2Framework-SDK` archive is a GitHub-only download. The release selector excludes SDK filenames, and preflight checks the runtime package kind, exact file inventory and all hashes before upload. The runtime includes the native mod checker needed by the existing Vortex extension; Python and authoring tools remain in the SDK.
+
 For a manual check, open **Actions > Publish Nexus files > Run workflow**, enter the existing release tag, select a target, and leave **publish** off. This validates artifacts and authenticated Nexus reads without an upload. Turn **publish** on to upload a newer version from that release.
 
 Runs for the same product are serialized. After a timeout or failed acknowledgement, inspect the retained plan and Nexus versions before retrying. A successful version read prevents the same version from being uploaded again; upload failures are not silently retried.

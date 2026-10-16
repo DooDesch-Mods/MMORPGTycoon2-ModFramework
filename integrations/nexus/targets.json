@@ -8,8 +8,8 @@
     "file_id": "8170305",
     "file_variable": "NEXUS_FRAMEWORK_FILE_ID",
     "mod_variable": "NEXUS_FRAMEWORK_MOD_ID",
-    "asset_pattern": "MT2Framework-*-windows-x64.zip",
-    "description": "The framework runtime, portable helper, CLI, SDK, templates and offline documentation. Extract outside the game directory and run mt2fw/MT2FW-Helper.exe, or import the full ZIP through the MMORPG Tycoon 2 Vortex Extension. Requires Windows x64 and a supported Steam game build."
+    "asset_pattern": "MT2Framework-[0-9]*-windows-x64.zip",
+    "description": "Player runtime for Lua mods, native plugins and custom scenery. Install this ZIP through the MMORPG Tycoon 2 Vortex Extension, or follow the included manual installation guide. Developer tools and the SDK are available separately on GitHub. Requires Windows x64 and a supported Steam game build."
   },
   "vortex": {
     "name": "MMORPG Tycoon 2 Vortex Extension",

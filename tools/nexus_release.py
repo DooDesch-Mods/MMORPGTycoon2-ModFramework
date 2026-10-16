@@ -13,6 +13,8 @@ import urllib.request
 import zipfile
 
 ROOT = Path(__file__).resolve().parents[1]
+sys.path.insert(0,str(ROOT/'tools'))
+from package_runtime import verify_runtime
 REPOSITORY = 'DooDesch-Mods/MMORPGTycoon2-ModFramework'
 API = 'https://api.nexusmods.com/v3'
 
@@ -54,6 +56,7 @@ def archive_version(path, product):
             for name, expected in metadata['files'].items():
                 if hashlib.sha256(archive.read(name)).hexdigest() != expected:
                     raise ValueError('Framework file checksum differs: ' + name)
+            verify_runtime(path)
         else:
             metadata = json.loads(archive.read('info.json'))
             if metadata['gameId'] != 4452 or metadata['id'] != 'game-mmorpgtycoon2':

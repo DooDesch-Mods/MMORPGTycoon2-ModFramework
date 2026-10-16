@@ -27,7 +27,7 @@ jobs:
       - run: python -m unittest discover -s tests -p "test_*.py"
       - run: python tools/generate_docs.py --check
       - run: python tools/check_contract.py
-      - run: node --test tests/vortex-routing.cjs
+      - run: node --test tests/vortex-routing.cjs tests/runtime-vortex.cjs
       - run: npm run docs:build
       - run: python tools/check_docs.py
       - run: npx playwright install chromium
@@ -35,7 +35,7 @@ jobs:
       - name: Build portable helper and CLI
         if: github.event_name != 'pull_request'
         run: python tools/build_helper.py --bootstrap
-      - name: Package framework
+      - name: Package player runtime and developer SDK
         if: github.event_name != 'pull_request'
         run: build/helper-env/Scripts/python.exe tools/package_product.py
       - name: Export source
@@ -53,6 +53,7 @@ jobs:
           name: MT2-ModFramework-windows-x64-${{ github.sha }}
           path: |
             dist/nexus/*.zip
+            dist/sdk/*.zip
             dist/vortex/*.zip
             dist/source/*.zip
             dist/docs/offline/**

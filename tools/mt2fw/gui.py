@@ -188,6 +188,7 @@ class Helper:
     def install_framework(self):
         import sys
         bundled=Path(sys.executable).parent.parent if getattr(sys,'frozen',False) else packages.FRAMEWORK/'dist'
+        if (bundled/'runtime/framework-package.json').is_file():bundled=bundled/'runtime'
         package = str(bundled) if (bundled/'framework-package.json').is_file() else filedialog.askdirectory(parent=self.root, title='Framework package')
         if package:
             game, profile = self.paths()

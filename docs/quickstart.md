@@ -6,11 +6,11 @@ title: Create your first mod
 
 Put a greeting in the game. Change it. Reload it.
 
-Use the portable helper and **Hello MT2**. You need the supported Windows Steam game and a text editor. Lua needs no compiler. Download the [framework package](https://github.com/DooDesch-Mods/MMORPGTycoon2-ModFramework/releases/tag/v0.1.0), or follow the [contributor build guide](contributing/build.md) to build it.
+Use the portable helper and **Hello MT2**. You need the supported Windows Steam game and a text editor. Lua needs no compiler. Download the [developer SDK](https://github.com/DooDesch-Mods/MMORPGTycoon2-ModFramework/releases), or follow the [contributor build guide](contributing/build.md) to build it.
 
 ## Install into your profile
 
-Open `mt2fw/MT2FW-Helper.exe` in the extracted package. Select your Steam game and a mod profile, then choose **Install framework**. Keep the helper package outside the game directory so it remains available for removal. Unknown existing loaders are preserved and reported.
+Download **MT2Framework-SDK** and extract it outside the game folder. Open `mt2fw/MT2FW-Helper.exe` in the SDK. The SDK includes the player runtime under `runtime/`. Select your Steam game and a mod profile, then choose **Install framework**. Keep the helper package outside the game directory so it remains available for removal. Unknown existing loaders are preserved and reported.
 
 ![The portable helper with installation and profile controls](public/media/helper-install.png)
 

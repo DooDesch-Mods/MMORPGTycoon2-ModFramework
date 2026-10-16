@@ -8,6 +8,8 @@ Start with the [build guide](docs/contributing/build.md). Source lives in `src/c
 
 [Nexus release automation](integrations/nexus/README.md) documents the two upload destinations, existing-version checks and manual validation runs. Published documentation is deployed by the separate **Publish documentation** workflow.
 
+The package build produces two downloads: `MT2Framework-<version>-windows-x64.zip` for players and `MT2Framework-SDK-<version>-windows-x64.zip` for modders. Only the runtime goes to Nexus. The SDK stays on GitHub and includes its matching runtime under `runtime/`. Runtime files are allowlisted and verified again before Nexus upload; Python, authoring tools and offline documentation cannot enter the player package. Vortex uses the native runtime validator at the existing `mt2fw/mt2fw.exe check` command. The full SDK CLI and helper retain their shared Python validation.
+
 ## API and example changes
 
 1. Update the public contract and the corresponding implementation or complete example.

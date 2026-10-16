@@ -80,7 +80,7 @@ onContentUpdated(() => {
         <nav aria-label="Main navigation">
           <a v-for="link in primaryLinks" :key="link.href" :href="withBase(link.href)" :aria-current="primaryState(link)">{{ link.text }}</a>
         </nav>
-        <span class="site-version">v0.1.0</span>
+        <span class="site-version">v0.1.1</span>
       </div>
     </div>
   </header>
@@ -119,7 +119,7 @@ onContentUpdated(() => {
         </nav>
       </div>
       <div class="sidebar-note">
-        <strong>Framework 0.1.0</strong>
+        <strong>Framework 0.1.1</strong>
         <p>Lua API 1.0.0 - native ABI 1</p>
         <a :href="withBase('/contributing/build.html')">Build from source <span aria-hidden="true">↗</span></a>
       </div>

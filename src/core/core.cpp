@@ -385,6 +385,6 @@ std::vector<std::string> Runtime::multiplayer_conflicts(const Json& peer) const 
 }
 Json Runtime::status() const {
     Json mods=Json::array();for(auto& p:plugins_)mods.push_back({{"id",p->manifest.id},{"name",p->manifest.name},{"version",p->manifest.version},{"type",p->manifest.type},{"active",p->active},{"error",p->error},{"calls",p->calls},{"last_ms",p->last_ms},{"total_ms",p->total_ms},{"settings",p->config},{"schema",p->config_schema}});
-    return {{"version","0.1.0"},{"api_version","1.0.0"},{"epoch",epoch},{"world",world_},{"mods",mods},{"multiplayer_bridge",false}};
+    return {{"version",MT2FW_VERSION},{"api_version","1.0.0"},{"epoch",epoch},{"world",world_},{"mods",mods},{"multiplayer_bridge",false}};
 }
 }
