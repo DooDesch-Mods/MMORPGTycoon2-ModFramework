@@ -19,7 +19,7 @@ Build mods for **MMORPG Tycoon 2**. Start with Lua and a text editor, extend wit
 | Manage framework packages with Vortex | [Vortex support and installation](integrations/vortex/README.md) |
 | Contribute to the framework | [Build and checks](docs/contributing/build.md) |
 
-This is a **development preview** for Windows x64 and the verified Steam game build. Multiplayer compatibility is not established. See [compatibility and acceptance](docs/compatibility.md). [GitHub Actions](https://github.com/DooDesch-Mods/MMORPGTycoon2-ModFramework/actions/workflows/checks.yml) builds the portable package and offline documentation. Download the artifact from a successful run while signed in to GitHub.
+This is a **development preview** for Windows x64 and the verified Steam game build. Multiplayer compatibility is not established. See [compatibility and acceptance](docs/compatibility.md). Download the portable framework and separate Vortex extension from [GitHub Releases](https://github.com/DooDesch-Mods/MMORPGTycoon2-ModFramework/releases/tag/v0.1.0). [GitHub Actions](https://github.com/DooDesch-Mods/MMORPGTycoon2-ModFramework/actions/workflows/checks.yml) builds and verifies the packages and offline documentation.
 
 The portable helper installs the framework, creates projects and installs mod ZIPs. Lua needs no compiler or Python on an end user's machine. F10 opens **Mods** in the game.
 
