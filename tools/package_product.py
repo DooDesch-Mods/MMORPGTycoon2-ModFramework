@@ -40,6 +40,7 @@ readme.write_text(text,encoding='utf-8')
 copy(ROOT/'evidence/runtime-acceptance.json',destination/'mt2fw/evidence/runtime-acceptance.json')
 copy(ROOT/'evidence/repository-acceptance.json',destination/'mt2fw/evidence/repository-acceptance.json')
 copy(ROOT/'evidence/vortex-acceptance.json',destination/'mt2fw/evidence/vortex-acceptance.json')
+copy(ROOT/'evidence/vortex-scenery-acceptance.json',destination/'mt2fw/evidence/vortex-scenery-acceptance.json')
 notices=destination/'mt2fw/licenses'
 for folder,name in [('imgui','LICENSE.txt'),('minhook','LICENSE.txt'),('nlohmann','LICENSE.MIT'),('SDL3','LICENSE.txt')]:
     copy(ROOT/'third_party/vendor'/folder/name,notices/(folder+'-'+name))

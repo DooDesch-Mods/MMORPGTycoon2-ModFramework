@@ -2,7 +2,7 @@
   "id": "game-mmorpgtycoon2",
   "name": "MMORPG Tycoon 2",
   "author": "DooDesch",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Steam discovery and profile-isolated MT2 Framework packages. Preserves game archives and user saves.",
   "type": "game",
   "gameId": 4452,

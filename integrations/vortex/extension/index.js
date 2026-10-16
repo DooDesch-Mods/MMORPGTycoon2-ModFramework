@@ -8,8 +8,9 @@ const {promisify} = require('node:util');
 const {util,selectors,actions} = require('vortex-api');
 const routing = require('./routing');
 const deployment = require('./guarded-deployment');
+const {steamAccount} = require('./steam-account');
 const run = promisify(execFile);
-const {GAME_ID,FRAMEWORK_TYPE} = routing;
+const {GAME_ID,FRAMEWORK_TYPE,SCENERY_TYPE} = routing;
 const error = message => { throw new Error('MT2 Framework: ' + message); };
 function profileId(api) {
   const state = api.getState();
@@ -20,14 +21,28 @@ function profileId(api) {
 }
 function modPath(api,game) {
   const profile = routing.profilePath(game,profileId(api));
-  let cursor = profile;
+  return prepareDirectory(path.join(profile,'mods'));
+}
+function prepareDirectory(directory) {
+  let cursor = directory;
   while (true) {
     try { if (syncFS.lstatSync(cursor).isSymbolicLink()) error('Framework profile path contains a symbolic link'); }
     catch(cause) { if (cause.code !== 'ENOENT') throw cause; }
     const parent = path.dirname(cursor); if (parent === cursor) break; cursor = parent;
   }
   // Vortex checks deployment availability before it emits will-deploy.
-  const result = path.join(profile,'mods');syncFS.mkdirSync(result,{recursive:true});return result;
+  syncFS.mkdirSync(directory,{recursive:true});return directory;
+}
+function classicPath(api) {
+  const profile=routing.profilePath(gamePath(api),profileId(api));
+  const account=steamAccount();
+  if (account.status==='available') return prepareDirectory(routing.sceneryPath(profile,account.id));
+  const data=path.join(profile,'game-data');
+  const existing=(syncFS.existsSync(data)?syncFS.readdirSync(data,{withFileTypes:true}):[]).filter(row=>row.isDirectory()&&routing.validSteamAccount(row.name));
+  if (existing.length===1) return prepareDirectory(routing.sceneryPath(profile,existing[0].name));
+  const enabled=Object.entries(api.getState().persistent.mods[GAME_ID] || {}).some(([id,mod])=>mod.type===SCENERY_TYPE&&api.getState().persistent.profiles[profileId(api)].modState[id]?.enabled);
+  if (enabled) error('Start Steam and sign in before deploying classic scenery: '+account.cause);
+  return undefined;
 }
 function gamePath(api) {
   const result = api.getState().settings.gameMode.discovered[GAME_ID]?.path;
@@ -63,7 +78,13 @@ async function willDeploy(api, id) {
       if (routing.hash(await routing.readFile(directory,name)) !== expected) error('Staged framework checksum differs: ' + name);
     }
     const seen = new Set();
+    const scenery=[];
     for (const [,mod] of content) {
+      if (mod.type===SCENERY_TYPE) {
+        classicPath(api);
+        scenery.push(await routing.checkScenery(path.join(staging,mod.installationPath),mod.attributes?.mt2fwClassicId));
+        continue;
+      }
       const modId = mod.attributes?.mt2fwModId;
       if (!modId) error('Reinstall this mod with the MT2 Framework installer');
       if (seen.has(modId)) error('Two enabled packages use mod ID ' + modId); seen.add(modId);
@@ -71,6 +92,7 @@ async function willDeploy(api, id) {
       try { await run(path.join(directory,'mt2fw','mt2fw.exe'),['check',folder],{windowsHide:true,encoding:'utf8'}); }
       catch (cause) { error('Mod '+modId+' failed the shared CLI validation: '+(cause.stderr || cause.message)); }
     }
+    routing.checkSceneryConflicts(scenery);
     // Vortex tracks this generated file. Update the staging copy before it deploys the selected profile.
     await fs.writeFile(path.join(directory,'mt2fw.json'),JSON.stringify({profile:target,enabled:true},null,2));
   } else {
@@ -106,6 +128,8 @@ function main(context) {
   });
   context.registerModType(FRAMEWORK_TYPE,25,id=>id===GAME_ID,()=>api.getState().settings.gameMode.discovered[GAME_ID]?.path,
     instructions=>Promise.resolve(instructions.some(row=>row.type==='generatefile' && row.destination===routing.OWNER)),{name:'MT2 Framework runtime'});
+  context.registerModType(SCENERY_TYPE,24,id=>id===GAME_ID,()=>classicPath(api),
+    instructions=>Promise.resolve(instructions.some(row=>row.type==='generatefile'&&path.basename(row.destination)===routing.SCENERY_RECORD)),{name:'MT2 classic scenery'});
   context.registerInstaller('mt2fw-packages',25,(_files,id)=>Promise.resolve({supported:id===GAME_ID,requiredFiles:[]}),
     (files,extraction)=>routing.installArchive(files,extraction,routing.profilePath(gamePath(api),profileId(api))));
   return true;

@@ -6,6 +6,7 @@ const path = require('node:path');
 const os = require('node:os');
 const r = require('../integrations/vortex/extension/routing');
 const {createGuardedDeployment} = require('../integrations/vortex/extension/guarded-deployment');
+const {steamAccount} = require('../integrations/vortex/extension/steam-account');
 test('awaited guards stop deployment and purge before file operations',async()=>{
   const calls=[];
   const base={isSupported:()=>undefined,prepare(){calls.push('prepare');},externalChanges(){calls.push('externalChanges');},prePurge(){calls.push('prePurge');},purge(){calls.push('purge');},deactivate(){calls.push('deactivate');},finalize(){assert.equal(this,base);calls.push('finalize');}};
@@ -73,4 +74,66 @@ test('retained manual profile configuration is backed up before transition',asyn
 test('exact executable identity is required',async()=>{
   const game=await fixture();await write(game,'MT2.exe','fixture');
   await r.assertGame(game,r.hash('fixture'));await assert.rejects(r.assertGame(game),/Unsupported/);
+});
+test('classic model packs retain bytes and a stable identity across updates',async()=>{
+  const root=await fixture(),name='More sceneries - lite mode/scenery/festival/bird.vmb';
+  await write(root,name,Buffer.from('\0\x07ModelV2first-model'));
+  const first=await r.installArchive([name],root,'profile');
+  const id=first.instructions.find(row=>row.key==='mt2fwClassicId').value;
+  assert.equal(first.instructions.at(-1).value,r.SCENERY_TYPE);
+  assert.equal(first.instructions[0].destination,path.join(id,'scenery/festival/bird.vmb'));
+  const record=JSON.parse(first.instructions.find(row=>row.type==='generatefile').data);
+  assert.equal(record.files['scenery/festival/bird.vmb'],r.hash(await fs.readFile(path.join(root,name))));
+  await write(root,name,Buffer.from('\0\x07ModelV2updated-model'));
+  const second=await r.installArchive([name],root,'profile');
+  assert.equal(second.instructions.find(row=>row.key==='mt2fwClassicId').value,id);
+});
+test('classic scenery rejects foreign payload, ambiguous roots and invalid models',async()=>{
+  const root=await fixture(),one='Pack/scenery/prop/bird.vmb',two='Other/scenery/table/bird.vmb';
+  await write(root,one,Buffer.from('\0\x07ModelV1fixture'));await write(root,two,Buffer.from('\0\x07ModelV2fixture'));
+  await assert.rejects(r.installArchive([one,'Pack/buttons/build.xml'],root,'p'),/Unexpected file/);
+  await assert.rejects(r.installArchive([one,two],root,'p'),/multiple classic/);
+  await assert.rejects(r.installArchive(['scenery/prop/bird.vmb'],root,'p'),/named top-level/);
+  await write(root,one,'not a model');await assert.rejects(r.installArchive([one],root,'p'),/VMB header/);
+});
+test('classic staging checks detect tampering and virtual-resource conflicts',async()=>{
+  const root=await fixture(),id='classic.pack.12345678',name='scenery/prop/bird.vmb',bytes=Buffer.from('\0\x07ModelV2fixture');
+  const record={format:1,id,name:'Pack',files:{[name]:r.hash(bytes)}};
+  await write(root,id+'/'+r.SCENERY_RECORD,record);await write(root,id+'/'+name,bytes);
+  assert.deepEqual(await r.checkScenery(root,id),record);
+  r.checkSceneryConflicts([record,{...record,id:'classic.other.87654321',name:'Other',files:{'scenery/prop/other.vmb':r.hash(bytes)}}]);
+  assert.throws(()=>r.checkSceneryConflicts([record,{...record,id:'classic.other.87654321',name:'Other'}]),/resource conflict.*Pack and Other/);
+  assert.throws(()=>r.checkSceneryConflicts([record,record]),/Two enabled packages/);
+  await write(root,id+'/'+name,'changed');await assert.rejects(r.checkScenery(root,id),/checksum differs/);
+  await write(root,id+'/'+name,bytes);await write(root,id+'/buttons/override.win','extra');
+  await assert.rejects(r.checkScenery(root,id),/Unexpected staged scenery file/);
+});
+test('classic paths follow the profile and exact Steam account',()=>{
+  const profile=path.resolve('profile');
+  assert.equal(r.sceneryPath(profile,'76561198000000001'),path.join(profile,'game-data','76561198000000001','mod'));
+  assert.notEqual(r.sceneryPath(profile,'76561198000000001'),r.sceneryPath(profile,'76561198000000002'));
+  assert.throws(()=>r.sceneryPath(profile,'../escape'));
+  assert.ok(r.validSteamAccount('76561202255233023'));
+  assert.equal(r.validSteamAccount('76561202255233024'),false);
+});
+test('Steam account lookup distinguishes signed-in, missing and failed results',()=>{
+  assert.deepEqual(steamAccount(()=>({status:0,stdout:'ActiveUser REG_DWORD 0x1'})),{status:'available',id:'76561197960265729'});
+  assert.equal(steamAccount(()=>({status:0,stdout:'ActiveUser REG_DWORD 0x0'})).status,'unavailable');
+  assert.equal(steamAccount(()=>({status:1,stderr:'not found'})).status,'unavailable');
+  assert.equal(steamAccount(()=>({error:new Error('query failed')})).cause,'query failed');
+  assert.equal(steamAccount(()=>({status:0,stdout:'unexpected'})).status,'error');
+});
+test('Vortex detects the scenery type from file instructions before activation',async()=>{
+  const Module=require('node:module'),original=Module._load,types=[];
+  let entry;
+  try {
+    Module._load=function(name,...args){if(name==='vortex-api')return {util:{},selectors:{},actions:{}};return original.call(this,name,...args);};
+    entry=require('../integrations/vortex/extension/index');
+  }finally{Module._load=original;}
+  entry.default({api:{},registerDeploymentMethod(){},registerActionCheck(){},registerGame(){},registerInstaller(){},registerModType(...args){types.push(args);}});
+  const root=await fixture(),name='Pack/scenery/prop/bird.vmb';await write(root,name,Buffer.from('\0\x07ModelV2fixture'));
+  const result=await r.installArchive([name],root,'p');
+  const files=result.instructions.filter(row=>['copy','generatefile'].includes(row.type));
+  assert.equal(await types.find(row=>row[0]===r.SCENERY_TYPE)[4](files),true);
+  assert.equal(await types.find(row=>row[0]===r.FRAMEWORK_TYPE)[4](files),false);
 });

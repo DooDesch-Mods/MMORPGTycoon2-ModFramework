@@ -5,6 +5,8 @@ const fs = require('node:fs/promises');
 const crypto = require('node:crypto');
 const GAME_ID = 'mmorpgtycoon2';
 const FRAMEWORK_TYPE = 'mt2fw-runtime';
+const SCENERY_TYPE = 'mt2fw-classic-scenery';
+const SCENERY_RECORD = '.mt2fw-scenery.json';
 const OWNER = '.mt2fw-vortex-owner.json';
 const EXE_SHA256 = 'bbab2dc68babcc644d0a1679548bf1e334b6c52aea669c3f61f6cb9d45c1aaf6';
 const hash = data => crypto.createHash('sha256').update(data).digest('hex');
@@ -45,6 +47,74 @@ function profilePath(gamePath, profileId) {
 }
 async function assertGame(gamePath, expected = EXE_SHA256) {
   if (hash(await fs.readFile(path.join(gamePath, 'MT2.exe'))) !== expected) fail('Unsupported Steam game build. Framework files were not deployed.');
+}
+function sceneryPath(profile,account) {
+  if (!validSteamAccount(account)) fail('Start Steam and sign in before deploying classic scenery');
+  return path.join(profile,'game-data',account,'mod');
+}
+function validSteamAccount(account) {
+  return /^\d{17}$/.test(account || '') && BigInt(account)>76561197960265728n && BigInt(account)<=76561202255233023n;
+}
+function sceneryName(name) {
+  relative(name);
+  if (!/^scenery\/(festival|prop|table)\/[^/]+\.vmb$/i.test(name)) fail('Unsupported classic scenery resource: '+name);
+}
+async function sceneryArchive(rows,extraction) {
+  const models=rows.filter(row=>/^(?:.+\/)?scenery\//i.test(row.name));
+  if (!models.length) fail('Expected framework mod.json or a classic scenery model pack. Mod Manager manifest.json and archive replacements are unsupported.');
+  const roots=new Set(models.map(row=>row.name.slice(0,row.name.toLowerCase().lastIndexOf('scenery/'))));
+  if (roots.size!==1) fail('Archive contains multiple classic scenery packs');
+  const prefix=[...roots][0];
+  if (!prefix) fail('Classic scenery needs a named top-level pack folder');
+  const label=prefix.slice(0,-1).split('/').at(-1);
+  const id='classic.'+(label.toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'').slice(0,48)||'scenery')+'.'+hash(label.toLowerCase()).slice(0,8);
+  const instructions=[],files={};
+  for (const row of rows) {
+    if (!models.includes(row)) {
+      if (/^(readme|license|changelog|credits)(\..*)?$/i.test(path.posix.basename(row.name))) continue;
+      fail('Unexpected file in classic scenery archive: '+row.name);
+    }
+    const name=row.name.slice(prefix.length);sceneryName(name);
+    const bytes=await readFile(extraction,row.name);
+    if (!['\0\x07ModelV1','\0\x07ModelV2'].some(header=>bytes.subarray(0,9).equals(Buffer.from(header)))) fail('Unsupported VMB header: '+row.name);
+    files[name]=hash(bytes);
+    instructions.push({type:'copy',source:row.source,destination:path.join(id,...name.split('/'))});
+  }
+  instructions.push({type:'generatefile',destination:path.join(id,SCENERY_RECORD),data:JSON.stringify({format:1,id,name:label,files},null,2)});
+  instructions.push({type:'attribute',key:'mt2fwClassicId',value:id},{type:'setmodtype',value:SCENERY_TYPE});
+  return {instructions};
+}
+async function checkScenery(staging,id) {
+  if (!/^classic\.[a-z0-9-]+\.[a-f0-9]{8}$/.test(id || '')) fail('Reinstall this classic scenery pack with Vortex');
+  const record=await readJSON(path.join(staging,id),SCENERY_RECORD);
+  if (record.format!==1 || record.id!==id || !record.files || !Object.keys(record.files).length) fail('Invalid classic scenery inventory: '+id);
+  const expected=new Set([...Object.keys(record.files),SCENERY_RECORD]);
+  async function inspect(folder,prefix='') {
+    for (const entry of await fs.readdir(folder,{withFileTypes:true})) {
+      const name=prefix+entry.name;
+      if (entry.isSymbolicLink()) fail('Symbolic link in staged scenery: '+name);
+      if (entry.isDirectory()) await inspect(path.join(folder,entry.name),name+'/');
+      else if (!entry.isFile() || !expected.has(name)) fail('Unexpected staged scenery file: '+name);
+    }
+  }
+  await inspect(path.join(staging,id));
+  for (const [name,expected] of Object.entries(record.files)) {
+    sceneryName(name);
+    if (hash(await readFile(path.join(staging,id),name))!==expected) fail('Staged scenery checksum differs: '+name);
+  }
+  return record;
+}
+function checkSceneryConflicts(records) {
+  const names=new Map(),ids=new Set();
+  for (const record of records) {
+    if (ids.has(record.id)) fail('Two enabled packages use classic scenery ID '+record.id);
+    ids.add(record.id);
+    for (const name of Object.keys(record.files)) {
+      const key=name.toLowerCase();
+      if (names.has(key)) fail('Classic scenery resource conflict: '+name+' in '+names.get(key)+' and '+record.name);
+      names.set(key,record.name);
+    }
+  }
 }
 async function prepareProfile(profile) {
   let cursor = path.resolve(profile);
@@ -108,7 +178,8 @@ async function installArchive(files, extraction, profile) {
     return {instructions};
   }
   const manifests = rows.filter(row => path.posix.basename(row.name) === 'mod.json');
-  if (manifests.length !== 1) fail('Expected one framework mod.json. Legacy manifest.json and archive-replacement mods use a different contract.');
+  if (!manifests.length) return sceneryArchive(rows,extraction);
+  if (manifests.length !== 1) fail('Expected one framework mod.json. Archive contains multiple mods.');
   const manifestFile = manifests[0]; const manifest = await readJSON(extraction,manifestFile.name);
   if (typeof manifest.id !== 'string' || !/^[a-z][a-z0-9]*(?:[._-][a-z0-9]+)*$/.test(manifest.id)) fail('Invalid mod ID');
   const root = path.posix.dirname(manifestFile.name); const prefix = root === '.' ? '' : root + '/';
@@ -124,4 +195,4 @@ async function installArchive(files, extraction, profile) {
   instructions.push({type:'attribute',key:'mt2fwModId',value:manifest.id});
   return {instructions};
 }
-module.exports = {GAME_ID,FRAMEWORK_TYPE,OWNER,EXE_SHA256,hash,relative,archiveFiles,readJSON,readFile,frameworkName,profilePath,assertGame,prepareProfile,verifyOwnership,installArchive};
+module.exports = {GAME_ID,FRAMEWORK_TYPE,SCENERY_TYPE,SCENERY_RECORD,OWNER,EXE_SHA256,hash,relative,archiveFiles,readJSON,readFile,frameworkName,profilePath,sceneryPath,validSteamAccount,assertGame,prepareProfile,verifyOwnership,installArchive,checkScenery,checkSceneryConflicts};

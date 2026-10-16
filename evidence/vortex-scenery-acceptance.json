@@ -1,0 +1,103 @@
+{
+  "product": "MMORPG Tycoon 2 Vortex Support",
+  "extension_version": "0.1.1",
+  "framework_version": "0.1.0",
+  "date": "2026-10-16",
+  "vortex_version": "2.8.2",
+  "fixture": {
+    "name": "More Sceneries - Lite Mode",
+    "version": "1.3",
+    "author": "Cow",
+    "source": "https://www.nexusmods.com/mmorpgtycoon2/mods/2",
+    "archive_sha256": "9432536d2ff7fb9764a24a1b61ce78a0042b08138cb6cb4044abfbcbf20d9539",
+    "model_files": 989,
+    "categories": {
+      "festival": 331,
+      "prop": 222,
+      "table": 436
+    },
+    "fixture_redistributed": false,
+    "original_model_bytes_modified": false
+  },
+  "source_sha256": {
+    "index.js": "4f797823720f7216c046a26941aa82fc7374e838e17ba6777ede278ee8609a96",
+    "routing.js": "da1cf47068b2b02f9f37c698802cadaec265bf0873a665e08826664c89deca3c",
+    "guarded-deployment.js": "db914893ddf002023dfc0c516836226dc59e481e49c36b908074c4808aa621c6",
+    "steam-account.js": "688399684b09f83e7751f2839865ad738b14524b7aef11dec41dc256b54d6576",
+    "info.json": "a676f69cebfb389c5dd66ea098ee2a80f8ac02c8a60ec1dacb6af1b709e9ccc0"
+  },
+  "node_tests": 16,
+  "checks": [
+    {
+      "case": "extra-staged-payload",
+      "blocked": true,
+      "noUnexpectedGameFile": true
+    },
+    {
+      "case": "profile-b",
+      "sceneryAbsent": true
+    },
+    {
+      "case": "fresh-type-detection",
+      "type": "mt2fw-classic-scenery",
+      "all989ModelsIdentical": true,
+      "noFrameworkFallbackFolder": true,
+      "automaticDeploymentEnabledDuringInstall": true
+    },
+    {
+      "case": "disable-b",
+      "all989ModelsRemoved": true
+    },
+    {
+      "case": "restore-a",
+      "modelFiles": 989,
+      "allBytesIdentical": true,
+      "confirmedByReadback": true
+    },
+    {
+      "case": "disable-a",
+      "all989ModelsRemoved": true,
+      "disabledPackages": 1
+    },
+    {
+      "case": "purge",
+      "originalExeUnchanged": true,
+      "bothProfilesPreserved": true
+    }
+  ],
+  "profile_data_files_preserved": 15,
+  "native_game": {
+    "game_exe_sha256": "bbab2dc68babcc644d0a1679548bf1e334b6c52aea669c3f61f6cb9d45c1aaf6",
+    "framework_modules": {
+      "WSOCK32.dll": "e570213aca62571ae8bea27257a08afb96132028200073ee313c1489851837f2",
+      "MT2Framework.dll": "49c04cc160c6f585fec54a83e7060480878f39106cfb9351abf505e4c19ae158"
+    },
+    "pack_mount_confirmed_by_engine_log": true,
+    "test_world_loaded": true,
+    "binary_model_probe": {
+      "source": "scenery/festival/1mechanical.vmb",
+      "sha256": "69b9cce0775df8670679a98319034be5f89e7bf0d0104f30dd06df7924c95c7b",
+      "unchanged_bytes_loaded_via_private_alias": true,
+      "native_acknowledged": true
+    },
+    "original_game_archive_sha256": {
+      "MMORPG.zip": "f3673cfc1ad819f89abd477177ad4c8f7f7db0eea54e2997de295646c7e92b0e",
+      "VS.zip": "421b915d463a6a4cb932dcce39a9743f6ac775dafc880542283c5a49cccfb9cd"
+    },
+    "exit": "exited:0",
+    "input_takeover": false
+  },
+  "limits": [
+    "Interactive scenery catalog selection, placement and save/reload of a placed classic object have not been exercised.",
+    "The native probe loaded one representative binary model; all 989 models were verified as identical during Vortex deployment, not individually rendered.",
+    "Classic packs use engine-native save references and do not gain framework content-dependency metadata. Keep the packs required by their worlds.",
+    "Only the documented named-folder, model-only scenery layout is supported. Mod Manager manifest.json merging and original archive replacements remain unsupported.",
+    "The framework runtime is unchanged from the separately accepted build. Human newcomer timing and multiplayer bridge acceptance remain pending."
+  ],
+  "test_notes": [
+    "Original-download installation and all model hashes were confirmed by readback after a queued deployment callback exceeded the test wait. The operation was not replayed.",
+    "Initial attribute-based type detection left Vortex marker-only directories in the framework mod folder. File-instruction-based type detection was then accepted with a fresh installation and no fallback directory.",
+    "A profile-transition test wait expired before the real transition completed. The completed result was read back before the remaining disable/purge operations.",
+    "A test-runner phase argument was omitted during restart. Vortex blocked the duplicate install; it was cancelled, the original state was restored and explicit phases were enforced. Failed receipts remain local."
+  ]
+}
