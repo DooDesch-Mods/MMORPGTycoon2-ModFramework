@@ -25,6 +25,10 @@ on:
         description: Existing Discord message ID to reconcile after an interrupted acknowledgement
         type: string
         required: false
+      update_announcement:
+        description: Update the identified existing Discord release post instead of sending
+        type: boolean
+        default: false
 permissions:
   contents: read
 jobs:
@@ -108,10 +112,12 @@ jobs:
           DISCORD_RELEASE_WEBHOOK: ${{ secrets.DISCORD_RELEASE_WEBHOOK }}
           ANNOUNCE: ${{ github.event_name == 'release' || inputs.announce }}
           DISCORD_MESSAGE_ID: ${{ inputs.discord_message_id }}
+          UPDATE_ANNOUNCEMENT: ${{ inputs.update_announcement }}
         run: |
           options=()
           if [[ "$ANNOUNCE" == true ]]; then options+=(--announce); fi
           if [[ -n "$DISCORD_MESSAGE_ID" ]]; then options+=(--message-id "$DISCORD_MESSAGE_ID"); fi
+          if [[ "$UPDATE_ANNOUNCEMENT" == true ]]; then options+=(--update-announcement); fi
           python tools/release_delivery.py --directory "artifacts/nexus/${{ matrix.product }}" "${options[@]}"
       - name: Retain release receipts
         if: always()

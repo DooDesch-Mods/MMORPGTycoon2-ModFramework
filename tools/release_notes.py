@@ -29,4 +29,31 @@ def bbcode(markdown):
     text = re.sub(r'\*\*(.+?)\*\*', r'[b]\1[/b]', text)
     text = re.sub(r'`([^`]+)`', r'\1', text)
     text = re.sub(r'^#{1,6}\s+(.+)$', r'[b]\1[/b]', text, flags=re.M)
-    return text.strip()
+    result, level, item = [], 0, None
+    def flush():
+        nonlocal item
+        if item is not None:
+            result.append('[*]' + item)
+            item = None
+    for line, source in zip(text.splitlines(), markdown.splitlines()):
+        if re.match(r'^#{1,6}\s+', source):
+            flush()
+            while level: result.append('[/list]'); level -= 1
+            result.append(line)
+            continue
+        bullet = re.match(r'^(\s*)[-*]\s+(.+)', line)
+        if bullet:
+            flush()
+            desired = 2 if len(bullet[1]) >= 2 else 1
+            while level > desired: result.append('[/list]'); level -= 1
+            while level < desired: result.append('[list]'); level += 1
+            item = bullet[2]
+        elif line.strip() and item is not None:
+            item += ' ' + line.strip()
+        else:
+            flush()
+            while level: result.append('[/list]'); level -= 1
+            result.append(line)
+    flush()
+    while level: result.append('[/list]'); level -= 1
+    return '\n'.join(result).strip()

@@ -64,15 +64,15 @@ def sync_changelog(plan, directory, request=request_json):
 
 def discord_payload(plan):
     target = targets()[plan['product']]
-    notes = plan['notes']
+    notes = re.sub(r'^#{1,6}\s+(.+)$', r'**\1**', plan['notes'], flags=re.M)
     if len(notes) > 1400:
         notes = notes[:1396].rsplit(' ', 1)[0] + '\n...'
     return {'allowed_mentions': {'parse': []}, 'embeds': [{
         'title': f"{target['name']} {plan['version']}", 'url': plan['release_url'],
         'description': notes, 'color': 8256434,
-        'image': {'url': f'https://raw.githubusercontent.com/{REPOSITORY}/main/assets/brand/readme-banner.png'},
-        'fields': [{'name': 'Get it', 'value': f"[Nexus]({plan['nexus_url']}) | [GitHub]({plan['release_url']})"}],
-        'footer': {'text': 'MMORPG Tycoon 2 | DooDesch Mods'}
+        'thumbnail': {'url': f'https://raw.githubusercontent.com/{REPOSITORY}/main/assets/brand/icon.png'},
+        'fields': [{'name': 'Get it', 'value': f"[Nexus]({plan['nexus_url']}) - [GitHub]({plan['release_url']})"}],
+        'footer': {'text': 'MMORPG Tycoon 2 - MMORPGTycoon2-ModFramework'}
     }]}
 
 
@@ -89,7 +89,7 @@ def canonical_embeds(embeds):
         row = {key: embed[key] for key in ('title', 'url', 'description', 'color') if key in embed}
         if 'fields' in embed:
             row['fields'] = [{**{key: field[key] for key in ('name', 'value')}, 'inline': field.get('inline', False)} for field in embed['fields']]
-        for key, value in (('image', 'url'), ('footer', 'text')):
+        for key, value in (('image', 'url'), ('thumbnail', 'url'), ('footer', 'text')):
             if key in embed:
                 row[key] = {value: embed[key][value]}
         result.append(row)
@@ -106,7 +106,7 @@ def remote_receipt(plan, filename, directory):
     return json.loads((receipt_dir / filename).read_text(encoding='utf-8'))
 
 
-def announce(plan, directory, request=request_json, message_id=None):
+def announce(plan, directory, request=request_json, message_id=None, update=False):
     secret = os.environ.get('DISCORD_RELEASE_WEBHOOK', '').strip()
     if not secret:
         raise ValueError('DISCORD_RELEASE_WEBHOOK is missing; release announcement was not sent')
@@ -125,9 +125,21 @@ def announce(plan, directory, request=request_json, message_id=None):
             print(f"Discord release destination: guild={destination.get('guild_id')}, channel={destination['channel_id']}")
             raise RuntimeError('Discord announcement has an unconfirmed send intent; inspect the channel before reconciling the receipt')
         message = request(webhook + '/messages/' + message_id, service='Discord')
-        if message['id'] != message_id or canonical_embeds(message['embeds']) != expected:
+        if message['id'] != message_id:
             raise ValueError('Previously acknowledged Discord message differs')
-        if previous.get('status') != 'confirmed':
+        if canonical_embeds(message['embeds']) != expected and update:
+            if len(message['embeds']) != 1 or any(message['embeds'][0].get(key) != expected[0][key] for key in ('title', 'url')):
+                raise ValueError('Discord message does not identify this exact product release; edit rejected')
+            (directory / 'discord-before.json').write_text(json.dumps(message, indent=2) + '\n', encoding='utf-8')
+            previous.update(status='updating', message_id=message_id)
+            path.write_text(json.dumps(previous, indent=2) + '\n', encoding='utf-8')
+            gh('release', 'upload', plan['tag'], str(path), '--clobber')
+            message = request(webhook + '/messages/' + message_id, 'PATCH', discord_payload(plan), service='Discord')
+            (directory / 'discord-message.json').write_text(json.dumps(message, indent=2) + '\n', encoding='utf-8')
+            message = request(webhook + '/messages/' + message_id, service='Discord')
+        if canonical_embeds(message['embeds']) != expected:
+            raise ValueError('Previously acknowledged Discord message differs')
+        if previous.get('status') != 'confirmed' or previous.get('embeds') != expected:
             previous.update(status='confirmed', message_id=message_id, channel_id=message['channel_id'], embeds=expected)
             path.write_text(json.dumps(previous, indent=2) + '\n', encoding='utf-8')
             gh('release', 'upload', plan['tag'], str(path), '--clobber')
@@ -159,7 +171,10 @@ def main():
     parser.add_argument('--directory', type=Path, required=True)
     parser.add_argument('--announce', action='store_true')
     parser.add_argument('--message-id', help='Read and reconcile this existing Discord message; never send a replacement')
+    parser.add_argument('--update-announcement', action='store_true', help='Update the identified existing release post and read it back')
     args = parser.parse_args()
+    if args.update_announcement and not (args.announce and args.message_id):
+        raise ValueError('Updating a Discord post requires --announce and its existing --message-id')
     plan = json.loads((args.directory / 'plan.json').read_text(encoding='utf-8'))
     if plan['status'] not in ('ready', 'already-present'):
         raise ValueError('Release has no deployable product')
@@ -167,7 +182,7 @@ def main():
     if args.announce:
         if args.message_id and not re.fullmatch(r'\d+', args.message_id):
             raise ValueError('Invalid Discord message ID')
-        announce(plan, args.directory, message_id=args.message_id)
+        announce(plan, args.directory, message_id=args.message_id, update=args.update_announcement)
 
 
 if __name__ == '__main__':

@@ -2,11 +2,14 @@
 
 ## 0.1.2
 
-- Fix an invisible Mods menu after pressing F10. MT2 can leave an offscreen framebuffer bound when presenting the window; framework UI now draws to the window and restores both previous framebuffer bindings afterward. Thanks to Escara for reporting the issue.
-- Apply the menu's mouse and text-input state on the first opening in an empty profile, and release it when the menu closes.
-- Start the in-game menu and portable helper in English. German remains available through the language button.
-- Verify visible output with a separate window capture. An internal framebuffer capture alone could show the menu even when the actual window did not.
-- Lua API 1.0.0, native ABI 1 and the Vortex extension remain unchanged.
+### Fixed
+
+- The Mods menu now appears when you press F10. Thanks to Escara for reporting the issue.
+- Opening Mods for the first time captures mouse and text input correctly. Closing it returns control to the game.
+
+### Changed
+
+- The menu and portable helper now start in English. German is still available through the language button.
 
 ## 0.1.1
 

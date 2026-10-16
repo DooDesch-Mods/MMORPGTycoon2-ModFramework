@@ -37,7 +37,7 @@ class ReleaseDeliveryTests(unittest.TestCase):
     def test_format_preserves_quotes_newlines_and_link_targets(self):
         text = '- **Fix** `menu` "first"\n- [Guide](https://example.org/help)'
         self.assertEqual(notes.plain(text), '- Fix menu "first"\n- Guide (https://example.org/help)')
-        self.assertEqual(notes.bbcode(text), '- [b]Fix[/b] menu "first"\n- [url=https://example.org/help]Guide[/url]')
+        self.assertEqual(notes.bbcode(text), '[list]\n[*][b]Fix[/b] menu "first"\n[*][url=https://example.org/help]Guide[/url]\n[/list]')
         destination = self.directory / 'outputs'
         with patch.dict(os.environ, {'GITHUB_OUTPUT': str(destination)}): nexus.outputs({'description': text})
         stored = destination.read_text()
@@ -75,6 +75,10 @@ class ReleaseDeliveryTests(unittest.TestCase):
         payload = delivery.discord_payload(self.plan)
         self.assertEqual(payload['allowed_mentions'], {'parse': []})
         self.assertIn('/mmorpgtycoon2/mods/25', payload['embeds'][0]['fields'][0]['value'])
+        self.assertIn('thumbnail', payload['embeds'][0])
+        self.assertNotIn('image', payload['embeds'][0])
+        self.plan['notes'] = '### Fixed\n\n- Fix menu.'
+        self.assertTrue(delivery.discord_payload(self.plan)['embeds'][0]['description'].startswith('**Fixed**'))
         self.plan['notes'] = 'x ' * 3000
         self.assertLessEqual(len(delivery.discord_payload(self.plan)['embeds'][0]['description']), 1400)
         for invalid in ('http://discord.com/api/webhooks/1/token', 'https://evil.example/api/webhooks/1/token'):
@@ -113,7 +117,7 @@ class ReleaseDeliveryTests(unittest.TestCase):
         returned = json.loads(json.dumps(expected))
         returned[0]['type'] = 'rich'
         returned[0]['fields'][0]['inline'] = False
-        returned[0]['image'].update(proxy_url='https://images-ext-1.discordapp.net/proxy/fixture', width=1280, height=720)
+        returned[0]['thumbnail'].update(proxy_url='https://images-ext-1.discordapp.net/proxy/fixture', width=128, height=128)
         self.assertEqual(delivery.canonical_embeds(expected), delivery.canonical_embeds(returned))
 
     def test_existing_message_reconciles_pending_intent_without_post(self):
@@ -133,6 +137,28 @@ class ReleaseDeliveryTests(unittest.TestCase):
                 delivery.announce(self.plan, self.directory, lambda *args, **kwargs: message)
         stored = json.loads((self.directory / 'release-delivery-framework-0.1.2.json').read_text())
         self.assertEqual((stored['status'], stored['message_id']), ('acknowledged', '123'))
+
+    def test_explicit_update_edits_existing_release_then_reads_back(self):
+        previous = {**{key: self.plan[key] for key in ('product', 'version', 'tag', 'sha256')}, 'status': 'pending'}
+        message = {'id': '123', 'channel_id': '456', 'embeds': delivery.discord_payload(self.plan)['embeds']}
+        message['embeds'][0]['description'] = 'Old release copy'
+        methods = []
+        def request(url, method='GET', body=None, **kwargs):
+            self.assertTrue(url.endswith('/messages/123'))
+            methods.append(method)
+            if method == 'PATCH': message['embeds'] = body['embeds']
+            return message
+        with patch.dict(os.environ, {'DISCORD_RELEASE_WEBHOOK': 'https://discord.com/api/webhooks/1/fixture'}), patch.object(delivery, 'remote_receipt', return_value=previous), patch.object(delivery, 'gh'):
+            delivery.announce(self.plan, self.directory, request, message_id='123', update=True)
+        self.assertEqual(methods, ['GET', 'PATCH', 'GET'])
+        self.assertEqual(previous['status'], 'confirmed')
+
+    def test_update_rejects_a_message_for_a_different_release(self):
+        previous = {**{key: self.plan[key] for key in ('product', 'version', 'tag', 'sha256')}, 'status': 'pending'}
+        message = {'id': '123', 'embeds': [{'title': 'Another product', 'url': self.plan['release_url']}]}
+        with patch.dict(os.environ, {'DISCORD_RELEASE_WEBHOOK': 'https://discord.com/api/webhooks/1/fixture'}), patch.object(delivery, 'remote_receipt', return_value=previous):
+            with self.assertRaisesRegex(ValueError, 'exact product release'):
+                delivery.announce(self.plan, self.directory, lambda url, **kwargs: message, message_id='123', update=True)
 
 
 if __name__ == '__main__': unittest.main()
