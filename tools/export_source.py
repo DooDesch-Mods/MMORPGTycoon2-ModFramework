@@ -22,7 +22,8 @@ def main():
         for name in files:stream.write(ROOT/name,name)
     with zipfile.ZipFile(archive) as stream:
         if stream.testzip():raise RuntimeError('Source ZIP CRC failed')
-    report={'archive':str(archive),'files':len(files),'sha256':hashlib.sha256(archive.read_bytes()).hexdigest(),'git_remote':False,'commits_created':False,'publication':False}
+    remotes=subprocess.run(['git','-C',str(ROOT),'remote'],capture_output=True,text=True,check=True).stdout.strip()
+    report={'archive':str(archive),'files':len(files),'sha256':hashlib.sha256(archive.read_bytes()).hexdigest(),'git_remote':bool(remotes),'commits_created_by_export':False,'publication_by_export':False}
     (ROOT/'artifacts').mkdir(exist_ok=True);(ROOT/'artifacts/source-export.json').write_text(json.dumps(report,indent=2)+'\n',encoding='utf-8')
     print(json.dumps(report,indent=2))
 if __name__=='__main__':

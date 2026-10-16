@@ -1,0 +1,15 @@
+{
+  "source": "Retained actual owned MT2 game capture",
+  "source_sha256": "a278170fb94c423a562729ad471ea2fd5850fdb6b4743186c403263843cb9dfc",
+  "crop": [
+    280,
+    170,
+    920,
+    530
+  ],
+  "sha256": "a80b1343a14555b67b01f87bc19c465c20602c89a042d2c06bf3efe216faedcc",
+  "rights": "Game artwork retains its respective rights; excluded from MIT. No text or synthetic UI added.",
+  "nexus_game_id": 4452,
+  "game_id_source": "https://staticdelivery.nexusmods.com/images/games/4_3/tile_4452.jpg",
+  "extension_spec": "https://github.com/Nexus-Mods/Vortex/wiki/How-to-package-a-game-extension"
+}

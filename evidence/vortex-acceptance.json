@@ -1,0 +1,105 @@
+{
+  "product": "MMORPG Tycoon 2 Vortex Support",
+  "version": "0.1.0",
+  "date": "2026-10-16",
+  "vortex_version": "2.8.2",
+  "steam_app_id": 486860,
+  "nexus_game_id": 4452,
+  "game_exe_sha256": "bbab2dc68babcc644d0a1679548bf1e334b6c52aea669c3f61f6cb9d45c1aaf6",
+  "source_sha256": {
+    "index.js": "593794b6237348065bd4af7ea24f2f72865b6b50cf34a2e2ade564fde01a7271",
+    "routing.js": "11164bceb1863e95047869b85ff49d56d7b7a170e6297fbe6106460bd570f02a",
+    "guarded-deployment.js": "db914893ddf002023dfc0c516836226dc59e481e49c36b908074c4808aa621c6",
+    "info.json": "9831f50f61b424a3ba4ce2e74d8f7d250668c8ddc20a2fae391e829d876ac1ed"
+  },
+  "scope": "Actual Vortex with isolated user data, owned executable copy and test profiles. The game was not launched; native game acceptance remains separately recorded.",
+  "checks": [
+    {
+      "case": "deploy-a",
+      "ack": "confirmed",
+      "verifiedFiles": 576,
+      "modPresent": true
+    },
+    {
+      "case": "profile-b",
+      "ack": "confirmed",
+      "isolated": true,
+      "disabledModAbsent": true
+    },
+    {
+      "case": "restore-a",
+      "ack": "confirmed",
+      "modPresent": true,
+      "dataPreserved": true
+    },
+    {
+      "case": "disable-mod",
+      "ack": "confirmed",
+      "filesRemoved": true
+    },
+    {
+      "case": "foreign-loader-purge",
+      "ack": "rejected",
+      "bytesPreserved": true,
+      "bothProfilesPreserved": true
+    },
+    {
+      "case": "foreign-loader-deployment",
+      "ack": "blocked",
+      "bytesPreserved": true,
+      "noRuntimeWrites": true,
+      "visibleCause": true,
+      "callback": "Vortex reports completion; failure confirmed by error dialog and file readback"
+    },
+    {
+      "case": "guarded-deployment",
+      "ack": "confirmed by complete inventory readback",
+      "fileHashes": 576
+    },
+    {
+      "case": "final-purge",
+      "ack": "confirmed",
+      "originalExeUnchanged": true,
+      "bothProfilesPreserved": true
+    },
+    {
+      "case": "manual-transition",
+      "ack": "confirmed",
+      "backupBytesIdentical": true,
+      "fileHashes": 576
+    },
+    {
+      "case": "purge-after-game-update",
+      "ack": "confirmed by file and idle-state readback",
+      "updatedExeUnchanged": true,
+      "bothProfilesPreserved": true,
+      "manualConfigurationBackupPreserved": true
+    },
+    {
+      "case": "foreign-loader-final-guard",
+      "ack": "blocked",
+      "bytesIdentical": true,
+      "noRuntimeWrites": true
+    }
+  ],
+  "routing_tests": 10,
+  "notes": [
+    "No existing MT2 extension was found in the official catalog or bundled game support on the research date. The separate MT2 Mod Manager uses a different manifest contract.",
+    "Vortex 2.8.2 notification events swallow handler rejection. Guards run in awaited deployment methods, including external-change detection before Vortex can apply its conflict choices.",
+    "Vortex can complete its deploy callback while presenting a deployment failure. Acceptance checks visible causes, file bytes and full inventories rather than callback success alone.",
+    "The original failing event-hook candidate and timeout/conflict-dialog receipts were retained locally. Completed effects were checked before any continuation.",
+    "A supported executable is required for deployment. Game management and removal remain available after an update.",
+    "The final transition slice changes the earlier strict purge handling to preserve a recoverable manual configuration; the unaffected install/profile slice is retained rather than repeated."
+  ],
+  "catalog_snapshot_git_blob": "8ed96f5988620c43d45c52b4c916c1f5f0087136",
+  "sources": [
+    "https://github.com/Nexus-Mods/Vortex-Backend/blob/main/out/extensions-manifest.json",
+    "https://github.com/Nexus-Mods/Vortex/wiki/How-to-package-a-game-extension",
+    "https://staticdelivery.nexusmods.com/images/games/4_3/tile_4452.jpg"
+  ],
+  "limits": [
+    "Human newcomer timing and multiplayer bridge acceptance remain pending.",
+    "No Nexus upload or automatic extension catalog listing has been performed.",
+    "No original user Vortex settings or real game installation were modified."
+  ]
+}

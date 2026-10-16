@@ -27,6 +27,7 @@ jobs:
       - run: python -m unittest discover -s tests -p "test_*.py"
       - run: python tools/generate_docs.py --check
       - run: python tools/check_contract.py
+      - run: node --test tests/vortex-routing.cjs
       - run: npm run docs:build
       - run: python tools/check_docs.py
       - run: npx playwright install chromium
@@ -40,13 +41,19 @@ jobs:
       - name: Export source
         if: github.event_name != 'pull_request'
         run: python tools/export_source.py
+      - name: Package Nexus and Vortex downloads
+        if: github.event_name != 'pull_request'
+        run: |
+          python tools/package_nexus.py
+          python tools/package_vortex.py
       - name: Retain build packages
         if: github.event_name != 'pull_request'
         uses: actions/upload-artifact@v4
         with:
           name: MT2-ModFramework-windows-x64-${{ github.sha }}
           path: |
-            dist/MT2Framework-*.zip
+            dist/nexus/*.zip
+            dist/vortex/*.zip
             dist/source/*.zip
             dist/docs/offline/**
           if-no-files-found: error

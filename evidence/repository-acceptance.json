@@ -52,5 +52,6 @@
   "publication": false,
   "hosting": false,
   "git_remote": false,
-  "commits_created": false
+  "commits_created": false,
+  "recorded_stage": "Historical local source preparation before GitHub publication. The repository is now public and hosted run 38942388211 passed; Vortex evidence is recorded separately."
 }

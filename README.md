@@ -16,6 +16,7 @@ Build mods for **MMORPG Tycoon 2**. Start with Lua and a text editor, extend wit
 | Create native C++ plugins | [Native SDK](docs/reference/native.md) and [example](examples/native) |
 | Import my own static scenery | [GLB guide](docs/guides/scenery.md) |
 | Add settings, shortcuts or world actions | [Recipes](docs/guides/config-storage.md) |
+| Manage framework packages with Vortex | [Vortex support and installation](integrations/vortex/README.md) |
 | Contribute to the framework | [Build and checks](docs/contributing/build.md) |
 
 This is a **development preview** for Windows x64 and the verified Steam game build. Multiplayer compatibility is not established. See [compatibility and acceptance](docs/compatibility.md). [GitHub Actions](https://github.com/DooDesch-Mods/MMORPGTycoon2-ModFramework/actions/workflows/checks.yml) builds the portable package and offline documentation. Download the artifact from a successful run while signed in to GitHub.

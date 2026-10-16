@@ -1,0 +1,169 @@
+{
+  "version": "0.1.0",
+  "composition_license": "MIT, Copyright 2026 DooDesch",
+  "game_artwork": "Game artwork belongs to its respective owners and is excluded from MIT.",
+  "private_reference_icon": "Not included or used in these compositions.",
+  "sources": [
+    {
+      "id": "helper-create",
+      "path": "public/media/helper-create.png",
+      "locale": "en",
+      "origin": "Owned helper HWND capture",
+      "framework_version": "0.1.0",
+      "rights": "Framework UI MIT; native operating system controls retain their respective rights.",
+      "case": "helper-create",
+      "alt": "English helper helper create",
+      "caption": "Real owned English helper capture.",
+      "sha256": "1ad2994a6a53826a9ffce8e20f20f49689ca4d51dece2ee51f4c3bcfe9e5e1d8",
+      "source": "docs/public/media/helper-create.png",
+      "kit_path": "assets/helper-create.png"
+    },
+    {
+      "id": "first-mod",
+      "path": "public/media/first-mod.png",
+      "locale": "en",
+      "framework_version": "0.1.0",
+      "source_sha256": "39fc2686dc3167cec23a04814047ebe96214982a5398e3241b77f583dea91c47",
+      "case": "Hello MT2 before editing",
+      "origin": "Retained receipt-bound real MT2 game capture",
+      "rights": "Original game artwork belongs to its respective owners; not licensed under framework MIT.",
+      "build_identity": {
+        "MT2.exe": "bbab2dc68babcc644d0a1679548bf1e334b6c52aea669c3f61f6cb9d45c1aaf6"
+      },
+      "alt": "first mod in the actual game",
+      "caption": "Cropped real framework 0.1.0 game acceptance capture; no UI content was added or changed.",
+      "sha256": "9dcf051d0a88dcf750f276b0130e3652a5d5fd6b55672c583abde61427298b52",
+      "crop": [
+        0,
+        0,
+        414,
+        205
+      ],
+      "source": "docs/public/media/first-mod.png",
+      "kit_path": "assets/first-mod.png"
+    },
+    {
+      "id": "edited-mod",
+      "path": "public/media/edited-mod.png",
+      "locale": "en",
+      "framework_version": "0.1.0",
+      "source_sha256": "aad94d7f606af348ba18e535a7c446ded26137be9b83d5711c8dd7ca1fdab87f",
+      "case": "Visible same-process Lua replacement",
+      "origin": "Retained receipt-bound real MT2 game capture",
+      "rights": "Original game artwork belongs to its respective owners; not licensed under framework MIT.",
+      "build_identity": {
+        "MT2.exe": "bbab2dc68babcc644d0a1679548bf1e334b6c52aea669c3f61f6cb9d45c1aaf6"
+      },
+      "alt": "edited mod in the actual game",
+      "caption": "Cropped real framework 0.1.0 game acceptance capture; no UI content was added or changed.",
+      "sha256": "645682d1ce367eb102fe6f196bdadb7cbd9fc183532413df493371341b4d3c34",
+      "crop": [
+        0,
+        0,
+        414,
+        205
+      ],
+      "source": "docs/public/media/edited-mod.png",
+      "kit_path": "assets/edited-mod.png"
+    },
+    {
+      "id": "mods-menu",
+      "path": "public/media/mods-menu.png",
+      "locale": "en",
+      "framework_version": "0.1.0",
+      "source_sha256": "d32aa62391a6ceca0d59bcf827c1871b8ce8e2996df045842bd1f70d8c28d744",
+      "case": "Independent Lua/native mods menu",
+      "origin": "Retained receipt-bound real MT2 game capture",
+      "rights": "Original game artwork belongs to its respective owners; not licensed under framework MIT.",
+      "build_identity": {
+        "MT2.exe": "bbab2dc68babcc644d0a1679548bf1e334b6c52aea669c3f61f6cb9d45c1aaf6"
+      },
+      "alt": "mods menu in the actual game",
+      "caption": "Retained original framework 0.1.0 game acceptance; current public API and pictured workflow unchanged.",
+      "sha256": "d32aa62391a6ceca0d59bcf827c1871b8ce8e2996df045842bd1f70d8c28d744",
+      "source": "docs/public/media/mods-menu.png",
+      "kit_path": "assets/mods-menu.png",
+      "locale_note": "Capture contains mixed English and German framework labels."
+    },
+    {
+      "id": "scenery",
+      "path": "public/media/scenery.png",
+      "locale": "en",
+      "framework_version": "0.1.0",
+      "source_sha256": "daa72beac1489ccf4f59085ca4341bec640390da5537b691cd606a56b76d0f6d",
+      "case": "Two authored static GLB packs",
+      "origin": "Retained receipt-bound real MT2 game capture",
+      "rights": "Original game artwork belongs to its respective owners; not licensed under framework MIT.",
+      "build_identity": {
+        "MT2.exe": "bbab2dc68babcc644d0a1679548bf1e334b6c52aea669c3f61f6cb9d45c1aaf6"
+      },
+      "alt": "scenery in the actual game",
+      "caption": "Retained original framework 0.1.0 game acceptance; current public API and pictured workflow unchanged.",
+      "sha256": "daa72beac1489ccf4f59085ca4341bec640390da5537b691cd606a56b76d0f6d",
+      "source": "docs/public/media/scenery.png",
+      "kit_path": "assets/scenery.png"
+    },
+    {
+      "id": "restored",
+      "path": "public/media/restored.png",
+      "locale": "en",
+      "framework_version": "0.1.0",
+      "source_sha256": "c7a7778d07549d7085461bad206a81b54acb4c61375e896a1de1129565872600",
+      "case": "Authored building after full process restart",
+      "origin": "Retained receipt-bound real MT2 game capture",
+      "rights": "Original game artwork belongs to its respective owners; not licensed under framework MIT.",
+      "build_identity": {
+        "MT2.exe": "bbab2dc68babcc644d0a1679548bf1e334b6c52aea669c3f61f6cb9d45c1aaf6"
+      },
+      "alt": "restored in the actual game",
+      "caption": "Retained original framework 0.1.0 game acceptance; current public API and pictured workflow unchanged.",
+      "sha256": "c7a7778d07549d7085461bad206a81b54acb4c61375e896a1de1129565872600",
+      "source": "docs/public/media/restored.png",
+      "kit_path": "assets/restored.png"
+    },
+    {
+      "source": "assets/brand/icon.svg",
+      "kit_path": "assets/icon.svg",
+      "rights": "Original framework icon, MIT, Copyright 2026 DooDesch",
+      "sha256": "4004451a8e4c492d1dd346dfe1600a16747a1a1a60e3e75a367941c01e9e45c5"
+    }
+  ],
+  "outputs": [
+    {
+      "path": "thumbnail.svg",
+      "source_images": [
+        "restored.png"
+      ],
+      "edits": "SVG framing, editorial labels, scaling and clipping only. Screenshot UI is unchanged."
+    },
+    {
+      "path": "gallery/01-create.svg",
+      "source_images": [
+        "helper-create.png"
+      ],
+      "edits": "SVG framing, editorial labels, scaling and clipping only. Screenshot UI is unchanged."
+    },
+    {
+      "path": "gallery/02-reload.svg",
+      "source_images": [
+        "first-mod.png",
+        "edited-mod.png"
+      ],
+      "edits": "SVG framing, editorial labels, scaling and clipping only. Screenshot UI is unchanged."
+    },
+    {
+      "path": "gallery/03-mods-menu.svg",
+      "source_images": [
+        "mods-menu.png"
+      ],
+      "edits": "SVG framing, editorial labels, scaling and clipping only. Screenshot UI is unchanged."
+    },
+    {
+      "path": "gallery/04-scenery.svg",
+      "source_images": [
+        "scenery.png"
+      ],
+      "edits": "SVG framing, editorial labels, scaling and clipping only. Screenshot UI is unchanged."
+    }
+  ]
+}
