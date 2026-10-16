@@ -1,0 +1,19 @@
+{
+  "name": "mt2-mod-framework-docs",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "docs:generate": "python tools/generate_docs.py",
+    "docs:dev": "vitepress dev docs",
+    "docs:site": "vitepress build docs",
+    "docs:build": "python tools/build_docs.py",
+    "docs:check": "python tools/generate_docs.py --check",
+    "docs:test": "node tests/docs-browser.mjs --site dist/docs/site --offline dist/docs/offline --report artifacts/docs-browser.json"
+  },
+  "devDependencies": {
+    "vitepress": "1.6.4",
+    "vue": "3.5.13",
+    "@playwright/test": "1.58.2"
+  }
+}

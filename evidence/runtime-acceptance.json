@@ -1,0 +1,99 @@
+{
+  "product": "MT2 Mod Framework",
+  "version": "0.1.0",
+  "channel": "local-development",
+  "supported_executable_sha256": "bbab2dc68babcc644d0a1679548bf1e334b6c52aea669c3f61f6cb9d45c1aaf6",
+  "automated_checks": {
+    "core_assertions": 45,
+    "package_tests": 6,
+    "glb_tests": 4,
+    "installer_tests": 5
+  },
+  "real_game_checks": [
+    "Independent Lua and C++ plugins share the central hooks and receive world events",
+    "Syntax and activation errors in a Lua replacement retain the previous instance",
+    "A failing bound input callback disables only its owner; a corrected reload recovers",
+    "Native place, move and remove operations have distinct confirmed acknowledgements",
+    "Native object operation observers emit events for the original game paths",
+    "Deleted objects and handles from previous world epochs are rejected",
+    "Two authored GLB packs render together with color and texture materials",
+    "A persisted scenery reference resolves the same saved building after full process restart",
+    "Missing required content blocks native Load before world transfer without modifying the save",
+    "Frozen helper and CLI create, check, pack, install and update packages in a fresh private game copy",
+    "Removal preserves all profile files and the original game executable",
+    "Unicode profile and world names support visible Lua reload and confirmed save association",
+    "Generated C++ CMake template builds, packs and executes alongside Lua in the final product",
+    "Unicode world save restores the exact persistent scenery position after full restart",
+    "Selected-object API reads the active native selection; native info window displays the authored scenery name"
+  ],
+  "performance": {
+    "fixture": "Same paused private world; identical diagnostic measurement probe",
+    "baseline_instrumented_p95_ms": 0.2082,
+    "empty_framework_p95_ms": 0.3478,
+    "empty_samples": 2048,
+    "reference_mods_p95_ms": 0.5662,
+    "empty_target_ms": 0.5,
+    "limit": "Not a vanilla benchmark. Retained candidate hashes are recorded with private measurement receipts. Render/input CPU and diagnostic status I/O are included.",
+    "baseline_modules": {
+      "MT2.exe": "bbab2dc68babcc644d0a1679548bf1e334b6c52aea669c3f61f6cb9d45c1aaf6",
+      "steam_api64.dll": "e082bf5c9f881c822b1540a76b74f9d15e18019a73ebd206a559595badcb7f65",
+      "WSOCK32.dll": "e1b59bcc5d236ee3237ea3365e52fb314e635e716ce81783a3c1e5671fa69fa5",
+      "MT2Framework.dll": "a53170f820386c9ac8112b5a364a251de5e728bf02decd681e581e7279b51f28"
+    },
+    "empty_modules": {
+      "MT2.exe": "bbab2dc68babcc644d0a1679548bf1e334b6c52aea669c3f61f6cb9d45c1aaf6",
+      "steam_api64.dll": "e082bf5c9f881c822b1540a76b74f9d15e18019a73ebd206a559595badcb7f65",
+      "WSOCK32.dll": "e1b59bcc5d236ee3237ea3365e52fb314e635e716ce81783a3c1e5671fa69fa5",
+      "MT2Framework.dll": "e50e3aadab8360fa0092b6a0cc8cb63ea3992279afd9fa41b69aa6c315bbd1ab"
+    },
+    "reference_modules": {
+      "MT2.exe": "bbab2dc68babcc644d0a1679548bf1e334b6c52aea669c3f61f6cb9d45c1aaf6",
+      "steam_api64.dll": "e082bf5c9f881c822b1540a76b74f9d15e18019a73ebd206a559595badcb7f65",
+      "WSOCK32.dll": "e1b59bcc5d236ee3237ea3365e52fb314e635e716ce81783a3c1e5671fa69fa5",
+      "MT2Framework.dll": "a53170f820386c9ac8112b5a364a251de5e728bf02decd681e581e7279b51f28"
+    }
+  },
+  "onboarding": {
+    "automated_authoring_seconds": 18.040575,
+    "automated_game_start_to_visible_edit_seconds": 19.748893,
+    "limit": "A human newcomer timing study has not been performed. The ten-minute usability target is not yet a public claim."
+  },
+  "pending": [
+    "Human newcomer onboarding timing",
+    "Milestone F with two separate Steam accounts before multiplayer compatibility claims",
+    "Separate authorization for publication, hosting or a public repository"
+  ],
+  "accepted_product_modules": {
+    "MT2.exe": "bbab2dc68babcc644d0a1679548bf1e334b6c52aea669c3f61f6cb9d45c1aaf6",
+    "steam_api64.dll": "e082bf5c9f881c822b1540a76b74f9d15e18019a73ebd206a559595badcb7f65",
+    "WSOCK32.dll": "96d9c478fa2af44a72c93c57a8ba58eca460cd340d144b475268583a0a0c752b",
+    "MT2Framework.dll": "16ae6bad3f5402e3fd5119589217acf6b16372867b0f3f2ef69c943da869c3d5"
+  },
+  "accepted_product": {
+    "native_sdk_id": "beginner.native",
+    "native_sdk_executed": true,
+    "unicode_save_rebound": true,
+    "selected_object_readback": {
+      "handle": {
+        "epoch": 1,
+        "uid": "1096"
+      },
+      "x": 8050.0,
+      "y": 68.01023864746094,
+      "z": 8584.0
+    },
+    "native_display_name": "Scenery Pyramid",
+    "profile_files_preserved_on_removal": 259,
+    "original_executable_preserved": true,
+    "normal_process_exit": true,
+    "original_multiplayer_profiles_untouched": true
+  },
+  "milestones": {
+    "A": "accepted on retained private game candidates",
+    "B": "accepted on retained private game candidates",
+    "C": "accepted on retained private game candidates",
+    "D": "accepted on retained private game candidates",
+    "E": "technical product workflow accepted; human newcomer timing pending",
+    "F": "pending, no multiplayer compatibility claim"
+  }
+}

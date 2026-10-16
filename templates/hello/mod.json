@@ -1,0 +1,10 @@
+{
+  "id": "example.hello",
+  "name": "Hello MT2",
+  "version": "1.0.0",
+  "api_version": "1.0.0",
+  "type": "lua",
+  "entry": "main.lua",
+  "capabilities": ["ui", "world.read"],
+  "multiplayer": "local"
+}

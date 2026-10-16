@@ -1,0 +1,6 @@
+{
+  "Lua.workspace.library": [
+    ".mt2fw"
+  ],
+  "Lua.runtime.version": "Lua 5.4"
+}

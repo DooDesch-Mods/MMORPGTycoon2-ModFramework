@@ -1,0 +1,15 @@
+name: Feature request
+description: Explain what you want to build as a modder
+body:
+  - type: textarea
+    id: result
+    attributes:
+      label: What would your mod do?
+      description: Give a concrete intended result and explain where the current API falls short.
+    validations:
+      required: true
+  - type: textarea
+    id: example
+    attributes:
+      label: Example or proposed API
+      description: Optional sample code or workflow. Mark unimplemented behavior clearly.

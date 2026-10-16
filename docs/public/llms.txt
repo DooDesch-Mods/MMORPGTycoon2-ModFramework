@@ -1,0 +1,20 @@
+# MT2 Mod Framework
+
+> Framework 0.1.0, Lua API 1.0.0, native ABI 1. Windows x64 Steam development candidate. Multiplayer compatibility is not established.
+
+Use the version matching the installed framework. World mutations need confirmed acknowledgement; never automatically retry unknown results.
+
+## Start
+
+- [First mod](quickstart.md): create, edit, reload and package Lua.
+- [Agent guide](agents/start.md): lifecycle rules and validation.
+- [API reference](reference/index.md): generated public functions.
+- [Events](reference/events.md): exact event payload types.
+- [Native C ABI](reference/native.md): authoritative header and ownership.
+- [Compatibility](compatibility.md): supported executable and current limits.
+
+## Machine contracts
+
+- [API JSON](api/1.0.0/api.json): functions, types, capabilities, errors and examples.
+- [Mod schema](api/1.0.0/mod.schema.json): structure; mt2fw check adds semantic validation.
+- [Versioned Markdown](versions/1.0.0/reference/index.md): documentation snapshot for this API.

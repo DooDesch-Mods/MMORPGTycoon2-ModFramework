@@ -1,0 +1,1546 @@
+{
+  "files": [
+    {
+      "source": "framework/LICENSE",
+      "destination": "LICENSE",
+      "sha256": "243986ed4ffeeba475845e6aca2a950e0ef1ab310f9f37cb17d93c460f0e8cbb",
+      "license": "MIT"
+    },
+    {
+      "source": "framework/THIRD_PARTY_NOTICES.md",
+      "destination": "THIRD_PARTY_NOTICES.md",
+      "sha256": "221b9f5b289cdbe8baca55a633ab7e7c6e996b3db4104de7da8d5caca3071702",
+      "license": "MIT"
+    },
+    {
+      "source": "framework/.gitignore",
+      "destination": ".gitignore",
+      "sha256": "8b1419a4668d47025e2957cc382bf8c377ff6c125cb3ab3a5fdba2def5e1ca3e",
+      "license": "MIT"
+    },
+    {
+      "source": "framework/src/core.cpp",
+      "destination": "src/core/core.cpp",
+      "sha256": "63d67806078d9384defc8450b48e441a3d57111c3f655dcc8fc317bf6c602b99",
+      "license": "MIT"
+    },
+    {
+      "source": "framework/src/crypto.h",
+      "destination": "src/core/crypto.h",
+      "sha256": "51fabb2308c54889ccfc550fc0764f316e905b3db9f3116282c4f2ec85e08992",
+      "license": "MIT"
+    },
+    {
+      "source": "framework/src/files.cpp",
+      "destination": "src/core/files.cpp",
+      "sha256": "a5cac23f6f34cc395561d40ac22c347a3854c4840405b179c6853b3f370e1046",
+      "license": "MIT"
+    },
+    {
+      "source": "framework/src/lua_mod.cpp",
+      "destination": "src/core/lua_mod.cpp",
+      "sha256": "a1ef8920af10d8ade984d662042782efcdabfc034c8d62d4b1f70e26751764ec",
+      "license": "MIT"
+    },
+    {
+      "source": "framework/src/lua_mod.h",
+      "destination": "src/core/lua_mod.h",
+      "sha256": "96de1cf107fcfaa5a199e8b6b4d48cd4e7e64dc58fce1e93c1a1c5ef498d5186",
+      "license": "MIT"
+    },
+    {
+      "source": "framework/include/mt2fw/core.h",
+      "destination": "include/mt2fw/core.h",
+      "sha256": "3836bac82ef11fcea31cd7506bacd66011b1159fb06ec5fff36ef0777f74706a",
+      "license": "MIT"
+    },
+    {
+      "source": "framework/include/mt2fw/plugin.h",
+      "destination": "include/mt2fw/plugin.h",
+      "sha256": "6a25a61c1bcc942888b8e991618919c61f6e2fd22676a0c2c5bc35faa6d32d3d",
+      "license": "MIT"
+    },
+    {
+      "source": "framework/sdk/mt2.lua",
+      "destination": "sdk/mt2.lua",
+      "sha256": "246c8797b05bad6e66fa34f0bce86c0705fc421ef572f01a11af1bb43a441d55",
+      "license": "MIT"
+    },
+    {
+      "source": "framework/templates/hello/main.lua",
+      "destination": "templates/hello/main.lua",
+      "sha256": "26b02825282ccbf10cc832aea535f0a7ea61d5d55443d05aafeac55a37fb9da4",
+      "license": "MIT"
+    },
+    {
+      "source": "framework/templates/hello/mod.json",
+      "destination": "templates/hello/mod.json",
+      "sha256": "9c0579260b0180508a60562e094b4f46c178faae844240f3a085c3d76a443e6e",
+      "license": "MIT"
+    },
+    {
+      "source": "framework/templates/inspector/main.lua",
+      "destination": "templates/inspector/main.lua",
+      "sha256": "637130b492964a8663c213a896142d93a8eae49e7a24ab01a652c040c7b02caa",
+      "license": "MIT"
+    },
+    {
+      "source": "framework/templates/inspector/mod.json",
+      "destination": "templates/inspector/mod.json",
+      "sha256": "65557d99667af0095e7f59d08ee1e5ba765c61c1eeefa7af44e9e93113fdf45c",
+      "license": "MIT"
+    },
+    {
+      "source": "framework/templates/native/CMakeLists.txt",
+      "destination": "templates/native/CMakeLists.txt",
+      "sha256": "25d9ef6556e20f9dfd5252bc77ed20f54a75b05a9f30a0d657dbe1019edebc32",
+      "license": "MIT"
+    },
+    {
+      "source": "framework/templates/native/mod.json",
+      "destination": "templates/native/mod.json",
+      "sha256": "f64a309ae0727af1e6fc57e1c30d7abb75649a09fa55742112fa205593b03bc2",
+      "license": "MIT"
+    },
+    {
+      "source": "framework/templates/native/plugin.cpp",
+      "destination": "templates/native/plugin.cpp",
+      "sha256": "4f6e930f0e22f58930ff77412dea705cd23e61701b120d3fc0078981d18b02e9",
+      "license": "MIT"
+    },
+    {
+      "source": "framework/templates/scenery/assets/buildings/scenery/mt2fw_example_scenery_d116a33e5f7e_pyramid.variant",
+      "destination": "templates/scenery/assets/buildings/scenery/mt2fw_example_scenery_d116a33e5f7e_pyramid.variant",
+      "sha256": "4760b79951a4dcdb2929197589ecbaabf2d36cf4c109cffa87e3f3a0b85b8797",
+      "license": "MIT"
+    },
+    {
+      "source": "framework/templates/scenery/assets/materials/mt2fw_example_scenery_d116a33e5f7e_pyramid_0.mat",
+      "destination": "templates/scenery/assets/materials/mt2fw_example_scenery_d116a33e5f7e_pyramid_0.mat",
+      "sha256": "5f4aebc4a9d9b65d60460998bafc72a013df8d03c5b3e8a06784ca84ddf097d8",
+      "license": "MIT"
+    },
+    {
+      "source": "framework/templates/scenery/assets/mt2fw/example_scenery_d116a33e5f7e_pyramid/model.vmb",
+      "destination": "templates/scenery/assets/mt2fw/example_scenery_d116a33e5f7e_pyramid/model.vmb",
+      "sha256": "02271dd251f35b1f389a1cd9f4a4ff33ccc4bf941b72cb9ed577220990cb9604",
+      "license": "MIT"
+    },
+    {
+      "source": "framework/templates/scenery/assets/mt2fw/example_scenery_d116a33e5f7e_pyramid/model.vmd",
+      "destination": "templates/scenery/assets/mt2fw/example_scenery_d116a33e5f7e_pyramid/model.vmd",
+      "sha256": "6ca697a48117d5b8e007b806b653abb3f91dbcfaaa9c4dc7cbf18f774cd076d4",
+      "license": "MIT"
+    },
+    {
+      "source": "framework/templates/scenery/content.json",
+      "destination": "templates/scenery/content.json",
+      "sha256": "13c8b027c831b927f81fb91bd266dae56c214f2816a2952ed45a4138c85b6277",
+      "license": "MIT"
+    },
+    {
+      "source": "framework/templates/scenery/import-report.json",
+      "destination": "templates/scenery/import-report.json",
+      "sha256": "c1660238f017317cbd3813b2eb149df3c851ea17cff555df5db597346ccbfba1",
+      "license": "MIT"
+    },
+    {
+      "source": "framework/templates/scenery/mod.json",
+      "destination": "templates/scenery/mod.json",
+      "sha256": "37695fdb3671d1b0b3a5ad6a02e29a429e34783b11461c623e332582433c7b70",
+      "license": "MIT"
+    },
+    {
+      "source": "framework/templates/scenery/source.glb",
+      "destination": "templates/scenery/source.glb",
+      "sha256": "6e32a34ccec143c2b9856b8751120c9753835dd6a9feda5838f0a16cf156e3ab",
+      "license": "MIT"
+    },
+    {
+      "source": "framework/tests/core_tests.cpp",
+      "destination": "tests/core_tests.cpp",
+      "sha256": "2a8c897b954de932522e44c43de3ee71907195c8519e30db572795a4e1be79cd",
+      "license": "MIT"
+    },
+    {
+      "source": "framework/tests/test_glb.py",
+      "destination": "tests/test_glb.py",
+      "sha256": "575fa031005840bd317d64b7c8a54f4301041fb86348327350301d19f3b0e896",
+      "license": "MIT"
+    },
+    {
+      "source": "framework/tests/test_install.py",
+      "destination": "tests/test_install.py",
+      "sha256": "9fe4a945a09ace132985659c1a79a9d87449204c2928a53f99fa87165270f42f",
+      "license": "MIT"
+    },
+    {
+      "source": "framework/tests/test_packages.py",
+      "destination": "tests/test_packages.py",
+      "sha256": "9ccae0420cd6b9c4a9e1eb1199544d6a67c7a5123723a3f10a1156a9b2ecb444",
+      "license": "MIT"
+    },
+    {
+      "source": "framework/tools/mt2fw/__init__.py",
+      "destination": "tools/mt2fw/__init__.py",
+      "sha256": "5f8e4af340ecb7468c8d34a6ac93ad7c776e7d8fb8a8f68b977f298207a45c39",
+      "license": "MIT"
+    },
+    {
+      "source": "framework/tools/mt2fw/__main__.py",
+      "destination": "tools/mt2fw/__main__.py",
+      "sha256": "1d5229f6b29e03b70300138bfd603ab6f1588e352d7137c004b6070a40138ef3",
+      "license": "MIT"
+    },
+    {
+      "source": "framework/tools/mt2fw/glb.py",
+      "destination": "tools/mt2fw/glb.py",
+      "sha256": "41171210fabf090c4a9bb30825e87df4feceac0107dec20e29ca06eb070c417b",
+      "license": "MIT"
+    },
+    {
+      "source": "framework/tools/mt2fw/gui.py",
+      "destination": "tools/mt2fw/gui.py",
+      "sha256": "d972faabaa1b56441210cd3759190ae25e882a04b970f78c2f83a06e90f7d660",
+      "license": "MIT"
+    },
+    {
+      "source": "framework/tools/mt2fw/install.py",
+      "destination": "tools/mt2fw/install.py",
+      "sha256": "059b1ea8ba7ef90f5d386795dec24a1256a1dbad01e515f80b9ba907080592ab",
+      "license": "MIT"
+    },
+    {
+      "source": "framework/tools/mt2fw/packages.py",
+      "destination": "tools/mt2fw/packages.py",
+      "sha256": "5c63d1d6bf963818f86c61678f5803dee052a40ee34ec1f2b5a8e4e8c6f61428",
+      "license": "MIT"
+    },
+    {
+      "source": "framework/tools/mt2fw/preview.py",
+      "destination": "tools/mt2fw/preview.py",
+      "sha256": "a6e5e64aef3b2d477ec7c2971b0640f4b3eb3ab8e196f947f6f424b6fe2e34d7",
+      "license": "MIT"
+    },
+    {
+      "source": "framework/tools/mt2fw/sample.py",
+      "destination": "tools/mt2fw/sample.py",
+      "sha256": "b3261c882f112c31a29788beb43e5ed2969c6b5a3cc3525dbb3602c21ca36314",
+      "license": "MIT"
+    },
+    {
+      "source": "framework/tools/mt2fw/vmb.py",
+      "destination": "tools/mt2fw/vmb.py",
+      "sha256": "100e25d918e2c167fd87423d946ccc2c6df35a41757a0bdcae44ff33b5a36860",
+      "license": "MIT"
+    },
+    {
+      "source": "framework/tools/launcher.py",
+      "destination": "tools/launcher.py",
+      "sha256": "88bfab7d27e0911203445ea37df0ea5dba4706418ab6e8f5e51d35761dccef69",
+      "license": "MIT"
+    },
+    {
+      "source": "framework/tools/build.py",
+      "destination": "tools/build.py",
+      "sha256": "f20f17a89f3f445bea1cd292e6b252d32d25cf79f050821ae043916e5b8f50cd",
+      "license": "MIT"
+    },
+    {
+      "source": "framework/tools/build_helper.py",
+      "destination": "tools/build_helper.py",
+      "sha256": "15c0a55d6a447dc68c6234d21d0564558db2b01c49184c53fc1dc0def48c52f4",
+      "license": "MIT"
+    },
+    {
+      "source": "framework/tools/package_product.py",
+      "destination": "tools/package_product.py",
+      "sha256": "6c0dad350b55e5d8f382db7a1984779b41fea1ff389d309b7f3b0cdbe9713c1b",
+      "license": "MIT"
+    },
+    {
+      "source": "framework/game/adapter.cpp",
+      "destination": "adapters/mt2/adapter.cpp",
+      "sha256": "60b71394604f321fbe73a029c9a611bf3d07d812bcf43b308eb69d5cc86bd823",
+      "license": "MIT"
+    },
+    {
+      "source": "framework/game/adapter.h",
+      "destination": "adapters/mt2/adapter.h",
+      "sha256": "4015b9dfbafe5106eb720d7217c5e96db7b731a7ee65fda6e837de9c1f2c4fbf",
+      "license": "MIT"
+    },
+    {
+      "source": "framework/game/bootstrap.h",
+      "destination": "src/loader/bootstrap.h",
+      "sha256": "a8fc650f21803b42fe91220543f34dd203b2ba2a961511f5424d4d856c886af3",
+      "license": "MIT"
+    },
+    {
+      "source": "framework/game/loader.cpp",
+      "destination": "src/loader/loader.cpp",
+      "sha256": "964f16a3c13851cfa69ebf2e1d7cf6e926cb6c32d4b52b9b8cfed2de48db330a",
+      "license": "MIT"
+    },
+    {
+      "source": "framework/game/native_engine.cpp",
+      "destination": "adapters/mt2/native_engine.cpp",
+      "sha256": "9e07eeb7b156cb4b56312d4a121814be841ad015ca5a9d883ffd452d9fd26103",
+      "license": "MIT"
+    },
+    {
+      "source": "framework/game/native_extensions.h",
+      "destination": "adapters/mt2/native_extensions.h",
+      "sha256": "557da4ea4c5df66a0153eee027af8b7bdebf7ec66a605ca40f25ad63e6f6dc83",
+      "license": "MIT"
+    },
+    {
+      "source": "framework/game/runtime.cpp",
+      "destination": "adapters/mt2/runtime.cpp",
+      "sha256": "59e9acff126e15b58fe1f588aaf2b5af634c4d454f0d4a5706ea2c5105204be5",
+      "license": "MIT"
+    },
+    {
+      "source": "proxy/wsock32_stubs.asm",
+      "destination": "src/loader/proxy/wsock32_stubs.asm",
+      "sha256": "84f99a3e45c978aa75d018a3501942fa10b4364b0d6d463e69788c96a933c7e7",
+      "license": "MIT"
+    },
+    {
+      "source": "proxy/wsock32_proxy.def",
+      "destination": "src/loader/proxy/wsock32_proxy.def",
+      "sha256": "258fafd9befd78e8f10df6dc0612b6cdaa79c00a1a761b7b6eab97795d8f9986",
+      "license": "MIT"
+    },
+    {
+      "source": "proxy/wsock32_exports.inc",
+      "destination": "src/loader/proxy/wsock32_exports.inc",
+      "sha256": "02211e6f113028d5ac4d3a6e43bd442f1dbcca7bee05219250c43e9a5190785a",
+      "license": "MIT"
+    },
+    {
+      "source": "src/core/logger.cpp",
+      "destination": "adapters/mt2/internal/logger.cpp",
+      "sha256": "f98e910c29c234fbc9e640981a2005f4ff4e1329e038bbb0216e78e7efdb4763",
+      "license": "MIT"
+    },
+    {
+      "source": "src/game/global_root.inc",
+      "destination": "adapters/mt2/internal/global_root.inc",
+      "sha256": "0175811a666e2025810c49a0f3f8e6f95120eb4f1b2e532fd0e49fb370f47b51",
+      "license": "MIT"
+    },
+    {
+      "source": "src/game/global_root.h",
+      "destination": "adapters/mt2/internal/global_root.h",
+      "sha256": "ce8e094a9eb15109cf289fd46865c29b5be6234af0d747da3a09ce37102230a8",
+      "license": "MIT"
+    },
+    {
+      "source": "include/mt2mp/game/native_engine.h",
+      "destination": "adapters/mt2/internal/mt2mp/game/native_engine.h",
+      "sha256": "3be5abddf01ad3157e826e0402bdb9f0499a4df7b8c9aa98008da59494a9dec2",
+      "license": "MIT"
+    },
+    {
+      "source": "src/game/live_host_state/memory_query_timing.h",
+      "destination": "adapters/mt2/internal/live_host_state/memory_query_timing.h",
+      "sha256": "cf3f6ddc80c03f2825848644ed93169ca6eb0bfddacb691e1885ac9c437d90b5",
+      "license": "MIT"
+    },
+    {
+      "source": "src/game/live_host_state/apply_timing.h",
+      "destination": "adapters/mt2/internal/live_host_state/apply_timing.h",
+      "sha256": "c677bfffdcd6db113e2cf032d79981285b1f70fb4949ce244a5d8c124c2134ba",
+      "license": "MIT"
+    },
+    {
+      "source": "include/mt2mp/net/snapshot_world_path.h",
+      "destination": "adapters/mt2/internal/mt2mp/net/snapshot_world_path.h",
+      "sha256": "efe5dcc00ae782a9c7340fe345a0da1e4bef373a0b75d974f898fd9cea66d84a",
+      "license": "MIT"
+    },
+    {
+      "source": "include/mt2mp/core/logger.h",
+      "destination": "adapters/mt2/internal/mt2mp/core/logger.h",
+      "sha256": "32eb1f59f3e2dd3adbe269117c63cdce77a18c825539d85c8975859a1749ff54",
+      "license": "MIT"
+    },
+    {
+      "source": "include/vendor/imgui/imgui.cpp",
+      "destination": "third_party/vendor/imgui/imgui.cpp",
+      "sha256": "fc49442b8b7e2ef00045830d94b81ffeffbfcca24761247e2f135e0703fa6d2b",
+      "license": "MIT"
+    },
+    {
+      "source": "include/vendor/imgui/imgui_draw.cpp",
+      "destination": "third_party/vendor/imgui/imgui_draw.cpp",
+      "sha256": "3c80aec39ecf3ea812557dfff9a9835494850a042cfbac2a021466cc175fa412",
+      "license": "MIT"
+    },
+    {
+      "source": "include/vendor/imgui/imgui_tables.cpp",
+      "destination": "third_party/vendor/imgui/imgui_tables.cpp",
+      "sha256": "23c87a271d20628cc762b829bb06ef7da47ef24e28958b32ea949a2804791203",
+      "license": "MIT"
+    },
+    {
+      "source": "include/vendor/imgui/imgui_widgets.cpp",
+      "destination": "third_party/vendor/imgui/imgui_widgets.cpp",
+      "sha256": "f67dd7bfc132eaa0338b6e93e6239d59d9fc2c87b785d697aff19be42b921778",
+      "license": "MIT"
+    },
+    {
+      "source": "include/vendor/imgui/imgui.h",
+      "destination": "third_party/vendor/imgui/imgui.h",
+      "sha256": "b42aa6ffa805685eb86e286a9d1fb0f2ec94e90e93bf2295d9c309ff8bce18ef",
+      "license": "MIT"
+    },
+    {
+      "source": "include/vendor/imgui/imgui_internal.h",
+      "destination": "third_party/vendor/imgui/imgui_internal.h",
+      "sha256": "edf17af83f7333833896e83b2fa7c805f6d1272306d1ecbe3025f5cac36d651d",
+      "license": "MIT"
+    },
+    {
+      "source": "include/vendor/imgui/imconfig.h",
+      "destination": "third_party/vendor/imgui/imconfig.h",
+      "sha256": "b198e51703a5b08bcf3763ba114f98a460edc172b6ba88efcbb3bbb8ac843f38",
+      "license": "MIT"
+    },
+    {
+      "source": "include/vendor/imgui/imstb_rectpack.h",
+      "destination": "third_party/vendor/imgui/imstb_rectpack.h",
+      "sha256": "bb53504995e983d54b1ae06ea727f0b39647e5e205b4bf7da01343953974951c",
+      "license": "MIT"
+    },
+    {
+      "source": "include/vendor/imgui/imstb_textedit.h",
+      "destination": "third_party/vendor/imgui/imstb_textedit.h",
+      "sha256": "d9deebe52c76276c42ca030e4ab92ea145552d2aa7e92fd7dea27ffc64eb7166",
+      "license": "MIT"
+    },
+    {
+      "source": "include/vendor/imgui/imstb_truetype.h",
+      "destination": "third_party/vendor/imgui/imstb_truetype.h",
+      "sha256": "941a95c9f36771aab45062e977596785aa9cfaa508a523f6c34ace84b5916780",
+      "license": "MIT"
+    },
+    {
+      "source": "include/vendor/imgui/LICENSE.txt",
+      "destination": "third_party/vendor/imgui/LICENSE.txt",
+      "sha256": "55e058cc5899e6077a819ad1005d6d1f4528f65ae100795c9692f9fa6525a8ce",
+      "license": "MIT"
+    },
+    {
+      "source": "include/vendor/imgui/backends/imgui_impl_sdl3.cpp",
+      "destination": "third_party/vendor/imgui/backends/imgui_impl_sdl3.cpp",
+      "sha256": "313a84016c437181737288118fceb0cbb0f2aa63c556571048c2fb131de58ec1",
+      "license": "MIT"
+    },
+    {
+      "source": "include/vendor/imgui/backends/imgui_impl_sdl3.h",
+      "destination": "third_party/vendor/imgui/backends/imgui_impl_sdl3.h",
+      "sha256": "fa7a2124d4a2cbdc4176a22209300ba54d97c8e8ddf1af1adafc05c880dec985",
+      "license": "MIT"
+    },
+    {
+      "source": "include/vendor/imgui/backends/imgui_impl_opengl3.cpp",
+      "destination": "third_party/vendor/imgui/backends/imgui_impl_opengl3.cpp",
+      "sha256": "86d00e86ca747e6af70ae403ba18136ec1f0645b5e089d76207778728d61374c",
+      "license": "MIT"
+    },
+    {
+      "source": "include/vendor/imgui/backends/imgui_impl_opengl3.h",
+      "destination": "third_party/vendor/imgui/backends/imgui_impl_opengl3.h",
+      "sha256": "0cc33088d0ded76dc5e07a2d91e574b32496c9b24b768ee7e04563a16b37e8f2",
+      "license": "MIT"
+    },
+    {
+      "source": "include/vendor/imgui/backends/imgui_impl_opengl3_loader.h",
+      "destination": "third_party/vendor/imgui/backends/imgui_impl_opengl3_loader.h",
+      "sha256": "e2ff7e693c20063c938291b7750a7570bc73321c231bbb37c8eaa4719a89da69",
+      "license": "MIT"
+    },
+    {
+      "source": "include/vendor/minhook/src/buffer.c",
+      "destination": "third_party/vendor/minhook/src/buffer.c",
+      "sha256": "27d64b9e3c30ff8d894fb20a5b6353a4b77b40dbea75690ec00a79440a4d85d7",
+      "license": "BSD-2-Clause"
+    },
+    {
+      "source": "include/vendor/minhook/src/buffer.h",
+      "destination": "third_party/vendor/minhook/src/buffer.h",
+      "sha256": "175ec5496c020509cf4c7670322b51b5bcd5b63a345bfefc4a19b43675857fa7",
+      "license": "BSD-2-Clause"
+    },
+    {
+      "source": "include/vendor/minhook/src/hde/hde32.c",
+      "destination": "third_party/vendor/minhook/src/hde/hde32.c",
+      "sha256": "2d4d7dd73d609028822aaf71ac05112b83fe6cc2ae2d6d71fa051b3fc6acfc43",
+      "license": "BSD-2-Clause"
+    },
+    {
+      "source": "include/vendor/minhook/src/hde/hde32.h",
+      "destination": "third_party/vendor/minhook/src/hde/hde32.h",
+      "sha256": "754579fbcec5f64fa229646ceecb241c0b7f31c8a0bb12370e604c316c569315",
+      "license": "BSD-2-Clause"
+    },
+    {
+      "source": "include/vendor/minhook/src/hde/hde64.c",
+      "destination": "third_party/vendor/minhook/src/hde/hde64.c",
+      "sha256": "06b588a5140e15f0a55e13ddadc7e3a4648f3223cefab2d5285b796a422bb9f5",
+      "license": "BSD-2-Clause"
+    },
+    {
+      "source": "include/vendor/minhook/src/hde/hde64.h",
+      "destination": "third_party/vendor/minhook/src/hde/hde64.h",
+      "sha256": "fd5b39e2865e12b9525ebda8fd9e9658b341ead5932d1bcb412a189f81ca42ca",
+      "license": "BSD-2-Clause"
+    },
+    {
+      "source": "include/vendor/minhook/src/hde/pstdint.h",
+      "destination": "third_party/vendor/minhook/src/hde/pstdint.h",
+      "sha256": "975488009779ea99c7e04b83a160397d5cd7195cb5bf6ad79180805f756c7d00",
+      "license": "BSD-2-Clause"
+    },
+    {
+      "source": "include/vendor/minhook/src/hde/table32.h",
+      "destination": "third_party/vendor/minhook/src/hde/table32.h",
+      "sha256": "e56f8641bd9133c1b99a1e6555b19eebe7ed663e5ea8de4edbe74ba461161ab4",
+      "license": "BSD-2-Clause"
+    },
+    {
+      "source": "include/vendor/minhook/src/hde/table64.h",
+      "destination": "third_party/vendor/minhook/src/hde/table64.h",
+      "sha256": "0b6c69ad498e67907e0c574ab06123aee4ec30c99fa181099ea929a8d820bfc1",
+      "license": "BSD-2-Clause"
+    },
+    {
+      "source": "include/vendor/minhook/src/hook.c",
+      "destination": "third_party/vendor/minhook/src/hook.c",
+      "sha256": "c6eec4f8dc5fb6513347c3f44fbdb25ca0bba7a2bcbe141d238c7da97094cd9d",
+      "license": "BSD-2-Clause"
+    },
+    {
+      "source": "include/vendor/minhook/src/trampoline.c",
+      "destination": "third_party/vendor/minhook/src/trampoline.c",
+      "sha256": "58ae2dcc65317983535963654bb10a4398dae4a90da08af1007ab1dcf0db82a9",
+      "license": "BSD-2-Clause"
+    },
+    {
+      "source": "include/vendor/minhook/src/trampoline.h",
+      "destination": "third_party/vendor/minhook/src/trampoline.h",
+      "sha256": "c93c66f8db04561f3345835f1185451f61043c1549e33425d87af86448580379",
+      "license": "BSD-2-Clause"
+    },
+    {
+      "source": "include/vendor/minhook/include/MinHook.h",
+      "destination": "third_party/vendor/minhook/include/MinHook.h",
+      "sha256": "d5cf8db333895134398c7f69bac43f232835fda1cccbd86875c654cd69989b23",
+      "license": "BSD-2-Clause"
+    },
+    {
+      "source": "include/vendor/minhook/CMakeLists.txt",
+      "destination": "third_party/vendor/minhook/CMakeLists.txt",
+      "sha256": "a04559ecf74dec745ef8c75f2b1d977e7e23bb6e08390035122511b382776a5d",
+      "license": "BSD-2-Clause"
+    },
+    {
+      "source": "include/vendor/minhook/LICENSE.txt",
+      "destination": "third_party/vendor/minhook/LICENSE.txt",
+      "sha256": "4f21f857550d7be854da6ea5f2da4e6775ca4e3fbb535e4f3d961c47d0bf3335",
+      "license": "BSD-2-Clause"
+    },
+    {
+      "source": "include/vendor/nlohmann/json.hpp",
+      "destination": "third_party/vendor/nlohmann/json.hpp",
+      "sha256": "aaf127c04cb31c406e5b04a63f1ae89369fccde6d8fa7cdda1ed4f32dfc5de63",
+      "license": "MIT"
+    },
+    {
+      "source": "include/vendor/nlohmann/LICENSE.MIT",
+      "destination": "third_party/vendor/nlohmann/LICENSE.MIT",
+      "sha256": "46a65cffd1ea955132d95a8dd921640714a8d6b537d2e4e482d31145ae95b603",
+      "license": "MIT"
+    },
+    {
+      "source": "include/vendor/SDL3/include/SDL3/SDL.h",
+      "destination": "third_party/vendor/SDL3/include/SDL3/SDL.h",
+      "sha256": "c6b6861410d6a268c81bf3b48cb13fe439a27bb4ba9b7824f1c26b779b536e1d",
+      "license": "Zlib"
+    },
+    {
+      "source": "include/vendor/SDL3/include/SDL3/SDL_assert.h",
+      "destination": "third_party/vendor/SDL3/include/SDL3/SDL_assert.h",
+      "sha256": "2ed21bb3ed11d1dd8c343400ae8da49c4e5ac166280b4be2cfdc99768b9d93c0",
+      "license": "Zlib"
+    },
+    {
+      "source": "include/vendor/SDL3/include/SDL3/SDL_asyncio.h",
+      "destination": "third_party/vendor/SDL3/include/SDL3/SDL_asyncio.h",
+      "sha256": "e9e4074f1b35bda21f3e1d97259f03c65e2dc6da9c5f218d29890475c9306da6",
+      "license": "Zlib"
+    },
+    {
+      "source": "include/vendor/SDL3/include/SDL3/SDL_atomic.h",
+      "destination": "third_party/vendor/SDL3/include/SDL3/SDL_atomic.h",
+      "sha256": "081ff913ad637a16b94ca5870fba7d9ed710e8e8e20b1b866feac2df19a58f17",
+      "license": "Zlib"
+    },
+    {
+      "source": "include/vendor/SDL3/include/SDL3/SDL_audio.h",
+      "destination": "third_party/vendor/SDL3/include/SDL3/SDL_audio.h",
+      "sha256": "9df2fe57f4ab31ae8ee1c8f117098e994fd3983ea0e48abd014541b566410fcd",
+      "license": "Zlib"
+    },
+    {
+      "source": "include/vendor/SDL3/include/SDL3/SDL_begin_code.h",
+      "destination": "third_party/vendor/SDL3/include/SDL3/SDL_begin_code.h",
+      "sha256": "7f193613b1e37af9274aa26e33a81d4d5764ef6f682aabba7468882a59e028e2",
+      "license": "Zlib"
+    },
+    {
+      "source": "include/vendor/SDL3/include/SDL3/SDL_bits.h",
+      "destination": "third_party/vendor/SDL3/include/SDL3/SDL_bits.h",
+      "sha256": "1fcf06b747c667e53bb6cf9d017d5abc5a29ad883c05eedfcfb021c571b61592",
+      "license": "Zlib"
+    },
+    {
+      "source": "include/vendor/SDL3/include/SDL3/SDL_blendmode.h",
+      "destination": "third_party/vendor/SDL3/include/SDL3/SDL_blendmode.h",
+      "sha256": "8406acc439c395ac49ea779c2d382a12da97832531398f68e83b6d680cc03fc5",
+      "license": "Zlib"
+    },
+    {
+      "source": "include/vendor/SDL3/include/SDL3/SDL_camera.h",
+      "destination": "third_party/vendor/SDL3/include/SDL3/SDL_camera.h",
+      "sha256": "835839506cd2ffa6c0f4c83031c2f8afb0c8a8b59d894c118d4d415349f91571",
+      "license": "Zlib"
+    },
+    {
+      "source": "include/vendor/SDL3/include/SDL3/SDL_clipboard.h",
+      "destination": "third_party/vendor/SDL3/include/SDL3/SDL_clipboard.h",
+      "sha256": "7c20b171893ef6020a81309bb0ab65487624513a043252a6604357a55c1b9201",
+      "license": "Zlib"
+    },
+    {
+      "source": "include/vendor/SDL3/include/SDL3/SDL_close_code.h",
+      "destination": "third_party/vendor/SDL3/include/SDL3/SDL_close_code.h",
+      "sha256": "ce3ca73e7fd5293310fd155692c58b5e82e516f1a8267f84d0af572c8398e3e9",
+      "license": "Zlib"
+    },
+    {
+      "source": "include/vendor/SDL3/include/SDL3/SDL_copying.h",
+      "destination": "third_party/vendor/SDL3/include/SDL3/SDL_copying.h",
+      "sha256": "64436d5078d6742f11c8b0acf8bc87237d15da36716eb2552986a8b45c419967",
+      "license": "Zlib"
+    },
+    {
+      "source": "include/vendor/SDL3/include/SDL3/SDL_cpuinfo.h",
+      "destination": "third_party/vendor/SDL3/include/SDL3/SDL_cpuinfo.h",
+      "sha256": "c03363b9c6c93f751b5b253d636208baa9d6658c6926802b35169736b96f1aef",
+      "license": "Zlib"
+    },
+    {
+      "source": "include/vendor/SDL3/include/SDL3/SDL_dialog.h",
+      "destination": "third_party/vendor/SDL3/include/SDL3/SDL_dialog.h",
+      "sha256": "7d674d748369f62e3ee79ce9b92e67a890413afb651a58c05f8c6d7ba0ff4dee",
+      "license": "Zlib"
+    },
+    {
+      "source": "include/vendor/SDL3/include/SDL3/SDL_egl.h",
+      "destination": "third_party/vendor/SDL3/include/SDL3/SDL_egl.h",
+      "sha256": "648d431c8c51bafeac9036db17c3ee5fdea6b6b7b8fe1b86d8b7541630d7cddb",
+      "license": "Zlib"
+    },
+    {
+      "source": "include/vendor/SDL3/include/SDL3/SDL_endian.h",
+      "destination": "third_party/vendor/SDL3/include/SDL3/SDL_endian.h",
+      "sha256": "8f22c489c5073a3034e0a1c4e05274680d485f4cc2d16d7c211a60c2731380b2",
+      "license": "Zlib"
+    },
+    {
+      "source": "include/vendor/SDL3/include/SDL3/SDL_error.h",
+      "destination": "third_party/vendor/SDL3/include/SDL3/SDL_error.h",
+      "sha256": "7d294ba3e994b89a42bc6346e7e59bff82fbce2d050f7cdb189d8f45f31795f2",
+      "license": "Zlib"
+    },
+    {
+      "source": "include/vendor/SDL3/include/SDL3/SDL_events.h",
+      "destination": "third_party/vendor/SDL3/include/SDL3/SDL_events.h",
+      "sha256": "8a586e47c465d2d9091a62adb331b84aef3c2114db2ed3b74a0a4c69fa6db9ab",
+      "license": "Zlib"
+    },
+    {
+      "source": "include/vendor/SDL3/include/SDL3/SDL_filesystem.h",
+      "destination": "third_party/vendor/SDL3/include/SDL3/SDL_filesystem.h",
+      "sha256": "6d1e800ff2b20de2d0416f7c6817dd6f11b3b9fc3bfb80be5834e3069466cbd2",
+      "license": "Zlib"
+    },
+    {
+      "source": "include/vendor/SDL3/include/SDL3/SDL_gamepad.h",
+      "destination": "third_party/vendor/SDL3/include/SDL3/SDL_gamepad.h",
+      "sha256": "2fc1db9f76cd78ca7a7b53df4a717b8f0fe70476d3f111f8a924cc90cd1704a7",
+      "license": "Zlib"
+    },
+    {
+      "source": "include/vendor/SDL3/include/SDL3/SDL_gpu.h",
+      "destination": "third_party/vendor/SDL3/include/SDL3/SDL_gpu.h",
+      "sha256": "30706ed2427c93a5c217fe68a707c64cf97ee119826edcd75c804746b9ee3956",
+      "license": "Zlib"
+    },
+    {
+      "source": "include/vendor/SDL3/include/SDL3/SDL_guid.h",
+      "destination": "third_party/vendor/SDL3/include/SDL3/SDL_guid.h",
+      "sha256": "0629f5b5f3fdd6bfc252d7beab1af214e1214574cc51e72871e2c0f9c308e69a",
+      "license": "Zlib"
+    },
+    {
+      "source": "include/vendor/SDL3/include/SDL3/SDL_haptic.h",
+      "destination": "third_party/vendor/SDL3/include/SDL3/SDL_haptic.h",
+      "sha256": "a8bba38a319298e6e2b110041c0fb7b144b6fec89c06ee428854542db73db70f",
+      "license": "Zlib"
+    },
+    {
+      "source": "include/vendor/SDL3/include/SDL3/SDL_hidapi.h",
+      "destination": "third_party/vendor/SDL3/include/SDL3/SDL_hidapi.h",
+      "sha256": "052fd434781ea148143f4644ed6af512589c4a432d31c5d9472d2f394d4eb16b",
+      "license": "Zlib"
+    },
+    {
+      "source": "include/vendor/SDL3/include/SDL3/SDL_hints.h",
+      "destination": "third_party/vendor/SDL3/include/SDL3/SDL_hints.h",
+      "sha256": "27df6d885b4267185e2084e935151fb655be57ca56ee186f7f866c5b990de52b",
+      "license": "Zlib"
+    },
+    {
+      "source": "include/vendor/SDL3/include/SDL3/SDL_init.h",
+      "destination": "third_party/vendor/SDL3/include/SDL3/SDL_init.h",
+      "sha256": "43fea08b512cbaaa331b21b1f885ba98c88c8b3dd423bce3ea46f0c0d0e3536c",
+      "license": "Zlib"
+    },
+    {
+      "source": "include/vendor/SDL3/include/SDL3/SDL_intrin.h",
+      "destination": "third_party/vendor/SDL3/include/SDL3/SDL_intrin.h",
+      "sha256": "6252e7239ea9366eef4271301faa037e48be7aa32443414f4ad2a8bd7186c666",
+      "license": "Zlib"
+    },
+    {
+      "source": "include/vendor/SDL3/include/SDL3/SDL_iostream.h",
+      "destination": "third_party/vendor/SDL3/include/SDL3/SDL_iostream.h",
+      "sha256": "db06713225006e84aa92662018e6e1f5d7a6192e2e5c67ad18839d7733a80715",
+      "license": "Zlib"
+    },
+    {
+      "source": "include/vendor/SDL3/include/SDL3/SDL_joystick.h",
+      "destination": "third_party/vendor/SDL3/include/SDL3/SDL_joystick.h",
+      "sha256": "af468fcbca5a13b3b9e4f881de4bb897ef9d6484e07dbda604b6246573f383b5",
+      "license": "Zlib"
+    },
+    {
+      "source": "include/vendor/SDL3/include/SDL3/SDL_keyboard.h",
+      "destination": "third_party/vendor/SDL3/include/SDL3/SDL_keyboard.h",
+      "sha256": "40c0048a237e7fd49468f16d7336f80c5ae5e3888c3cd1d7bde43159f60682ad",
+      "license": "Zlib"
+    },
+    {
+      "source": "include/vendor/SDL3/include/SDL3/SDL_keycode.h",
+      "destination": "third_party/vendor/SDL3/include/SDL3/SDL_keycode.h",
+      "sha256": "0861f1ec14bbfd2eddf2a3135cdd4f55ccaafa81a283e5740236ef4d10e8e700",
+      "license": "Zlib"
+    },
+    {
+      "source": "include/vendor/SDL3/include/SDL3/SDL_loadso.h",
+      "destination": "third_party/vendor/SDL3/include/SDL3/SDL_loadso.h",
+      "sha256": "2ee703a4dbe54fea84980134c26d21cb87c30df4b7afdfa1a3cc6ca6ef64e09e",
+      "license": "Zlib"
+    },
+    {
+      "source": "include/vendor/SDL3/include/SDL3/SDL_locale.h",
+      "destination": "third_party/vendor/SDL3/include/SDL3/SDL_locale.h",
+      "sha256": "b34500fc0c94685211fd4c6e15b0272f3ba5dfb50060407c3901c6c9e983985b",
+      "license": "Zlib"
+    },
+    {
+      "source": "include/vendor/SDL3/include/SDL3/SDL_log.h",
+      "destination": "third_party/vendor/SDL3/include/SDL3/SDL_log.h",
+      "sha256": "b8f7707c73286f1631293b7766ee684ab686b8c5d00a5ba45a4f53cc738fbad8",
+      "license": "Zlib"
+    },
+    {
+      "source": "include/vendor/SDL3/include/SDL3/SDL_main.h",
+      "destination": "third_party/vendor/SDL3/include/SDL3/SDL_main.h",
+      "sha256": "ea28f889b980a954d102936737a4c50c2ac58f038775a4a60f5ce519f8b337aa",
+      "license": "Zlib"
+    },
+    {
+      "source": "include/vendor/SDL3/include/SDL3/SDL_main_impl.h",
+      "destination": "third_party/vendor/SDL3/include/SDL3/SDL_main_impl.h",
+      "sha256": "9cb2612a63b331fff7a0d9fc307be9dbc3e1f21c7b0ae64e8181afcb16b4160f",
+      "license": "Zlib"
+    },
+    {
+      "source": "include/vendor/SDL3/include/SDL3/SDL_messagebox.h",
+      "destination": "third_party/vendor/SDL3/include/SDL3/SDL_messagebox.h",
+      "sha256": "7fd26a4a17ab80cec0a58c47409a74accc27440d935b79b508e11098982bc0c8",
+      "license": "Zlib"
+    },
+    {
+      "source": "include/vendor/SDL3/include/SDL3/SDL_metal.h",
+      "destination": "third_party/vendor/SDL3/include/SDL3/SDL_metal.h",
+      "sha256": "ec5b39fa253ba8b1cd87c5e40ef6de36dc32a588f20d5078b011280124b08240",
+      "license": "Zlib"
+    },
+    {
+      "source": "include/vendor/SDL3/include/SDL3/SDL_misc.h",
+      "destination": "third_party/vendor/SDL3/include/SDL3/SDL_misc.h",
+      "sha256": "ce53806638666ecde452ae3f8bce9a653c8539fe78b8c6fd9585bd4888ec93e0",
+      "license": "Zlib"
+    },
+    {
+      "source": "include/vendor/SDL3/include/SDL3/SDL_mouse.h",
+      "destination": "third_party/vendor/SDL3/include/SDL3/SDL_mouse.h",
+      "sha256": "325398956b2f49874f44e74244adf304738c478b67a1189248b5f6b57ea393bd",
+      "license": "Zlib"
+    },
+    {
+      "source": "include/vendor/SDL3/include/SDL3/SDL_mutex.h",
+      "destination": "third_party/vendor/SDL3/include/SDL3/SDL_mutex.h",
+      "sha256": "2b4980fc376b179f9f01892deaf679a8da2771efb301e705d1ffb66b2e9e7225",
+      "license": "Zlib"
+    },
+    {
+      "source": "include/vendor/SDL3/include/SDL3/SDL_oldnames.h",
+      "destination": "third_party/vendor/SDL3/include/SDL3/SDL_oldnames.h",
+      "sha256": "a461ac4c49c64b5a8ddfc9dfad0a282b55ff08ce29e84858c07b92ad40ae6421",
+      "license": "Zlib"
+    },
+    {
+      "source": "include/vendor/SDL3/include/SDL3/SDL_opengl.h",
+      "destination": "third_party/vendor/SDL3/include/SDL3/SDL_opengl.h",
+      "sha256": "2ea5b106f91bf54a283f761d3efda185a515ed9d61702ac7357274920e69202e",
+      "license": "Zlib"
+    },
+    {
+      "source": "include/vendor/SDL3/include/SDL3/SDL_opengl_glext.h",
+      "destination": "third_party/vendor/SDL3/include/SDL3/SDL_opengl_glext.h",
+      "sha256": "d885e4af07f53083cac1ae90a61ccb39317947ee73e5216506fb25f6ae503324",
+      "license": "Zlib"
+    },
+    {
+      "source": "include/vendor/SDL3/include/SDL3/SDL_opengles.h",
+      "destination": "third_party/vendor/SDL3/include/SDL3/SDL_opengles.h",
+      "sha256": "abc718af7453d169d1e7c7dfdfb5d939a250519bee02df7d42e0d6a65b7e0c85",
+      "license": "Zlib"
+    },
+    {
+      "source": "include/vendor/SDL3/include/SDL3/SDL_opengles2.h",
+      "destination": "third_party/vendor/SDL3/include/SDL3/SDL_opengles2.h",
+      "sha256": "d043611c5c1e06e466a623b88d1ee498746295db8cc1f15f1872c19742045217",
+      "license": "Zlib"
+    },
+    {
+      "source": "include/vendor/SDL3/include/SDL3/SDL_opengles2_gl2.h",
+      "destination": "third_party/vendor/SDL3/include/SDL3/SDL_opengles2_gl2.h",
+      "sha256": "d6ec44b1d73f3afce3a20ac6976db7fb3dac656c5190f0b563e4ce90d79a15aa",
+      "license": "Zlib"
+    },
+    {
+      "source": "include/vendor/SDL3/include/SDL3/SDL_opengles2_gl2ext.h",
+      "destination": "third_party/vendor/SDL3/include/SDL3/SDL_opengles2_gl2ext.h",
+      "sha256": "4fc5b0034dcde9c125922e3e70d01489a6b335076856ee660294e1a6305a3719",
+      "license": "Zlib"
+    },
+    {
+      "source": "include/vendor/SDL3/include/SDL3/SDL_opengles2_gl2platform.h",
+      "destination": "third_party/vendor/SDL3/include/SDL3/SDL_opengles2_gl2platform.h",
+      "sha256": "4779be999acd1904458238f09c86983b7960ac40e612e05db2db97db615f1e0f",
+      "license": "Zlib"
+    },
+    {
+      "source": "include/vendor/SDL3/include/SDL3/SDL_opengles2_khrplatform.h",
+      "destination": "third_party/vendor/SDL3/include/SDL3/SDL_opengles2_khrplatform.h",
+      "sha256": "7b1e01aaa7ad8f6fc34b5c7bdf79ebf5189bb09e2c4d2e79fc5d350623d11e83",
+      "license": "Zlib"
+    },
+    {
+      "source": "include/vendor/SDL3/include/SDL3/SDL_pen.h",
+      "destination": "third_party/vendor/SDL3/include/SDL3/SDL_pen.h",
+      "sha256": "90c55ee2b222942d03d9b0815da42e4dbc8971f62e141e8d176cd8d063076527",
+      "license": "Zlib"
+    },
+    {
+      "source": "include/vendor/SDL3/include/SDL3/SDL_pixels.h",
+      "destination": "third_party/vendor/SDL3/include/SDL3/SDL_pixels.h",
+      "sha256": "78249e55f5eb05bf6510e5de53242eb6c938cb2e7af66676b2c64ec10217ee9a",
+      "license": "Zlib"
+    },
+    {
+      "source": "include/vendor/SDL3/include/SDL3/SDL_platform.h",
+      "destination": "third_party/vendor/SDL3/include/SDL3/SDL_platform.h",
+      "sha256": "ac9cf309bddc0e7555fbe1d425837bad13ab6887a00a2941be8d4fcdf4b3111a",
+      "license": "Zlib"
+    },
+    {
+      "source": "include/vendor/SDL3/include/SDL3/SDL_platform_defines.h",
+      "destination": "third_party/vendor/SDL3/include/SDL3/SDL_platform_defines.h",
+      "sha256": "26606666d530a777cb40eb27c46d882278539d9649b1ad3a6926c24c12f85bcd",
+      "license": "Zlib"
+    },
+    {
+      "source": "include/vendor/SDL3/include/SDL3/SDL_power.h",
+      "destination": "third_party/vendor/SDL3/include/SDL3/SDL_power.h",
+      "sha256": "0abc02f096234518b87527e917ebb3fef1629fccf94a595c4953afd3f869e8ff",
+      "license": "Zlib"
+    },
+    {
+      "source": "include/vendor/SDL3/include/SDL3/SDL_process.h",
+      "destination": "third_party/vendor/SDL3/include/SDL3/SDL_process.h",
+      "sha256": "a270b5070d67d561ed927833916449a948db0316fd4276b30cb5a37cd9f91d04",
+      "license": "Zlib"
+    },
+    {
+      "source": "include/vendor/SDL3/include/SDL3/SDL_properties.h",
+      "destination": "third_party/vendor/SDL3/include/SDL3/SDL_properties.h",
+      "sha256": "14c48c9c47da233be6b83fe8e4204beab85dea95c6ba1ae48e6490d45ea64edf",
+      "license": "Zlib"
+    },
+    {
+      "source": "include/vendor/SDL3/include/SDL3/SDL_rect.h",
+      "destination": "third_party/vendor/SDL3/include/SDL3/SDL_rect.h",
+      "sha256": "8de19c9341581c7a2916f99bd8553994a2c558c21bd34ea372a012539ddbfb76",
+      "license": "Zlib"
+    },
+    {
+      "source": "include/vendor/SDL3/include/SDL3/SDL_render.h",
+      "destination": "third_party/vendor/SDL3/include/SDL3/SDL_render.h",
+      "sha256": "e32fcbc32e80d06bd69a3d36855bdac412b2d00195b83a5181458ced4cd317bf",
+      "license": "Zlib"
+    },
+    {
+      "source": "include/vendor/SDL3/include/SDL3/SDL_revision.h",
+      "destination": "third_party/vendor/SDL3/include/SDL3/SDL_revision.h",
+      "sha256": "b15d7906108785962c6d27c1b9879b9c2c931cb25075a13a20d743f59281fdb2",
+      "license": "Zlib"
+    },
+    {
+      "source": "include/vendor/SDL3/include/SDL3/SDL_scancode.h",
+      "destination": "third_party/vendor/SDL3/include/SDL3/SDL_scancode.h",
+      "sha256": "055b04c228b86451e97c972614a76cb0785a8d869df70ba8cef98b0a96235418",
+      "license": "Zlib"
+    },
+    {
+      "source": "include/vendor/SDL3/include/SDL3/SDL_sensor.h",
+      "destination": "third_party/vendor/SDL3/include/SDL3/SDL_sensor.h",
+      "sha256": "0629da20ce5c42c4cf9b12e3c35ba4caaeb0fb73841bc2a246fcefe260330c43",
+      "license": "Zlib"
+    },
+    {
+      "source": "include/vendor/SDL3/include/SDL3/SDL_stdinc.h",
+      "destination": "third_party/vendor/SDL3/include/SDL3/SDL_stdinc.h",
+      "sha256": "e9176755a32346b2c9ec60c350b8dd98c1561b46e12539e9bb027a0e27932dbf",
+      "license": "Zlib"
+    },
+    {
+      "source": "include/vendor/SDL3/include/SDL3/SDL_storage.h",
+      "destination": "third_party/vendor/SDL3/include/SDL3/SDL_storage.h",
+      "sha256": "773c66839fb16a004d632ab0f7d34fb7a3b4371106b5ffe292255a15f01ddd9e",
+      "license": "Zlib"
+    },
+    {
+      "source": "include/vendor/SDL3/include/SDL3/SDL_surface.h",
+      "destination": "third_party/vendor/SDL3/include/SDL3/SDL_surface.h",
+      "sha256": "97a4c47b926d001cbd56c1f703861099ff7b27e11c9a2f76519e7b3b2e1b8189",
+      "license": "Zlib"
+    },
+    {
+      "source": "include/vendor/SDL3/include/SDL3/SDL_system.h",
+      "destination": "third_party/vendor/SDL3/include/SDL3/SDL_system.h",
+      "sha256": "8febdcffaa9afed5b09cd56ec45b65ffe65ab230e91622888ff496b3d5af9a80",
+      "license": "Zlib"
+    },
+    {
+      "source": "include/vendor/SDL3/include/SDL3/SDL_test.h",
+      "destination": "third_party/vendor/SDL3/include/SDL3/SDL_test.h",
+      "sha256": "d3b3d881d54137b19347c81c914b52e20f2a89d13c7ca7225270d1dd19b7c925",
+      "license": "Zlib"
+    },
+    {
+      "source": "include/vendor/SDL3/include/SDL3/SDL_test_assert.h",
+      "destination": "third_party/vendor/SDL3/include/SDL3/SDL_test_assert.h",
+      "sha256": "4e81b0f08e829abf7ec9bbb3f524c58d4b3dff81070899bf2f69afe64d48a8b5",
+      "license": "Zlib"
+    },
+    {
+      "source": "include/vendor/SDL3/include/SDL3/SDL_test_common.h",
+      "destination": "third_party/vendor/SDL3/include/SDL3/SDL_test_common.h",
+      "sha256": "6b112c4d00c2cfb78d626a43aa3be480435e3f986c426e2e38a02db33f77d182",
+      "license": "Zlib"
+    },
+    {
+      "source": "include/vendor/SDL3/include/SDL3/SDL_test_compare.h",
+      "destination": "third_party/vendor/SDL3/include/SDL3/SDL_test_compare.h",
+      "sha256": "dbac58641d39195715d34875c7d884440fa4fd4fdcccfc6ba8590ca4df28a695",
+      "license": "Zlib"
+    },
+    {
+      "source": "include/vendor/SDL3/include/SDL3/SDL_test_crc32.h",
+      "destination": "third_party/vendor/SDL3/include/SDL3/SDL_test_crc32.h",
+      "sha256": "8ab40c4a3e116a6182ee135b067c54449463b422dfc417106c6219b4222be27a",
+      "license": "Zlib"
+    },
+    {
+      "source": "include/vendor/SDL3/include/SDL3/SDL_test_font.h",
+      "destination": "third_party/vendor/SDL3/include/SDL3/SDL_test_font.h",
+      "sha256": "b9f0b7dbbfdcd979167a0766014981e04d730073a6080c3c29609d6e08479b16",
+      "license": "Zlib"
+    },
+    {
+      "source": "include/vendor/SDL3/include/SDL3/SDL_test_fuzzer.h",
+      "destination": "third_party/vendor/SDL3/include/SDL3/SDL_test_fuzzer.h",
+      "sha256": "6dd147744812442b54ff3ff005b2123683f0bae39b014440b1833c07f38d0709",
+      "license": "Zlib"
+    },
+    {
+      "source": "include/vendor/SDL3/include/SDL3/SDL_test_harness.h",
+      "destination": "third_party/vendor/SDL3/include/SDL3/SDL_test_harness.h",
+      "sha256": "32f657a13d89451188134cc667d6d11b3e4553f975a6f17fba426326f5c46182",
+      "license": "Zlib"
+    },
+    {
+      "source": "include/vendor/SDL3/include/SDL3/SDL_test_log.h",
+      "destination": "third_party/vendor/SDL3/include/SDL3/SDL_test_log.h",
+      "sha256": "935eb712ab9aca7dd1ec349f89dbb458e2feb78312513092a89a1bd9f88f2d35",
+      "license": "Zlib"
+    },
+    {
+      "source": "include/vendor/SDL3/include/SDL3/SDL_test_md5.h",
+      "destination": "third_party/vendor/SDL3/include/SDL3/SDL_test_md5.h",
+      "sha256": "86c13419584377686d8be95933f421246aea396e6e1fc8223748453f2a506bf7",
+      "license": "Zlib"
+    },
+    {
+      "source": "include/vendor/SDL3/include/SDL3/SDL_test_memory.h",
+      "destination": "third_party/vendor/SDL3/include/SDL3/SDL_test_memory.h",
+      "sha256": "a381268143f2013022d742a77b1e35491fa710cf244d957e5987b8af527ea0da",
+      "license": "Zlib"
+    },
+    {
+      "source": "include/vendor/SDL3/include/SDL3/SDL_thread.h",
+      "destination": "third_party/vendor/SDL3/include/SDL3/SDL_thread.h",
+      "sha256": "f8b9761ad77090828102d49ac7f01962e4bc918b6b19cfa1c3e9ed607aa19a21",
+      "license": "Zlib"
+    },
+    {
+      "source": "include/vendor/SDL3/include/SDL3/SDL_time.h",
+      "destination": "third_party/vendor/SDL3/include/SDL3/SDL_time.h",
+      "sha256": "dae323ae82b6a4942a4e9418477ed4f284eeac4b815966af2b8ca934842b8e22",
+      "license": "Zlib"
+    },
+    {
+      "source": "include/vendor/SDL3/include/SDL3/SDL_timer.h",
+      "destination": "third_party/vendor/SDL3/include/SDL3/SDL_timer.h",
+      "sha256": "e619324d446432abb3cc2f5218ac089b2345c00e454ec52b5fc723f137e4bf3c",
+      "license": "Zlib"
+    },
+    {
+      "source": "include/vendor/SDL3/include/SDL3/SDL_touch.h",
+      "destination": "third_party/vendor/SDL3/include/SDL3/SDL_touch.h",
+      "sha256": "2248db7eb31d850dc6f7784097acb250c1bafe6508b3e91550478ffffd465261",
+      "license": "Zlib"
+    },
+    {
+      "source": "include/vendor/SDL3/include/SDL3/SDL_tray.h",
+      "destination": "third_party/vendor/SDL3/include/SDL3/SDL_tray.h",
+      "sha256": "65d74cb1727af7cb9029cbdad9cd6d0a7b9fe782efef05fec89fff267ca45036",
+      "license": "Zlib"
+    },
+    {
+      "source": "include/vendor/SDL3/include/SDL3/SDL_version.h",
+      "destination": "third_party/vendor/SDL3/include/SDL3/SDL_version.h",
+      "sha256": "fca9724f2ae1995414c76bf52986a5550bed26a7356ebe9c64e830938428af83",
+      "license": "Zlib"
+    },
+    {
+      "source": "include/vendor/SDL3/include/SDL3/SDL_video.h",
+      "destination": "third_party/vendor/SDL3/include/SDL3/SDL_video.h",
+      "sha256": "3a9acf9c1f494b476aba5a515c893cfd55b136c6e18e82f4e570d01718139eb4",
+      "license": "Zlib"
+    },
+    {
+      "source": "include/vendor/SDL3/include/SDL3/SDL_vulkan.h",
+      "destination": "third_party/vendor/SDL3/include/SDL3/SDL_vulkan.h",
+      "sha256": "a0d1b8c6a2a7982e419dbdb8ea60fce09e99390238634ca117d82442953a4e1c",
+      "license": "Zlib"
+    },
+    {
+      "source": "include/vendor/SDL3/lib/x64/SDL3.lib",
+      "destination": "third_party/vendor/SDL3/lib/x64/SDL3.lib",
+      "sha256": "ee7ebb052e2853708b4cd3d54a0677b63cb64600a736f09d944578dba89640d6",
+      "license": "Zlib"
+    },
+    {
+      "source": "include/vendor/SDL3/LICENSE.txt",
+      "destination": "third_party/vendor/SDL3/LICENSE.txt",
+      "sha256": "97f35b302b361680ec1e891e95d2d52097bb95abff361434916d99dc1305f127",
+      "license": "Zlib"
+    },
+    {
+      "source": "framework/build/_deps/lua-src/src/lapi.c",
+      "destination": "third_party/lua/src/lapi.c",
+      "sha256": "cd369dc6900a7696ca55ccbd4f50eadfa799b975f34b7afe450e1b859517a56e",
+      "license": "MIT"
+    },
+    {
+      "source": "framework/build/_deps/lua-src/src/lapi.h",
+      "destination": "third_party/lua/src/lapi.h",
+      "sha256": "9522209670086adfbb11379416078a7f4dafe154043e320cd435fa1811aaabfb",
+      "license": "MIT"
+    },
+    {
+      "source": "framework/build/_deps/lua-src/src/lauxlib.c",
+      "destination": "third_party/lua/src/lauxlib.c",
+      "sha256": "257c287ed4964ec8bb07fe0a1fd1b52b712e4bccd6c889db62f84abb905d6996",
+      "license": "MIT"
+    },
+    {
+      "source": "framework/build/_deps/lua-src/src/lauxlib.h",
+      "destination": "third_party/lua/src/lauxlib.h",
+      "sha256": "2d9e18e577a6062646268e7f7228264c28bd9b972c186e1af81b8357179c0ab4",
+      "license": "MIT"
+    },
+    {
+      "source": "framework/build/_deps/lua-src/src/lbaselib.c",
+      "destination": "third_party/lua/src/lbaselib.c",
+      "sha256": "5dc9a64468c1ac31e59066c7d3597eeb8ea4ac8fc19a257a74c431624300b487",
+      "license": "MIT"
+    },
+    {
+      "source": "framework/build/_deps/lua-src/src/lcode.c",
+      "destination": "third_party/lua/src/lcode.c",
+      "sha256": "2cf13c7f8205e9f07c2ccf1fedc3f0f0a05d238c194b176c72cc22b2cc96210e",
+      "license": "MIT"
+    },
+    {
+      "source": "framework/build/_deps/lua-src/src/lcode.h",
+      "destination": "third_party/lua/src/lcode.h",
+      "sha256": "c5ad73fb12fd3e9f6b6a5f37fea5b60e4c09f8a262e9ac3ca85e8e047f745cea",
+      "license": "MIT"
+    },
+    {
+      "source": "framework/build/_deps/lua-src/src/lcorolib.c",
+      "destination": "third_party/lua/src/lcorolib.c",
+      "sha256": "5408ccec737678d045d421f84a56e1ce03192a42c55440ffef07bec356aaec89",
+      "license": "MIT"
+    },
+    {
+      "source": "framework/build/_deps/lua-src/src/lctype.c",
+      "destination": "third_party/lua/src/lctype.c",
+      "sha256": "3e21ae6a8faab3ed470ae0de19360da6b4e21a0a0f8572f502f7e13d590186f8",
+      "license": "MIT"
+    },
+    {
+      "source": "framework/build/_deps/lua-src/src/lctype.h",
+      "destination": "third_party/lua/src/lctype.h",
+      "sha256": "c800311872ecba642f6d013b290eda83ba6cd8df8061e25cdca1dd4adcbed8b5",
+      "license": "MIT"
+    },
+    {
+      "source": "framework/build/_deps/lua-src/src/ldblib.c",
+      "destination": "third_party/lua/src/ldblib.c",
+      "sha256": "349afd63c8be2cb8a522e4a04e9f444b65ed1fc7f4dabba5b4b61fd8c11d0c42",
+      "license": "MIT"
+    },
+    {
+      "source": "framework/build/_deps/lua-src/src/ldebug.c",
+      "destination": "third_party/lua/src/ldebug.c",
+      "sha256": "06d065d1f26c29546cc74b61a50267cb70567ae538691f190bf15ca5cd29d308",
+      "license": "MIT"
+    },
+    {
+      "source": "framework/build/_deps/lua-src/src/ldebug.h",
+      "destination": "third_party/lua/src/ldebug.h",
+      "sha256": "b0fd38f6461251ec481cf5633d622569cef939067e37cac23331d9f96b601702",
+      "license": "MIT"
+    },
+    {
+      "source": "framework/build/_deps/lua-src/src/ldo.c",
+      "destination": "third_party/lua/src/ldo.c",
+      "sha256": "af1522801876fe267bf2f892caa24209c395459331ac9a1fdf7ad3ed82402a6c",
+      "license": "MIT"
+    },
+    {
+      "source": "framework/build/_deps/lua-src/src/ldo.h",
+      "destination": "third_party/lua/src/ldo.h",
+      "sha256": "a577744f7c773bd91263540a1effefe75d3dfbfc8a9874349844f9a1ddae8d52",
+      "license": "MIT"
+    },
+    {
+      "source": "framework/build/_deps/lua-src/src/ldump.c",
+      "destination": "third_party/lua/src/ldump.c",
+      "sha256": "3c05402c5e282e06c2218f2469b1f38e1b84c783b9387aec7740c60b287d82c9",
+      "license": "MIT"
+    },
+    {
+      "source": "framework/build/_deps/lua-src/src/lfunc.c",
+      "destination": "third_party/lua/src/lfunc.c",
+      "sha256": "38809428b76fafa79db9f65b7248cc0c02c9b696e7410fc4ab1699940768f1b2",
+      "license": "MIT"
+    },
+    {
+      "source": "framework/build/_deps/lua-src/src/lfunc.h",
+      "destination": "third_party/lua/src/lfunc.h",
+      "sha256": "81dc02d55ae8000461ab90bb9689d2600ba51f2ea9ac9fb019386995c07e3e4a",
+      "license": "MIT"
+    },
+    {
+      "source": "framework/build/_deps/lua-src/src/lgc.c",
+      "destination": "third_party/lua/src/lgc.c",
+      "sha256": "caa4df2eccfae0899686d1aed3f2bad91184de3bd12176fdfead91147f704e0b",
+      "license": "MIT"
+    },
+    {
+      "source": "framework/build/_deps/lua-src/src/lgc.h",
+      "destination": "third_party/lua/src/lgc.h",
+      "sha256": "c83d3b8e31345c0aacd37442954a7f2434312ee48f98a8b9ae4fc8aad26d0c99",
+      "license": "MIT"
+    },
+    {
+      "source": "framework/build/_deps/lua-src/src/linit.c",
+      "destination": "third_party/lua/src/linit.c",
+      "sha256": "3578568e27b9c1e2f4a7f9a53fdb4bc8ac095db75cc86e966bb1deec2792158e",
+      "license": "MIT"
+    },
+    {
+      "source": "framework/build/_deps/lua-src/src/liolib.c",
+      "destination": "third_party/lua/src/liolib.c",
+      "sha256": "bd3176d1c5d30d61fdfc2aa17d7af0819f2da51694942a24b6c185ef797f0060",
+      "license": "MIT"
+    },
+    {
+      "source": "framework/build/_deps/lua-src/src/ljumptab.h",
+      "destination": "third_party/lua/src/ljumptab.h",
+      "sha256": "6c3e9858b9dad03ccd61445ab0bff0eb6ddfa5e731e044f93350fe6c6b2ad8d5",
+      "license": "MIT"
+    },
+    {
+      "source": "framework/build/_deps/lua-src/src/llex.c",
+      "destination": "third_party/lua/src/llex.c",
+      "sha256": "5cfbaabf3dc0d75835aaafc37fcd87a92f3dba451e002732747b602fda122958",
+      "license": "MIT"
+    },
+    {
+      "source": "framework/build/_deps/lua-src/src/llex.h",
+      "destination": "third_party/lua/src/llex.h",
+      "sha256": "5ce0302528260ed6a40ec3ebf5e27d3bc108242d9dca57e8cdbe80fe34e13410",
+      "license": "MIT"
+    },
+    {
+      "source": "framework/build/_deps/lua-src/src/llimits.h",
+      "destination": "third_party/lua/src/llimits.h",
+      "sha256": "d588bdac3c8e1adc88df3dc92c950a1bfa29663d15f9221f58e2aa553b05a422",
+      "license": "MIT"
+    },
+    {
+      "source": "framework/build/_deps/lua-src/src/lmathlib.c",
+      "destination": "third_party/lua/src/lmathlib.c",
+      "sha256": "da5c7d74cffce22f0a9eb468e6e7e80b543ea6bec5c21aefb8cf285a3556722a",
+      "license": "MIT"
+    },
+    {
+      "source": "framework/build/_deps/lua-src/src/lmem.c",
+      "destination": "third_party/lua/src/lmem.c",
+      "sha256": "6154c2865bec97e61a92d8284be7e8ba21818f6edc95f5d72adb5dcf3e9532ca",
+      "license": "MIT"
+    },
+    {
+      "source": "framework/build/_deps/lua-src/src/lmem.h",
+      "destination": "third_party/lua/src/lmem.h",
+      "sha256": "8318a170a1d4bf21c3cb4deb1f8661f1dc7cf4eb688e4ec9a1e7ea16bfc3b5cf",
+      "license": "MIT"
+    },
+    {
+      "source": "framework/build/_deps/lua-src/src/loadlib.c",
+      "destination": "third_party/lua/src/loadlib.c",
+      "sha256": "f21cafa3258669d6f8c4f09195c654a4a588ab402f5e976c731918658b747a5b",
+      "license": "MIT"
+    },
+    {
+      "source": "framework/build/_deps/lua-src/src/lobject.c",
+      "destination": "third_party/lua/src/lobject.c",
+      "sha256": "7a9748e38c52e45bc468cae74ccea08b98f8c53a523c1b0f9a117e5cf162c921",
+      "license": "MIT"
+    },
+    {
+      "source": "framework/build/_deps/lua-src/src/lobject.h",
+      "destination": "third_party/lua/src/lobject.h",
+      "sha256": "8539beae7dd9a08efc09b04d64c09663e9afc0f2ad342abc612bb000c0c9be70",
+      "license": "MIT"
+    },
+    {
+      "source": "framework/build/_deps/lua-src/src/lopcodes.c",
+      "destination": "third_party/lua/src/lopcodes.c",
+      "sha256": "bdc9d39fd8bf1a350c0249f726c5f61bef64b122b93a0fbc172b0328dc01f594",
+      "license": "MIT"
+    },
+    {
+      "source": "framework/build/_deps/lua-src/src/lopcodes.h",
+      "destination": "third_party/lua/src/lopcodes.h",
+      "sha256": "b3f511933be3039a4b92ba79601b2e5daf75b34f268bfc757adf3e24ea4f1ec9",
+      "license": "MIT"
+    },
+    {
+      "source": "framework/build/_deps/lua-src/src/lopnames.h",
+      "destination": "third_party/lua/src/lopnames.h",
+      "sha256": "fbdbebc96b136efc6165cba1ac2b311b0c52413aaef59ae9ec750748f13c9e9a",
+      "license": "MIT"
+    },
+    {
+      "source": "framework/build/_deps/lua-src/src/loslib.c",
+      "destination": "third_party/lua/src/loslib.c",
+      "sha256": "474f2a3ee7ca8083e4552177da426ea159be82b4b34f3bd2151239810b57bb0e",
+      "license": "MIT"
+    },
+    {
+      "source": "framework/build/_deps/lua-src/src/lparser.c",
+      "destination": "third_party/lua/src/lparser.c",
+      "sha256": "e24f9e869afd690749404b3075fd82efaf3af882a13a131b612c6ff28e052a8c",
+      "license": "MIT"
+    },
+    {
+      "source": "framework/build/_deps/lua-src/src/lparser.h",
+      "destination": "third_party/lua/src/lparser.h",
+      "sha256": "68c34ef2d6e5a227f7cff18436a42c6739b1470ce12f059f168d9bb69fc8d49c",
+      "license": "MIT"
+    },
+    {
+      "source": "framework/build/_deps/lua-src/src/lprefix.h",
+      "destination": "third_party/lua/src/lprefix.h",
+      "sha256": "626785d4eda75e9435f0ac21a780ae3b11f8b27dc36934e637a5c2305f906531",
+      "license": "MIT"
+    },
+    {
+      "source": "framework/build/_deps/lua-src/src/lstate.c",
+      "destination": "third_party/lua/src/lstate.c",
+      "sha256": "e5f3b17104f6764bad609d18ce8f3008a87731491a41cb78b79aed78777c21d8",
+      "license": "MIT"
+    },
+    {
+      "source": "framework/build/_deps/lua-src/src/lstate.h",
+      "destination": "third_party/lua/src/lstate.h",
+      "sha256": "8816454aa1df7c6cb1bc6366ca163b575e259e36497b75db354c572a81836cee",
+      "license": "MIT"
+    },
+    {
+      "source": "framework/build/_deps/lua-src/src/lstring.c",
+      "destination": "third_party/lua/src/lstring.c",
+      "sha256": "b6162f3a65735a902911ffafcafe1db0994c3b0df441581dcbb04dca6bc0b71d",
+      "license": "MIT"
+    },
+    {
+      "source": "framework/build/_deps/lua-src/src/lstring.h",
+      "destination": "third_party/lua/src/lstring.h",
+      "sha256": "a8cb0d737276f6a41071a0776ee1d8aa13cf02fa7c79ea096d202b14ea792e31",
+      "license": "MIT"
+    },
+    {
+      "source": "framework/build/_deps/lua-src/src/lstrlib.c",
+      "destination": "third_party/lua/src/lstrlib.c",
+      "sha256": "d386f8bbb75d5ef7b04c8ca9e747ff256525a9546bb6ff01c788b912b6995aa6",
+      "license": "MIT"
+    },
+    {
+      "source": "framework/build/_deps/lua-src/src/ltable.c",
+      "destination": "third_party/lua/src/ltable.c",
+      "sha256": "27a711276b1e22aaea3b9182e2d17693f598cfe9bc7fd203c05d400df6673853",
+      "license": "MIT"
+    },
+    {
+      "source": "framework/build/_deps/lua-src/src/ltable.h",
+      "destination": "third_party/lua/src/ltable.h",
+      "sha256": "1c8736b87aa408ef2afebfe693f46ae5424d658d798fb2a8a88b6868cf5569b5",
+      "license": "MIT"
+    },
+    {
+      "source": "framework/build/_deps/lua-src/src/ltablib.c",
+      "destination": "third_party/lua/src/ltablib.c",
+      "sha256": "3d430a6f9cde66d0b791444c6164e7559ccf62b7cdc3a6325882408c6806e26c",
+      "license": "MIT"
+    },
+    {
+      "source": "framework/build/_deps/lua-src/src/ltm.c",
+      "destination": "third_party/lua/src/ltm.c",
+      "sha256": "7cbe645ed7e1161d31eb32ea467d8220b592c0acfa6107f0194487f0ddbf954b",
+      "license": "MIT"
+    },
+    {
+      "source": "framework/build/_deps/lua-src/src/ltm.h",
+      "destination": "third_party/lua/src/ltm.h",
+      "sha256": "5b2f6e59951edeef6e71bebe5ac4351f4b3602ee0461729308b80dcee8cea910",
+      "license": "MIT"
+    },
+    {
+      "source": "framework/build/_deps/lua-src/src/lua.c",
+      "destination": "third_party/lua/src/lua.c",
+      "sha256": "ee7b72f64fa489d3e5393494f09c2517f5bdceb43f768c087a9ced74060af254",
+      "license": "MIT"
+    },
+    {
+      "source": "framework/build/_deps/lua-src/src/lua.h",
+      "destination": "third_party/lua/src/lua.h",
+      "sha256": "06138352a12f0710bc214eb3a2e134889979cadc9a7a761a4e43dafa926419af",
+      "license": "MIT"
+    },
+    {
+      "source": "framework/build/_deps/lua-src/src/lua.hpp",
+      "destination": "third_party/lua/src/lua.hpp",
+      "sha256": "fd83f7e823cfbb03ac2da937ec83f01b4a6ddaac220a4fa1ffd6c6c3842c5890",
+      "license": "MIT"
+    },
+    {
+      "source": "framework/build/_deps/lua-src/src/luac.c",
+      "destination": "third_party/lua/src/luac.c",
+      "sha256": "3a424e6cb4177886c8790821cf15345f488764bc215eb29719c80002ef24cdc1",
+      "license": "MIT"
+    },
+    {
+      "source": "framework/build/_deps/lua-src/src/luaconf.h",
+      "destination": "third_party/lua/src/luaconf.h",
+      "sha256": "af243c94bee6d2601383e8b65ed66a0d1b4ab3b7418ff903fcd0679912160e3a",
+      "license": "MIT"
+    },
+    {
+      "source": "framework/build/_deps/lua-src/src/lualib.h",
+      "destination": "third_party/lua/src/lualib.h",
+      "sha256": "4ea0f67d3e467f5d6a327616e22a3c2da8e03d47a3c3660916275f2842f521ea",
+      "license": "MIT"
+    },
+    {
+      "source": "framework/build/_deps/lua-src/src/lundump.c",
+      "destination": "third_party/lua/src/lundump.c",
+      "sha256": "7f7b078026e162161d402feba73a69cbe66a98558ec0745a445a595f42eac688",
+      "license": "MIT"
+    },
+    {
+      "source": "framework/build/_deps/lua-src/src/lundump.h",
+      "destination": "third_party/lua/src/lundump.h",
+      "sha256": "1137c0c9d8654ce223374d21c52a599fd1cc1ccb869801f87a27238a7bf55e8e",
+      "license": "MIT"
+    },
+    {
+      "source": "framework/build/_deps/lua-src/src/lutf8lib.c",
+      "destination": "third_party/lua/src/lutf8lib.c",
+      "sha256": "441251bdf176e066e60a36735594f0cb92c067143fed32e373949bdb65a52866",
+      "license": "MIT"
+    },
+    {
+      "source": "framework/build/_deps/lua-src/src/lvm.c",
+      "destination": "third_party/lua/src/lvm.c",
+      "sha256": "7df5095ee2f6c88162d3536afb1fa04527b98fa3265cb579fc9aa6dcf05606de",
+      "license": "MIT"
+    },
+    {
+      "source": "framework/build/_deps/lua-src/src/lvm.h",
+      "destination": "third_party/lua/src/lvm.h",
+      "sha256": "aba601b887236d5e135392e0c49370df3b5a9ac5c66ab2d44156b3244f2dcef3",
+      "license": "MIT"
+    },
+    {
+      "source": "framework/build/_deps/lua-src/src/lzio.c",
+      "destination": "third_party/lua/src/lzio.c",
+      "sha256": "fba61ceeeb257a3fe5f63310f21e14fc26c4be647583dcf8e74cbc7fb7e43e8a",
+      "license": "MIT"
+    },
+    {
+      "source": "framework/build/_deps/lua-src/src/lzio.h",
+      "destination": "third_party/lua/src/lzio.h",
+      "sha256": "9673f62eac2d0fe3010f9d23148be7b8113319fdf4c4490015cd9feae2ecaad4",
+      "license": "MIT"
+    },
+    {
+      "source": "framework/build/_deps/lua-src/src/Makefile",
+      "destination": "third_party/lua/src/Makefile",
+      "sha256": "d945aee4718785b5bbdbc575d76a16ef60bd65cbfed47ef53e7ced99b580371d",
+      "license": "MIT"
+    },
+    {
+      "source": "framework/build/_deps/lua-src/README",
+      "destination": "third_party/lua/README",
+      "sha256": "d79084a014fca706eefe55350ee81b2ddd8560dc85245176afce3c8d1f1b963a",
+      "license": "MIT"
+    },
+    {
+      "source": "framework/licenses/Tcl-8.6.15-license.terms",
+      "destination": "licenses/Tcl-8.6.15-license.terms",
+      "sha256": "c0a69a2bfd757361ec7e6143973b103c90409316b49e9c88db26ad6388e79f16",
+      "license": "Tcl"
+    },
+    {
+      "source": "framework/licenses/sources.json",
+      "destination": "licenses/sources.json",
+      "sha256": "42a7b53cc6700712d315fdfddcb211bff4e710603f4c0fc28677e9cd72f7573e",
+      "license": "Tcl"
+    },
+    {
+      "source": "_drafts/framework-brand/icon.svg",
+      "destination": "assets/brand/icon.svg",
+      "sha256": "4004451a8e4c492d1dd346dfe1600a16747a1a1a60e3e75a367941c01e9e45c5",
+      "license": "MIT"
+    },
+    {
+      "source": "_drafts/framework-brand/icon-small.svg",
+      "destination": "assets/brand/icon-small.svg",
+      "sha256": "2e9b974652996bfffe945f0ae069ed4300fe022087856cf5e17a5db955b87049",
+      "license": "MIT"
+    },
+    {
+      "source": "_drafts/framework-brand/icon-mono.svg",
+      "destination": "assets/brand/icon-mono.svg",
+      "sha256": "ee1abe078dcbf5192bce9b2dcb13cd09c44e0e7a2db4272acb44b840fad24afa",
+      "license": "MIT"
+    },
+    {
+      "source": "_drafts/framework-brand/wordmark.svg",
+      "destination": "assets/brand/wordmark.svg",
+      "sha256": "d3d011e9b551436b70be15b994374403a168bd34eadf047badbe57bc59d4307a",
+      "license": "MIT"
+    },
+    {
+      "source": "_drafts/framework-brand/readme-banner.svg",
+      "destination": "assets/brand/readme-banner.svg",
+      "sha256": "3820c93f2f5617b876d929df4101c977510730bfe0586a32befdf39c8740b422",
+      "license": "MIT"
+    },
+    {
+      "source": "_drafts/framework-brand/readme-banner.png",
+      "destination": "assets/brand/readme-banner.png",
+      "sha256": "16ec9731af32b76704fe80948eaf57aae1e2393f92c0978594428ff9ab4e91fc",
+      "license": "MIT"
+    },
+    {
+      "source": "_drafts/framework-brand/style.css",
+      "destination": "docs/theme/astra.css",
+      "sha256": "c8b8db50bc4aef3ab0e6eafde5171a761476a58927eff79517af1cd2b5dff1a5",
+      "license": "MIT"
+    },
+    {
+      "source": "framework/evidence/acceptance.json",
+      "destination": "evidence/runtime-acceptance.json",
+      "sha256": "79a5bf0a2e31d778ec2e5efb5498a78b6c22f610f6aa8aff93ad1ef5d20ebdd5",
+      "license": "MIT"
+    },
+    {
+      "source": "framework/docs/quickstart.html",
+      "destination": "docs/legacy/quickstart.html",
+      "sha256": "f3560bfa2229530f785f2e26f9360caa82b93ef3e20a6b64313af3006a60ca4c",
+      "license": "MIT"
+    },
+    {
+      "source": "include/vendor/minhook/cmake/minhook-config.cmake.in",
+      "destination": "third_party/vendor/minhook/cmake/minhook-config.cmake.in",
+      "sha256": "3213ac21ad3415576ce5138fcf5a00dc2913179387252808573d91dcc4d5dd1d",
+      "license": "BSD-2-Clause"
+    }
+  ]
+}

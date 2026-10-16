@@ -1,0 +1,8 @@
+Material
+{
+    mode lit
+    color 1 1 1 1
+    zread true
+    zwrite true
+    culling none
+}

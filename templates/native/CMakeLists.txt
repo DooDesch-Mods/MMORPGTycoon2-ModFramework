@@ -1,0 +1,5 @@
+cmake_minimum_required(VERSION 3.24)
+project(ExampleNative LANGUAGES CXX)
+add_library(ExampleNative SHARED plugin.cpp)
+target_include_directories(ExampleNative PRIVATE .mt2fw)
+set_target_properties(ExampleNative PROPERTIES RUNTIME_OUTPUT_DIRECTORY "$<1:${CMAKE_CURRENT_SOURCE_DIR}>")

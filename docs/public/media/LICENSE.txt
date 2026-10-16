@@ -1,0 +1,3 @@
+Framework UI and original branding: Copyright (c) 2026 DooDesch, MIT.
+Original game artwork shown in real MMORPG Tycoon 2 captures retains its respective rights and is not licensed under the framework MIT license.
+No original game files or private reference icon are redistributed here. See media.json for individual capture cases.

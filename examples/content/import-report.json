@@ -1,0 +1,17 @@
+{
+  "triangles": 6,
+  "bounds": [
+    [
+      -2.0,
+      0.0,
+      -2.0
+    ],
+    [
+      2.0,
+      4.0,
+      2.0
+    ]
+  ],
+  "warnings": [],
+  "format": "VectorStorm ModelV1 binary for building catalog; editable VMD retained alongside it"
+}

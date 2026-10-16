@@ -1,0 +1,14 @@
+{
+  "id": "example.camera",
+  "name": "Camera",
+  "version": "1.0.0",
+  "api_version": "1.0.0",
+  "type": "lua",
+  "entry": "main.lua",
+  "capabilities": [
+    "ui",
+    "world.read",
+    "camera"
+  ],
+  "multiplayer": "singleplayer"
+}

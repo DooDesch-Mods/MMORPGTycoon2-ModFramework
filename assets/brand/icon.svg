@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" role="img" aria-labelledby="title desc"><title id="title">MT2 Mod Framework</title><desc id="desc">An open cyan world tile with an amber module above it.</desc><g id="world-tile">
+  <path fill="#11758c" d="M12 66 64 96 116 66v22l-52 30-52-30z"/>
+  <path fill="#075267" d="m64 96 52-30v22l-52 30z"/>
+  <path fill="#64e4d5" d="m12 66 28-16 24 14 24-14 28 16-52 30z"/>
+  <path fill="#b7fff0" d="m12 66 28-16 8 5-28 16z"/>
+</g>
+<g id="added-module">
+  <path fill="#ffca67" d="m42 30 22-13 22 13-22 13z"/>
+  <path fill="#d68b29" d="m42 30 22 13v24L42 54z"/>
+  <path fill="#f3ad43" d="m64 43 22-13v24L64 67z"/>
+</g></svg>

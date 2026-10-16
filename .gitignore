@@ -1,0 +1,13 @@
+/build/
+/artifacts/
+/dist/
+/node_modules/
+/docs/.vitepress/cache/
+/docs/.vitepress/dist/
+__pycache__/
+*.pyc
+*.dll
+*.pdb
+*.obj
+*.log
+/examples/*/build/

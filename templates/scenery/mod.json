@@ -1,0 +1,12 @@
+{
+  "id": "example.scenery",
+  "name": "Pyramid",
+  "version": "1.0.0",
+  "api_version": "1.0.0",
+  "type": "content",
+  "entry": "content.json",
+  "capabilities": [
+    "content"
+  ],
+  "multiplayer": "singleplayer"
+}

@@ -1,0 +1,140 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>MT2 Mod Framework - Create your first mod</title>
+<style>
+:root{color-scheme:dark;font:17px/1.65 system-ui,sans-serif;background:#101824;color:#e4edf6}body{margin:0}main{max-width:920px;margin:auto;padding:38px 28px}h1{font-size:34px;line-height:1.2}h2{margin-top:40px;font-size:24px}h3{margin-top:30px}a{color:#87ceff}a:focus-visible{outline:3px solid #ffdc86;outline-offset:4px}pre{background:#1b2b3e;padding:20px;overflow:auto;border-left:3px solid #87ceff}code{font-size:14px}nav{display:flex;gap:24px;flex-wrap:wrap;border-block:1px solid #34465b;padding:16px 0}table{border-collapse:collapse;width:100%}th,td{text-align:left;padding:12px;border-bottom:1px solid #34465b;vertical-align:top}.note{border-left:3px solid #ffda94;padding-left:18px}li{padding-bottom:9px}footer{margin-top:44px;padding-top:20px;border-top:1px solid #34465b}
+</style>
+<style>@media(max-width:650px){main{padding:24px 18px;min-width:0}h1{font-size:28px}table{display:block;overflow-x:auto}td,th{min-width:130px}pre{max-width:100%;box-sizing:border-box}code{overflow-wrap:anywhere}}</style>
+</head>
+<body><main>
+<h1>Create your first MT2 mod</h1>
+<p>MT2 Mod Framework loads Lua scripts, native plugins and authored content into MMORPG Tycoon 2. Start with a visible greeting, change it, then reload it while the game stays open.</p>
+<p>🛟 <strong>Need help or found a bug?</strong> Get support at <a href="https://support.doodesch.de/modframework">support.doodesch.de/modframework</a>.</p>
+<nav aria-label="Contents"><a href="#first">First mod</a><a href="#recipes">Recipes</a><a href="#api">API</a><a href="#errors">Troubleshooting</a><a href="#versions">Versions</a></nav>
+<p class="note">Development candidate. Check the package's acceptance record before treating a feature as release-ready. Multiplayer writes require the later multiplayer bridge.</p>
+<h2 id="first">A greeting in five steps</h2>
+<ol>
+<li>Open <strong>MT2FW-Helper.exe</strong>. Select your Steam game and a mod profile, then install the framework. An unknown existing loader must be inspected first.</li>
+<li>Choose <strong>Create a mod</strong>, select <strong>Hello MT2</strong>, and enter an ID such as <code>yourname.hello</code>. Select the profile's <code>mods</code> directory as the parent.</li>
+<li>Start the game normally through Steam. A <strong>Hello MT2</strong> window appears. F10 opens the Mods menu. Load a world to see its name in the greeting.</li>
+<li>Open the generated <code>main.lua</code> in your text editor. Change <code>"Hello, MT2!"</code> to your own message and save the file.</li>
+<li>Open <strong>Mods</strong> and select <strong>Reload</strong> beside your mod. The message changes without restarting the game. A syntax error preserves the previous instance and shows the original file and line.</li>
+</ol>
+<p>Lua needs no compiler. VS Code with Lua language support is optional. Generated projects include API types and editor settings for completion.</p>
+<h3>Share the mod</h3>
+<p>Use <strong>Check mod</strong>, then <strong>Pack mod ZIP</strong> in the helper. Write the ZIP outside the source directory. Another player installs that ZIP through the same helper. Include your own source, assets and license; reference game resources instead of redistributing them.</p>
+<pre><code>mt2fw new yourname.hello C:/Mods/yourname.hello --template hello
+mt2fw check C:/Mods/yourname.hello
+mt2fw pack C:/Mods/yourname.hello C:/Mods/hello-1.0.0.zip
+mt2fw doctor --game "C:/Steam/steamapps/common/MMORPG Tycoon 2"</code></pre>
+<h2 id="recipes">Small, useful recipes</h2>
+<h3>Show a setting and a world event</h3>
+<pre><code>mt2.config.define("greeting", {
+    type = "string", default = "Hello, MT2!", label = "Greeting"
+})
+
+mt2.events.on("world_ready", function(event)
+    mt2.log.info("World ready: " .. event.name)
+end)
+
+mt2.ui.window("My greeting", function()
+    mt2.ui.text(mt2.config.get("greeting"))
+end)</code></pre>
+<h3>Read an object explicitly</h3>
+<pre><code>mt2.ui.window("Selected object", function()
+    if mt2.world.status().loaded and mt2.ui.button("Read selection") then
+        local object = mt2.objects.selected()
+        if object then mt2.log.info("Selected UID: " .. object.handle.uid) end
+    end
+end)</code></pre>
+<p>Declare <code>ui</code>, <code>world.read</code> and <code>objects.read</code> capabilities. Read large lists on demand. Handles contain an epoch and an exact string UID; keep the handle intact instead of converting its UID to a floating-point number.</p>
+<h3>Keep profile and world data</h3>
+<pre><code>mt2.events.on("start", function()
+    local count = mt2.storage.get("starts", 0)
+    mt2.storage.set("starts", count + 1)
+end)
+
+mt2.events.on("world_ready", function()
+    local value = mt2.storage.get("visits", 0, "world")
+    mt2.storage.set("visits", value + 1, "world")
+end)</code></pre>
+<p>Profile data persists independently. World data is associated with a confirmed game save. Reloading code preserves completed world actions; it does not rewind a save.</p>
+<p>Use <code>mt2.objects.persist(handle)</code> for a mod-owned reference to a root-world building. Store the returned string in world data, then use <code>mt2.objects.resolve(id)</code> after loading. The framework captures the saved region and building position and checks the saved identity before rebinding. Session handles are invalid after a world change.</p>
+<h3>Bind a key</h3>
+<pre><code>-- SDL scancode 66 is F9. Declare the input capability.
+mt2.input.bind("show_message", 66, function()
+    mt2.log.info("My shortcut was pressed")
+end)</code></pre>
+<p>F10 belongs to the framework. Conflicting mod shortcuts report their current owner.</p>
+<h3>Submit a world action</h3>
+<pre><code>local pending
+mt2.events.on("world_ready", function()
+    -- Use an owned, buildable position and a registered definition.
+    pending = mt2.actions.place("yourname.scenery:obelisk", 0, 0, 0)
+end)
+mt2.events.on("action_completed", function(result)
+    if pending and result.id == pending.id then
+        mt2.log.info(result.status)
+        if result.cause ~= "" then mt2.log.warn(result.cause) end
+    end
+end)</code></pre>
+<p>Declare <code>objects.write</code> and use <code>singleplayer</code> or <code>shared</code>. A returned <code>accepted</code> request is queued. Wait for <code>confirmed</code>. Investigate <code>unknown</code> before taking another action; it must not be automatically replayed.</p>
+<h2 id="api">API reference</h2>
+<h3>Camera and time</h3>
+<pre><code>-- Declare ui, world.read, camera and time.write; use singleplayer.
+mt2.ui.window("World controls", function()
+    if not mt2.world.status().loaded then return end
+    local view = mt2.camera.get()
+    mt2.ui.text("Camera distance: " .. view.distance)
+    if mt2.ui.button("Pause") then mt2.time.set(true, 1) end
+    if mt2.ui.button("Resume") then mt2.time.set(false, 1) end
+    if mt2.ui.button("Focus here") then
+        mt2.camera.focus(view.focus_x, view.focus_y, view.focus_z, 100)
+    end
+end)</code></pre>
+<h3>Import static scenery</h3>
+<p>Choose <strong>Import GLB</strong> in the helper. Drag the preview to inspect orientation, enter a scale and refresh. The importer reports triangle count, materials, textures, bounds and unsupported features before exporting a separate content package. Place that package in the profile's <code>mods</code> directory and restart the game. Its model is registered in the native Scenery catalog. Each content ID and generated resource name belongs to that mod.</p>
+<p>Version 1 supports static triangles, node transforms, normals, UVs, vertex colors, base colors and embedded PNG/JPEG textures. Skins, animation, morphs, sparse accessors, compressed geometry and unsupported material extensions report an import error. Metallic and roughness factors map to diffuse materials with a warning. The native catalog uses binary ModelV1 files; the editable VMD remains alongside the generated VMB.</p>
+<p>The generated content manifest registers the package automatically. To combine Lua behavior and content in one package, set its manifest type to <code>lua</code>, use <code>main.lua</code> as the entry, retain the <code>content</code> capability, and register the generated definitions once at startup:</p>
+<pre><code>mt2.content.register(require("definitions"))</code></pre>
+<p>The generated <code>definitions.lua</code> contains the exact resource names. Registrations are prepared before activation. Lua packages that register content require restarting for changes, just like content packages.</p>
+<table><thead><tr><th>Group</th><th>Entry points</th><th>Contract</th></tr></thead><tbody>
+<tr><td><code>events</code></td><td><code>on</code>, <code>off</code></td><td>Start, stop, world_ready, world_leave, saved, update, render, input, object_changed and action_completed. Subscriptions belong to one plugin.</td></tr>
+<tr><td><code>ui</code></td><td><code>window</code>, <code>text</code>, <code>button</code>, <code>checkbox</code>, <code>number</code></td><td>Register each window once. Draw widgets inside its callback. UI callbacks share the framework's render hook.</td></tr>
+<tr><td><code>input</code></td><td><code>bind(name, scancode, callback)</code></td><td>Named keyboard shortcuts with ownership and conflict reporting.</td></tr>
+<tr><td><code>world</code></td><td><code>status()</code></td><td>Loaded state, name and world epoch.</td></tr>
+<tr><td><code>objects</code></td><td><code>list(limit)</code>, <code>get(handle)</code>, <code>selected()</code></td><td>Bounded queries. Deleted objects and handles from other epochs are rejected.</td></tr>
+<tr><td><code>camera</code></td><td><code>get()</code>, <code>focus(x,y,z,distance)</code></td><td>Native camera state and focus request with native zoom-range checks.</td></tr>
+<tr><td><code>time</code></td><td><code>get()</code>, <code>set(paused,speed)</code></td><td>Native clock state. Changing it requires world-write permission.</td></tr>
+<tr><td><code>actions</code></td><td><code>place</code>, <code>move</code>, <code>remove</code>, <code>status</code></td><td>Queued game-thread operations, exact action IDs and explicit outcomes.</td></tr>
+<tr><td><code>content</code></td><td><code>register(definitions)</code></td><td>Namespaced authored static scenery and its resources. Content changes require restart.</td></tr>
+<tr><td><code>config</code></td><td><code>define</code>, <code>get</code>, <code>set</code></td><td>Boolean, string, number and integer settings. Optional min/max bounds. Settings appear in the Mods menu.</td></tr>
+<tr><td><code>storage</code></td><td><code>get(key,default,scope)</code>, <code>set(key,value,scope)</code></td><td>JSON-compatible values in profile or world scope.</td></tr>
+<tr><td><code>log</code></td><td><code>debug</code>, <code>info</code>, <code>warn</code>, <code>error</code></td><td>Original causes stay visible. The developer window filters by mod or message.</td></tr>
+</tbody></table>
+<h3>Native plugins</h3>
+<p>Use the native template and the bundled <code>mt2fw/plugin.h</code>. Export <code>MT2FW_PluginQuery</code>, <code>MT2FW_PluginLoad</code> and <code>MT2FW_PluginShutdown</code>. The host struct carries its size and ABI version. Subscribe to named events and use JSON requests for the same capability-checked services as Lua.</p>
+<p>With Visual Studio C++ and CMake installed, build from the generated native mod directory. The DLL is written beside <code>mod.json</code>, ready for checking and packaging:</p>
+<pre><code>cmake -S . -B build -A x64
+cmake --build build --config Release
+mt2fw check .</code></pre>
+<p>Measure the host request buffer first; that call does not execute the operation. Supply the returned capacity for the execution call. Strings are UTF-8. Never let C++ exceptions cross the ABI or free memory owned by the other module. Native plugins remain loaded until the game exits.</p>
+<h2 id="errors">Troubleshooting</h2>
+<table><thead><tr><th>State</th><th>Action</th></tr></thead><tbody>
+<tr><td>Unsupported game build</td><td>Use <strong>Diagnostics</strong> to read the executable hash. Wait for an adapter for that build. Do not force a signature match.</td></tr>
+<tr><td>Reload rejected</td><td>Fix the reported file and line, then reload again. The previous instance stays active if replacement preparation fails.</td></tr>
+<tr><td>Mod disabled after callback failure</td><td>Read the original exception, fix the script and reload. Other independent mods continue running.</td></tr>
+<tr><td>Dependency unavailable</td><td>Install and enable the named dependency at a compatible version, then restart.</td></tr>
+<tr><td>Expired handle</td><td>Read the selection or query the current world again. Do not carry live object handles between worlds.</td></tr>
+<tr><td>Action result unknown</td><td>Inspect the actual world and original error. Do not replay the same mutation automatically.</td></tr>
+<tr><td>Missing content for a save</td><td>Restore the matching content package before loading. The framework must preserve the save.</td></tr>
+</tbody></table>
+<p>Lua callbacks have an instruction budget and each Lua state has a memory budget. Long-running work belongs outside frame callbacks. Direct process execution and arbitrary native Lua libraries are unavailable through the regular Lua API.</p>
+<h2 id="versions">Versions and compatibility</h2>
+<p>Declare <code>api_version: "1.0.0"</code>. Stable APIs are additive within a major version. The manifest supports exact dependency versions, caret ranges and minimum ranges. Keep package IDs stable when releasing updates.</p>
+<p><code>local</code> mods cannot request world changes. <code>shared</code> mods require matching packages, hashes and shared settings on all peers. <code>singleplayer</code> mods cannot activate in a multiplayer session. The separate multiplayer bridge must pass its two-account acceptance before shared writes become available.</p>
+<footer>MT2 Mod Framework | MIT for framework, SDK and templates. The original multiplayer product retains its own license. Game files are not part of a mod package.</footer>
+</main></body></html>

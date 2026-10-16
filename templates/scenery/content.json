@@ -1,0 +1,9 @@
+[
+  {
+    "id": "example.scenery:pyramid",
+    "name": "Pyramid",
+    "variant": "mt2fw_example_scenery_d116a33e5f7e_pyramid",
+    "model": "assets/mt2fw/example_scenery_d116a33e5f7e_pyramid/model.vmb",
+    "material": "assets/materials/mt2fw_example_scenery_d116a33e5f7e_pyramid_0.mat"
+  }
+]

@@ -1,0 +1,22 @@
+name: Bug report
+description: Describe a reproducible framework or mod authoring problem
+body:
+  - type: input
+    id: versions
+    attributes:
+      label: Framework and game version
+      description: Include the framework version and supported-game check from doctor.
+    validations:
+      required: true
+  - type: textarea
+    id: reproduce
+    attributes:
+      label: Steps and expected result
+      description: Include a small mod or code sample. Remove private paths and account details.
+    validations:
+      required: true
+  - type: textarea
+    id: cause
+    attributes:
+      label: Actual result and original error
+      description: Preserve the original cause, file and line where available. Do not attach private saves or game files.

@@ -1,0 +1,61 @@
+name: Build and verify framework
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: framework-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  windows:
+    runs-on: windows-2022
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - run: python -m pip install -r requirements-dev.txt
+      - run: npm ci --ignore-scripts
+      - run: python tools/license_inventory.py
+      - run: python tools/build.py
+      - run: python -m unittest discover -s tests -p "test_*.py"
+      - run: python tools/generate_docs.py --check
+      - run: python tools/check_contract.py
+      - run: npm run docs:build
+      - run: python tools/check_docs.py
+      - run: npx playwright install chromium
+      - run: npm run docs:test
+      - name: Build portable helper and CLI
+        if: github.event_name != 'pull_request'
+        run: python tools/build_helper.py --bootstrap
+      - name: Package framework
+        if: github.event_name != 'pull_request'
+        run: build/helper-env/Scripts/python.exe tools/package_product.py
+      - name: Export source
+        if: github.event_name != 'pull_request'
+        run: python tools/export_source.py
+      - name: Retain build packages
+        if: github.event_name != 'pull_request'
+        uses: actions/upload-artifact@v4
+        with:
+          name: MT2-ModFramework-windows-x64-${{ github.sha }}
+          path: |
+            dist/MT2Framework-*.zip
+            dist/source/*.zip
+            dist/docs/offline/**
+          if-no-files-found: error
+          retention-days: 30
+      - name: Retain diagnostics
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: framework-build-evidence-${{ github.run_id }}
+          path: artifacts/**
+          if-no-files-found: warn
+          retention-days: 14

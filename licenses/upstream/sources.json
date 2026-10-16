@@ -1,0 +1,14 @@
+{
+  "autocomplete-1.17.7.txt": {
+    "url": "https://raw.githubusercontent.com/algolia/autocomplete/v1.17.7/LICENSE",
+    "sha256": "1e605499213e06118cc81abc00b32bbb33ead185d9b0e190f2662588e8806f02"
+  },
+  "docsearch-3.8.2.txt": {
+    "url": "https://raw.githubusercontent.com/algolia/docsearch/v3.8.2/LICENSE",
+    "sha256": "1e605499213e06118cc81abc00b32bbb33ead185d9b0e190f2662588e8806f02"
+  },
+  "CC0-1.0.txt": {
+    "url": "https://raw.githubusercontent.com/simple-icons/simple-icons/develop/LICENSE.md",
+    "sha256": "9046848b63a5c92bff14e4accca80bd987e0623b74adf9226ce5198d312b79d5"
+  }
+}

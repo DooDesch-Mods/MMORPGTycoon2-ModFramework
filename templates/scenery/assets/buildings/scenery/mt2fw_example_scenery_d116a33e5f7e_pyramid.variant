@@ -1,0 +1,10 @@
+mmoBuildingVariant
+{
+    name "mt2fw_example_scenery_d116a33e5f7e_pyramid"
+    modelFile "mt2fw/example_scenery_d116a33e5f7e_pyramid/model.vmb"
+    dockPosition 0 0 0
+    dockEntry 0 0 0
+    pad
+    {
+    }
+}

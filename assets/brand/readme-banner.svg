@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1280 360" role="img" aria-labelledby="title desc"><title id="title">MT2 Mod Framework</title><desc id="desc">MT2 Mod Framework. Make room for your ideas. Build mods for MMORPG Tycoon 2 with Lua scripts, C++ plugins and GLB scenery.</desc><defs><pattern id="grid" width="64" height="36" patternUnits="userSpaceOnUse"><path d="m0 18 32-18 32 18-32 18z" fill="none" stroke="#193345" stroke-width="1"/></pattern></defs><path fill="#0b1723" d="M0 0h1280v360H0z"/><path fill="url(#grid)" d="M820 0h460v360H820z"/><path fill="#64e4d5" d="M0 0h8v360H0z"/><g transform="translate(56 32) scale(.54)"><g id="world-tile">
+  <path fill="#11758c" d="M12 66 64 96 116 66v22l-52 30-52-30z"/>
+  <path fill="#075267" d="m64 96 52-30v22l-52 30z"/>
+  <path fill="#64e4d5" d="m12 66 28-16 24 14 24-14 28 16-52 30z"/>
+  <path fill="#b7fff0" d="m12 66 28-16 8 5-28 16z"/>
+</g>
+<g id="added-module">
+  <path fill="#ffca67" d="m42 30 22-13 22 13-22 13z"/>
+  <path fill="#d68b29" d="m42 30 22 13v24L42 54z"/>
+  <path fill="#f3ad43" d="m64 43 22-13v24L64 67z"/>
+</g></g><g font-family="Segoe UI,Arial,sans-serif"><text x="140" y="67" fill="#f2f7fb" font-size="25" font-weight="700">MT2 Mod Framework</text><text x="58" y="171" fill="#f2f7fb" font-size="53" font-weight="750">Make room for your ideas.</text><text x="60" y="222" fill="#b8cad8" font-size="24">Build mods for MMORPG Tycoon 2.</text><text x="60" y="301" fill="#64e4d5" font-size="20" font-weight="600">Lua scripts</text><text x="225" y="301" fill="#b8cad8" font-size="20">/</text><text x="257" y="301" fill="#64e4d5" font-size="20" font-weight="600">C++ plugins</text><text x="443" y="301" fill="#b8cad8" font-size="20">/</text><text x="475" y="301" fill="#64e4d5" font-size="20" font-weight="600">GLB scenery</text></g><g transform="translate(923 52) scale(1.85)"><g id="world-tile">
+  <path fill="#11758c" d="M12 66 64 96 116 66v22l-52 30-52-30z"/>
+  <path fill="#075267" d="m64 96 52-30v22l-52 30z"/>
+  <path fill="#64e4d5" d="m12 66 28-16 24 14 24-14 28 16-52 30z"/>
+  <path fill="#b7fff0" d="m12 66 28-16 8 5-28 16z"/>
+</g>
+<g id="added-module">
+  <path fill="#ffca67" d="m42 30 22-13 22 13-22 13z"/>
+  <path fill="#d68b29" d="m42 30 22 13v24L42 54z"/>
+  <path fill="#f3ad43" d="m64 43 22-13v24L64 67z"/>
+</g></g></svg>

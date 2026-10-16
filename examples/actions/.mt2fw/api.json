@@ -1,0 +1,1233 @@
+{
+  "schema_version": 1,
+  "framework_version": "0.1.0",
+  "api_version": "1.0.0",
+  "abi_version": 1,
+  "capabilities": [
+    "ui",
+    "input",
+    "world.read",
+    "objects.read",
+    "objects.write",
+    "camera",
+    "time.write",
+    "content"
+  ],
+  "types": {
+    "MT2Handle": {
+      "epoch": "integer",
+      "uid": "string"
+    },
+    "MT2Object": {
+      "handle": "MT2Handle",
+      "x": "number",
+      "y": "number",
+      "z": "number",
+      "deleted?": "boolean"
+    },
+    "MT2World": {
+      "loaded": "boolean",
+      "name": "string",
+      "epoch": "integer"
+    },
+    "MT2Setting": {
+      "type": "'boolean'|'string'|'number'|'integer'",
+      "default": "boolean|string|number",
+      "label?": "string",
+      "min?": "number",
+      "max?": "number"
+    },
+    "MT2Camera": {
+      "x": "number",
+      "y": "number",
+      "z": "number",
+      "focus_x": "number",
+      "focus_y": "number",
+      "focus_z": "number",
+      "distance": "number",
+      "min": "number",
+      "max": "number",
+      "script_weight": "number",
+      "editable": "boolean"
+    },
+    "MT2Clock": {
+      "paused": "boolean",
+      "speed": "number",
+      "day": "integer",
+      "seconds": "integer"
+    },
+    "MT2Accepted": {
+      "accepted": "boolean"
+    },
+    "MT2Action": {
+      "id": "string",
+      "status": "'accepted'|'confirmed'|'rejected'|'unknown'",
+      "cause?": "string",
+      "native_attempted?": "boolean",
+      "object?": "MT2Object"
+    },
+    "MT2ContentDefinition": {
+      "id": "string",
+      "name?": "string",
+      "variant": "string",
+      "model": "string",
+      "material": "string"
+    },
+    "MT2ContentReceipt": {
+      "staged?": "integer",
+      "registered?": "integer"
+    },
+    "MT2WorldEvent": {
+      "epoch": "integer",
+      "name": "string"
+    },
+    "MT2SavedEvent": {
+      "epoch": "integer",
+      "name": "string",
+      "save": "string"
+    },
+    "MT2UpdateEvent": {
+      "dt": "number",
+      "epoch": "integer"
+    },
+    "MT2InputEvent": {
+      "owner": "string",
+      "name": "string",
+      "scancode": "integer"
+    },
+    "MT2ObjectChangedEvent": {
+      "operation": "'actions.place'|'actions.move'|'actions.remove'",
+      "source": "'native'",
+      "object": "MT2Object"
+    }
+  },
+  "events": [
+    {
+      "name": "start",
+      "payload": "table",
+      "summary": "Runs during preparation; game-dependent operations are unavailable.",
+      "since": "1.0.0"
+    },
+    {
+      "name": "stop",
+      "payload": "table",
+      "summary": "Final callback before registrations are removed.",
+      "since": "1.0.0"
+    },
+    {
+      "name": "world_ready",
+      "payload": "MT2WorldEvent",
+      "summary": "A world becomes ready, including activation into an existing world.",
+      "since": "1.0.0"
+    },
+    {
+      "name": "world_leave",
+      "payload": "MT2WorldEvent",
+      "summary": "The world is leaving; old handles expire.",
+      "since": "1.0.0"
+    },
+    {
+      "name": "saved",
+      "payload": "MT2SavedEvent",
+      "summary": "The original game save is confirmed and associated metadata is committed.",
+      "since": "1.0.0"
+    },
+    {
+      "name": "update",
+      "payload": "MT2UpdateEvent",
+      "summary": "One game update with delta seconds.",
+      "since": "1.0.0"
+    },
+    {
+      "name": "render",
+      "payload": "table",
+      "summary": "Draw UI widgets during this render callback.",
+      "since": "1.0.0"
+    },
+    {
+      "name": "input",
+      "payload": "MT2InputEvent",
+      "summary": "Owned hotkey event, suspended while the Mods menu is open.",
+      "since": "1.0.0"
+    },
+    {
+      "name": "object_changed",
+      "payload": "MT2ObjectChangedEvent",
+      "summary": "A supported original native placement, move or removal was observed.",
+      "since": "1.0.0"
+    },
+    {
+      "name": "action_completed",
+      "payload": "MT2Action",
+      "summary": "A queued world action has a terminal status; unknown is not success.",
+      "since": "1.0.0"
+    }
+  ],
+  "functions": [
+    {
+      "name": "mt2.events.on",
+      "group": "events",
+      "parameters": [
+        {
+          "name": "event",
+          "type": "MT2EventName",
+          "description": "One supported event name."
+        },
+        {
+          "name": "callback",
+          "type": "fun(event:MT2EventPayload)",
+          "description": "Receives the event payload."
+        }
+      ],
+      "returns": "integer",
+      "summary": "Subscribe to an event.",
+      "capabilities": [],
+      "since": "1.0.0",
+      "stability": "stable-within-api-1",
+      "thread": "Framework callbacks; native object/camera/time reads verify the game thread.",
+      "lifecycle": "Script preparation or an active callback.",
+      "side_effects": "Registers one mod-owned callback; maximum 2048 subscriptions per mod.",
+      "reload": "Subscriptions owned by the old instance are removed on a successful replacement.",
+      "persistence": "Subscription IDs are session-local.",
+      "errors": [
+        "Invalid arguments raise a Lua error."
+      ],
+      "host_operations": [],
+      "example": "examples/events/main.lua"
+    },
+    {
+      "name": "mt2.events.off",
+      "group": "events",
+      "parameters": [
+        {
+          "name": "subscription",
+          "type": "integer",
+          "description": "The token returned by on, input.bind or ui.window."
+        }
+      ],
+      "returns": "nil",
+      "summary": "Remove your subscription.",
+      "capabilities": [],
+      "since": "1.0.0",
+      "stability": "stable-within-api-1",
+      "thread": "Framework callbacks; native object/camera/time reads verify the game thread.",
+      "lifecycle": "Script preparation or an active callback.",
+      "side_effects": "Unsubscribes the token if owned by this mod.",
+      "reload": "Subscriptions owned by the old instance are removed on a successful replacement.",
+      "persistence": "No implicit persistence.",
+      "errors": [
+        "Invalid arguments raise a Lua error."
+      ],
+      "host_operations": [],
+      "example": "examples/events/main.lua"
+    },
+    {
+      "name": "mt2.ui.window",
+      "group": "ui",
+      "parameters": [
+        {
+          "name": "title",
+          "type": "string",
+          "description": "Window title, at most 256 UTF-8 bytes."
+        },
+        {
+          "name": "draw",
+          "type": "fun()",
+          "description": "Draw widgets inside this callback."
+        }
+      ],
+      "returns": "integer",
+      "summary": "Register a window once and draw its contents on render.",
+      "capabilities": [
+        "ui"
+      ],
+      "since": "1.0.0",
+      "stability": "stable-within-api-1",
+      "thread": "Framework callbacks; native object/camera/time reads verify the game thread.",
+      "lifecycle": "Register during script preparation or a callback; draw runs only during render.",
+      "side_effects": "Registers a render subscription. Never register a window on every update.",
+      "reload": "Subscriptions owned by the old instance are removed on a successful replacement.",
+      "persistence": "No implicit persistence.",
+      "errors": [
+        "Invalid arguments raise a Lua error.",
+        "A required capability or unavailable adapter raises an error."
+      ],
+      "host_operations": [
+        "ui.begin",
+        "ui.end"
+      ],
+      "example": "examples/ui/main.lua"
+    },
+    {
+      "name": "mt2.ui.text",
+      "group": "ui",
+      "parameters": [
+        {
+          "name": "text",
+          "type": "any",
+          "description": "Converted to text, at most 8192 UTF-8 bytes per widget."
+        }
+      ],
+      "returns": "boolean",
+      "summary": "Draw text in the current window.",
+      "capabilities": [
+        "ui"
+      ],
+      "since": "1.0.0",
+      "stability": "stable-within-api-1",
+      "thread": "Framework callbacks; native object/camera/time reads verify the game thread.",
+      "lifecycle": "Only within ui.window or a render callback.",
+      "side_effects": "Draws a widget.",
+      "reload": "Subscriptions owned by the old instance are removed on a successful replacement.",
+      "persistence": "No implicit persistence.",
+      "errors": [
+        "Invalid arguments raise a Lua error.",
+        "A required capability or unavailable adapter raises an error."
+      ],
+      "host_operations": [
+        "ui.text"
+      ],
+      "example": "examples/ui/main.lua"
+    },
+    {
+      "name": "mt2.ui.button",
+      "group": "ui",
+      "parameters": [
+        {
+          "name": "label",
+          "type": "string",
+          "description": "Button label."
+        }
+      ],
+      "returns": "boolean",
+      "summary": "Draw a button; true on the frame it is pressed.",
+      "capabilities": [
+        "ui"
+      ],
+      "since": "1.0.0",
+      "stability": "stable-within-api-1",
+      "thread": "Framework callbacks; native object/camera/time reads verify the game thread.",
+      "lifecycle": "Only within ui.window or a render callback.",
+      "side_effects": "Draws a widget.",
+      "reload": "Subscriptions owned by the old instance are removed on a successful replacement.",
+      "persistence": "No implicit persistence.",
+      "errors": [
+        "Invalid arguments raise a Lua error.",
+        "A required capability or unavailable adapter raises an error."
+      ],
+      "host_operations": [
+        "ui.button"
+      ],
+      "example": "examples/ui/main.lua"
+    },
+    {
+      "name": "mt2.ui.checkbox",
+      "group": "ui",
+      "parameters": [
+        {
+          "name": "label",
+          "type": "string",
+          "description": "Checkbox label."
+        },
+        {
+          "name": "value",
+          "type": "boolean",
+          "description": "Current value."
+        }
+      ],
+      "returns": "boolean",
+      "summary": "Draw a checkbox and return its current value.",
+      "capabilities": [
+        "ui"
+      ],
+      "since": "1.0.0",
+      "stability": "stable-within-api-1",
+      "thread": "Framework callbacks; native object/camera/time reads verify the game thread.",
+      "lifecycle": "Only within ui.window or a render callback.",
+      "side_effects": "Draws a widget; assign the returned value in your mod.",
+      "reload": "Subscriptions owned by the old instance are removed on a successful replacement.",
+      "persistence": "No implicit persistence.",
+      "errors": [
+        "Invalid arguments raise a Lua error.",
+        "A required capability or unavailable adapter raises an error."
+      ],
+      "host_operations": [
+        "ui.checkbox"
+      ],
+      "example": "examples/ui/main.lua"
+    },
+    {
+      "name": "mt2.ui.number",
+      "group": "ui",
+      "parameters": [
+        {
+          "name": "label",
+          "type": "string",
+          "description": "Slider label."
+        },
+        {
+          "name": "value",
+          "type": "number",
+          "description": "Current value."
+        },
+        {
+          "name": "min",
+          "type": "number",
+          "description": "Lower bound."
+        },
+        {
+          "name": "max",
+          "type": "number",
+          "description": "Upper bound."
+        }
+      ],
+      "returns": "number",
+      "summary": "Draw a numeric slider and return its value.",
+      "capabilities": [
+        "ui"
+      ],
+      "since": "1.0.0",
+      "stability": "stable-within-api-1",
+      "thread": "Framework callbacks; native object/camera/time reads verify the game thread.",
+      "lifecycle": "Only within ui.window or a render callback.",
+      "side_effects": "Draws a widget; assign the returned value in your mod.",
+      "reload": "Subscriptions owned by the old instance are removed on a successful replacement.",
+      "persistence": "No implicit persistence.",
+      "errors": [
+        "Invalid arguments raise a Lua error.",
+        "A required capability or unavailable adapter raises an error."
+      ],
+      "host_operations": [
+        "ui.number"
+      ],
+      "example": "examples/ui/main.lua"
+    },
+    {
+      "name": "mt2.input.bind",
+      "group": "input",
+      "parameters": [
+        {
+          "name": "name",
+          "type": "string",
+          "description": "Mod-local shortcut name."
+        },
+        {
+          "name": "scancode",
+          "type": "integer",
+          "description": "SDL scancode, 1..511 excluding F10 (67)."
+        },
+        {
+          "name": "callback",
+          "type": "fun(event:MT2InputEvent)",
+          "description": "Called for this mod and binding only."
+        }
+      ],
+      "returns": "integer",
+      "summary": "Bind an owned keyboard shortcut.",
+      "capabilities": [
+        "input"
+      ],
+      "since": "1.0.0",
+      "stability": "stable-within-api-1",
+      "thread": "Framework callbacks; native object/camera/time reads verify the game thread.",
+      "lifecycle": "Script preparation or an active callback.",
+      "side_effects": "Reserves the scancode and registers an input subscription.",
+      "reload": "Subscriptions owned by the old instance are removed on a successful replacement.",
+      "persistence": "No implicit persistence.",
+      "errors": [
+        "The input capability is required.",
+        "Invalid/reserved scancodes and shortcuts owned by another mod are rejected."
+      ],
+      "host_operations": [
+        "input.bind"
+      ],
+      "example": "examples/input/main.lua"
+    },
+    {
+      "name": "mt2.world.status",
+      "group": "world",
+      "parameters": [],
+      "returns": "MT2World",
+      "summary": "Read the loaded world name and current epoch.",
+      "capabilities": [
+        "world.read"
+      ],
+      "since": "1.0.0",
+      "stability": "stable-within-api-1",
+      "thread": "Framework callbacks; native object/camera/time reads verify the game thread.",
+      "lifecycle": "Active callbacks. Game-dependent calls reject during script preparation and start.",
+      "side_effects": "Reads state only.",
+      "reload": "Subscriptions owned by the old instance are removed on a successful replacement.",
+      "persistence": "No implicit persistence.",
+      "errors": [
+        "Invalid arguments raise a Lua error.",
+        "A required capability or unavailable adapter raises an error."
+      ],
+      "host_operations": [
+        "world.status"
+      ],
+      "example": "examples/world/main.lua"
+    },
+    {
+      "name": "mt2.objects.list",
+      "group": "objects",
+      "parameters": [
+        {
+          "name": "limit",
+          "type": "integer",
+          "description": "Maximum result count, 1..128.",
+          "optional": true,
+          "default": 100
+        }
+      ],
+      "returns": "MT2Object[]",
+      "summary": "Read a bounded list of supported props.",
+      "capabilities": [
+        "objects.read"
+      ],
+      "since": "1.0.0",
+      "stability": "stable-within-api-1",
+      "thread": "Framework callbacks; native object/camera/time reads verify the game thread.",
+      "lifecycle": "Active callbacks. Game-dependent calls reject during script preparation and start.",
+      "side_effects": "Explicit bounded query; do not poll or scan the complete world each frame.",
+      "reload": "Subscriptions owned by the old instance are removed on a successful replacement.",
+      "persistence": "No implicit persistence.",
+      "errors": [
+        "Invalid arguments raise a Lua error.",
+        "A required capability or unavailable adapter raises an error."
+      ],
+      "host_operations": [
+        "objects.list"
+      ],
+      "example": "examples/objects/main.lua"
+    },
+    {
+      "name": "mt2.objects.get",
+      "group": "objects",
+      "parameters": [
+        {
+          "name": "handle",
+          "type": "MT2Handle",
+          "description": "Handle from this active world epoch."
+        }
+      ],
+      "returns": "MT2Object",
+      "summary": "Read a supported object.",
+      "capabilities": [
+        "objects.read"
+      ],
+      "since": "1.0.0",
+      "stability": "stable-within-api-1",
+      "thread": "Framework callbacks; native object/camera/time reads verify the game thread.",
+      "lifecycle": "Active callbacks. Game-dependent calls reject during script preparation and start.",
+      "side_effects": "Reads state only.",
+      "reload": "Subscriptions owned by the old instance are removed on a successful replacement.",
+      "persistence": "No implicit persistence.",
+      "errors": [
+        "Missing world, wrong thread, expired epoch and deleted/unreadable objects are rejected."
+      ],
+      "host_operations": [
+        "objects.get"
+      ],
+      "example": "examples/objects/main.lua"
+    },
+    {
+      "name": "mt2.objects.selected",
+      "group": "objects",
+      "parameters": [],
+      "returns": "MT2Object|nil",
+      "summary": "Read the first supported selected object, or nil.",
+      "capabilities": [
+        "objects.read"
+      ],
+      "since": "1.0.0",
+      "stability": "stable-within-api-1",
+      "thread": "Framework callbacks; native object/camera/time reads verify the game thread.",
+      "lifecycle": "Active callbacks. Game-dependent calls reject during script preparation and start.",
+      "side_effects": "Reads state only.",
+      "reload": "Subscriptions owned by the old instance are removed on a successful replacement.",
+      "persistence": "No implicit persistence.",
+      "errors": [
+        "Invalid arguments raise a Lua error.",
+        "A required capability or unavailable adapter raises an error."
+      ],
+      "host_operations": [
+        "objects.selected"
+      ],
+      "example": "examples/objects/main.lua"
+    },
+    {
+      "name": "mt2.objects.persist",
+      "group": "objects",
+      "parameters": [
+        {
+          "name": "handle",
+          "type": "MT2Handle",
+          "description": "A supported root-world building."
+        }
+      ],
+      "returns": "string",
+      "summary": "Create a mod-owned persistent building reference.",
+      "capabilities": [
+        "objects.read"
+      ],
+      "since": "1.0.0",
+      "stability": "stable-within-api-1",
+      "thread": "Framework callbacks; native object/camera/time reads verify the game thread.",
+      "lifecycle": "Active callbacks. Game-dependent calls reject during script preparation and start.",
+      "side_effects": "Registers a persistent reference, maximum 1024 per world.",
+      "reload": "Subscriptions owned by the old instance are removed on a successful replacement.",
+      "persistence": "Retained only with a confirmed save; store the returned ID in world storage.",
+      "errors": [
+        "Non-building/dungeon targets, expired handles and the reference budget are rejected."
+      ],
+      "host_operations": [
+        "objects.persist"
+      ],
+      "example": "examples/objects/main.lua"
+    },
+    {
+      "name": "mt2.objects.resolve",
+      "group": "objects",
+      "parameters": [
+        {
+          "name": "id",
+          "type": "string",
+          "description": "A saved persistent reference owned by this mod."
+        }
+      ],
+      "returns": "MT2Object",
+      "summary": "Resolve a saved reference to a fresh session handle.",
+      "capabilities": [
+        "objects.read"
+      ],
+      "since": "1.0.0",
+      "stability": "stable-within-api-1",
+      "thread": "Framework callbacks; native object/camera/time reads verify the game thread.",
+      "lifecycle": "Active callbacks. Game-dependent calls reject during script preparation and start.",
+      "side_effects": "Reads state only.",
+      "reload": "Subscriptions owned by the old instance are removed on a successful replacement.",
+      "persistence": "Checks saved region/building identity, type, variant and pose before rebinding.",
+      "errors": [
+        "Missing, removed, mismatched or foreign references are rejected."
+      ],
+      "host_operations": [
+        "objects.resolve"
+      ],
+      "example": "examples/objects/main.lua"
+    },
+    {
+      "name": "mt2.camera.get",
+      "group": "camera",
+      "parameters": [],
+      "returns": "MT2Camera",
+      "summary": "Read camera position, focus and edit state.",
+      "capabilities": [
+        "camera"
+      ],
+      "since": "1.0.0",
+      "stability": "stable-within-api-1",
+      "thread": "Framework callbacks; native object/camera/time reads verify the game thread.",
+      "lifecycle": "Active callbacks. Game-dependent calls reject during script preparation and start.",
+      "side_effects": "Reads state only.",
+      "reload": "Subscriptions owned by the old instance are removed on a successful replacement.",
+      "persistence": "No implicit persistence.",
+      "errors": [
+        "Invalid arguments raise a Lua error.",
+        "A required capability or unavailable adapter raises an error."
+      ],
+      "host_operations": [
+        "camera.get"
+      ],
+      "example": "examples/camera/main.lua"
+    },
+    {
+      "name": "mt2.camera.focus",
+      "group": "camera",
+      "parameters": [
+        {
+          "name": "x",
+          "type": "number",
+          "description": "Focus X."
+        },
+        {
+          "name": "y",
+          "type": "number",
+          "description": "Focus height."
+        },
+        {
+          "name": "z",
+          "type": "number",
+          "description": "Focus Z."
+        },
+        {
+          "name": "distance",
+          "type": "number",
+          "description": "Native allowed zoom distance."
+        }
+      ],
+      "returns": "MT2Accepted",
+      "summary": "Request the native edit camera to focus a position.",
+      "capabilities": [
+        "camera"
+      ],
+      "since": "1.0.0",
+      "stability": "stable-within-api-1",
+      "thread": "Framework callbacks; native object/camera/time reads verify the game thread.",
+      "lifecycle": "Active callbacks. Game-dependent calls reject during script preparation and start.",
+      "side_effects": "Moves the local camera; does not change world objects.",
+      "reload": "Subscriptions owned by the old instance are removed on a successful replacement.",
+      "persistence": "No implicit persistence.",
+      "errors": [
+        "Non-finite/out-of-range values, unavailable camera and a native camera script still controlling the view are rejected."
+      ],
+      "host_operations": [
+        "camera.focus"
+      ],
+      "example": "examples/camera/main.lua"
+    },
+    {
+      "name": "mt2.time.get",
+      "group": "time",
+      "parameters": [],
+      "returns": "MT2Clock",
+      "summary": "Read pause, simulation speed and clock.",
+      "capabilities": [
+        "world.read"
+      ],
+      "since": "1.0.0",
+      "stability": "stable-within-api-1",
+      "thread": "Framework callbacks; native object/camera/time reads verify the game thread.",
+      "lifecycle": "Active callbacks. Game-dependent calls reject during script preparation and start.",
+      "side_effects": "Reads state only.",
+      "reload": "Subscriptions owned by the old instance are removed on a successful replacement.",
+      "persistence": "No implicit persistence.",
+      "errors": [
+        "Invalid arguments raise a Lua error.",
+        "A required capability or unavailable adapter raises an error."
+      ],
+      "host_operations": [
+        "time.get"
+      ],
+      "example": "examples/time/main.lua"
+    },
+    {
+      "name": "mt2.time.set",
+      "group": "time",
+      "parameters": [
+        {
+          "name": "paused",
+          "type": "boolean",
+          "description": "Whether simulation is paused."
+        },
+        {
+          "name": "speed",
+          "type": "number",
+          "description": "Native simulation speed.",
+          "optional": true,
+          "default": 1
+        }
+      ],
+      "returns": "MT2Clock",
+      "summary": "Set pause and speed, then read them back.",
+      "capabilities": [
+        "time.write"
+      ],
+      "since": "1.0.0",
+      "stability": "stable-within-api-1",
+      "thread": "Framework callbacks; native object/camera/time reads verify the game thread.",
+      "lifecycle": "Active callbacks. Game-dependent calls reject during script preparation and start.",
+      "side_effects": "Changes simulation time; local multiplayer class is not allowed.",
+      "reload": "Subscriptions owned by the old instance are removed on a successful replacement.",
+      "persistence": "No implicit persistence.",
+      "errors": [
+        "Invalid speed, unavailable world and shared writes without the multiplayer bridge are rejected."
+      ],
+      "host_operations": [
+        "time.set"
+      ],
+      "example": "examples/time/main.lua"
+    },
+    {
+      "name": "mt2.actions.place",
+      "group": "actions",
+      "parameters": [
+        {
+          "name": "definition",
+          "type": "string",
+          "description": "Registered mod:id or mt2:Type/Variant."
+        },
+        {
+          "name": "x",
+          "type": "number",
+          "description": "World X."
+        },
+        {
+          "name": "y",
+          "type": "number",
+          "description": "Finite argument; native placement resolves terrain height."
+        },
+        {
+          "name": "z",
+          "type": "number",
+          "description": "World Z."
+        }
+      ],
+      "returns": "MT2Action",
+      "summary": "Queue a checked native building placement.",
+      "capabilities": [
+        "objects.write"
+      ],
+      "since": "1.0.0",
+      "stability": "stable-within-api-1",
+      "thread": "Framework callbacks; native object/camera/time reads verify the game thread.",
+      "lifecycle": "Active callbacks. Game-dependent calls reject during script preparation and start.",
+      "side_effects": "Queues a world mutation for the game thread; maximum 64 pending requests. World changes survive Lua reload.",
+      "reload": "Subscriptions owned by the old instance are removed on a successful replacement.",
+      "persistence": "Successful world effects are stored by the game when saved.",
+      "errors": [
+        "A loaded world, objects.write and singleplayer/shared class are required.",
+        "Only confirmed establishes success. Unknown must never be retried automatically."
+      ],
+      "host_operations": [
+        "actions.place"
+      ],
+      "example": "examples/actions/main.lua"
+    },
+    {
+      "name": "mt2.actions.move",
+      "group": "actions",
+      "parameters": [
+        {
+          "name": "handle",
+          "type": "MT2Handle",
+          "description": "Current object handle."
+        },
+        {
+          "name": "x",
+          "type": "number",
+          "description": "Target X."
+        },
+        {
+          "name": "y",
+          "type": "number",
+          "description": "Target Y; native settling may adjust ground height."
+        },
+        {
+          "name": "z",
+          "type": "number",
+          "description": "Target Z."
+        }
+      ],
+      "returns": "MT2Action",
+      "summary": "Queue a checked native move.",
+      "capabilities": [
+        "objects.write"
+      ],
+      "since": "1.0.0",
+      "stability": "stable-within-api-1",
+      "thread": "Framework callbacks; native object/camera/time reads verify the game thread.",
+      "lifecycle": "Active callbacks. Game-dependent calls reject during script preparation and start.",
+      "side_effects": "Queues a world mutation for the game thread; maximum 64 pending requests. World changes survive Lua reload.",
+      "reload": "Subscriptions owned by the old instance are removed on a successful replacement.",
+      "persistence": "Successful world effects are stored by the game when saved.",
+      "errors": [
+        "A loaded world, objects.write and singleplayer/shared class are required.",
+        "Only confirmed establishes success. Unknown must never be retried automatically."
+      ],
+      "host_operations": [
+        "actions.move"
+      ],
+      "example": "examples/actions/main.lua"
+    },
+    {
+      "name": "mt2.actions.remove",
+      "group": "actions",
+      "parameters": [
+        {
+          "name": "handle",
+          "type": "MT2Handle",
+          "description": "Current object handle."
+        }
+      ],
+      "returns": "MT2Action",
+      "summary": "Queue a checked native removal.",
+      "capabilities": [
+        "objects.write"
+      ],
+      "since": "1.0.0",
+      "stability": "stable-within-api-1",
+      "thread": "Framework callbacks; native object/camera/time reads verify the game thread.",
+      "lifecycle": "Active callbacks. Game-dependent calls reject during script preparation and start.",
+      "side_effects": "Queues a world mutation for the game thread; maximum 64 pending requests. World changes survive Lua reload.",
+      "reload": "Subscriptions owned by the old instance are removed on a successful replacement.",
+      "persistence": "Successful world effects are stored by the game when saved.",
+      "errors": [
+        "A loaded world, objects.write and singleplayer/shared class are required.",
+        "Only confirmed establishes success. Unknown must never be retried automatically."
+      ],
+      "host_operations": [
+        "actions.remove"
+      ],
+      "example": "examples/actions/main.lua"
+    },
+    {
+      "name": "mt2.actions.status",
+      "group": "actions",
+      "parameters": [
+        {
+          "name": "id",
+          "type": "string",
+          "description": "Action ID owned by this mod."
+        }
+      ],
+      "returns": "MT2Action",
+      "summary": "Read accepted, confirmed, rejected or unknown status.",
+      "capabilities": [
+        "objects.write"
+      ],
+      "since": "1.0.0",
+      "stability": "stable-within-api-1",
+      "thread": "Framework callbacks; native object/camera/time reads verify the game thread.",
+      "lifecycle": "Active callbacks. Game-dependent calls reject during script preparation and start.",
+      "side_effects": "Reads state only.",
+      "reload": "Subscriptions owned by the old instance are removed on a successful replacement.",
+      "persistence": "No implicit persistence.",
+      "errors": [
+        "An unknown, expired or foreign action ID is rejected.",
+        "Only the last 256 completed requests are retained."
+      ],
+      "host_operations": [
+        "actions.status"
+      ],
+      "example": "examples/actions/main.lua"
+    },
+    {
+      "name": "mt2.config.define",
+      "group": "config",
+      "parameters": [
+        {
+          "name": "key",
+          "type": "string",
+          "description": "Setting key."
+        },
+        {
+          "name": "schema",
+          "type": "MT2Setting",
+          "description": "Typed default, label and optional bounds."
+        }
+      ],
+      "returns": "boolean|string|number",
+      "summary": "Define a typed setting shown in the Mods menu.",
+      "capabilities": [],
+      "since": "1.0.0",
+      "stability": "stable-within-api-1",
+      "thread": "Framework callbacks; native object/camera/time reads verify the game thread.",
+      "lifecycle": "Script preparation or an active callback.",
+      "side_effects": "Registers a schema and validates an existing profile value.",
+      "reload": "Subscriptions owned by the old instance are removed on a successful replacement.",
+      "persistence": "Settings are scoped to mod and profile.",
+      "errors": [
+        "Invalid arguments raise a Lua error."
+      ],
+      "host_operations": [
+        "config.define"
+      ],
+      "example": "examples/config/main.lua"
+    },
+    {
+      "name": "mt2.config.get",
+      "group": "config",
+      "parameters": [
+        {
+          "name": "key",
+          "type": "string",
+          "description": "Previously defined setting."
+        }
+      ],
+      "returns": "boolean|string|number",
+      "summary": "Read a defined setting.",
+      "capabilities": [],
+      "since": "1.0.0",
+      "stability": "stable-within-api-1",
+      "thread": "Framework callbacks; native object/camera/time reads verify the game thread.",
+      "lifecycle": "Script preparation or an active callback.",
+      "side_effects": "Reads state only.",
+      "reload": "Subscriptions owned by the old instance are removed on a successful replacement.",
+      "persistence": "No implicit persistence.",
+      "errors": [
+        "An undefined setting is rejected."
+      ],
+      "host_operations": [
+        "config.get"
+      ],
+      "example": "examples/config/main.lua"
+    },
+    {
+      "name": "mt2.config.set",
+      "group": "config",
+      "parameters": [
+        {
+          "name": "key",
+          "type": "string",
+          "description": "Previously defined setting."
+        },
+        {
+          "name": "value",
+          "type": "boolean|string|number",
+          "description": "Value matching the declared schema."
+        }
+      ],
+      "returns": "boolean",
+      "summary": "Validate and save a setting.",
+      "capabilities": [],
+      "since": "1.0.0",
+      "stability": "stable-within-api-1",
+      "thread": "Framework callbacks; native object/camera/time reads verify the game thread.",
+      "lifecycle": "Script preparation or an active callback.",
+      "side_effects": "Writes profile settings after successful activation.",
+      "reload": "Subscriptions owned by the old instance are removed on a successful replacement.",
+      "persistence": "Scoped to mod and profile.",
+      "errors": [
+        "Undefined keys, wrong types and values outside bounds are rejected."
+      ],
+      "host_operations": [
+        "config.set"
+      ],
+      "example": "examples/config/main.lua"
+    },
+    {
+      "name": "mt2.storage.get",
+      "group": "storage",
+      "parameters": [
+        {
+          "name": "key",
+          "type": "string",
+          "description": "Mod-local key."
+        },
+        {
+          "name": "default",
+          "type": "any",
+          "description": "Fallback for a missing key.",
+          "optional": true
+        },
+        {
+          "name": "scope",
+          "type": "'profile'|'world'",
+          "description": "Storage scope.",
+          "optional": true,
+          "default": "profile"
+        }
+      ],
+      "returns": "any",
+      "summary": "Read mod-owned profile or world data.",
+      "capabilities": [],
+      "since": "1.0.0",
+      "stability": "stable-within-api-1",
+      "thread": "Framework callbacks; native object/camera/time reads verify the game thread.",
+      "lifecycle": "Preparation/callbacks for profile data; a loaded world for world data.",
+      "side_effects": "Reads state only.",
+      "reload": "Subscriptions owned by the old instance are removed on a successful replacement.",
+      "persistence": "World data restores from the exact confirmed save metadata.",
+      "errors": [
+        "Invalid arguments raise a Lua error."
+      ],
+      "host_operations": [
+        "storage.get"
+      ],
+      "example": "examples/storage/main.lua"
+    },
+    {
+      "name": "mt2.storage.set",
+      "group": "storage",
+      "parameters": [
+        {
+          "name": "key",
+          "type": "string",
+          "description": "Mod-local key."
+        },
+        {
+          "name": "value",
+          "type": "any",
+          "description": "JSON-compatible data."
+        },
+        {
+          "name": "scope",
+          "type": "'profile'|'world'",
+          "description": "Storage scope.",
+          "optional": true,
+          "default": "profile"
+        }
+      ],
+      "returns": "boolean",
+      "summary": "Store mod-owned profile or world data.",
+      "capabilities": [],
+      "since": "1.0.0",
+      "stability": "stable-within-api-1",
+      "thread": "Framework callbacks; native object/camera/time reads verify the game thread.",
+      "lifecycle": "Preparation/callbacks for profile data; a loaded world for world data.",
+      "side_effects": "Updates mod-owned data; profile data writes after activation, never as an implicit per-frame operation.",
+      "reload": "Subscriptions owned by the old instance are removed on a successful replacement.",
+      "persistence": "World data is committed only with a confirmed game save.",
+      "errors": [
+        "Invalid scopes, cyclic/non-JSON data, missing world and data larger than 1 MiB are rejected."
+      ],
+      "host_operations": [
+        "storage.set"
+      ],
+      "example": "examples/storage/main.lua"
+    },
+    {
+      "name": "mt2.content.register",
+      "group": "content",
+      "parameters": [
+        {
+          "name": "definitions",
+          "type": "MT2ContentDefinition[]",
+          "description": "Nonempty mod-namespaced content definitions."
+        }
+      ],
+      "returns": "MT2ContentReceipt",
+      "summary": "Register static scenery resources at startup.",
+      "capabilities": [
+        "content"
+      ],
+      "since": "1.0.0",
+      "stability": "stable-within-api-1",
+      "thread": "Framework callbacks; native object/camera/time reads verify the game thread.",
+      "lifecycle": "Script preparation/start only, before a world is loaded.",
+      "side_effects": "Stages definitions then mounts their assets on activation. Content changes require restart.",
+      "reload": "Subscriptions owned by the old instance are removed on a successful replacement.",
+      "persistence": "Save metadata records required content package versions and hashes.",
+      "errors": [
+        "Duplicate IDs/resources, foreign namespaces, missing model/material files and late registration are rejected."
+      ],
+      "host_operations": [
+        "content.register"
+      ],
+      "example": "examples/content/main.lua"
+    },
+    {
+      "name": "mt2.log.debug",
+      "group": "log",
+      "parameters": [
+        {
+          "name": "message",
+          "type": "any",
+          "description": "Converted with tostring."
+        }
+      ],
+      "returns": "boolean",
+      "summary": "Write a mod-labelled debug log entry.",
+      "capabilities": [],
+      "since": "1.0.0",
+      "stability": "stable-within-api-1",
+      "thread": "Framework callbacks; native object/camera/time reads verify the game thread.",
+      "lifecycle": "Script preparation or an active callback.",
+      "side_effects": "Appends to the bounded structured log.",
+      "reload": "Subscriptions owned by the old instance are removed on a successful replacement.",
+      "persistence": "No implicit persistence.",
+      "errors": [
+        "Invalid arguments raise a Lua error."
+      ],
+      "host_operations": [
+        "log"
+      ],
+      "example": "examples/log/main.lua"
+    },
+    {
+      "name": "mt2.log.info",
+      "group": "log",
+      "parameters": [
+        {
+          "name": "message",
+          "type": "any",
+          "description": "Converted with tostring."
+        }
+      ],
+      "returns": "boolean",
+      "summary": "Write a mod-labelled info log entry.",
+      "capabilities": [],
+      "since": "1.0.0",
+      "stability": "stable-within-api-1",
+      "thread": "Framework callbacks; native object/camera/time reads verify the game thread.",
+      "lifecycle": "Script preparation or an active callback.",
+      "side_effects": "Appends to the bounded structured log.",
+      "reload": "Subscriptions owned by the old instance are removed on a successful replacement.",
+      "persistence": "No implicit persistence.",
+      "errors": [
+        "Invalid arguments raise a Lua error."
+      ],
+      "host_operations": [
+        "log"
+      ],
+      "example": "examples/log/main.lua"
+    },
+    {
+      "name": "mt2.log.warn",
+      "group": "log",
+      "parameters": [
+        {
+          "name": "message",
+          "type": "any",
+          "description": "Converted with tostring."
+        }
+      ],
+      "returns": "boolean",
+      "summary": "Write a mod-labelled warn log entry.",
+      "capabilities": [],
+      "since": "1.0.0",
+      "stability": "stable-within-api-1",
+      "thread": "Framework callbacks; native object/camera/time reads verify the game thread.",
+      "lifecycle": "Script preparation or an active callback.",
+      "side_effects": "Appends to the bounded structured log.",
+      "reload": "Subscriptions owned by the old instance are removed on a successful replacement.",
+      "persistence": "No implicit persistence.",
+      "errors": [
+        "Invalid arguments raise a Lua error."
+      ],
+      "host_operations": [
+        "log"
+      ],
+      "example": "examples/log/main.lua"
+    },
+    {
+      "name": "mt2.log.error",
+      "group": "log",
+      "parameters": [
+        {
+          "name": "message",
+          "type": "any",
+          "description": "Converted with tostring."
+        }
+      ],
+      "returns": "boolean",
+      "summary": "Write a mod-labelled error log entry.",
+      "capabilities": [],
+      "since": "1.0.0",
+      "stability": "stable-within-api-1",
+      "thread": "Framework callbacks; native object/camera/time reads verify the game thread.",
+      "lifecycle": "Script preparation or an active callback.",
+      "side_effects": "Appends to the bounded structured log.",
+      "reload": "Subscriptions owned by the old instance are removed on a successful replacement.",
+      "persistence": "No implicit persistence.",
+      "errors": [
+        "Invalid arguments raise a Lua error."
+      ],
+      "host_operations": [
+        "log"
+      ],
+      "example": "examples/log/main.lua"
+    }
+  ],
+  "limits": {
+    "lua_memory_bytes": 67108864,
+    "lua_instructions_per_callback": 1000000,
+    "subscriptions_per_mod": 2048,
+    "object_query_results": 128,
+    "pending_actions": 64,
+    "completed_actions": 256,
+    "persistent_objects": 1024,
+    "storage_bytes": 1048576
+  }
+}

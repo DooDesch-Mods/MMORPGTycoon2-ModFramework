@@ -1,0 +1,102 @@
+{
+  "copyright": "2026 DooDesch",
+  "license": "MIT for these extracted authored copies only",
+  "files": [
+    {
+      "source": "framework/game/adapter.cpp",
+      "destination": "adapters/mt2/adapter.cpp",
+      "sha256": "60b71394604f321fbe73a029c9a611bf3d07d812bcf43b308eb69d5cc86bd823",
+      "license": "MIT"
+    },
+    {
+      "source": "framework/game/adapter.h",
+      "destination": "adapters/mt2/adapter.h",
+      "sha256": "4015b9dfbafe5106eb720d7217c5e96db7b731a7ee65fda6e837de9c1f2c4fbf",
+      "license": "MIT"
+    },
+    {
+      "source": "framework/game/native_engine.cpp",
+      "destination": "adapters/mt2/native_engine.cpp",
+      "sha256": "9e07eeb7b156cb4b56312d4a121814be841ad015ca5a9d883ffd452d9fd26103",
+      "license": "MIT"
+    },
+    {
+      "source": "framework/game/native_extensions.h",
+      "destination": "adapters/mt2/native_extensions.h",
+      "sha256": "557da4ea4c5df66a0153eee027af8b7bdebf7ec66a605ca40f25ad63e6f6dc83",
+      "license": "MIT"
+    },
+    {
+      "source": "framework/game/runtime.cpp",
+      "destination": "adapters/mt2/runtime.cpp",
+      "sha256": "59e9acff126e15b58fe1f588aaf2b5af634c4d454f0d4a5706ea2c5105204be5",
+      "license": "MIT"
+    },
+    {
+      "source": "proxy/wsock32_stubs.asm",
+      "destination": "src/loader/proxy/wsock32_stubs.asm",
+      "sha256": "84f99a3e45c978aa75d018a3501942fa10b4364b0d6d463e69788c96a933c7e7",
+      "license": "MIT"
+    },
+    {
+      "source": "proxy/wsock32_proxy.def",
+      "destination": "src/loader/proxy/wsock32_proxy.def",
+      "sha256": "258fafd9befd78e8f10df6dc0612b6cdaa79c00a1a761b7b6eab97795d8f9986",
+      "license": "MIT"
+    },
+    {
+      "source": "proxy/wsock32_exports.inc",
+      "destination": "src/loader/proxy/wsock32_exports.inc",
+      "sha256": "02211e6f113028d5ac4d3a6e43bd442f1dbcca7bee05219250c43e9a5190785a",
+      "license": "MIT"
+    },
+    {
+      "source": "src/core/logger.cpp",
+      "destination": "adapters/mt2/internal/logger.cpp",
+      "sha256": "f98e910c29c234fbc9e640981a2005f4ff4e1329e038bbb0216e78e7efdb4763",
+      "license": "MIT"
+    },
+    {
+      "source": "src/game/global_root.inc",
+      "destination": "adapters/mt2/internal/global_root.inc",
+      "sha256": "0175811a666e2025810c49a0f3f8e6f95120eb4f1b2e532fd0e49fb370f47b51",
+      "license": "MIT"
+    },
+    {
+      "source": "src/game/global_root.h",
+      "destination": "adapters/mt2/internal/global_root.h",
+      "sha256": "ce8e094a9eb15109cf289fd46865c29b5be6234af0d747da3a09ce37102230a8",
+      "license": "MIT"
+    },
+    {
+      "source": "include/mt2mp/game/native_engine.h",
+      "destination": "adapters/mt2/internal/mt2mp/game/native_engine.h",
+      "sha256": "3be5abddf01ad3157e826e0402bdb9f0499a4df7b8c9aa98008da59494a9dec2",
+      "license": "MIT"
+    },
+    {
+      "source": "src/game/live_host_state/memory_query_timing.h",
+      "destination": "adapters/mt2/internal/live_host_state/memory_query_timing.h",
+      "sha256": "cf3f6ddc80c03f2825848644ed93169ca6eb0bfddacb691e1885ac9c437d90b5",
+      "license": "MIT"
+    },
+    {
+      "source": "src/game/live_host_state/apply_timing.h",
+      "destination": "adapters/mt2/internal/live_host_state/apply_timing.h",
+      "sha256": "c677bfffdcd6db113e2cf032d79981285b1f70fb4949ce244a5d8c124c2134ba",
+      "license": "MIT"
+    },
+    {
+      "source": "include/mt2mp/net/snapshot_world_path.h",
+      "destination": "adapters/mt2/internal/mt2mp/net/snapshot_world_path.h",
+      "sha256": "efe5dcc00ae782a9c7340fe345a0da1e4bef373a0b75d974f898fd9cea66d84a",
+      "license": "MIT"
+    },
+    {
+      "source": "include/mt2mp/core/logger.h",
+      "destination": "adapters/mt2/internal/mt2mp/core/logger.h",
+      "sha256": "32eb1f59f3e2dd3adbe269117c63cdce77a18c825539d85c8975859a1749ff54",
+      "license": "MIT"
+    }
+  ]
+}
