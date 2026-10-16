@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.1.2
+
+- Fix an invisible Mods menu after pressing F10. MT2 can leave an offscreen framebuffer bound when presenting the window; framework UI now draws to the window and restores both previous framebuffer bindings afterward. Thanks to Escara for reporting the issue.
+- Apply the menu's mouse and text-input state on the first opening in an empty profile, and release it when the menu closes.
+- Start the in-game menu and portable helper in English. German remains available through the language button.
+- Verify visible output with a separate window capture. An internal framebuffer capture alone could show the menu even when the actual window did not.
+- Lua API 1.0.0, native ABI 1 and the Vortex extension remain unchanged.
+
 ## 0.1.1
 
 - Separate the player runtime from the developer SDK. Nexus distributes only the runtime; the complete SDK remains a separate GitHub download.

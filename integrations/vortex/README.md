@@ -8,7 +8,7 @@ Manage MT2 Framework packages and classic model-only scenery packs through Vorte
 
 1. In Vortex **Extensions**, use **Drop File(s)** to install `MMORPGTycoon2-Vortex-0.1.1.zip`, then restart Vortex.
 2. Manage **MMORPG Tycoon 2** and select its Steam installation. Deployment checks the exact supported executable; purge remains available after a game update.
-3. Import `MT2Framework-0.1.1-windows-x64.zip`, enable it and deploy with the game closed.
+3. Import `MT2Framework-0.1.2-windows-x64.zip`, enable it and deploy with the game closed.
 4. Import framework mod ZIPs or a supported classic scenery ZIP, enable them and deploy. Start the game through Steam. F10 opens the framework **Mods** menu; classic scenery uses the game's scenery categories.
 
 The framework is a separate **MT2 Framework runtime** mod type. The extension selects **MT2 protected hardlink deployment**, which delegates file tracking and linking to Vortex after its checks pass. Vortex owns deployment and purge of the loader, runtime, tools and generated configuration. No original game archive is replaced. The same packaged CLI validates mods before deployment. Unknown or modified loader files stop deployment and purge with a concrete error.

@@ -1,0 +1,38 @@
+{
+  "schema_version": 1,
+  "framework_version": "0.1.2",
+  "reporter": "Escara",
+  "scope": "F10 presentation, empty-profile input lifecycle, two Lua windows and English defaults",
+  "game_sha256": "bbab2dc68babcc644d0a1679548bf1e334b6c52aea669c3f61f6cb9d45c1aaf6",
+  "reproduced_release": {
+    "version": "0.1.1",
+    "framework_sha256": "2cbb5315773bbe2ebf355269f6480132dedb3676869eb57cb102fc0f62320eb4",
+    "menu_state_open_but_window_invisible": true,
+    "internal_capture_misleading": true
+  },
+  "candidate_framework_sha256": "f176ea313c4d24445f1d3c67bdc09c5ed7d776849b526c387bd9617b2f1e6d05",
+  "accepted": {
+    "empty_profile_first_f10_visible_in_window": true,
+    "empty_profile_english_default": true,
+    "menu_open_cursor_visible_relative_disabled_text_input_active": true,
+    "second_f10_releases_menu_input_and_stops_text_input": true,
+    "two_independent_lua_windows_visible": true,
+    "f10_visible_in_loaded_world": true,
+    "mods_active_after_menu_closes": true,
+    "helper_english_default_and_german_toggle": true
+  },
+  "window_capture_sha256": {
+    "released-f10.png": "94c7309d5fdd49477d6dd958cf57e3cf54b8cc317a5b121643012f682ce2be71",
+    "fixed-f10.png": "e41975f4238f9304170e9cc147a0039520f365030cee3f63322ed6b9b39a07d8",
+    "hotfix-0.1.2-empty.png": "7b023166984561bb7f349d765a5dc456293ae277e1a839310c0397d6b36f8fc1",
+    "hotfix-0.1.2-mods.png": "9d2a3ec477c9eb3c76f298d4fae8a1077bb85b4f8c00a1c92365fb34327ce354",
+    "hotfix-0.1.2-world.png": "485bce8961192c2b35e62cb47ec89a00d4c913c644083f4774496380b05f9acf"
+  },
+  "limits": [
+    "Physical mouse/keyboard takeover was declined and was not used. F10 was injected through the owned game diagnostic event queue.",
+    "The reporter laptop was not available; no hardware performance conclusion is claimed.",
+    "Window capture warned about Auto HDR; captures establish visibility rather than color accuracy.",
+    "Initial test-world creation reported save metadata with no matching observed world. This separate save issue remains visible in retained logs and is not fixed by the rendering change.",
+    "Existing world-action, content persistence and multiplayer acceptance are not rerun or extended by this focused UI check."
+  ]
+}

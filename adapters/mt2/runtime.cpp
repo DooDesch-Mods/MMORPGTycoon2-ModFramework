@@ -28,8 +28,20 @@ using Hide=bool(*)();
 using Relative=bool(*)(SDL_Window*,bool);
 Update original_update=nullptr;Swap original_swap=nullptr;Poll original_poll=nullptr;
 Hide original_hide=nullptr;Relative original_relative=nullptr;
-bool show_menu=false,ui_ready=false,running=false,developer=false,german=true,restore_relative=false;
+bool show_menu=false,ui_ready=false,running=false,developer=false,german=false,restore_relative=false,menu_input_active=false;
 SDL_Window* window=nullptr;
+using BindFramebuffer=void(APIENTRY*)(GLenum,GLuint);
+BindFramebuffer bind_framebuffer=nullptr;
+// MT2 can leave an offscreen target bound when it presents the window.
+struct WindowFramebuffer {
+    GLint draw=0,read=0;
+    WindowFramebuffer() {
+        if(!bind_framebuffer)throw std::runtime_error("Framework framebuffer entrypoint unavailable");
+        glGetIntegerv(0x8CA6,&draw);glGetIntegerv(0x8CAA,&read);
+        bind_framebuffer(0x8CA9,0);bind_framebuffer(0x8CA8,0);
+    }
+    ~WindowFramebuffer(){bind_framebuffer(0x8CA9,GLuint(draw));bind_framebuffer(0x8CA8,GLuint(read));}
+};
 DWORD engine_thread=0;
 std::string process_started;
 uint64_t frames=0;
@@ -171,16 +183,21 @@ void drain_saves() {
 Json status() {
     auto value=runtime->status();value["pid"]=GetCurrentProcessId();value["frames"]=frames;value["running"]=running;value["ui_ready"]=ui_ready;value["menu_open"]=show_menu;
     value["error"]=last_error;value["process_start_time"]=process_started;value["confirmed_saves"]=confirmed_saves;value["last_save"]=last_save;
+    value["menu_input_active"]=menu_input_active;
+    if(window){value["relative_mouse"]=SDL_GetWindowRelativeMouseMode(window);value["text_input_active"]=SDL_TextInputActive(window);value["cursor_visible"]=SDL_CursorVisible();}
     if(!timings.empty()){std::vector<double> sorted(timings.begin(),timings.end());std::sort(sorted.begin(),sorted.end());value["core_ms_p95"]=sorted[size_t((sorted.size()-1)*0.95)];value["core_ms_samples"]=sorted.size();}
     value["measurement_mode"]=benchmark_mode;
     for(auto pair:{std::pair{"original_update_ms_p95",&original_timings},std::pair{"total_update_ms_p95",&total_timings}})if(!pair.second->empty()){std::vector<double> sorted(pair.second->begin(),pair.second->end());std::sort(sorted.begin(),sorted.end());value[pair.first]=sorted[size_t((sorted.size()-1)*0.95)];}
     Json logs=Json::array();for(auto& item:runtime->logs())logs.push_back({{"mod",item.mod},{"level",item.level},{"message",item.message}});value["logs"]=logs;return value;
 }
-void menu_state(bool visible) {
-    if(show_menu==visible)return;show_menu=visible;
-    if(!window)return;
+void menu_input(bool visible) {
+    if(!window||menu_input_active==visible)return;
+    menu_input_active=visible;
     if(visible){restore_relative=SDL_GetWindowRelativeMouseMode(window);if(!original_relative(window,false))report(std::string("Disable relative mouse failed: ")+SDL_GetError());if(!SDL_ShowCursor())report(std::string("Show cursor failed: ")+SDL_GetError());if(!SDL_StartTextInput(window))report(std::string("Start text input failed: ")+SDL_GetError());}
     else{if(!SDL_StopTextInput(window))report(std::string("Stop text input failed: ")+SDL_GetError());if(restore_relative&&!original_relative(window,true))report(std::string("Restore relative mouse failed: ")+SDL_GetError());}
+}
+void menu_state(bool visible) {
+    show_menu=visible;menu_input(visible);
 }
 Json ui_request(const std::string& op,const Json& args) {
     if(!ui_ready||!ImGui::GetCurrentContext())throw std::runtime_error("UI context unavailable");
@@ -336,8 +353,12 @@ bool swap(SDL_Window* target) {
             if(!ui_ready) {
                 window=target;ImGui::CreateContext();ImGui::GetIO().IniFilename=nullptr;ImGui::StyleColorsDark();
                 if(!ImGui_ImplSDL3_InitForOpenGL(window,SDL_GL_GetCurrentContext())||!ImGui_ImplOpenGL3_Init("#version 150"))throw std::runtime_error("Framework UI backend initialization failed");
+                bind_framebuffer=reinterpret_cast<BindFramebuffer>(SDL_GL_GetProcAddress("glBindFramebuffer"));
+                if(!bind_framebuffer)throw std::runtime_error("Framework framebuffer entrypoint unavailable");
                 ui_ready=true;
+                menu_input(show_menu);
             }
+            WindowFramebuffer framebuffer;
             ImGui_ImplOpenGL3_NewFrame();ImGui_ImplSDL3_NewFrame();ImGui::NewFrame();
             ImGui::SetNextWindowPos(ImVec2(16,16),ImGuiCond_Once);ImGui::SetNextWindowBgAlpha(0.88f);
             ImGui::Begin("##mt2fw-entry",nullptr,ImGuiWindowFlags_NoDecoration|ImGuiWindowFlags_AlwaysAutoResize|ImGuiWindowFlags_NoSavedSettings);

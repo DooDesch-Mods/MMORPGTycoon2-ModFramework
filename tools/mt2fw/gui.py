@@ -44,7 +44,7 @@ WORDS = {
 class Helper:
     def __init__(self, root):
         self.root = root
-        self.language = 'de'
+        self.language = 'en'
         self.executor = ThreadPoolExecutor(max_workers=1)
         self.game = tk.StringVar()
         self.profile = tk.StringVar()

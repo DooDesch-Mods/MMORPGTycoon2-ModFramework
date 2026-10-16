@@ -1,6 +1,6 @@
 # MT2 Mod Framework
 
-> Framework 0.1.1, Lua API 1.0.0, native ABI 1. Windows x64 Steam. Multiplayer compatibility is not established.
+> Framework 0.1.2, Lua API 1.0.0, native ABI 1. Windows x64 Steam. Multiplayer compatibility is not established.
 
 Use the version matching the installed framework. World mutations need confirmed acknowledgement; never automatically retry unknown results.
 

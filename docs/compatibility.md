@@ -4,7 +4,7 @@ title: Compatibility and status
 
 # Compatibility and status
 
-This is a public development preview: framework **0.1.1**, Lua API **1.0.0**, native ABI **1**. It supports only Windows x64 with Steam and the exact verified MT2 executable:
+This is a public development preview: framework **0.1.2**, Lua API **1.0.0**, native ABI **1**. It supports only Windows x64 with Steam and the exact verified MT2 executable:
 
 ```text
 bbab2dc68babcc644d0a1679548bf1e334b6c52aea669c3f61f6cb9d45c1aaf6
