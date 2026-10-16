@@ -84,7 +84,7 @@ class ReleaseDeliveryTests(unittest.TestCase):
         previous = {**{key: self.plan[key] for key in ('product', 'version', 'tag', 'sha256')}, 'status': 'pending'}
         with patch.dict(os.environ, {'DISCORD_RELEASE_WEBHOOK': 'https://discord.com/api/webhooks/1/fixture'}), patch.object(delivery, 'remote_receipt', return_value=previous):
             with self.assertRaisesRegex(RuntimeError, 'unconfirmed send intent'):
-                delivery.announce(self.plan, self.directory, lambda *args, **kwargs: self.fail('Must not send again'))
+                delivery.announce(self.plan, self.directory, lambda url, **kwargs: {'guild_id': '1', 'channel_id': '2'})
 
     def test_discord_intent_precedes_post_and_ack_is_retained(self):
         events = []
@@ -97,16 +97,42 @@ class ReleaseDeliveryTests(unittest.TestCase):
             return {'id': '123', 'channel_id': '456', 'embeds': delivery.discord_payload(self.plan)['embeds']}
         with patch.dict(os.environ, {'DISCORD_RELEASE_WEBHOOK': 'https://discord.com/api/webhooks/1/fixture'}), patch.object(delivery, 'remote_receipt', return_value=None), patch.object(delivery, 'gh', side_effect=gh):
             delivery.announce(self.plan, self.directory, request)
-        self.assertEqual(events, ['pending', 'POST', 'confirmed'])
+        self.assertEqual(events, ['pending', 'POST', 'acknowledged', 'confirmed'])
 
     def test_confirmed_discord_message_is_read_instead_of_posted(self):
         previous = {**{key: self.plan[key] for key in ('product', 'version', 'tag', 'sha256')},
-                    'status': 'confirmed', 'message_id': '123', 'embeds': []}
+                    'status': 'confirmed', 'message_id': '123', 'embeds': delivery.canonical_embeds(delivery.discord_payload(self.plan)['embeds'])}
         def request(url, **kwargs):
             self.assertTrue(url.endswith('/messages/123'))
-            return {'id': '123', 'embeds': []}
+            return {'id': '123', 'embeds': delivery.discord_payload(self.plan)['embeds']}
         with patch.dict(os.environ, {'DISCORD_RELEASE_WEBHOOK': 'https://discord.com/api/webhooks/1/fixture'}), patch.object(delivery, 'remote_receipt', return_value=previous):
             delivery.announce(self.plan, self.directory, request)
+
+    def test_discord_added_transport_fields_do_not_change_content_identity(self):
+        expected = delivery.discord_payload(self.plan)['embeds']
+        returned = json.loads(json.dumps(expected))
+        returned[0]['type'] = 'rich'
+        returned[0]['fields'][0]['inline'] = False
+        returned[0]['image'].update(proxy_url='https://images-ext-1.discordapp.net/proxy/fixture', width=1280, height=720)
+        self.assertEqual(delivery.canonical_embeds(expected), delivery.canonical_embeds(returned))
+
+    def test_existing_message_reconciles_pending_intent_without_post(self):
+        previous = {**{key: self.plan[key] for key in ('product', 'version', 'tag', 'sha256')}, 'status': 'pending'}
+        def request(url, **kwargs):
+            self.assertTrue(url.endswith('/messages/123'))
+            return {'id': '123', 'channel_id': '456', 'embeds': delivery.discord_payload(self.plan)['embeds']}
+        with patch.dict(os.environ, {'DISCORD_RELEASE_WEBHOOK': 'https://discord.com/api/webhooks/1/fixture'}), patch.object(delivery, 'remote_receipt', return_value=previous), patch.object(delivery, 'gh') as gh:
+            delivery.announce(self.plan, self.directory, request, message_id='123')
+        self.assertEqual(previous['status'], 'confirmed')
+        self.assertEqual(gh.call_count, 1)
+
+    def test_mismatched_discord_ack_keeps_message_id_for_recovery(self):
+        message = {'id': '123', 'channel_id': '456', 'embeds': []}
+        with patch.dict(os.environ, {'DISCORD_RELEASE_WEBHOOK': 'https://discord.com/api/webhooks/1/fixture'}), patch.object(delivery, 'remote_receipt', return_value=None), patch.object(delivery, 'gh'):
+            with self.assertRaisesRegex(ValueError, 'different release content'):
+                delivery.announce(self.plan, self.directory, lambda *args, **kwargs: message)
+        stored = json.loads((self.directory / 'release-delivery-framework-0.1.2.json').read_text())
+        self.assertEqual((stored['status'], stored['message_id']), ('acknowledged', '123'))
 
 
 if __name__ == '__main__': unittest.main()

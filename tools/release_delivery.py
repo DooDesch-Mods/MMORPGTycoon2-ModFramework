@@ -86,7 +86,9 @@ def webhook_url(value):
 def canonical_embeds(embeds):
     result = []
     for embed in embeds:
-        row = {key: embed[key] for key in ('title', 'url', 'description', 'color', 'fields') if key in embed}
+        row = {key: embed[key] for key in ('title', 'url', 'description', 'color') if key in embed}
+        if 'fields' in embed:
+            row['fields'] = [{**{key: field[key] for key in ('name', 'value')}, 'inline': field.get('inline', False)} for field in embed['fields']]
         for key, value in (('image', 'url'), ('footer', 'text')):
             if key in embed:
                 row[key] = {value: embed[key][value]}
@@ -104,7 +106,7 @@ def remote_receipt(plan, filename, directory):
     return json.loads((receipt_dir / filename).read_text(encoding='utf-8'))
 
 
-def announce(plan, directory, request=request_json):
+def announce(plan, directory, request=request_json, message_id=None):
     secret = os.environ.get('DISCORD_RELEASE_WEBHOOK', '').strip()
     if not secret:
         raise ValueError('DISCORD_RELEASE_WEBHOOK is missing; release announcement was not sent')
@@ -112,25 +114,38 @@ def announce(plan, directory, request=request_json):
     filename = f"release-delivery-{plan['product']}-{plan['version']}.json"
     previous = remote_receipt(plan, filename, directory)
     identity = {name: plan[name] for name in ('product', 'version', 'tag', 'sha256')}
+    expected = canonical_embeds(discord_payload(plan)['embeds'])
+    path = directory / filename
     if previous:
         if any(previous.get(name) != value for name, value in identity.items()):
             raise ValueError('Discord delivery receipt differs from release identity')
-        if previous.get('status') != 'confirmed':
+        message_id = message_id or previous.get('message_id')
+        if previous.get('status') != 'confirmed' and not message_id:
+            destination = request(webhook, service='Discord')
+            print(f"Discord release destination: guild={destination.get('guild_id')}, channel={destination['channel_id']}")
             raise RuntimeError('Discord announcement has an unconfirmed send intent; inspect the channel before reconciling the receipt')
-        message = request(webhook + '/messages/' + previous['message_id'], service='Discord')
-        if message['id'] != previous['message_id'] or canonical_embeds(message['embeds']) != previous['embeds']:
+        message = request(webhook + '/messages/' + message_id, service='Discord')
+        if message['id'] != message_id or canonical_embeds(message['embeds']) != expected:
             raise ValueError('Previously acknowledged Discord message differs')
+        if previous.get('status') != 'confirmed':
+            previous.update(status='confirmed', message_id=message_id, channel_id=message['channel_id'], embeds=expected)
+            path.write_text(json.dumps(previous, indent=2) + '\n', encoding='utf-8')
+            gh('release', 'upload', plan['tag'], str(path), '--clobber')
         print(f"Discord {plan['product']} {plan['version']}: already confirmed ({message['id']})")
         return
-    path = directory / filename
+    if message_id:
+        raise ValueError('Discord message reconciliation requires an existing send intent')
     receipt = {**identity, 'status': 'pending', 'run_id': os.environ.get('GITHUB_RUN_ID')}
     path.write_text(json.dumps(receipt, indent=2) + '\n', encoding='utf-8')
     # Persist intent before sending. An ambiguous POST blocks replay across workflow reruns.
     gh('release', 'upload', plan['tag'], str(path))
     message = request(webhook + '?wait=true', 'POST', discord_payload(plan), service='Discord')
+    (directory / 'discord-message.json').write_text(json.dumps(message, indent=2) + '\n', encoding='utf-8')
     if not message or not re.fullmatch(r'\d+', message.get('id', '')):
         raise RuntimeError('Discord did not acknowledge a message ID; send intent remains pending')
-    expected = canonical_embeds(discord_payload(plan)['embeds'])
+    receipt.update(status='acknowledged', message_id=message['id'], channel_id=message['channel_id'])
+    path.write_text(json.dumps(receipt, indent=2) + '\n', encoding='utf-8')
+    gh('release', 'upload', plan['tag'], str(path), '--clobber')
     if canonical_embeds(message['embeds']) != expected:
         raise ValueError('Discord acknowledged a message with different release content; inspect send intent before retrying')
     receipt.update(status='confirmed', message_id=message['id'], channel_id=message['channel_id'], embeds=expected)
@@ -143,13 +158,16 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--directory', type=Path, required=True)
     parser.add_argument('--announce', action='store_true')
+    parser.add_argument('--message-id', help='Read and reconcile this existing Discord message; never send a replacement')
     args = parser.parse_args()
     plan = json.loads((args.directory / 'plan.json').read_text(encoding='utf-8'))
     if plan['status'] not in ('ready', 'already-present'):
         raise ValueError('Release has no deployable product')
     sync_changelog(plan, args.directory)
     if args.announce:
-        announce(plan, args.directory)
+        if args.message_id and not re.fullmatch(r'\d+', args.message_id):
+            raise ValueError('Invalid Discord message ID')
+        announce(plan, args.directory, message_id=args.message_id)
 
 
 if __name__ == '__main__':

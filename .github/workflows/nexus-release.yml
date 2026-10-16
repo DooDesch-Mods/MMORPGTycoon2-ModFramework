@@ -21,6 +21,10 @@ on:
         description: Send the release announcement to Discord (once per product/version)
         type: boolean
         default: false
+      discord_message_id:
+        description: Existing Discord message ID to reconcile after an interrupted acknowledgement
+        type: string
+        required: false
 permissions:
   contents: read
 jobs:
@@ -103,9 +107,11 @@ jobs:
           NEXUSMODS_API_KEY: ${{ secrets.NEXUSMODS_API_KEY }}
           DISCORD_RELEASE_WEBHOOK: ${{ secrets.DISCORD_RELEASE_WEBHOOK }}
           ANNOUNCE: ${{ github.event_name == 'release' || inputs.announce }}
+          DISCORD_MESSAGE_ID: ${{ inputs.discord_message_id }}
         run: |
           options=()
           if [[ "$ANNOUNCE" == true ]]; then options+=(--announce); fi
+          if [[ -n "$DISCORD_MESSAGE_ID" ]]; then options+=(--message-id "$DISCORD_MESSAGE_ID"); fi
           python tools/release_delivery.py --directory "artifacts/nexus/${{ matrix.product }}" "${options[@]}"
       - name: Retain release receipts
         if: always()
