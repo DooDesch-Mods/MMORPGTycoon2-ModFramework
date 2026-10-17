@@ -1,6 +1,7 @@
 #include "bootstrap.h"
 #include "adapter.h"
 #include "desktop_ui.h"
+#include "document_ui.h"
 #include "crypto.h"
 #include <MinHook.h>
 #include <SDL3/SDL.h>
@@ -31,6 +32,8 @@ Update original_update=nullptr;Swap original_swap=nullptr;Poll original_poll=nul
 Hide original_hide=nullptr;Relative original_relative=nullptr;
 bool show_menu=false,ui_ready=false,running=false,developer=false,german=false,restore_relative=false,menu_input_active=false;
 SDL_Window* window=nullptr;
+int diagnostic_mouse_frames=0;
+float diagnostic_mouse_x=0,diagnostic_mouse_y=0;
 using BindFramebuffer=void(APIENTRY*)(GLenum,GLuint);
 BindFramebuffer bind_framebuffer=nullptr;
 // MT2 can leave an offscreen target bound when it presents the window.
@@ -209,7 +212,10 @@ void menu_state(bool visible) {
     show_menu=visible;menu_input(visible);
 }
 Json ui_request(const std::string& op,const Json& args) {
+    if(op=="ui.app")return mt2::desktop::app(args);
+    if(op=="ui.native")return mt2::desktop::native_window(args);
     if(!ui_ready||!ImGui::GetCurrentContext())throw std::runtime_error("UI context unavailable");
+    if(op=="ui.document"||op=="ui.image.load")return mt2fw::document_ui::request(op,args,root);
     auto id=args.at("mod_id").get<std::string>();
     if(op=="ui.begin") {
         auto title=args.at("title").get<std::string>();if(title.size()>256)throw std::runtime_error("Window title exceeds 256 bytes");
@@ -315,17 +321,24 @@ void diagnostics() {
         else if(op=="desktop_activate")result=mt2::desktop::activate(args);
         else if(op=="capture"){if(!pending_capture.empty())throw std::runtime_error("Screenshot already pending");pending_capture=id;result={{"accepted",true},{"id",id}};}
         else if(op=="key") {
+            if(!window)throw std::runtime_error("Diagnostic input requires the game window");
             auto code=args.at("scancode").get<int>();if(code<=0||code>=SDL_SCANCODE_COUNT)throw std::runtime_error("Invalid diagnostic scancode");
-            SDL_Event down{};down.type=SDL_EVENT_KEY_DOWN;down.key.scancode=SDL_Scancode(code);down.key.key=SDL_GetKeyFromScancode(down.key.scancode,SDL_KMOD_NONE,false);down.key.down=true;
+            SDL_Event down{};down.type=SDL_EVENT_KEY_DOWN;down.key.windowID=SDL_GetWindowID(window);down.key.scancode=SDL_Scancode(code);down.key.key=SDL_GetKeyFromScancode(down.key.scancode,SDL_KMOD_NONE,false);down.key.down=true;
             SDL_Event up=down;up.type=SDL_EVENT_KEY_UP;up.key.down=false;
             if(!SDL_PushEvent(&down)||!SDL_PushEvent(&up))throw std::runtime_error(std::string("SDL key event enqueue failed: ")+SDL_GetError());result={{"accepted",true}};
         }
         else if(op=="click") {
             float x=args.at("x"),y=args.at("y");int width=0,height=0;if(!window||!SDL_GetWindowSize(window,&width,&height)||x<0||y<0||x>=width||y>=height)throw std::runtime_error("Diagnostic click is outside the owned game client");
-            SDL_Event motion{};motion.type=SDL_EVENT_MOUSE_MOTION;motion.motion.x=x;motion.motion.y=y;
-            SDL_Event down{};down.type=SDL_EVENT_MOUSE_BUTTON_DOWN;down.button.button=SDL_BUTTON_LEFT;down.button.down=true;down.button.x=x;down.button.y=y;
+            SDL_Event motion{};motion.type=SDL_EVENT_MOUSE_MOTION;motion.motion.windowID=SDL_GetWindowID(window);motion.motion.x=x;motion.motion.y=y;
+            SDL_Event down{};down.type=SDL_EVENT_MOUSE_BUTTON_DOWN;down.button.windowID=SDL_GetWindowID(window);down.button.button=SDL_BUTTON_LEFT;down.button.down=true;down.button.x=x;down.button.y=y;
             SDL_Event up=down;up.type=SDL_EVENT_MOUSE_BUTTON_UP;up.button.down=false;
-            if(!SDL_PushEvent(&motion)||!SDL_PushEvent(&down)||!SDL_PushEvent(&up))throw std::runtime_error(std::string("SDL click enqueue failed: ")+SDL_GetError());result={{"accepted",true}};
+            if(!SDL_PushEvent(&motion)||!SDL_PushEvent(&down)||!SDL_PushEvent(&up))throw std::runtime_error(std::string("SDL click enqueue failed: ")+SDL_GetError());
+            diagnostic_mouse_x=x;diagnostic_mouse_y=y;diagnostic_mouse_frames=3;result={{"accepted",true}};
+        }
+        else if(op=="text"){
+            if(!ui_ready||!ImGui::GetIO().WantTextInput)throw std::runtime_error("Diagnostic text requires a focused framework text field");
+            auto text=args.at("text").get<std::string>();if(text.size()>256||text.find('\0')!=std::string::npos)throw std::runtime_error("Diagnostic text exceeds its input budget");
+            ImGui::GetIO().AddInputCharactersUTF8(text.c_str());result={{"accepted",true}};
         }
         else if(op=="plugin_request") {
             auto plugin_id=args.at("id").get<std::string>();
@@ -369,6 +382,7 @@ bool swap(SDL_Window* target) {
         if(runtime&&running) {
             if(!ui_ready) {
                 window=target;ImGui::CreateContext();ImGui::GetIO().IniFilename=nullptr;ImGui::StyleColorsDark();
+                document_ui::initialize();
                 if(!ImGui_ImplSDL3_InitForOpenGL(window,SDL_GL_GetCurrentContext())||!ImGui_ImplOpenGL3_Init("#version 150"))throw std::runtime_error("Framework UI backend initialization failed");
                 bind_framebuffer=reinterpret_cast<BindFramebuffer>(SDL_GL_GetProcAddress("glBindFramebuffer"));
                 if(!bind_framebuffer)throw std::runtime_error("Framework framebuffer entrypoint unavailable");
@@ -376,7 +390,11 @@ bool swap(SDL_Window* target) {
                 menu_input(show_menu);
             }
             WindowFramebuffer framebuffer;
-            ImGui_ImplOpenGL3_NewFrame();ImGui_ImplSDL3_NewFrame();ImGui::NewFrame();
+            document_ui::collect(*runtime);
+            ImGui_ImplOpenGL3_NewFrame();ImGui_ImplSDL3_NewFrame();
+            // Keep synthetic hit testing independent of the user's physical mouse position.
+            if(diagnostic_mouse_frames>0){ImGui::GetIO().AddMousePosEvent(diagnostic_mouse_x,diagnostic_mouse_y);--diagnostic_mouse_frames;}
+            ImGui::NewFrame();
             // Keep render callbacks running while management owns the visible UI and input.
             bool management=show_menu||mt2::desktop::visible();
             if(management)ImGui::PushStyleVar(ImGuiStyleVar_Alpha,0.f);
@@ -401,7 +419,8 @@ bool poll(SDL_Event* event) {
         if(ui_ready&&overlay_visible)ImGui_ImplSDL3_ProcessEvent(event);
         if(event->type==SDL_EVENT_KEY_DOWN&&!event->key.repeat&&!show_menu&&!mt2::desktop::visible()) {
             std::vector<Json> owned;
-            for(auto& p:runtime->plugins())if(p->active)for(auto& [name,scancode]:p->hotkeys)if(scancode==event->key.scancode) {
+            bool typing=ui_ready&&ImGui::GetIO().WantTextInput;
+            for(auto& p:runtime->plugins())if(p->active&&(!typing||(event->key.scancode>=SDL_SCANCODE_F1&&event->key.scancode<=SDL_SCANCODE_F12)))for(auto& [name,scancode]:p->hotkeys)if(scancode==event->key.scancode) {
                 owned.push_back({{"name",name},{"owner",p->manifest.id},{"scancode",scancode}});
             }
             // A failing callback may clear its owner's bindings, so dispatch after taking the snapshot.
@@ -410,7 +429,7 @@ bool poll(SDL_Event* event) {
         if(ui_ready&&overlay_visible) {
             const auto& io=ImGui::GetIO();bool mouse=event->type>=SDL_EVENT_MOUSE_MOTION&&event->type<=SDL_EVENT_MOUSE_WHEEL;
             bool keyboard=event->type==SDL_EVENT_KEY_DOWN||event->type==SDL_EVENT_KEY_UP||event->type==SDL_EVENT_TEXT_INPUT||event->type==SDL_EVENT_TEXT_EDITING;
-            if((mouse&&io.WantCaptureMouse)||(keyboard&&show_menu&&io.WantCaptureKeyboard))continue;
+            if((mouse&&io.WantCaptureMouse)||(keyboard&&io.WantCaptureKeyboard))continue;
         }
         return true;
     }

@@ -43,3 +43,5 @@ Only the verified Windows x64 Steam build is supported. The adapter stays disabl
 Read `<profile>/bootstrap.jsonl` and `<profile>/logs/framework.jsonl` for diagnostics. Native plugins and content changes require a restart; Lua mods can be reloaded from **Mods**.
 
 Original framework code is MIT licensed. Keep `LICENSE`, `THIRD_PARTY_NOTICES.md` and `licenses/` with the runtime. No original game files are included.
+
+Open **Mods...** from the in-game menu, before **Options...**. At the title screen, use the **Mods** desktop icon. Select an installed mod app and choose its **Open** button. F10 also opens Mods.

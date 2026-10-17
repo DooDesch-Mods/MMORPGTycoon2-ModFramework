@@ -6,6 +6,7 @@
 #include <chrono>
 #include <cstring>
 #include <fstream>
+#include <sstream>
 
 namespace mt2fw::mt2::desktop {
 namespace {
@@ -27,6 +28,25 @@ std::string selected, fault, notice, last_command, pending_reload;
 uint64_t commands = 0, command_errors = 0;
 std::chrono::steady_clock::time_point refreshed{};
 std::map<std::string, std::string> labels;
+struct App { const Plugin* owner = nullptr; std::string id, title; bool requested = false; };
+std::map<std::string, App> apps;
+struct NativeWindow {
+    const Plugin* owner = nullptr;
+    void* mode = nullptr;
+    void* panel = nullptr;
+    std::string name, shape, path;
+    Json widgets, values = Json::object(), clicked = Json::array();
+    bool requested = false, suspended = false;
+};
+std::map<std::string, NativeWindow> native_windows;
+std::map<std::string, std::string> native_images;
+uint64_t native_instances = 0;
+using MenuElements = void(*)(void*, const void*, float);
+using MenuSelect = void(*)(void*, const void*);
+MenuElements original_elements = nullptr;
+MenuSelect original_select = nullptr;
+bool start_entry_registered = false;
+uint64_t start_entry_launches = 0;
 struct Binding { void* desktop; void* record; };
 std::map<void*, Binding> icons;
 using IconMethod = void(*)(void*);
@@ -78,10 +98,10 @@ DWORD string_call(uintptr_t rva, void* receiver, const char* value, void** outpu
 void check(DWORD code, const std::string& operation) {
     require(!code, operation + " exception=" + std::to_string(code));
 }
-DWORD window_lookup(void** output) {
+DWORD window_lookup(void** output, const char* name = "mt2fw_mods") {
     String input{}; bool constructed = false; DWORD error = 0;
     __try {
-        reinterpret_cast<void(*)(void*, const char*)>(image + 0x49e090)(&input, "mt2fw_mods"); constructed = true;
+        reinterpret_cast<void(*)(void*, const char*)>(image + 0x49e090)(&input, name); constructed = true;
         *output = reinterpret_cast<void*(*)(const void*)>(image + 0x81aa90)(&input);
     } __except (EXCEPTION_EXECUTE_HANDLER) { error = GetExceptionCode(); }
     if (constructed) { __try { reinterpret_cast<void(*)(void*)>(image + 0x11bd1e0)(&input); }
@@ -116,9 +136,19 @@ void* pane(const std::string& id) {
     check(string_call(0x81d860, panel, id.c_str(), &result), "Pane lookup " + id);
     require(result != nullptr, "Pane missing: " + id); return result;
 }
+void* native_pane(void* window, const std::string& id) {
+    void* result = nullptr; check(string_call(0x81d860, window, id.c_str(), &result), "Native app pane " + id);
+    require(result, "Native app pane missing: " + id); return result;
+}
+void native_shown(void* target, bool value) {
+    uint8_t current = 0; require(read(target, 0x2b4, current) && current <= 1 && read(target, 0x69, current) && current <= 1,
+        "Native app pane visibility differs");
+    static_cast<unsigned char*>(target)[0x2b4] = uint8_t(value);
+    static_cast<unsigned char*>(target)[0x69] = uint8_t(value);
+}
 void label(const std::string& id, const std::string& value) {
     if (auto found = labels.find(id); found != labels.end() && found->second == value) return;
-    static const std::set<std::string> buttons{"mod0","mod1","mod2","mod3","mod4","mod5","previous","next","toggle","reload","settings","tools","language"};
+    static const std::set<std::string> buttons{"mod0","mod1","mod2","mod3","mod4","mod5","previous","next","toggle","reload","settings","tools","language","open_app"};
     check(text_label(pane(buttons.contains(id) ? id + "_label" : id), value.c_str()), "Pane text " + id);
     labels[id] = value;
 }
@@ -195,6 +225,10 @@ void refresh() {
     const bool can_reload = plugin && plugin->manifest.type == "lua" && !plugin->manifest.capabilities.contains("content");
     label("toggle", plugin && runtime->enabled(plugin->manifest.id) ? tr("Disable", "Deaktivieren") : tr("Enable", "Aktivieren"));
     label("reload", tr("Reload Lua", "Lua neu laden")); disabled("toggle", !plugin); disabled("reload", !can_reload || !pending_reload.empty()); disabled("settings", !plugin);
+    auto app = apps.find(selected);
+    bool can_open = plugin && plugin->active && app != apps.end() && app->second.owner == plugin;
+    label("open_app", can_open ? std::string(tr("Open ", "Öffne ")) + app->second.title : tr("Open mod", "Mod öffnen"));
+    shown("open_app", can_open); shown("open_app_label", can_open); disabled("open_app", !can_open);
     label("notice", tr("Lua changes can be reloaded.\nNative plugins and content need a restart.", "Lua kann neu geladen werden.\nNative Plugins und Inhalte benötigen einen Neustart."));
     dirty = false; refreshed = std::chrono::steady_clock::now();
 }
@@ -225,6 +259,10 @@ void invoke(const std::string& value) {
             require(plugin->manifest.type == "lua" && !plugin->manifest.capabilities.contains("content"), "This mod requires a restart");
             require(pending_reload.empty(), "A Lua reload is already pending");
             pending_reload = selected; notice = tr("Reload requested", "Neuladen angefordert");
+        } else if (value == "MT2FWApp") {
+            auto app = apps.find(selected);
+            require(plugin->active && app != apps.end() && app->second.owner == plugin, "Selected mod has no active app");
+            app->second.requested = true; set_open(false);
         } else if (value == "MT2FWSettings") details(selected, false);
         else throw std::runtime_error("Unknown Mods command: " + value);
     }
@@ -367,6 +405,64 @@ DWORD activate_native(void* target, bool icon) {
         else reinterpret_cast<void(*)(void*)>(image + 0x674780)(target);
     } __except (EXCEPTION_EXECUTE_HANDLER) { return GetExceptionCode(); } return 0;
 }
+struct alignas(8) MenuElement { String key; Literal label; };
+static_assert(sizeof(MenuElement) == 0x58);
+struct MenuArray { void* vtable; void* data; int count, capacity; };
+DWORD menu_element(MenuElement* item, bool construct) {
+    DWORD error = 0;
+    __try {
+        if (construct) {
+            reinterpret_cast<void(*)(void*, const char*)>(image + 0x49e090)(&item->key, "mt2fw_mods");
+            reinterpret_cast<void(*)(void*, const char*)>(image + 0xa16f10)(&item->label, "Mods...");
+        } else {
+            reinterpret_cast<void(*)(void*)>(image + 0x11bd1e0)(&item->label);
+            reinterpret_cast<void(*)(void*)>(image + 0x11bd1e0)(&item->key);
+        }
+    } __except (EXCEPTION_EXECUTE_HANDLER) { error = GetExceptionCode(); }
+    return error;
+}
+void menu_elements(void* menu, const void* source, float width) {
+    void* owner = nullptr; void* start = nullptr;
+    if (!runtime || !mode || GetCurrentThreadId() != thread || !read(menu, 0x280, owner) ||
+        window_lookup(&start, "startmenu") || !start || owner != start) {
+        original_elements(menu, source, width); return;
+    }
+    std::vector<MenuElement> elements;
+    MenuArray array{}; size_t inserted = 0;
+    try {
+        require(read(source, 0, array) && array.count > 0 && array.count < 128 &&
+            readable(array.data, size_t(array.count) * sizeof(MenuElement)), "Start menu element layout differs");
+        inserted = size_t(array.count);
+        for (int index = 0; index < array.count; ++index) {
+            std::string key;
+            require(text(static_cast<unsigned char*>(array.data) + index * sizeof(MenuElement), key), "Start menu key unreadable");
+            if (key == "mt2fw_mods") { original_elements(menu, source, width); return; }
+            if (key == "options") inserted = size_t(index);
+        }
+        elements.resize(size_t(array.count) + 1);
+        std::memcpy(elements.data(), array.data, inserted * sizeof(MenuElement));
+        std::memcpy(elements.data() + inserted + 1, static_cast<unsigned char*>(array.data) + inserted * sizeof(MenuElement),
+            (size_t(array.count) - inserted) * sizeof(MenuElement));
+        check(menu_element(&elements[inserted], true), "Start menu label construction");
+    } catch (const std::exception& error) {
+        log_error(error.what()); original_elements(menu, source, width); return;
+    }
+    // SetElements copies the borrowed elements into game-owned controls synchronously.
+    array.data = elements.data(); ++array.count; array.capacity = array.count;
+    original_elements(menu, &array, width);
+    start_entry_registered = true;
+    auto cleanup = menu_element(&elements[inserted], false);
+    if (cleanup) log_error("Start menu label cleanup failed: " + std::to_string(cleanup));
+}
+void menu_select(void* receiver, const void* key) {
+    std::string value; void* start = nullptr;
+    if (!text(key, value) || value != "mt2fw_mods") { original_select(receiver, key); return; }
+    try {
+        require(GetCurrentThreadId() == thread && !window_lookup(&start, "startmenu") && start == receiver,
+            "Mods menu item belongs to another window or thread");
+        check(show(start, false), "Close start menu"); invoke("MT2FWOpen"); ++start_entry_launches;
+    } catch (const std::exception& error) { log_error(error.what()); }
+}
 }
 
 void configure(Runtime& owner, const fs::path& root, Details open_details, std::function<void()> change_language) {
@@ -380,7 +476,9 @@ std::vector<Hook> hooks() {
     require(readable(reinterpret_cast<void*>(image + 0x609060), sizeof(launch_bytes)) && !std::memcmp(reinterpret_cast<void*>(image + 0x609060), launch_bytes, sizeof(launch_bytes)), "Desktop icon launch entry differs");
     require(readable(reinterpret_cast<void*>(image + 0x6087e0), sizeof(destroy_bytes)) && !std::memcmp(reinterpret_cast<void*>(image + 0x6087e0), destroy_bytes, sizeof(destroy_bytes)), "Desktop icon destructor entry differs");
     return {{reinterpret_cast<void*>(image + 0x609060), reinterpret_cast<void*>(&launch), reinterpret_cast<void**>(&original_launch)},
-            {reinterpret_cast<void*>(image + 0x6087e0), reinterpret_cast<void*>(&destroy), reinterpret_cast<void**>(&original_destroy)}};
+            {reinterpret_cast<void*>(image + 0x6087e0), reinterpret_cast<void*>(&destroy), reinterpret_cast<void**>(&original_destroy)},
+            {reinterpret_cast<void*>(image + 0x73c200), reinterpret_cast<void*>(&menu_elements), reinterpret_cast<void**>(&original_elements)},
+            {reinterpret_cast<void*>(image + 0x73d8a0), reinterpret_cast<void*>(&menu_select), reinterpret_cast<void**>(&original_select)}};
 }
 void frame(bool use_german) {
     if (!fault.empty()) return;
@@ -415,6 +513,13 @@ void frame(bool use_german) {
             set_open(false); labels.clear(); dirty = true;
         }
         void* icon = entry(title);
+        for (auto& [owner, app] : native_windows) {
+            bool active = false;
+            for (const auto& plugin : runtime->plugins()) if (plugin.get() == app.owner && plugin->active) active = true;
+            if (!active && app.panel && app.mode == mode && app.requested) {
+                check(show(app.panel, false), "Hide inactive mod app"); app.requested = false; app.clicked = Json::array();
+            }
+        }
         uint8_t shown = 0; require(read(panel, 0x45f, shown), "Mods window visibility unreadable"); panel_open = shown != 0;
         if (toggle_pending) { toggle_pending = false; set_open(!panel_open); }
         if (panel_open && (dirty || std::chrono::steady_clock::now() - refreshed > std::chrono::milliseconds(250))) refresh();
@@ -426,6 +531,25 @@ void frame(bool use_german) {
 bool command(void* receiver, const void* input) {
     std::string value;
     if (!text(input, value) || !value.starts_with("MT2FW")) return false;
+    if (value.starts_with("MT2FWNative ")) {
+        try {
+            require(receiver == mode && thread == GetCurrentThreadId(), "Native app command owner differs");
+            std::istringstream words(value); std::string prefix, name, id; words >> prefix >> name >> id;
+            bool handled = false;
+            for (auto& [key, window] : native_windows) if (window.name == name && window.mode == mode && window.panel) {
+                uint8_t visible = 0; require(read(window.panel, 0x45f, visible) && visible, "Native app command requires an open window");
+                const Plugin* owner = nullptr;
+                for (const auto& plugin : runtime->plugins()) if (plugin.get() == window.owner && plugin->active) owner = plugin.get();
+                require(owner, "Native app mod is no longer active");
+                for (auto& widget : window.widgets) if (widget.at("id") == id && widget.at("type") == "button") {
+                    uint8_t disabled = 0; require(read(native_pane(window.panel, id), 0x46d, disabled) && !disabled, "Native app button is disabled");
+                    require(window.clicked.size() < 16, "Native app event queue is full"); window.clicked.push_back(id); handled = true;
+                }
+            }
+            require(handled, "Native app command is not registered");
+        } catch (const std::exception& error) { log_error(error.what()); }
+        return true;
+    }
     try { require(receiver == mode, "Mods command receiver is not the current mode"); invoke(value); }
     catch (const std::exception& error) { log_error(error.what()); }
     return true;
@@ -444,16 +568,38 @@ void end_frame() {
     dirty = true;
 }
 bool visible() { return panel_open; }
-Json status() { auto result = observed; result["error"] = fault; result["notice"] = notice; result["panel_open"] = panel_open; result["commands"] = commands; result["command_errors"] = command_errors; result["last_command"] = last_command; result["selected"] = selected; result["pending_reload"] = pending_reload; return result; }
+Json status() { auto result = observed; result["error"] = fault; result["notice"] = notice; result["panel_open"] = panel_open; result["commands"] = commands; result["command_errors"] = command_errors; result["last_command"] = last_command; result["selected"] = selected; result["pending_reload"] = pending_reload; result["start_menu_entry"] = start_entry_registered; result["start_menu_launches"] = start_entry_launches; return result; }
 Json activate(const Json& args) {
     require(fault.empty(), fault);
     require(thread == GetCurrentThreadId() && mode && panel, "Diagnostic requires current game-thread Mods window");
     const auto id = args.at("target").get<std::string>(); bool icon = id == "icon";
+    if (id.starts_with("app:")) {
+        auto split = id.find(':',4); require(split != std::string::npos,"Native app diagnostic target requires its owner and widget");
+        auto found = native_windows.find(id.substr(4,split-4)); require(found != native_windows.end(),"Native app is not registered");
+        auto& app = found->second; require(app.panel && app.mode == mode,"Native app belongs to another mode");
+        auto widget = id.substr(split+1); auto* target = native_pane(app.panel,widget);
+        if(args.contains("text")) {
+            bool input = false; for(auto& item:app.widgets)if(item.at("id")==widget&&item.at("type")=="input")input=true;
+            require(input,"Native app diagnostic text target is not an input");
+            auto value=args.at("text").get<std::string>(); require(value.size()<=128,"Diagnostic text exceeds 128 bytes");
+            check(string_call(0x7f1630,target,value.c_str()),"Native app diagnostic text");
+            return {{"native_event","mmoTextEditPane::SetText"},{"accepted",true}};
+        }
+        auto count=app.clicked.size(); check(activate_native(target,false),"Native app button activation");
+        require(app.clicked.size()==count+1,"Native app button did not reach its handler");
+        return {{"native_event","mmoButtonPane::Activate"},{"handler_reached",true},{"widget",widget}};
+    }
+    if (id == "start_menu" || id == "start_mods") {
+        void* start = nullptr; check(window_lookup(&start, "startmenu"), "Start menu lookup"); require(start, "Start menu unavailable");
+        if (id == "start_menu") check(show(start, true), "Show start menu");
+        else { MenuElement item{}; check(menu_element(&item, true), "Menu diagnostic key"); menu_select(start, &item.key); check(menu_element(&item, false), "Menu diagnostic cleanup"); }
+        return {{"menu_registered", start_entry_registered}, {"panel_open", panel_open}, {"launches", start_entry_launches}};
+    }
     void* target = nullptr;
     if (icon) { target = entry(mode_index == 2); require(entry_visible(target, mode_index == 2), "Mods Desktop icon is not visible"); }
     else {
         require(panel_open, "Mods window is not open");
-        static const std::set<std::string> buttons{"mod0","mod1","mod2","mod3","mod4","mod5","previous","next","toggle","reload","settings","tools","language"};
+        static const std::set<std::string> buttons{"mod0","mod1","mod2","mod3","mod4","mod5","previous","next","toggle","reload","settings","tools","language","open_app"};
         require(buttons.contains(id), "Unknown native Mods button: " + id); target = pane(id);
         uint8_t is_disabled = 0; require(read(target, 0x46d, is_disabled) && !is_disabled, "Native Mods button is disabled");
     }
@@ -463,5 +609,156 @@ Json activate(const Json& args) {
     if (dirty && panel_open) refresh();
     return {{"native_event", icon ? "mmoDesktopIcon::DoubleClick" : "mmoButtonPane::Activate"},
         {"handler_reached", true}, {"command", last_command}, {"panel_open", panel_open}, {"selected", selected}, {"notice", notice}};
+}
+Json app(const Json& args) {
+    auto owner = args.at("mod_id").get<std::string>();
+    auto id = args.at("id").get<std::string>(), title = args.at("title").get<std::string>();
+    require(!id.empty() && id.size() <= 64 && id.find_first_not_of("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_-.") == std::string::npos,
+        "App ID must contain 1-64 letters, digits, dots, hyphens or underscores");
+    require(!title.empty() && title.size() <= 80, "App title must contain 1-80 bytes");
+    const Plugin* plugin = nullptr;
+    for (const auto& candidate : runtime->plugins()) if (candidate->manifest.id == owner && candidate->active) plugin = candidate.get();
+    require(plugin, "App registration requires its active mod");
+    auto& value = apps[owner];
+    if (value.owner != plugin || value.id != id || value.title != title) { value = {plugin, id, title, false}; dirty = true; }
+    bool requested = value.requested; value.requested = false;
+    return {{"open_requested", requested}};
+}
+namespace {
+bool native_mounted = false;
+void native_file(const fs::path& path, const std::string& bytes) {
+    if (fs::exists(path)) { require(file_digest(path) == digest(bytes), "Cached native app asset differs"); return; }
+    fs::create_directories(path.parent_path()); std::ofstream out(path, std::ios::binary);
+    out.write(bytes.data(), bytes.size()); out.close(); require(bool(out), "Native app asset write failed");
+}
+void native_mount() {
+    if (native_mounted) return;
+    auto root = profile / "cache/framework-native"; fs::create_directories(root / "materials");
+    auto module = GetModuleHandleW(L"libphysfs.dll");
+    auto mount = reinterpret_cast<int(*)(const char*, const char*, int)>(GetProcAddress(module, "PHYSFS_mount"));
+    require(mount && mount(path_text(root).c_str(), "mt2fw_native", 1) && mount(path_text(root / "materials").c_str(), "materials", 1),
+        "Native app resource mount failed"); native_mounted = true;
+}
+std::string native_image(const std::string& owner, const std::string& relative) {
+    require(relative.starts_with("cache/") && relative.size() == 74 && relative.ends_with(".png") &&
+        relative.substr(6, 64).find_first_not_of("0123456789abcdef") == std::string::npos,
+        "Native preview requires an immutable cache/<sha256>.png file");
+    auto key = owner + ":" + relative;
+    if (auto found = native_images.find(key); found != native_images.end()) return found->second;
+    require(native_images.size() < 128, "Native preview session limit reached");
+    auto path = confined(confined(profile, fs::path("data") / owner), fs::u8path(relative));
+    auto length = fs::file_size(path); require(length > 32 && length <= 1024 * 1024, "Native preview size exceeds 1 MiB");
+    std::ifstream stream(path, std::ios::binary); std::string bytes(size_t(length), '\0');
+    stream.read(bytes.data(), std::streamsize(bytes.size())); require(bool(stream), "Native preview read failed");
+    constexpr unsigned char magic[]{137,80,78,71,13,10,26,10};
+    require(!std::memcmp(bytes.data(), magic, 8), "Native preview is not PNG");
+    auto number = [&](int offset) { auto* p = reinterpret_cast<const unsigned char*>(bytes.data()) + offset; return uint32_t(p[0]) << 24 | uint32_t(p[1]) << 16 | uint32_t(p[2]) << 8 | p[3]; };
+    require(number(16) && number(16) <= 2048 && number(20) && number(20) <= 2048, "Native preview dimensions exceed 2048 pixels");
+    auto sha = digest(bytes); require(relative.substr(6,64) == sha, "Native preview hash differs");
+    auto name = "mt2fw_preview_" + sha;
+    auto root = profile / "cache/framework-native";
+    native_file(root / (sha + ".png"), bytes);
+    native_file(root / "materials" / (name + ".mat"), "Material\n{\nmode normal\ncolor 1 1 1 1\nculling none\nzread false\nzwrite false\nglow false\ntexture \"mt2fw_native/" + sha + ".png\" clampUV\nshader \"default_v.glsl\" \"icon_f.glsl\"\n}\n");
+    native_images.emplace(key, name); return name;
+}
+}
+Json native_window(const Json& args) {
+    if (!mode || !thread) return {{"ready", false}, {"open", args.value("open", false)}, {"clicked", Json::array()}, {"values", Json::object()}};
+    require(thread == GetCurrentThreadId(), "Native app window is outside the game thread");
+    const auto owner = args.at("mod_id").get<std::string>(), id = args.at("id").get<std::string>();
+    auto registration = apps.find(owner); require(registration != apps.end() && registration->second.id == id, "Register the native app before its window");
+    const auto& items = args.at("widgets"); require(items.is_array() && !items.empty() && items.size() <= 80, "Native app requires 1-80 widgets");
+    Json structure = Json::array(); std::set<std::string> identifiers;
+    int width = args.at("width"), height = args.at("height");
+    require(width >= 400 && width <= 1100 && height >= 300 && height <= 640, "Native app dimensions are outside the supported range");
+    for (auto& item : items) {
+        auto name = item.at("id").get<std::string>(), type = item.at("type").get<std::string>();
+        require(!name.empty() && name.size() <= 48 && name.find_first_not_of("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_") == std::string::npos &&
+            !name.ends_with("_label") && identifiers.insert(name).second, "Native app widget ID is invalid or duplicated");
+        require(type == "text" || type == "button" || type == "input" || type == "image" || type == "panel", "Unsupported native app widget");
+        int x = item.at("x"), y = item.at("y"), w = item.at("width"), h = item.at("height"), size = item.value("size", 16);
+        require(x >= 0 && y >= 0 && w > 0 && h > 0 && x + w <= width && y + h <= height && size >= 10 && size <= 30, "Native app widget is outside its window");
+        for (auto field : {"text", "value"}) if (item.contains(field)) require(item[field].is_string() && item[field].get_ref<const std::string&>().size() <= 1024, "Native app text exceeds 1024 bytes");
+        for (auto field : {"visible", "disabled", "selected"}) if (item.contains(field)) require(item[field].is_boolean(), "Invalid native app widget state");
+        structure.push_back({{"id",name},{"type",type},{"x",x},{"y",y},{"width",w},{"height",h},{"size",size},{"tone",item.value("tone",std::string())}});
+    }
+    auto shape = digest(Json{{"format",3},{"widgets",structure},{"width",width},{"height",height},{"title",registration->second.title}}.dump());
+    auto& window = native_windows[owner];
+    if (window.owner != registration->second.owner) {
+        if (window.panel && window.mode == mode) check(show(window.panel, false), "Hide previous mod instance window");
+        window = {}; window.owner = registration->second.owner;
+    }
+    require(window.shape.empty() || window.shape == shape, "Native app layout changed; restart required");
+    if (window.shape.empty()) {
+        native_mount(); window.shape = shape; window.name = "mt2fw_app_" + digest(owner + id + std::to_string(++native_instances)).substr(0,20); window.widgets = structure;
+        std::ostringstream source;
+        source << "mmoWindow { id \"" << window.name << "\"; dims " << width << ' ' << height
+            << "; anchorType Window; anchorPos 80 35; title " << Json(registration->second.title).dump()
+            << "; material \"mt2fw_ui_base\"; corners \"BottomRight\"; hideOnEscape true; transitionType rez; rezSpeed fast; content {\n";
+        for (auto& item : structure) {
+            auto type = item.at("type").get<std::string>(), name = item.at("id").get<std::string>();
+            int x=item.at("x"), y=item.at("y"), w=item.at("width"), h=item.at("height"), size=item.at("size");
+            const char* kind = type == "button" ? "mmoButtonPane" : type == "input" ? "mmoTextEditPane" : type == "text" ? "mmoTextPane" : "mmoPane";
+            source << kind << " { id \"" << name << "\"; anchorType TopLeft; anchorPos " << x << ' ' << y << "; dims " << w << ' ' << h << "; border false; ";
+            if(type == "button") source << "text \"\"; clickable true; border true; edges All; corners \"TopLeft BottomRight\"; cornerSize 5; command \"MessageTo Mode MT2FWNative " << window.name << ' ' << name << "\";";
+            else if(type == "input") source << "text \"\"; size " << size << "; clickable true; editable true; maxLength 128; margin 8; material \"DarkGrey\"; border true; edges Bottom; justify left;";
+            else if(type == "text") source << "text \"\"; size " << size << "; clickable false; justify topleft; textColor " << (item.at("tone") == "muted" ? "0.7 0.8 0.88 1" : item.at("tone") == "error" ? "1 0.65 0.4 1" : "0.95 0.97 1 1") << ';';
+            else source << "clickable false; material \"" << (type == "panel" ? "AltPanelBacking" : "") << "\";";
+            source << " }\n";
+            if(type == "button") source << "mmoTextPane { id \"" << name << "_label\"; anchorType TopLeft; anchorPos " << x+10 << ' ' << y+6 << "; dims " << w-20 << ' ' << h-6 << "; text \"\"; size " << size << "; justify topleft; clickable false; border false; }\n";
+        }
+        source << "} }\n";
+        std::string formatted; bool quoted = false, escaped = false;
+        for(char c : source.str()) {
+            if(c == '"' && !escaped) quoted = !quoted;
+            if(!quoted && c == '{') formatted += '\n';
+            formatted += c;
+            if(!quoted && (c == ';' || c == '{' || c == '}')) formatted += '\n';
+            escaped = c == '\\' && !escaped;
+        }
+        window.path = digest(formatted) + ".win";
+        native_file(profile / "cache/framework-native" / window.path, formatted);
+    }
+    if (window.mode != mode) { window.mode = mode; window.panel = nullptr; window.values = Json::object(); window.clicked = Json::array(); window.requested = false; window.suspended = false; }
+    if (window.panel) {
+        void* registered = nullptr; check(window_lookup(&registered,window.name.c_str()), "Native app owner lookup");
+        if (registered != window.panel) { window.panel = registered; window.values = Json::object(); window.requested = false; window.clicked = Json::array(); }
+    }
+    bool desired = args.value("open", false);
+    if (!window.panel && desired) {
+        check(string_call(0xbbe090, static_cast<unsigned char*>(mode) + (mode_index == 2 ? 0x40 : 0x98), ("mt2fw_native/" + window.path).c_str()), "Append native app window");
+        check(window_lookup(&window.panel, window.name.c_str()), "Native app registry lookup"); require(window.panel, "Native app window registration not acknowledged");
+        check(show(window.panel, false), "Initialize native app visibility");
+    }
+    Json events{{"ready", true},{"open",desired},{"clicked",Json::array()},{"values",Json::object()}};
+    if (!window.panel) return events;
+    if (!desired || panel_open) {
+        if (window.requested || panel_open) check(show(window.panel, false), "Hide native app");
+        window.requested = desired; window.suspended = desired && panel_open; events["open"] = desired; return events;
+    }
+    if (!window.requested || window.suspended) check(show(window.panel, true), "Open native app");
+    window.requested = true; window.suspended = false;
+    uint8_t visible = 0; require(read(window.panel, 0x45f, visible), "Native app visibility unreadable"); events["open"] = visible != 0;
+    if (!visible) { window.clicked = Json::array(); return events; }
+    for (auto& item : items) {
+        auto name = item.at("id").get<std::string>(), type = item.at("type").get<std::string>(); auto* target = native_pane(window.panel, name);
+        bool shown = item.value("visible", true); native_shown(target, shown);
+        if(type == "button") native_shown(native_pane(window.panel,name+"_label"), shown);
+        if(!shown) continue;
+        if(type == "button") { check(disable(target,item.value("disabled",false)),"Native app button state"); check(toggle_row(target,item.value("selected",false)),"Native app selection"); }
+        if(type == "text" || type == "button") {
+            auto value = item.value("text",std::string());
+            if(!window.values.contains(name) || window.values[name] != value) { check(text_label(type == "button" ? native_pane(window.panel,name+"_label") : target,value.c_str()),"Native app text"); window.values[name] = value; }
+        } else if(type == "input") {
+            auto value = item.value("value",std::string());
+            if(!window.values.contains(name) || window.values[name] != value) { check(string_call(0x7f1630,target,value.c_str()),"Native app input value"); window.values[name] = value; }
+            std::string actual; require(text(static_cast<unsigned char*>(target)+0x2d0,actual) && actual.size() <= 1024,"Native app input unreadable");
+            if(actual != value) { events["values"][name] = actual; window.values[name] = actual; }
+        } else if(type == "image") {
+            auto value = item.value("path",std::string());
+            if(!value.empty() && (!window.values.contains(name) || window.values[name] != value)) { check(string_call(0x771f90,target,native_image(owner,value).c_str()),"Native app image material"); window.values[name] = value; }
+        }
+    }
+    events["clicked"] = std::move(window.clicked); window.clicked = Json::array(); return events;
 }
 }

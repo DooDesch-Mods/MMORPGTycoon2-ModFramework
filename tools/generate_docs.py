@@ -131,6 +131,10 @@ def outputs(c):
             for name,command in action.choices.items():cli+='\n## '+name+'\n\n```text\n'+command.format_help().rstrip()+'\n```\n'
     cli+='\n`new` creates a complete project. `check` validates it without executing scripts. `pack` writes an archive outside its source. `doctor` reads game/profile diagnostics. Installation commands preserve original game data and require the target game to be closed.\n'
     result['docs/reference/cli.md']=page('Command-line reference',cli)
+    for source in sorted((ROOT/'api/experimental').glob('*.json')):
+        contract = read(source)
+        contract['documentation'] = 'https://doodesch-mods.github.io/MMORPGTycoon2-ModFramework/experimental/native-document-ui.html'
+        result['docs/public/api/experimental/'+source.name] = encoded(contract)
     return result
 
 def main():

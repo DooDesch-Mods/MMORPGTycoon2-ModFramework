@@ -21,7 +21,9 @@ Build mods for **MMORPG Tycoon 2**. Start with Lua and a text editor, extend wit
 
 This is a **development preview** for Windows x64 and the verified Steam game build. Multiplayer compatibility is not established. See [compatibility and acceptance](docs/compatibility.md). Players need only the **Runtime** from [Nexus](https://www.nexusmods.com/mmorpgtycoon2/mods/25) or [GitHub Releases](https://github.com/DooDesch-Mods/MMORPGTycoon2-ModFramework/releases). Modders download the separate **MT2Framework-SDK** from GitHub. The SDK includes the runtime, portable helper, full CLI, GLB importer, templates, editor types and offline documentation. Install the separate [Vortex extension](https://www.nexusmods.com/site/mods/2465) to manage runtime and mod ZIPs. [GitHub Actions](https://github.com/DooDesch-Mods/MMORPGTycoon2-ModFramework/actions/workflows/checks.yml) builds and verifies the packages and offline documentation.
 
-The portable helper installs the framework, creates projects and installs mod ZIPs. Lua needs no compiler or Python on an end user's machine. Open **Mods** on the game's desktop, or press F10. Its native window lists installed mods, dependencies and errors, with activation controls and Lua reload. Select a mod to open its settings; developer tools remain available from the same window.
+The portable helper installs the framework, creates projects and installs mod ZIPs. Lua needs no compiler or Python on an end user's machine. Open **Mods...** from the in-game menu, use **Mods** on the title-screen desktop, or press F10. Select a mod app and choose its **Open** button. Its native window lists installed mods, dependencies and errors, with activation controls and Lua reload. Select a mod to open its settings; developer tools remain available from the same window.
+
+Native plugin authors can also register a central app and use [native game windows and previews](docs/experimental/native-document-ui.md). These operations are experimental and are separate from the stable Lua API.
 
 ## For contributors
 

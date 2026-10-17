@@ -1,0 +1,111 @@
+{
+  "schema_version": 1,
+  "feature": "native-document-ui",
+  "stability": "experimental",
+  "availability": "MT2 Mod Framework 0.1.4 or newer",
+  "abi_version": 1,
+  "capability": "ui",
+  "thread": "render callback",
+  "documentation": "https://doodesch-mods.github.io/MMORPGTycoon2-ModFramework/experimental/native-document-ui.html",
+  "operations": {
+    "ui.app": {
+      "arguments": {
+        "id": "string[1..64], letters/digits/dot/hyphen/underscore",
+        "title": "string[1..80 bytes]"
+      },
+      "result": {
+        "open_requested": "boolean; consumes one request from this mod's Mods-menu entry"
+      },
+      "ownership": "one app per active mod instance; call in render even when closed"
+    },
+    "ui.native": {
+      "arguments": {
+        "id": "registered app ID",
+        "open": "boolean",
+        "width": "integer 400..1100",
+        "height": "integer 300..640",
+        "widgets": "NativeWidget[1..80]"
+      },
+      "result": {
+        "ready": "boolean",
+        "open": "boolean",
+        "clicked": "widget ID[]",
+        "values": "Record<input ID,string>"
+      },
+      "layout": "immutable per app instance; native window and controls owned by the active game mode",
+      "images": "immutable mod-owned cache/<sha256>.png, <=1MiB and 2048px per dimension; session budget 128 unique previews"
+    },
+    "ui.document": {
+      "arguments": {
+        "document": "Document"
+      },
+      "result": {
+        "clicked": "string[]",
+        "values": "Record<string,string>",
+        "open": "boolean"
+      }
+    },
+    "ui.image.load": {
+      "arguments": {
+        "id": "string[1..128 bytes]",
+        "path": "relative mod-owned data path"
+      },
+      "result": {
+        "id": "string",
+        "ready": "boolean"
+      },
+      "format": "M2RGBA1 NUL; uint32 LE width; uint32 LE height; RGBA8 pixels",
+      "max_dimension": 2048,
+      "max_textures_per_mod": 16
+    }
+  },
+  "types": {
+    "NativeWidget": {
+      "id": "unique string[1..48], letters/digits/underscore, cannot end in _label",
+      "type": "text|button|input|image|panel",
+      "x": "nonnegative integer",
+      "y": "nonnegative integer",
+      "width": "positive integer; inside window",
+      "height": "positive integer; inside window",
+      "size?": "integer 10..30, default 16",
+      "tone?": "muted|error",
+      "text?": "string <=1024 bytes",
+      "value?": "string <=1024 bytes; input editing limited to 128 characters",
+      "path?": "immutable preview PNG path",
+      "visible?": "boolean, default true",
+      "disabled?": "boolean, buttons only",
+      "selected?": "boolean, buttons only"
+    },
+    "Document": {
+      "id": "string <=128 bytes",
+      "title": "string <=128 bytes",
+      "width?": "number",
+      "height?": "number",
+      "content": "Widget"
+    },
+    "Widget": {
+      "type": "text|button|input|selectable|image|separator|space|panel|columns",
+      "id?": "stable string",
+      "text?": "string",
+      "title?": "string",
+      "subtitle?": "string",
+      "value?": "string",
+      "hint?": "string",
+      "tone?": "heading|muted|success|error",
+      "image?": "texture ID",
+      "width?": "number 0..4096",
+      "height?": "number 0..4096",
+      "disabled?": "boolean",
+      "selected?": "boolean",
+      "primary?": "boolean",
+      "children?": "Widget[]; required for panel/columns"
+    }
+  },
+  "budgets": {
+    "widgets": 200,
+    "depth": 8,
+    "columns": 4,
+    "widget_string_bytes": 2048,
+    "input_utf8_bytes": 256
+  }
+}

@@ -124,6 +124,32 @@
       "alt": "English helper helper create",
       "caption": "Real owned English helper capture.",
       "sha256": "1ad2994a6a53826a9ffce8e20f20f49689ca4d51dece2ee51f4c3bcfe9e5e1d8"
+    },
+    {
+      "id": "mods-menu-entry",
+      "path": "public/media/mods-menu-entry.png",
+      "locale": "en",
+      "framework_version": "0.1.4-candidate",
+      "sha256": "228ec59523a602361d7e16066b1706c6d7c1dad3dcb1a4f42a0a96b1dd3b0823",
+      "source_sha256": "228ec59523a602361d7e16066b1706c6d7c1dad3dcb1a4f42a0a96b1dd3b0823",
+      "origin": "Owned game WGC capture; accepted native UI source before release version change",
+      "rights": "Game artwork retains its respective rights and is excluded from MIT.",
+      "case": "Mods... in the game menu, before Options....",
+      "alt": "Mods... in the game menu, before Options....",
+      "caption": "Mods... in the game menu, before Options...."
+    },
+    {
+      "id": "mod-apps",
+      "path": "public/media/mod-apps.png",
+      "locale": "en",
+      "framework_version": "0.1.4-candidate",
+      "sha256": "c5ba766c8ee47d1b636056cf1688d23ca468ae50802b07c5c87ab9be0f01c852",
+      "source_sha256": "c5ba766c8ee47d1b636056cf1688d23ca468ae50802b07c5c87ab9be0f01c852",
+      "origin": "Owned game WGC capture; accepted native UI source before release version change",
+      "rights": "Game artwork retains its respective rights and is excluded from MIT.",
+      "case": "Select MT2 Card Vault and choose Open Card Vault.",
+      "alt": "Select MT2 Card Vault and choose Open Card Vault.",
+      "caption": "Select MT2 Card Vault and choose Open Card Vault."
     }
   ],
   "capture_policy": "Real owned-game/helper captures only. Keep original receipts private; update affected views when workflow changes. Game artwork is excluded from MIT."

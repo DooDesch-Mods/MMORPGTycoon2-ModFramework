@@ -465,8 +465,8 @@ mmoWindow {
         {
             id "error";
             anchorType TopLeft;
-            anchorPos 324 358;
-            dims 510 52;
+            anchorPos 590 358;
+            dims 244 52;
             text "";
             size 14;
             textColor 1 0.79 0.42 1;
@@ -475,6 +475,33 @@ mmoWindow {
             editable false;
             clickable false;
             border false;
+        }
+        mmoButtonPane
+        {
+            id "open_app";
+            anchorType TopLeft;
+            anchorPos 324 374;
+            dims 250 34;
+            text "";
+            clickable true;
+            border true;
+            edges All;
+            corners "TopLeft BottomRight";
+            cornerSize 7;
+            command "MessageTo Mode MT2FWApp";
+        }
+        mmoTextPane
+        {
+            id "open_app_label";
+            anchorType TopLeft;
+            anchorPos 328 382;
+            dims 242 24;
+            text "Open mod";
+            size 14;
+            justify topcenter;
+            clickable false;
+            border false;
+            textColor 0.89 0.95 0.98 1;
         }
         mmoButtonPane
         {
