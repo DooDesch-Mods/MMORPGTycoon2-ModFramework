@@ -43,6 +43,9 @@ struct Plugin {
     void* native_module = nullptr;
     MT2FW_ShutdownFn native_shutdown = nullptr;
     bool native_loaded = false;
+    uint32_t native_pins = 0;
+    bool native_shutdown_pending = false, native_retirement_failed = false;
+    bool native_retained = false;
     std::vector<Subscription> subscriptions;
     Json config = Json::object(), config_schema = Json::object();
     Json profile_data = Json::object(), world_data = Json::object();
@@ -80,10 +83,15 @@ public:
     void world_leave();
     void saved(const std::string& save_identity);
     Json capture_save(const std::string& world) const;
+    Json capture_initial_save(const std::string& world) const;
     void save_acknowledged(const Json& metadata,const std::string& identity);
     void check_save(const std::string& save_identity);
     std::vector<std::string> multiplayer_conflicts(const Json& peer) const;
     Json shared_manifest() const;
+    Plugin* native_plugin(const MT2FW_Host* host) const;
+    void release_native(Plugin& plugin);
+    void stop_plugins();
+    std::function<bool(Plugin&)> native_retire;
     const fs::path& root() const { return root_; }
     const std::vector<std::unique_ptr<Plugin>>& plugins() const { return plugins_; }
     const std::deque<LogEntry>& logs() const { return logs_; }

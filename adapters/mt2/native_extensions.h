@@ -2,6 +2,7 @@
 #include "mt2mp/game/native_engine.h"
 #include <nlohmann/json.hpp>
 namespace mt2mp::game::native {
+bool read_initial_save_world(void* receiver,std::string& folder,std::string& error);
 struct ObservationHook {void* target;void* replacement;void** original;};
 struct ObjectChange {std::string operation;PropState prop;bool removed=false;};
 std::vector<ObservationHook> observation_hooks();

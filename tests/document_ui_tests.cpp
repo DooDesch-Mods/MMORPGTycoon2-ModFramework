@@ -1,4 +1,5 @@
 #include "document_ui.h"
+#include "native_input.h"
 #include <imgui.h>
 #include <windows.h>
 #include <fstream>
@@ -16,6 +17,18 @@ Json definition(Json content){return {{"mod_id","test.cards"},{"document",{{"id"
 }
 int main(){
     try{
+        check(native_input::limit(Json::object())==128,"Native input default limit changed");
+        check(native_input::limit({{"max_bytes",240}})==240,"Chat byte limit unavailable");
+        for(auto value:Json::array({0,1025,-1,128.5,"240",true}))rejected([&]{native_input::limit({{"max_bytes",value}});},"max_bytes");
+        native_input::validate(std::string(240,'a'),240);
+        rejected([&]{native_input::validate(std::string(241,'a'),240);},"max_bytes");
+        check(native_input::prefix(std::string(237,'a')+"\xe2\x82\xac",240)==std::string(237,'a')+"\xe2\x82\xac","Complete UTF-8 boundary was lost");
+        check(native_input::prefix(std::string(239,'a')+"\xe2\x82\xac",240)==std::string(239,'a'),"UTF-8 was split at byte limit");
+        check(native_input::prefix(std::string(237,'a')+"\xf0\x9f\x98\x80",240)==std::string(237,'a'),"Four-byte UTF-8 was split");
+        rejected([&]{native_input::prefix("\xc0\xaf",240);},"UTF-8");
+        rejected([&]{native_input::prefix("\xed\xa0\x80",240);},"UTF-8");
+        rejected([&]{native_input::prefix("\xf4\x90\x80\x80",240);},"UTF-8");
+        rejected([&]{native_input::prefix(std::string("a\0b",3),240);},"null byte");
         ImGui::CreateContext();auto& io=ImGui::GetIO();io.DisplaySize={1280,768};io.DeltaTime=1.f/60;io.IniFilename=nullptr;
         io.Fonts->AddFontDefault();io.Fonts->Build();ImGui::NewFrame();
         auto root=fs::current_path()/"document-ui-test-data";

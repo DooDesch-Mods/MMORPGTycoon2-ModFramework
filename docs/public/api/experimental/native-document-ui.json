@@ -29,6 +29,9 @@
       "result": {
         "ready": "boolean",
         "open": "boolean",
+        "visible": "boolean|null; actual native window visibility flag, null when unavailable",
+        "visibility_known": "boolean; true only after native flag readback",
+        "suspended": "boolean|null; Framework management suspension, null during unavailable mode",
         "clicked": "widget ID[]",
         "values": "Record<input ID,string>"
       },
@@ -71,7 +74,8 @@
       "size?": "integer 10..30, default 16",
       "tone?": "muted|error",
       "text?": "string <=1024 bytes",
-      "value?": "string <=1024 bytes; input editing limited to 128 characters",
+      "value?": "UTF-8 string within max_bytes for input; other text <=1024 bytes",
+      "max_bytes?": "input UTF-8 byte limit, integer 1..1024, default 128; part of immutable layout",
       "path?": "immutable preview PNG path",
       "visible?": "boolean, default true",
       "disabled?": "boolean, buttons only",
@@ -107,6 +111,8 @@
     "depth": 8,
     "columns": 4,
     "widget_string_bytes": 2048,
-    "input_utf8_bytes": 256
+    "input_utf8_bytes": 256,
+    "native_input_default_bytes": 128,
+    "native_input_maximum_bytes": 1024
   }
 }

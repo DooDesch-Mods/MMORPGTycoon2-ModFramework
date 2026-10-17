@@ -26,6 +26,7 @@ const guideLinks = [
   { text: 'Events and input', href: '/guides/events-input.html' },
   { text: 'World actions', href: '/guides/world-actions.html' },
   { text: 'Import GLB scenery', href: '/guides/scenery.html' },
+  { text: 'Profile a mod', href: '/guides/profiling.html' },
 ]
 
 const referenceLinks = [

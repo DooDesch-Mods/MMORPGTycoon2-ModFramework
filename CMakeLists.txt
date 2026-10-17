@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.24)
-project(MT2Framework VERSION 0.1.4 LANGUAGES C CXX)
+project(MT2Framework VERSION 0.1.5 LANGUAGES C CXX)
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_POLICY_VERSION_MINIMUM 3.5)
@@ -63,4 +63,26 @@ if(MT2FW_GAME)
     message(FATAL_ERROR "The MT2 adapter requires Windows x64; use MT2FW_GAME=OFF for core tests")
   endif()
   add_subdirectory(adapters/mt2)
+endif()
+
+if(MT2FW_GAME)
+  add_subdirectory(tests/native_initial)
+  add_executable(mt2fw_titlebar_visibility_tests tests/titlebar-visibility/native_app_close_tests.cpp)
+  target_include_directories(mt2fw_titlebar_visibility_tests PRIVATE "${MT2FW_VENDOR}" adapters/mt2)
+  add_test(NAME framework_titlebar_visibility COMMAND mt2fw_titlebar_visibility_tests)
+  find_package(Python3 REQUIRED COMPONENTS Interpreter)
+  add_custom_command(OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/actual_native_window_block.inc"
+    COMMAND "${Python3_EXECUTABLE}" -B -X utf8 "${CMAKE_CURRENT_SOURCE_DIR}/tests/native-window-reopen/extract_native_window.py"
+      --source "${CMAKE_CURRENT_SOURCE_DIR}/adapters/mt2/desktop_ui.cpp"
+      --output "${CMAKE_CURRENT_BINARY_DIR}/actual_native_window_block.inc"
+    DEPENDS tests/native-window-reopen/extract_native_window.py adapters/mt2/desktop_ui.cpp
+    VERBATIM)
+  add_executable(mt2fw_native_window_reopen_tests tests/native-window-reopen/native_window_reopen_tests.cpp
+    "${CMAKE_CURRENT_BINARY_DIR}/actual_native_window_block.inc")
+  target_include_directories(mt2fw_native_window_reopen_tests PRIVATE "${MT2FW_VENDOR}" "${CMAKE_CURRENT_BINARY_DIR}")
+  add_test(NAME framework_native_window_reopen COMMAND mt2fw_native_window_reopen_tests)
+  if(MSVC)
+    target_compile_options(mt2fw_titlebar_visibility_tests PRIVATE /W4 /WX /utf-8)
+    target_compile_options(mt2fw_native_window_reopen_tests PRIVATE /W4 /WX /utf-8)
+  endif()
 endif()

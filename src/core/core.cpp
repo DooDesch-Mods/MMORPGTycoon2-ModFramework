@@ -1,4 +1,5 @@
 #include "mt2fw/core.h"
+#include "mt2fw/save_metadata.h"
 #include "lua_mod.h"
 #include "crypto.h"
 #include <algorithm>
@@ -128,13 +129,14 @@ Manifest Manifest::parse(const Json& value) {
     return m;
 }
 Plugin::Plugin(Runtime* owner):runtime(owner) { host={sizeof(MT2FW_Host),MT2FW_ABI_VERSION,this,native_request,native_subscribe,native_unsubscribe}; }
-Plugin::~Plugin(){if(native_loaded&&native_shutdown)native_shutdown();}
+Plugin::~Plugin(){if(native_loaded&&native_shutdown&&!native_retirement_failed&&!native_retained&&!native_pins)native_shutdown();}
 Runtime::Runtime(fs::path root,Adapter adapter):root_(fs::absolute(root)),adapter_(std::move(adapter)) {
     fs::create_directories(root_/"mods");
     if (fs::exists(root_/"settings.json")) settings_=read_json(root_/"settings.json");
     if (!settings_.is_object()) throw std::runtime_error("settings.json must contain an object");
 }
-Runtime::~Runtime() { for (auto it=plugins_.rbegin();it!=plugins_.rend();++it) deactivate(**it); }
+Runtime::~Runtime() { stop_plugins(); }
+void Runtime::stop_plugins(){for(auto it=plugins_.rbegin();it!=plugins_.rend();++it)deactivate(**it);}
 void Runtime::log(const std::string& mod,const std::string& level,const std::string& message) {
     auto bounded=message.substr(0,8192); logs_.push_back({mod,level,bounded}); if(logs_.size()>512)logs_.pop_front();
     fs::create_directories(root_/"logs"); auto path=root_/"logs"/"framework.jsonl";
@@ -222,11 +224,27 @@ void Runtime::activate(Plugin& plugin) {
 void Runtime::deactivate(Plugin& plugin) {
     if(plugin.active)dispatch(plugin,"stop",Json::object());
     plugin.active=false; plugin.subscriptions.clear(); plugin.hotkeys.clear();
-    if(plugin.native_loaded&&plugin.native_shutdown) { plugin.native_shutdown(); plugin.native_shutdown=nullptr;plugin.native_loaded=false; }
+    if(native_retire)plugin.native_retirement_failed=!native_retire(plugin);
+    if(plugin.native_loaded&&plugin.native_shutdown) {
+        if(plugin.native_pins||plugin.native_retirement_failed||plugin.native_retained)plugin.native_shutdown_pending=true;
+        else {plugin.native_shutdown();plugin.native_shutdown=nullptr;plugin.native_loaded=false;}
+    }
 }
 void Runtime::disable(Plugin& plugin,const std::string& cause) {
     plugin.active=false; plugin.error=cause; plugin.subscriptions.clear(); plugin.hotkeys.clear(); log(plugin.manifest.id,"error",cause);
+    if(native_retire)plugin.native_retirement_failed=!native_retire(plugin);
     if(!plugin.staging&&!plugin.provisional)for(auto& other:plugins_)if(other->active&&other->manifest.dependencies.contains(plugin.manifest.id))disable(*other,"Dependency failed: "+plugin.manifest.id);
+}
+Plugin* Runtime::native_plugin(const MT2FW_Host* host) const {
+    for(auto& plugin:plugins_)if(&plugin->host==host&&plugin->native_loaded&&plugin->active&&!plugin->staging)return plugin.get();
+    return nullptr;
+}
+void Runtime::release_native(Plugin& plugin) {
+    if(!plugin.native_pins)throw std::runtime_error("Native callback lease underflow: "+plugin.manifest.id);
+    --plugin.native_pins;
+    if(!plugin.native_pins&&plugin.native_shutdown_pending&&!plugin.native_retirement_failed&&!plugin.native_retained&&plugin.native_loaded&&plugin.native_shutdown){
+        plugin.native_shutdown();plugin.native_shutdown=nullptr;plugin.native_loaded=false;plugin.native_shutdown_pending=false;
+    }
 }
 uint64_t Runtime::subscribe(Plugin& plugin,const std::string& event,std::function<void(const Json&)> callback) {
     if(!events.contains(event))throw std::runtime_error("Unknown event: "+event);
@@ -338,9 +356,11 @@ void Runtime::world_ready(const std::string& identity) {
     for(auto& p:plugins_)p->world_data=Json::object();
     object_bindings=Json::object();
     if(pending_world_metadata_.is_object()&&pending_world_metadata_.value("world",std::string())==identity) {
-        for(auto& p:plugins_)if(pending_world_metadata_["mods"].contains(p->manifest.id))p->world_data=pending_world_metadata_["mods"][p->manifest.id];
-        object_bindings=pending_world_metadata_.value("objects",Json::object());
-        for(auto& row:object_bindings)row["epoch"]=0;
+        if(!native_initial_metadata(pending_world_metadata_)) {
+            for(auto& p:plugins_)if(pending_world_metadata_["mods"].contains(p->manifest.id))p->world_data=pending_world_metadata_["mods"][p->manifest.id];
+            object_bindings=pending_world_metadata_.value("objects",Json::object());
+            for(auto& row:object_bindings)row["epoch"]=0;
+        }
     }
     pending_world_metadata_=Json();
     emit("world_ready",{{"epoch",epoch},{"name",identity}});
@@ -355,11 +375,32 @@ Json Runtime::capture_save(const std::string& name) const {
     for(auto& p:plugins_){if(p->active)data["mods"][p->manifest.id]=p->world_data;if(p->content_registered)data["required"].push_back(p->fingerprint);}
     return data;
 }
+Json Runtime::capture_initial_save(const std::string& name) const {
+    if(name.empty() || !world_.empty())
+        throw std::runtime_error("Initial save metadata requires no ready world");
+    if(pending_world_metadata_.is_object())
+        throw std::runtime_error("Initial save metadata cannot replace pending loaded mod data");
+    for(const auto& plugin:plugins_)
+        if(plugin->active && (!plugin->world_data.is_object() || !plugin->world_data.empty()))
+            throw std::runtime_error("Initial save metadata has uninitialized mod data: " + plugin->manifest.id);
+    for(const auto& row:object_bindings)
+        if(!row.is_object() || row.value("epoch",epoch)>=epoch)
+            throw std::runtime_error("Initial save metadata has current or unknown object bindings");
+    Json data={{"world",name},{"epoch",nullptr},{"phase","native_initial"},
+        {"mods",Json::object()},{"objects",Json::object()},{"required",Json::array()}};
+    for(const auto& plugin:plugins_)
+        if(plugin->content_registered)data["required"].push_back(plugin->fingerprint);
+    return data;
+}
 void store_save_metadata(const fs::path& root,Json data,const std::string& identity) {
+    native_initial_metadata(data);
     data["save"]=identity;auto world=data.at("world").get<std::string>();
     atomic_json(root/"saves"/(digest(identity)+".json"),data);atomic_json(root/"worlds"/(digest(world)+".json"),data);
 }
-void Runtime::save_acknowledged(const Json& data,const std::string& identity) {emit("saved",{{"save",identity},{"epoch",data.at("epoch")},{"name",data.at("world")}});}
+void Runtime::save_acknowledged(const Json& data,const std::string& identity) {
+    if(native_initial_metadata(data))throw std::runtime_error("Native initial metadata cannot acknowledge a ready-world save");
+    emit("saved",{{"save",identity},{"epoch",data.at("epoch")},{"name",data.at("world")}});
+}
 void Runtime::saved(const std::string& identity) {
     if(world_.empty())throw std::runtime_error("Save acknowledgement without a world");
     auto data=capture_save(world_);store_save_metadata(root_,data,identity);save_acknowledged(data,identity);
@@ -368,6 +409,7 @@ void Runtime::check_save(const std::string& identity) {
     pending_world_metadata_=Json();
     auto path=root_/"saves"/(digest(identity)+".json");if(!fs::exists(path))return;
     auto metadata=read_json(path);
+    native_initial_metadata(metadata);
     for(auto& needed:metadata.at("required")) {
         auto required_id=needed.at("id").get<std::string>();
         auto found=std::find_if(plugins_.begin(),plugins_.end(),[&](auto& p){return p->active&&p->manifest.id==required_id;});

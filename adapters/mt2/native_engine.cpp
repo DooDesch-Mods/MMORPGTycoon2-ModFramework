@@ -3,6 +3,8 @@
 #include "mt2mp/net/snapshot_world_path.h"
 #include "mt2mp/core/logger.h"
 #include "native_extensions.h"
+#include "shared_operations.h"
+#include <intrin.h>
 
 #define WIN32_LEAN_AND_MEAN
 #define NOMINMAX
@@ -2261,6 +2263,21 @@ bool set_clock(bool paused, float speed, std::string& error) {
     return true;
 }
 
+bool read_initial_save_world(void* receiver, std::string& folder, std::string& error) {
+    folder.clear();
+    if(!check_thread(error))return false;
+    const auto* game=singleton(game_slot);
+    const auto* mode=singleton(mode_slot);
+    void* active=nullptr;void* world=nullptr;int state=-1;unsigned char quitting=1;
+    if(!has_vtable(game,0x1743730) || !read_at(game,0x28,active) || active!=mode || receiver!=mode ||
+        !has_vtable(mode,0x16e6720) || !read_at(mode,0x58,world) || !world ||
+        !read_at(mode,0x2c4,state) || state!=3 || !read_at(mode,0x304,quitting) || quitting ||
+        !read_game_string(game,0x470,folder) || !net::snapshot_world_path::valid_folder(folder)) {
+        folder.clear();return fail(error,"initial save requires the exact current state3 world and folder");
+    }
+    error.clear();return true;
+}
+
 bool read_active_world_folder(std::string& folder, std::string& error) {
     folder.clear();
     if (!check_thread(error)) return false;
@@ -2618,11 +2635,15 @@ void observe(const char* operation,const PropState& prop,bool removed=false) {
     if(observed_changes.size()>=4096){if(!dropped_changes)LOG_WARN("[Framework] Native object event budget exceeded (4096); events are being counted as dropped");++dropped_changes;return;}
     observed_changes.push_back({operation,prop,removed});
 }
-void* create_building(void* manager,const void* type,const void* variant,const void* pose,void* a,void* b,void* c,bool flag) {
+void* create_observed(void* manager,const void* type,const void* variant,const void* pose,void* a,void* b,void* c,bool flag) {
     auto result=original_create_building(manager,type,variant,pose,a,b,c,flag);
     try{if(observing()&&result){PropState prop;if(prop_state(result,prop))observe("actions.place",prop);else LOG_WARN("[Framework] Created building event omitted: native prop identity is unreadable");}}
     catch(const std::exception& error){LOG_ERROR("[Framework] Created building observer failed: {}",error.what());}
     return result;
+}
+void* create_building(void* manager,const void* type,const void* variant,const void* pose,void* a,void* b,void* c,bool flag) {
+    MT2FW_MT2_CreateCall call{sizeof(call),flag?1u:0u,0,GetCurrentThreadId(),manager,type,variant,pose,a,b,c};
+    return mt2fw::mt2::dispatch_create(call,create_observed);
 }
 void move_building(void* action,void* graph) {
     uint64_t uid=0;PropState before;std::string error;bool watched=false;
@@ -2637,7 +2658,7 @@ void move_building(void* action,void* graph) {
         else if(before.x!=after.x||before.y!=after.y||before.z!=after.z)observe("actions.move",after);}}
     catch(const std::exception& problem){LOG_ERROR("[Framework] Move event observer failed: {}",problem.what());}
 }
-void remove_buildings(void* manager,void* array) {
+void remove_observed(void* manager,void* array) {
     std::vector<PropState> before;
     try{if(observing()){
         void* data=nullptr;int32_t count=0,capacity=0;
@@ -2649,6 +2670,12 @@ void remove_buildings(void* manager,void* array) {
         if(exception)LOG_WARN("[Framework] Remove event registry read failed: exception={}",exception);
         else if(!remaining)observe("actions.remove",row,true);}}
     catch(const std::exception& problem){LOG_ERROR("[Framework] Remove event observer failed: {}",problem.what());}
+}
+__declspec(noinline) void remove_buildings(void* manager,void* array) {
+    auto slot=reinterpret_cast<uintptr_t>(_AddressOfReturnAddress());
+    auto address=reinterpret_cast<uintptr_t>(_ReturnAddress());
+    MT2FW_MT2_RemoveCall call{sizeof(call),0,0,GetCurrentThreadId(),manager,array,slot,address};
+    mt2fw::mt2::dispatch_remove(call,remove_observed);
 }
 }
 std::vector<ObservationHook> observation_hooks() {

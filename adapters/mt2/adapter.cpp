@@ -92,7 +92,7 @@ void refresh_saved_bindings() {
         Json location;require(native::saved_location(prop.uid,location,error),error);row["location"]=location;row["uid"]=std::to_string(prop.uid);row["epoch"]=current_runtime->epoch;
     }
 }
-void frame(Runtime& runtime,float dt) {
+void observe_world(Runtime& runtime) {
     current_runtime=&runtime;
     if(!native::bind_game_thread())throw std::runtime_error("Native game-thread identity rejected");
     bool active=native::in_game();
@@ -100,6 +100,9 @@ void frame(Runtime& runtime,float dt) {
         std::string folder,error;require(native::read_active_world_folder(folder,error),error);
         if(!world||folder!=current_world){current_world=folder;world=true;runtime.world_ready(folder);}
     }else if(world){runtime.world_leave();world=false;current_world.clear();}
+}
+void frame(Runtime& runtime,float dt) {
+    observe_world(runtime);
     perform_actions(runtime);
     auto changes=native::take_object_changes();
     if(world)for(auto& change:changes){auto object=prop(change.prop);object["deleted"]=change.removed;runtime.emit("object_changed",{{"operation",change.operation},{"source","native"},{"object",object}});}

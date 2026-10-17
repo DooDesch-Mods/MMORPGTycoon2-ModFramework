@@ -1,5 +1,17 @@
 # Changelog
 
+## 0.1.5
+
+### Added
+
+- Support for the optional MT2 Profiler mod, with bounded native captures and exported reports.
+- Versioned experimental native services for instrumented sections, shared event routes and owned hooks.
+
+### Fixed
+
+- Native mod windows can be opened again after closing them with the game's X button.
+- The game's first world snapshot receives explicit pre-ready metadata, separate from normal save confirmations.
+
 ## 0.1.4
 
 ### Added

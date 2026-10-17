@@ -1,6 +1,7 @@
 #include "desktop_ui.h"
 #include "native_extensions.h"
 #include "crypto.h"
+#include "native_input.h"
 #include <windows.h>
 #include <array>
 #include <chrono>
@@ -405,6 +406,7 @@ DWORD activate_native(void* target, bool icon) {
         else reinterpret_cast<void(*)(void*)>(image + 0x674780)(target);
     } __except (EXCEPTION_EXECUTE_HANDLER) { return GetExceptionCode(); } return 0;
 }
+#include "native_app_close.inc"
 struct alignas(8) MenuElement { String key; Literal label; };
 static_assert(sizeof(MenuElement) == 0x58);
 struct MenuArray { void* vtable; void* data; int count, capacity; };
@@ -573,17 +575,19 @@ Json activate(const Json& args) {
     require(fault.empty(), fault);
     require(thread == GetCurrentThreadId() && mode && panel, "Diagnostic requires current game-thread Mods window");
     const auto id = args.at("target").get<std::string>(); bool icon = id == "icon";
+    if (id.starts_with("app-close:")) return close_native_app(id.substr(10), args);
     if (id.starts_with("app:")) {
         auto split = id.find(':',4); require(split != std::string::npos,"Native app diagnostic target requires its owner and widget");
         auto found = native_windows.find(id.substr(4,split-4)); require(found != native_windows.end(),"Native app is not registered");
         auto& app = found->second; require(app.panel && app.mode == mode,"Native app belongs to another mode");
         auto widget = id.substr(split+1); auto* target = native_pane(app.panel,widget);
         if(args.contains("text")) {
-            bool input = false; for(auto& item:app.widgets)if(item.at("id")==widget&&item.at("type")=="input")input=true;
+            bool input = false;size_t maximum=128; for(auto& item:app.widgets)if(item.at("id")==widget&&item.at("type")=="input"){input=true;maximum=native_input::limit(item);}
             require(input,"Native app diagnostic text target is not an input");
-            auto value=args.at("text").get<std::string>(); require(value.size()<=128,"Diagnostic text exceeds 128 bytes");
+            auto value=args.at("text").get<std::string>();native_input::validate(value,maximum);
             check(string_call(0x7f1630,target,value.c_str()),"Native app diagnostic text");
-            return {{"native_event","mmoTextEditPane::SetText"},{"accepted",true}};
+            std::string actual;require(text(static_cast<unsigned char*>(target)+0x2d0,actual)&&actual==value,"Native app diagnostic text readback differs");
+            return {{"native_event","mmoTextEditPane::SetText"},{"accepted",true},{"readback_matches",true},{"bytes",actual.size()}};
         }
         auto count=app.clicked.size(); check(activate_native(target,false),"Native app button activation");
         require(app.clicked.size()==count+1,"Native app button did not reach its handler");
@@ -663,7 +667,7 @@ std::string native_image(const std::string& owner, const std::string& relative) 
 }
 }
 Json native_window(const Json& args) {
-    if (!mode || !thread) return {{"ready", false}, {"open", args.value("open", false)}, {"clicked", Json::array()}, {"values", Json::object()}};
+    if (!mode || !thread) return {{"ready", false}, {"open", args.value("open", false)}, {"visible",nullptr},{"visibility_known",false},{"suspended",nullptr},{"clicked", Json::array()}, {"values", Json::object()}};
     require(thread == GetCurrentThreadId(), "Native app window is outside the game thread");
     const auto owner = args.at("mod_id").get<std::string>(), id = args.at("id").get<std::string>();
     auto registration = apps.find(owner); require(registration != apps.end() && registration->second.id == id, "Register the native app before its window");
@@ -681,11 +685,13 @@ Json native_window(const Json& args) {
         for (auto field : {"text", "value"}) if (item.contains(field)) require(item[field].is_string() && item[field].get_ref<const std::string&>().size() <= 1024, "Native app text exceeds 1024 bytes");
         for (auto field : {"visible", "disabled", "selected"}) if (item.contains(field)) require(item[field].is_boolean(), "Invalid native app widget state");
         auto style = item.value("style",std::string("button")), tone = item.value("tone",std::string());
+        size_t maximum=type=="input"?native_input::limit(item):0;
+        if(type=="input")native_input::validate(item.value("value",std::string()),maximum);
         require(style == "button" || style == "tab" || style == "row" || style == "quiet", "Unsupported native app widget style");
         require(tone.empty() || tone == "muted" || tone == "error" || tone == "subtle" || tone == "preview", "Unsupported native app widget tone");
-        structure.push_back({{"id",name},{"type",type},{"x",x},{"y",y},{"width",w},{"height",h},{"size",size},{"tone",tone},{"style",style}});
+        structure.push_back({{"id",name},{"type",type},{"x",x},{"y",y},{"width",w},{"height",h},{"size",size},{"tone",tone},{"style",style},{"max_bytes",maximum}});
     }
-    auto shape = digest(Json{{"format",4},{"widgets",structure},{"width",width},{"height",height},{"title",registration->second.title}}.dump());
+    auto shape = digest(Json{{"format",5},{"widgets",structure},{"width",width},{"height",height},{"title",registration->second.title}}.dump());
     auto& window = native_windows[owner];
     if (window.owner != registration->second.owner) {
         if (window.panel && window.mode == mode) check(show(window.panel, false), "Hide previous mod instance window");
@@ -704,7 +710,7 @@ Json native_window(const Json& args) {
             const char* kind = type == "button" ? "mmoButtonPane" : type == "input" ? "mmoTextEditPane" : type == "text" ? "mmoTextPane" : "mmoPane";
             source << kind << " { id \"" << name << "\"; anchorType TopLeft; anchorPos " << x << ' ' << y << "; dims " << w << ' ' << h << "; border false; ";
             if(type == "button") source << "text \"\"; clickable true; border true; edges All; corners \"TopLeft BottomRight\"; cornerSize 5; command \"MessageTo Mode MT2FWNative " << window.name << ' ' << name << "\";";
-            else if(type == "input") source << "text \"\"; size " << size << "; clickable true; editable true; maxLength 128; margin 8; material \"AltPanelBacking\"; border true; edges All; justify left;";
+            else if(type == "input") source << "text \"\"; size " << size << "; clickable true; editable true; maxLength " << item.at("max_bytes").get<size_t>() << "; margin 8; material \"AltPanelBacking\"; border true; edges All; justify left;";
             else if(type == "text") source << "text \"\"; size " << size << "; clickable false; justify topleft; textColor " << (item.at("tone") == "muted" ? "0.7 0.8 0.88 1" : item.at("tone") == "error" ? "1 0.65 0.4 1" : "0.95 0.97 1 1") << ';';
             else source << "clickable false; material \"" << (type == "panel" ? (item.at("tone") == "subtle" ? "DarkPanelBacking" : "PanelBacking") : "") << "\";";
             source << " }\n";
@@ -739,16 +745,22 @@ Json native_window(const Json& args) {
             check(string_call(0x671030,target,"ButtonBackgroundActive"), "Native app selected material");
         }
     }
-    Json events{{"ready", true},{"open",desired},{"clicked",Json::array()},{"values",Json::object()}};
+    Json events{{"ready", true},{"open",desired},{"visible",nullptr},{"visibility_known",false},{"suspended",window.suspended},{"clicked",Json::array()},{"values",Json::object()}};
     if (!window.panel) return events;
     if (!desired || panel_open) {
         if (window.requested || panel_open) check(show(window.panel, false), "Hide native app");
-        window.requested = desired; window.suspended = desired && panel_open; events["open"] = desired; return events;
+        window.requested = desired; window.suspended = desired && panel_open; events["open"] = desired;
+        uint8_t actual=0;require(read(window.panel,0x45f,actual),"Native app hidden visibility unreadable");events["visible"]=actual!=0;events["visibility_known"]=true;events["suspended"]=window.suspended;return events;
     }
     if (!window.requested || window.suspended) check(show(window.panel, true), "Open native app");
     window.requested = true; window.suspended = false;
     uint8_t visible = 0; require(read(window.panel, 0x45f, visible), "Native app visibility unreadable"); events["open"] = visible != 0;
-    if (!visible) { window.clicked = Json::array(); return events; }
+    events["visible"]=visible!=0;events["visibility_known"]=true;events["suspended"]=false;
+    if (!visible) {
+        window.requested = false;
+        window.clicked = Json::array();
+        return events;
+    }
     for (auto& item : items) {
         auto name = item.at("id").get<std::string>(), type = item.at("type").get<std::string>(); auto* target = native_pane(window.panel, name);
         bool shown = item.value("visible", true); native_shown(target, shown);
@@ -761,7 +773,9 @@ Json native_window(const Json& args) {
         } else if(type == "input") {
             auto value = item.value("value",std::string());
             if(!window.values.contains(name) || window.values[name] != value) { check(string_call(0x7f1630,target,value.c_str()),"Native app input value"); window.values[name] = value; }
-            std::string actual; require(text(static_cast<unsigned char*>(target)+0x2d0,actual) && actual.size() <= 1024,"Native app input unreadable");
+            std::string actual; require(text(static_cast<unsigned char*>(target)+0x2d0,actual) && actual.size() <= 4096,"Native app input unreadable");
+            auto maximum=native_input::limit(item);auto bounded=native_input::prefix(actual,maximum);
+            if(bounded!=actual){check(string_call(0x7f1630,target,bounded.c_str()),"Native app input byte limit");std::string readback;require(text(static_cast<unsigned char*>(target)+0x2d0,readback)&&readback==bounded,"Native app bounded input readback differs");actual=std::move(bounded);}
             if(actual != value) { events["values"][name] = actual; window.values[name] = actual; }
         } else if(type == "image") {
             auto value = item.value("path",std::string());

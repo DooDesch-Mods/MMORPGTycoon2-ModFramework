@@ -1,0 +1,1645 @@
+{
+  "inventory_sha256": "43696453287e835a8a8014432ae0f384b384c7df22b2ef2ef84ef9302f773a8a",
+  "targets": [
+    {
+      "name": "mp.purchase-subscription-price.54ce0",
+      "rva": 347360,
+      "shared": false,
+      "groups": [
+        {
+          "feature": "Purchase/subscription price",
+          "phase": "typed_action_runtime::start, bound Mainthread, once per process",
+          "site": "src/game/ui_price_runtime.cpp:245"
+        }
+      ]
+    },
+    {
+      "name": "mp.purchase-subscription-price.54cf0",
+      "rva": 347376,
+      "shared": false,
+      "groups": [
+        {
+          "feature": "Purchase/subscription price",
+          "phase": "typed_action_runtime::start, bound Mainthread, once per process",
+          "site": "src/game/ui_price_runtime.cpp:245"
+        }
+      ]
+    },
+    {
+      "name": "mp.economic-authority-fence.54d30",
+      "rva": 347440,
+      "shared": false,
+      "groups": [
+        {
+          "feature": "Economic authority fence",
+          "phase": "initialize, after native exact-image binding, before global enable",
+          "site": "src/game/live_host_state/economic_fence.cpp:48"
+        }
+      ]
+    },
+    {
+      "name": "mp.economic-authority-fence.54d80",
+      "rva": 347520,
+      "shared": false,
+      "groups": [
+        {
+          "feature": "Economic authority fence",
+          "phase": "initialize, after native exact-image binding, before global enable",
+          "site": "src/game/live_host_state/economic_fence.cpp:48"
+        }
+      ]
+    },
+    {
+      "name": "mp.economic-authority-fence.555a0",
+      "rva": 349600,
+      "shared": false,
+      "groups": [
+        {
+          "feature": "Economic authority fence",
+          "phase": "initialize, after native exact-image binding, before global enable",
+          "site": "src/game/live_host_state/economic_fence.cpp:48"
+        }
+      ]
+    },
+    {
+      "name": "mp.economic-authority-fence.55c20",
+      "rva": 351264,
+      "shared": false,
+      "groups": [
+        {
+          "feature": "Economic authority fence",
+          "phase": "initialize, after native exact-image binding, before global enable",
+          "site": "src/game/live_host_state/economic_fence.cpp:48"
+        }
+      ]
+    },
+    {
+      "name": "mp.businessnextdayfinances.57570",
+      "rva": 357744,
+      "shared": false,
+      "groups": [
+        {
+          "feature": "BusinessNextDayFinances",
+          "phase": "initialize, after native exact-image binding, before global enable",
+          "site": "src/core/dll_main.cpp:2328"
+        }
+      ]
+    },
+    {
+      "name": "mp.economic-authority-fence.575d0",
+      "rva": 357840,
+      "shared": false,
+      "groups": [
+        {
+          "feature": "Economic authority fence",
+          "phase": "initialize, after native exact-image binding, before global enable",
+          "site": "src/game/live_host_state/economic_fence.cpp:48"
+        }
+      ]
+    },
+    {
+      "name": "mp.economic-authority-fence.57620",
+      "rva": 357920,
+      "shared": false,
+      "groups": [
+        {
+          "feature": "Economic authority fence",
+          "phase": "initialize, after native exact-image binding, before global enable",
+          "site": "src/game/live_host_state/economic_fence.cpp:48"
+        }
+      ]
+    },
+    {
+      "name": "mp.bug-lifecycle-and-saved-identity.58740",
+      "rva": 362304,
+      "shared": false,
+      "groups": [
+        {
+          "feature": "Bug lifecycle and saved identity",
+          "phase": "initialize, after native exact-image binding, before global enable",
+          "site": "src/game/bug_authority/hooks.cpp:234"
+        }
+      ]
+    },
+    {
+      "name": "mp.bug-lifecycle-and-saved-identity.58da0",
+      "rva": 363936,
+      "shared": false,
+      "groups": [
+        {
+          "feature": "Bug lifecycle and saved identity",
+          "phase": "initialize, after native exact-image binding, before global enable",
+          "site": "src/game/bug_authority/hooks.cpp:234"
+        }
+      ]
+    },
+    {
+      "name": "mp.bug-lifecycle-and-saved-identity.59a00",
+      "rva": 367104,
+      "shared": false,
+      "groups": [
+        {
+          "feature": "Bug lifecycle and saved identity",
+          "phase": "initialize, after native exact-image binding, before global enable",
+          "site": "src/game/bug_authority/hooks.cpp:234"
+        }
+      ]
+    },
+    {
+      "name": "mp.bug-lifecycle-and-saved-identity.59fb0",
+      "rva": 368560,
+      "shared": false,
+      "groups": [
+        {
+          "feature": "Bug lifecycle and saved identity",
+          "phase": "initialize, after native exact-image binding, before global enable",
+          "site": "src/game/bug_authority/hooks.cpp:234"
+        }
+      ]
+    },
+    {
+      "name": "mp.bug-lifecycle-and-saved-identity.5d100",
+      "rva": 381184,
+      "shared": false,
+      "groups": [
+        {
+          "feature": "Bug lifecycle and saved identity",
+          "phase": "initialize, after native exact-image binding, before global enable",
+          "site": "src/game/bug_authority/hooks.cpp:234"
+        }
+      ]
+    },
+    {
+      "name": "mp.time-activate-update.20e6d0",
+      "rva": 2156240,
+      "shared": false,
+      "groups": [
+        {
+          "feature": "Time Activate/Update",
+          "phase": "after engine-bound GameUpdate, local_test or connected session",
+          "site": "src/core/dll_main.cpp:339"
+        }
+      ]
+    },
+    {
+      "name": "mp.time-activate-update.20e8d0",
+      "rva": 2156752,
+      "shared": false,
+      "groups": [
+        {
+          "feature": "Time Activate/Update",
+          "phase": "after engine-bound GameUpdate, local_test or connected session",
+          "site": "src/core/dll_main.cpp:339"
+        }
+      ]
+    },
+    {
+      "name": "objects.create",
+      "rva": 2420016,
+      "shared": true,
+      "groups": []
+    },
+    {
+      "name": "mp.clockupdate.259450",
+      "rva": 2462800,
+      "shared": false,
+      "groups": [
+        {
+          "feature": "ClockUpdate",
+          "phase": "initialize, after native exact-image binding, before global enable",
+          "site": "src/core/dll_main.cpp:2292"
+        }
+      ]
+    },
+    {
+      "name": "mp.hud-native-time-and-calendar.25a190",
+      "rva": 2466192,
+      "shared": false,
+      "groups": [
+        {
+          "feature": "HUD native Time and Calendar",
+          "phase": "after engine-bound GameUpdate, local_test or connected session",
+          "site": "src/game/hud_time_runtime.cpp:87"
+        }
+      ]
+    },
+    {
+      "name": "mp.tutorial-research-staff-starting-point-authority.25ec40",
+      "rva": 2485312,
+      "shared": false,
+      "groups": [
+        {
+          "feature": "Tutorial, Research, Staff, starting-point authority",
+          "phase": "initialize, after native exact-image binding, before global enable",
+          "site": "src/game/tutorial_replication/native.cpp:272"
+        }
+      ]
+    },
+    {
+      "name": "mp.tutorial-research-staff-starting-point-authority.25fb10",
+      "rva": 2489104,
+      "shared": false,
+      "groups": [
+        {
+          "feature": "Tutorial, Research, Staff, starting-point authority",
+          "phase": "initialize, after native exact-image binding, before global enable",
+          "site": "src/game/tutorial_replication/native.cpp:272"
+        }
+      ]
+    },
+    {
+      "name": "mp.tutorial-research-staff-starting-point-authority.262ec0",
+      "rva": 2502336,
+      "shared": false,
+      "groups": [
+        {
+          "feature": "Tutorial, Research, Staff, starting-point authority",
+          "phase": "initialize, after native exact-image binding, before global enable",
+          "site": "src/game/tutorial_replication/native.cpp:272"
+        }
+      ]
+    },
+    {
+      "name": "mp.building-and-scenery-capture.2cb340",
+      "rva": 2929472,
+      "shared": false,
+      "groups": [
+        {
+          "feature": "Building and Scenery capture",
+          "phase": "world-ready action capture enable, on bound Mainthread",
+          "site": "src/game/ui_build_runtime.cpp:387"
+        }
+      ]
+    },
+    {
+      "name": "mp.remove-ownership-observers.2d3f90",
+      "rva": 2965392,
+      "shared": false,
+      "groups": [
+        {
+          "feature": "Remove ownership observers",
+          "phase": "world-ready action capture enable, on bound Mainthread",
+          "site": "src/game/object_identity/remove_runtime/remove_runtime.cpp:75"
+        }
+      ]
+    },
+    {
+      "name": "objects.remove",
+      "rva": 2966208,
+      "shared": true,
+      "groups": []
+    },
+    {
+      "name": "mp.softwarecalculaterating.2de360",
+      "rva": 3007328,
+      "shared": false,
+      "groups": [
+        {
+          "feature": "SoftwareCalculateRating",
+          "phase": "initialize, after native exact-image binding, before global enable",
+          "site": "src/core/dll_main.cpp:2323"
+        }
+      ]
+    },
+    {
+      "name": "mp.softwarecalculatefun.2de6b0",
+      "rva": 3008176,
+      "shared": false,
+      "groups": [
+        {
+          "feature": "SoftwareCalculateFun",
+          "phase": "initialize, after native exact-image binding, before global enable",
+          "site": "src/core/dll_main.cpp:2324"
+        }
+      ]
+    },
+    {
+      "name": "mp.softwaretick.2de7f0",
+      "rva": 3008496,
+      "shared": false,
+      "groups": [
+        {
+          "feature": "SoftwareTick",
+          "phase": "initialize, after native exact-image binding, before global enable",
+          "site": "src/core/dll_main.cpp:2321"
+        }
+      ]
+    },
+    {
+      "name": "mp.softwaretickertick.2de820",
+      "rva": 3008544,
+      "shared": false,
+      "groups": [
+        {
+          "feature": "SoftwareTickerTick",
+          "phase": "initialize, after native exact-image binding, before global enable",
+          "site": "src/core/dll_main.cpp:2322"
+        }
+      ]
+    },
+    {
+      "name": "mp.economic-authority-fence.2eb3d0",
+      "rva": 3060688,
+      "shared": false,
+      "groups": [
+        {
+          "feature": "Economic authority fence",
+          "phase": "initialize, after native exact-image binding, before global enable",
+          "site": "src/game/live_host_state/economic_fence.cpp:48"
+        }
+      ]
+    },
+    {
+      "name": "mp.subscribernewday.2eb530",
+      "rva": 3061040,
+      "shared": false,
+      "groups": [
+        {
+          "feature": "SubscriberNewDay",
+          "phase": "initialize, after native exact-image binding, before global enable",
+          "site": "src/core/dll_main.cpp:2329"
+        }
+      ]
+    },
+    {
+      "name": "mp.subscriber-retirement.2ef4c0",
+      "rva": 3077312,
+      "shared": false,
+      "groups": [
+        {
+          "feature": "Subscriber retirement",
+          "phase": "initialize, after native exact-image binding, before global enable",
+          "site": "src/core/dll_main.cpp:2316"
+        }
+      ]
+    },
+    {
+      "name": "mp.region-setpreset.3575d0",
+      "rva": 3503568,
+      "shared": false,
+      "groups": [
+        {
+          "feature": "Region SetPreset",
+          "phase": "world-ready action capture enable, on bound Mainthread",
+          "site": "src/game/ui_region_runtime.cpp:263"
+        }
+      ]
+    },
+    {
+      "name": "mp.region-properties.36bad0",
+      "rva": 3586768,
+      "shared": false,
+      "groups": [
+        {
+          "feature": "Region properties",
+          "phase": "world-ready action capture enable, on bound Mainthread",
+          "site": "src/game/region_properties_runtime.inc:165"
+        }
+      ]
+    },
+    {
+      "name": "mp.subscriberupdateneeds.38f620",
+      "rva": 3733024,
+      "shared": false,
+      "groups": [
+        {
+          "feature": "SubscriberUpdateNeeds",
+          "phase": "initialize, after native exact-image binding, before global enable",
+          "site": "src/core/dll_main.cpp:2335"
+        }
+      ]
+    },
+    {
+      "name": "mp.subscriberbraintick.394a20",
+      "rva": 3754528,
+      "shared": false,
+      "groups": [
+        {
+          "feature": "SubscriberBrainTick",
+          "phase": "initialize, after native exact-image binding, before global enable",
+          "site": "src/core/dll_main.cpp:2334"
+        }
+      ]
+    },
+    {
+      "name": "mp.needsetset.395ee0",
+      "rva": 3759840,
+      "shared": false,
+      "groups": [
+        {
+          "feature": "NeedSetSet",
+          "phase": "initialize, after native exact-image binding, before global enable",
+          "site": "src/core/dll_main.cpp:2330"
+        }
+      ]
+    },
+    {
+      "name": "mp.needsetincrement.395f00",
+      "rva": 3759872,
+      "shared": false,
+      "groups": [
+        {
+          "feature": "NeedSetIncrement",
+          "phase": "initialize, after native exact-image binding, before global enable",
+          "site": "src/core/dll_main.cpp:2331"
+        }
+      ]
+    },
+    {
+      "name": "mp.needsetaddassign.3960a0",
+      "rva": 3760288,
+      "shared": false,
+      "groups": [
+        {
+          "feature": "NeedSetAddAssign",
+          "phase": "initialize, after native exact-image binding, before global enable",
+          "site": "src/core/dll_main.cpp:2332"
+        }
+      ]
+    },
+    {
+      "name": "mp.needsetsubtractassign.396120",
+      "rva": 3760416,
+      "shared": false,
+      "groups": [
+        {
+          "feature": "NeedSetSubtractAssign",
+          "phase": "initialize, after native exact-image binding, before global enable",
+          "site": "src/core/dll_main.cpp:2333"
+        }
+      ]
+    },
+    {
+      "name": "mp.toon-visual-equip.3a1df0",
+      "rva": 3808752,
+      "shared": false,
+      "groups": [
+        {
+          "feature": "Toon visual equip",
+          "phase": "typed_action_runtime::start, bound Mainthread, once per process",
+          "site": "src/game/toon_weapon_visual/native.cpp:184"
+        }
+      ]
+    },
+    {
+      "name": "mp.toon-time-normalization.3ea3a0",
+      "rva": 4105120,
+      "shared": false,
+      "groups": [
+        {
+          "feature": "Toon time normalization",
+          "phase": "typed_action_runtime::start, bound Mainthread, once per process",
+          "site": "src/game/toon_time_fence/native.cpp:118"
+        }
+      ]
+    },
+    {
+      "name": "mp.building-and-scenery-capture.40bb10",
+      "rva": 4242192,
+      "shared": false,
+      "groups": [
+        {
+          "feature": "Building and Scenery capture",
+          "phase": "world-ready action capture enable, on bound Mainthread",
+          "site": "src/game/ui_build_runtime.cpp:387"
+        }
+      ]
+    },
+    {
+      "name": "mp.network-leaf-observer.42c8f0",
+      "rva": 4376816,
+      "shared": false,
+      "groups": [
+        {
+          "feature": "Network leaf observer",
+          "phase": "lazy diagnostic node observer dispatch after resolver/Mainthread preparation",
+          "site": "src/game/observer_hooks.cpp:47"
+        }
+      ]
+    },
+    {
+      "name": "mp.network-leaf-observer.42cb10",
+      "rva": 4377360,
+      "shared": false,
+      "groups": [
+        {
+          "feature": "Network leaf observer",
+          "phase": "lazy diagnostic node observer dispatch after resolver/Mainthread preparation",
+          "site": "src/game/observer_hooks.cpp:47"
+        }
+      ]
+    },
+    {
+      "name": "mp.network-leaf-observer.42cc10",
+      "rva": 4377616,
+      "shared": false,
+      "groups": [
+        {
+          "feature": "Network leaf observer",
+          "phase": "lazy diagnostic node observer dispatch after resolver/Mainthread preparation",
+          "site": "src/game/observer_hooks.cpp:47"
+        }
+      ]
+    },
+    {
+      "name": "mp.network-leaf-observer.42cc30",
+      "rva": 4377648,
+      "shared": false,
+      "groups": [
+        {
+          "feature": "Network leaf observer",
+          "phase": "lazy diagnostic node observer dispatch after resolver/Mainthread preparation",
+          "site": "src/game/observer_hooks.cpp:47"
+        }
+      ]
+    },
+    {
+      "name": "mp.network-leaf-observer.42d570",
+      "rva": 4380016,
+      "shared": false,
+      "groups": [
+        {
+          "feature": "Network leaf observer",
+          "phase": "lazy diagnostic node observer dispatch after resolver/Mainthread preparation",
+          "site": "src/game/observer_hooks.cpp:47"
+        }
+      ]
+    },
+    {
+      "name": "mp.network-node-ui.42db30",
+      "rva": 4381488,
+      "shared": false,
+      "groups": [
+        {
+          "feature": "Network node UI",
+          "phase": "world-ready action capture enable, on bound Mainthread",
+          "site": "src/game/ui_network_runtime.inc:161"
+        }
+      ]
+    },
+    {
+      "name": "mp.network-pipe-ui.433e80",
+      "rva": 4406912,
+      "shared": false,
+      "groups": [
+        {
+          "feature": "Network pipe UI",
+          "phase": "world-ready action capture enable, on bound Mainthread",
+          "site": "src/game/ui_network_pipe.inc:87"
+        }
+      ]
+    },
+    {
+      "name": "mp.path-actions.43a1b0",
+      "rva": 4432304,
+      "shared": false,
+      "groups": [
+        {
+          "feature": "Path actions",
+          "phase": "world-ready action capture enable, on bound Mainthread",
+          "site": "src/game/path_execution.inc:44"
+        }
+      ]
+    },
+    {
+      "name": "mp.building-and-scenery-capture.448330",
+      "rva": 4490032,
+      "shared": false,
+      "groups": [
+        {
+          "feature": "Building and Scenery capture",
+          "phase": "world-ready action capture enable, on bound Mainthread",
+          "site": "src/game/ui_build_runtime.cpp:387"
+        }
+      ]
+    },
+    {
+      "name": "game.update",
+      "rva": 4603104,
+      "shared": true,
+      "groups": []
+    },
+    {
+      "name": "save.command",
+      "rva": 4850832,
+      "shared": true,
+      "groups": []
+    },
+    {
+      "name": "mp.vip-alert-lifecycle-cleanup.4a0ba0",
+      "rva": 4852640,
+      "shared": false,
+      "groups": [
+        {
+          "feature": "VIP alert lifecycle cleanup",
+          "phase": "typed_action_runtime::start, bound Mainthread, once per process",
+          "site": "src/game/scenario_vip_authority/alert_cleanup_hook.cpp:53"
+        }
+      ]
+    },
+    {
+      "name": "mp.modeupdate.4a1bb0",
+      "rva": 4856752,
+      "shared": false,
+      "groups": [
+        {
+          "feature": "ModeUpdate",
+          "phase": "initialize, after native exact-image binding, before global enable (local_test only)",
+          "site": "src/core/dll_main.cpp:176"
+        }
+      ]
+    },
+    {
+      "name": "ingame.command",
+      "rva": 4861840,
+      "shared": true,
+      "groups": []
+    },
+    {
+      "name": "title.command",
+      "rva": 4955104,
+      "shared": true,
+      "groups": []
+    },
+    {
+      "name": "mp.remove-ownership-observers.4d05c0",
+      "rva": 5047744,
+      "shared": false,
+      "groups": [
+        {
+          "feature": "Remove ownership observers",
+          "phase": "world-ready action capture enable, on bound Mainthread",
+          "site": "src/game/object_identity/remove_runtime/remove_runtime.cpp:75"
+        }
+      ]
+    },
+    {
+      "name": "mp.tutorial-research-staff-starting-point-authority.4f3b00",
+      "rva": 5192448,
+      "shared": false,
+      "groups": [
+        {
+          "feature": "Tutorial, Research, Staff, starting-point authority",
+          "phase": "initialize, after native exact-image binding, before global enable",
+          "site": "src/game/tutorial_replication/native.cpp:272"
+        }
+      ]
+    },
+    {
+      "name": "mp.tutorial-research-staff-starting-point-authority.4f5900",
+      "rva": 5200128,
+      "shared": false,
+      "groups": [
+        {
+          "feature": "Tutorial, Research, Staff, starting-point authority",
+          "phase": "initialize, after native exact-image binding, before global enable",
+          "site": "src/game/tutorial_replication/native.cpp:272"
+        }
+      ]
+    },
+    {
+      "name": "mp.vip-original-update.4f85b0",
+      "rva": 5211568,
+      "shared": false,
+      "groups": [
+        {
+          "feature": "VIP original update",
+          "phase": "typed_action_runtime::start, bound Mainthread, once per process",
+          "site": "src/game/scenario_vip_authority/native.cpp:79"
+        }
+      ]
+    },
+    {
+      "name": "mp.tutorial-research-staff-starting-point-authority.4fc4a0",
+      "rva": 5227680,
+      "shared": false,
+      "groups": [
+        {
+          "feature": "Tutorial, Research, Staff, starting-point authority",
+          "phase": "initialize, after native exact-image binding, before global enable",
+          "site": "src/game/tutorial_replication/native.cpp:272"
+        }
+      ]
+    },
+    {
+      "name": "mp.tutorial-research-staff-starting-point-authority.4fceb0",
+      "rva": 5230256,
+      "shared": false,
+      "groups": [
+        {
+          "feature": "Tutorial, Research, Staff, starting-point authority",
+          "phase": "initialize, after native exact-image binding, before global enable",
+          "site": "src/game/tutorial_replication/native.cpp:272"
+        }
+      ]
+    },
+    {
+      "name": "mp.tutorial-research-staff-starting-point-authority.4fd410",
+      "rva": 5231632,
+      "shared": false,
+      "groups": [
+        {
+          "feature": "Tutorial, Research, Staff, starting-point authority",
+          "phase": "initialize, after native exact-image binding, before global enable",
+          "site": "src/game/tutorial_replication/native.cpp:272"
+        }
+      ]
+    },
+    {
+      "name": "mp.tutorial-research-staff-starting-point-authority.4fd870",
+      "rva": 5232752,
+      "shared": false,
+      "groups": [
+        {
+          "feature": "Tutorial, Research, Staff, starting-point authority",
+          "phase": "initialize, after native exact-image binding, before global enable",
+          "site": "src/game/tutorial_replication/native.cpp:272"
+        }
+      ]
+    },
+    {
+      "name": "mp.tutorial-research-staff-starting-point-authority.506010",
+      "rva": 5267472,
+      "shared": false,
+      "groups": [
+        {
+          "feature": "Tutorial, Research, Staff, starting-point authority",
+          "phase": "initialize, after native exact-image binding, before global enable",
+          "site": "src/game/tutorial_replication/native.cpp:272"
+        }
+      ]
+    },
+    {
+      "name": "mp.campaign-expiry-isactive-observer.518290",
+      "rva": 5341840,
+      "shared": false,
+      "groups": [
+        {
+          "feature": "Campaign expiry IsActive observer",
+          "phase": "lazy Host marketing notice Runtime::bind during live-state setup",
+          "site": "src/game/marketing_authority/notice_hook.cpp:54"
+        }
+      ]
+    },
+    {
+      "name": "mp.remove-ownership-observers.539990",
+      "rva": 5478800,
+      "shared": false,
+      "groups": [
+        {
+          "feature": "Remove ownership observers",
+          "phase": "world-ready action capture enable, on bound Mainthread",
+          "site": "src/game/object_identity/remove_runtime/remove_runtime.cpp:75"
+        }
+      ]
+    },
+    {
+      "name": "mp.building-history-undo-redo.53ab70",
+      "rva": 5483376,
+      "shared": false,
+      "groups": [
+        {
+          "feature": "Building history Undo/Redo",
+          "phase": "world-ready action capture enable, on bound Mainthread",
+          "site": "src/game/building_history_slice/native_bridge.cpp:157"
+        }
+      ]
+    },
+    {
+      "name": "mp.building-history-undo-redo.53aef0",
+      "rva": 5484272,
+      "shared": false,
+      "groups": [
+        {
+          "feature": "Building history Undo/Redo",
+          "phase": "world-ready action capture enable, on bound Mainthread",
+          "site": "src/game/building_history_slice/native_bridge.cpp:157"
+        }
+      ]
+    },
+    {
+      "name": "mp.building-and-scenery-capture.53b260",
+      "rva": 5485152,
+      "shared": false,
+      "groups": [
+        {
+          "feature": "Building and Scenery capture",
+          "phase": "world-ready action capture enable, on bound Mainthread",
+          "site": "src/game/ui_build_runtime.cpp:387"
+        }
+      ]
+    },
+    {
+      "name": "mp.remove-ownership-observers.5449a0",
+      "rva": 5523872,
+      "shared": false,
+      "groups": [
+        {
+          "feature": "Remove ownership observers",
+          "phase": "world-ready action capture enable, on bound Mainthread",
+          "site": "src/game/object_identity/remove_runtime/remove_runtime.cpp:75"
+        }
+      ]
+    },
+    {
+      "name": "objects.move",
+      "rva": 5631360,
+      "shared": true,
+      "groups": []
+    },
+    {
+      "name": "mp.building-and-scenery-capture.593cc0",
+      "rva": 5848256,
+      "shared": false,
+      "groups": [
+        {
+          "feature": "Building and Scenery capture",
+          "phase": "world-ready action capture enable, on bound Mainthread",
+          "site": "src/game/ui_build_runtime.cpp:387"
+        }
+      ]
+    },
+    {
+      "name": "mp.region-properties.5956f0",
+      "rva": 5854960,
+      "shared": false,
+      "groups": [
+        {
+          "feature": "Region properties",
+          "phase": "world-ready action capture enable, on bound Mainthread",
+          "site": "src/game/region_properties_runtime.inc:165"
+        }
+      ]
+    },
+    {
+      "name": "mp.region-properties.5b9610",
+      "rva": 6002192,
+      "shared": false,
+      "groups": [
+        {
+          "feature": "Region properties",
+          "phase": "world-ready action capture enable, on bound Mainthread",
+          "site": "src/game/region_properties_runtime.inc:165"
+        }
+      ]
+    },
+    {
+      "name": "mp.move-purchase-capture.5c25b0",
+      "rva": 6038960,
+      "shared": false,
+      "groups": [
+        {
+          "feature": "Move Purchase capture",
+          "phase": "world-ready action capture enable, on bound Mainthread",
+          "site": "src/game/ui_move_runtime.cpp:255"
+        }
+      ]
+    },
+    {
+      "name": "mp.npc-release-capture.5c3ef0",
+      "rva": 6045424,
+      "shared": false,
+      "groups": [
+        {
+          "feature": "NPC Release capture",
+          "phase": "typed_action_runtime::start, bound Mainthread, once per process",
+          "site": "src/game/npc_action_runtime.inc:208"
+        }
+      ]
+    },
+    {
+      "name": "mp.network-node-ui.5c5580",
+      "rva": 6051200,
+      "shared": false,
+      "groups": [
+        {
+          "feature": "Network node UI",
+          "phase": "world-ready action capture enable, on bound Mainthread",
+          "site": "src/game/ui_network_runtime.inc:161"
+        }
+      ]
+    },
+    {
+      "name": "mp.network-pipe-ui.5c7970",
+      "rva": 6060400,
+      "shared": false,
+      "groups": [
+        {
+          "feature": "Network pipe UI",
+          "phase": "world-ready action capture enable, on bound Mainthread",
+          "site": "src/game/ui_network_pipe.inc:87"
+        }
+      ]
+    },
+    {
+      "name": "mp.path-actions.5cc2b0",
+      "rva": 6079152,
+      "shared": false,
+      "groups": [
+        {
+          "feature": "Path actions",
+          "phase": "world-ready action capture enable, on bound Mainthread",
+          "site": "src/game/path_execution.inc:44"
+        }
+      ]
+    },
+    {
+      "name": "mp.building-and-scenery-capture.5cf440",
+      "rva": 6091840,
+      "shared": false,
+      "groups": [
+        {
+          "feature": "Building and Scenery capture",
+          "phase": "world-ready action capture enable, on bound Mainthread",
+          "site": "src/game/ui_build_runtime.cpp:387"
+        }
+      ]
+    },
+    {
+      "name": "mp.building-and-scenery-capture.5d0600",
+      "rva": 6096384,
+      "shared": false,
+      "groups": [
+        {
+          "feature": "Building and Scenery capture",
+          "phase": "world-ready action capture enable, on bound Mainthread",
+          "site": "src/game/ui_build_runtime.cpp:387"
+        }
+      ]
+    },
+    {
+      "name": "mp.building-and-scenery-capture.5d4620",
+      "rva": 6112800,
+      "shared": false,
+      "groups": [
+        {
+          "feature": "Building and Scenery capture",
+          "phase": "world-ready action capture enable, on bound Mainthread",
+          "site": "src/game/ui_build_runtime.cpp:387"
+        }
+      ]
+    },
+    {
+      "name": "mp.building-and-scenery-capture.5d64e0",
+      "rva": 6120672,
+      "shared": false,
+      "groups": [
+        {
+          "feature": "Building and Scenery capture",
+          "phase": "world-ready action capture enable, on bound Mainthread",
+          "site": "src/game/ui_build_runtime.cpp:387"
+        }
+      ]
+    },
+    {
+      "name": "mp.region-level.5d8480",
+      "rva": 6128768,
+      "shared": false,
+      "groups": [
+        {
+          "feature": "Region level",
+          "phase": "world-ready action capture enable, on bound Mainthread",
+          "site": "src/game/region_level_runtime.inc:57"
+        }
+      ]
+    },
+    {
+      "name": "mp.terrain-paint.5dfe70",
+      "rva": 6159984,
+      "shared": false,
+      "groups": [
+        {
+          "feature": "Terrain paint",
+          "phase": "world-ready action capture enable, on bound Mainthread",
+          "site": "src/game/ui_terrain_runtime.inc:282"
+        }
+      ]
+    },
+    {
+      "name": "mp.terrain-paint.5e03b0",
+      "rva": 6161328,
+      "shared": false,
+      "groups": [
+        {
+          "feature": "Terrain paint",
+          "phase": "world-ready action capture enable, on bound Mainthread",
+          "site": "src/game/ui_terrain_runtime.inc:282"
+        }
+      ]
+    },
+    {
+      "name": "mp.terrain-paint.5e04b0",
+      "rva": 6161584,
+      "shared": false,
+      "groups": [
+        {
+          "feature": "Terrain paint",
+          "phase": "world-ready action capture enable, on bound Mainthread",
+          "site": "src/game/ui_terrain_runtime.inc:282"
+        }
+      ]
+    },
+    {
+      "name": "mp.terrain-paint.5e06a0",
+      "rva": 6162080,
+      "shared": false,
+      "groups": [
+        {
+          "feature": "Terrain paint",
+          "phase": "world-ready action capture enable, on bound Mainthread",
+          "site": "src/game/ui_terrain_runtime.inc:282"
+        }
+      ]
+    },
+    {
+      "name": "mp.terrain-paint.5e0700",
+      "rva": 6162176,
+      "shared": false,
+      "groups": [
+        {
+          "feature": "Terrain paint",
+          "phase": "world-ready action capture enable, on bound Mainthread",
+          "site": "src/game/ui_terrain_runtime.inc:282"
+        }
+      ]
+    },
+    {
+      "name": "mp.terrain-paint.5e0c20",
+      "rva": 6163488,
+      "shared": false,
+      "groups": [
+        {
+          "feature": "Terrain paint",
+          "phase": "world-ready action capture enable, on bound Mainthread",
+          "site": "src/game/ui_terrain_runtime.inc:282"
+        }
+      ]
+    },
+    {
+      "name": "mp.terrain-height.5e1860",
+      "rva": 6166624,
+      "shared": false,
+      "groups": [
+        {
+          "feature": "Terrain height",
+          "phase": "world-ready action capture enable, on bound Mainthread",
+          "site": "src/game/ui_terrain_height.inc:19"
+        }
+      ]
+    },
+    {
+      "name": "mp.monster-zone-action-capture.5ef6a0",
+      "rva": 6223520,
+      "shared": false,
+      "groups": [
+        {
+          "feature": "Monster Zone action capture",
+          "phase": "typed_action_runtime::start, bound Mainthread, once per process",
+          "site": "src/game/monster_zone_action_runtime.inc:271"
+        }
+      ]
+    },
+    {
+      "name": "mp.monster-zone-action-capture.5f0990",
+      "rva": 6228368,
+      "shared": false,
+      "groups": [
+        {
+          "feature": "Monster Zone action capture",
+          "phase": "typed_action_runtime::start, bound Mainthread, once per process",
+          "site": "src/game/monster_zone_action_runtime.inc:271"
+        }
+      ]
+    },
+    {
+      "name": "mp.monster-zone-action-capture.5f1510",
+      "rva": 6231312,
+      "shared": false,
+      "groups": [
+        {
+          "feature": "Monster Zone action capture",
+          "phase": "typed_action_runtime::start, bound Mainthread, once per process",
+          "site": "src/game/monster_zone_action_runtime.inc:271"
+        }
+      ]
+    },
+    {
+      "name": "desktop.destroy",
+      "rva": 6326240,
+      "shared": true,
+      "groups": []
+    },
+    {
+      "name": "desktop.launch",
+      "rva": 6328416,
+      "shared": true,
+      "groups": []
+    },
+    {
+      "name": "mp.hud-native-time-and-calendar.62c400",
+      "rva": 6472704,
+      "shared": false,
+      "groups": [
+        {
+          "feature": "HUD native Time and Calendar",
+          "phase": "after engine-bound GameUpdate, local_test or connected session",
+          "site": "src/game/hud_time_runtime.cpp:87"
+        }
+      ]
+    },
+    {
+      "name": "mp.monster-zone-action-capture.67fb40",
+      "rva": 6814528,
+      "shared": false,
+      "groups": [
+        {
+          "feature": "Monster Zone action capture",
+          "phase": "typed_action_runtime::start, bound Mainthread, once per process",
+          "site": "src/game/monster_zone_action_runtime.inc:271"
+        }
+      ]
+    },
+    {
+      "name": "mp.bug-manual-uicommand.69df50",
+      "rva": 6938448,
+      "shared": false,
+      "groups": [
+        {
+          "feature": "Bug manual UICommand",
+          "phase": "typed_action_runtime::start, bound Mainthread, once per process",
+          "site": "src/game/bug_authority/manual_action.cpp:135"
+        }
+      ]
+    },
+    {
+      "name": "mp.tutorial-research-staff-starting-point-authority.6c6660",
+      "rva": 7104096,
+      "shared": false,
+      "groups": [
+        {
+          "feature": "Tutorial, Research, Staff, starting-point authority",
+          "phase": "initialize, after native exact-image binding, before global enable",
+          "site": "src/game/tutorial_replication/native.cpp:272"
+        }
+      ]
+    },
+    {
+      "name": "mp.developer-uicommand.6c7b70",
+      "rva": 7109488,
+      "shared": false,
+      "groups": [
+        {
+          "feature": "Developer UICommand",
+          "phase": "typed_action_runtime::start, bound Mainthread, once per process",
+          "site": "src/game/developer_staff/action_native.cpp:177"
+        }
+      ]
+    },
+    {
+      "name": "startmenu.elements",
+      "rva": 7586304,
+      "shared": true,
+      "groups": []
+    },
+    {
+      "name": "startmenu.select",
+      "rva": 7592096,
+      "shared": true,
+      "groups": []
+    },
+    {
+      "name": "mp.region-styles.797850",
+      "rva": 7960656,
+      "shared": false,
+      "groups": [
+        {
+          "feature": "Region Styles",
+          "phase": "world-ready action capture enable, on bound Mainthread",
+          "site": "src/game/region_styles_runtime.inc:86"
+        }
+      ]
+    },
+    {
+      "name": "mp.path-actions.7b04b0",
+      "rva": 8062128,
+      "shared": false,
+      "groups": [
+        {
+          "feature": "Path actions",
+          "phase": "world-ready action capture enable, on bound Mainthread",
+          "site": "src/game/path_execution.inc:44"
+        }
+      ]
+    },
+    {
+      "name": "mp.hud-native-time-and-calendar.81ec20",
+      "rva": 8514592,
+      "shared": false,
+      "groups": [
+        {
+          "feature": "HUD native Time and Calendar",
+          "phase": "after engine-bound GameUpdate, local_test or connected session",
+          "site": "src/game/hud_time_runtime.cpp:87"
+        }
+      ]
+    },
+    {
+      "name": "mp.subscriber-context-lookup.89e0f0",
+      "rva": 9036016,
+      "shared": false,
+      "groups": [
+        {
+          "feature": "Subscriber context lookup",
+          "phase": "initialize, after native exact-image binding, before global enable",
+          "site": "src/core/dll_main.cpp:2317"
+        }
+      ]
+    },
+    {
+      "name": "mp.root-building-load-identity.89e770",
+      "rva": 9037680,
+      "shared": false,
+      "groups": [
+        {
+          "feature": "Root building load identity",
+          "phase": "initialize, after native exact-image binding, before global enable",
+          "site": "src/core/dll_main.cpp:2296"
+        }
+      ]
+    },
+    {
+      "name": "mp.normal-load-registration.89ea20",
+      "rva": 9038368,
+      "shared": false,
+      "groups": [
+        {
+          "feature": "Normal load registration",
+          "phase": "initialize, after native exact-image binding, before global enable",
+          "site": "src/core/dll_main.cpp:2320"
+        }
+      ]
+    },
+    {
+      "name": "mp.bug-lifecycle-and-saved-identity.8acc80",
+      "rva": 9096320,
+      "shared": false,
+      "groups": [
+        {
+          "feature": "Bug lifecycle and saved identity",
+          "phase": "initialize, after native exact-image binding, before global enable",
+          "site": "src/game/bug_authority/hooks.cpp:234"
+        }
+      ]
+    },
+    {
+      "name": "mp.native-opened-file-provenance.95ec00",
+      "rva": 9825280,
+      "shared": false,
+      "groups": [
+        {
+          "feature": "Native opened-file provenance",
+          "phase": "initialize, after native exact-image binding, before global enable",
+          "site": "src/game/native_open_runtime.cpp:101"
+        }
+      ]
+    },
+    {
+      "name": "mp.native-opened-file-provenance.96bbd0",
+      "rva": 9878480,
+      "shared": false,
+      "groups": [
+        {
+          "feature": "Native opened-file provenance",
+          "phase": "initialize, after native exact-image binding, before global enable",
+          "site": "src/game/native_open_runtime.cpp:101"
+        }
+      ]
+    },
+    {
+      "name": "mp.root-building-load-identity.96bf30",
+      "rva": 9879344,
+      "shared": false,
+      "groups": [
+        {
+          "feature": "Root building load identity",
+          "phase": "initialize, after native exact-image binding, before global enable",
+          "site": "src/core/dll_main.cpp:2296"
+        }
+      ]
+    },
+    {
+      "name": "mp.render-pool-recursive-lock.9ab8f0",
+      "rva": 10139888,
+      "shared": false,
+      "groups": [
+        {
+          "feature": "Render pool recursive lock",
+          "phase": "initialize, after native exact-image binding, before global enable",
+          "site": "src/game/render_pool_guard/runtime.cpp:58"
+        }
+      ]
+    },
+    {
+      "name": "mp.render-pool-recursive-lock.9abca0",
+      "rva": 10140832,
+      "shared": false,
+      "groups": [
+        {
+          "feature": "Render pool recursive lock",
+          "phase": "initialize, after native exact-image binding, before global enable",
+          "site": "src/game/render_pool_guard/runtime.cpp:58"
+        }
+      ]
+    },
+    {
+      "name": "mp.render-pool-recursive-lock.9ad1a0",
+      "rva": 10146208,
+      "shared": false,
+      "groups": [
+        {
+          "feature": "Render pool recursive lock",
+          "phase": "initialize, after native exact-image binding, before global enable",
+          "site": "src/game/render_pool_guard/runtime.cpp:58"
+        }
+      ]
+    },
+    {
+      "name": "mp.render-pool-recursive-lock.9ad400",
+      "rva": 10146816,
+      "shared": false,
+      "groups": [
+        {
+          "feature": "Render pool recursive lock",
+          "phase": "initialize, after native exact-image binding, before global enable",
+          "site": "src/game/render_pool_guard/runtime.cpp:58"
+        }
+      ]
+    },
+    {
+      "name": "mp.render-pool-recursive-lock.9ad570",
+      "rva": 10147184,
+      "shared": false,
+      "groups": [
+        {
+          "feature": "Render pool recursive lock",
+          "phase": "initialize, after native exact-image binding, before global enable",
+          "site": "src/game/render_pool_guard/runtime.cpp:58"
+        }
+      ]
+    },
+    {
+      "name": "mp.render-pool-recursive-lock.9ad7d0",
+      "rva": 10147792,
+      "shared": false,
+      "groups": [
+        {
+          "feature": "Render pool recursive lock",
+          "phase": "initialize, after native exact-image binding, before global enable",
+          "site": "src/game/render_pool_guard/runtime.cpp:58"
+        }
+      ]
+    },
+    {
+      "name": "mp.render-pool-recursive-lock.9ad940",
+      "rva": 10148160,
+      "shared": false,
+      "groups": [
+        {
+          "feature": "Render pool recursive lock",
+          "phase": "initialize, after native exact-image binding, before global enable",
+          "site": "src/game/render_pool_guard/runtime.cpp:58"
+        }
+      ]
+    },
+    {
+      "name": "mp.render-pool-recursive-lock.9af0d0",
+      "rva": 10154192,
+      "shared": false,
+      "groups": [
+        {
+          "feature": "Render pool recursive lock",
+          "phase": "initialize, after native exact-image binding, before global enable",
+          "site": "src/game/render_pool_guard/runtime.cpp:58"
+        }
+      ]
+    },
+    {
+      "name": "mp.render-pool-recursive-lock.9af500",
+      "rva": 10155264,
+      "shared": false,
+      "groups": [
+        {
+          "feature": "Render pool recursive lock",
+          "phase": "initialize, after native exact-image binding, before global enable",
+          "site": "src/game/render_pool_guard/runtime.cpp:58"
+        }
+      ]
+    },
+    {
+      "name": "mp.screenupdate.9ca0e0",
+      "rva": 10264800,
+      "shared": false,
+      "groups": [
+        {
+          "feature": "ScreenUpdate",
+          "phase": "initialize, after native exact-image binding, before global enable (local_test only)",
+          "site": "src/core/dll_main.cpp:177"
+        }
+      ]
+    },
+    {
+      "name": "mp.screendrawpipeline.9cb150",
+      "rva": 10269008,
+      "shared": false,
+      "groups": [
+        {
+          "feature": "ScreenDrawPipeline",
+          "phase": "initialize, after native exact-image binding, before global enable (local_test only)",
+          "site": "src/core/dll_main.cpp:178"
+        }
+      ]
+    },
+    {
+      "name": "mp.native-opened-file-provenance.a02d10",
+      "rva": 10497296,
+      "shared": false,
+      "groups": [
+        {
+          "feature": "Native opened-file provenance",
+          "phase": "initialize, after native exact-image binding, before global enable",
+          "site": "src/game/native_open_runtime.cpp:101"
+        }
+      ]
+    },
+    {
+      "name": "mp.bug-lifecycle-and-saved-identity.baded0",
+      "rva": 12246736,
+      "shared": false,
+      "groups": [
+        {
+          "feature": "Bug lifecycle and saved identity",
+          "phase": "initialize, after native exact-image binding, before global enable",
+          "site": "src/game/bug_authority/hooks.cpp:234"
+        }
+      ]
+    },
+    {
+      "name": "mp.native-opened-file-provenance.bd7a80",
+      "rva": 12417664,
+      "shared": false,
+      "groups": [
+        {
+          "feature": "Native opened-file provenance",
+          "phase": "initialize, after native exact-image binding, before global enable",
+          "site": "src/game/native_open_runtime.cpp:101"
+        }
+      ]
+    },
+    {
+      "name": "mp.root-building-load-identity.c0ab50",
+      "rva": 12626768,
+      "shared": false,
+      "groups": [
+        {
+          "feature": "Root building load identity",
+          "phase": "initialize, after native exact-image binding, before global enable",
+          "site": "src/core/dll_main.cpp:2296"
+        }
+      ]
+    },
+    {
+      "name": "mp.bug-lifecycle-and-saved-identity.c2e810",
+      "rva": 12773392,
+      "shared": false,
+      "groups": [
+        {
+          "feature": "Bug lifecycle and saved identity",
+          "phase": "initialize, after native exact-image binding, before global enable",
+          "site": "src/game/bug_authority/hooks.cpp:234"
+        }
+      ]
+    },
+    {
+      "name": "mp.bug-lifecycle-and-saved-identity.dc17d0",
+      "rva": 14424016,
+      "shared": false,
+      "groups": [
+        {
+          "feature": "Bug lifecycle and saved identity",
+          "phase": "initialize, after native exact-image binding, before global enable",
+          "site": "src/game/bug_authority/hooks.cpp:234"
+        }
+      ]
+    },
+    {
+      "name": "mp.bug-lifecycle-and-saved-identity.dc1800",
+      "rva": 14424064,
+      "shared": false,
+      "groups": [
+        {
+          "feature": "Bug lifecycle and saved identity",
+          "phase": "initialize, after native exact-image binding, before global enable",
+          "site": "src/game/bug_authority/hooks.cpp:234"
+        }
+      ]
+    },
+    {
+      "name": "mp.network-node-capture.ddda40",
+      "rva": 14539328,
+      "shared": false,
+      "groups": [
+        {
+          "feature": "Network node capture",
+          "phase": "initialize, after native exact-image binding, before global enable",
+          "site": "src/core/dll_main.cpp:2319"
+        }
+      ]
+    },
+    {
+      "name": "mp.building-array-capture.e0e500",
+      "rva": 14738688,
+      "shared": false,
+      "groups": [
+        {
+          "feature": "Building array capture",
+          "phase": "initialize, after native exact-image binding, before global enable",
+          "site": "src/core/dll_main.cpp:2312"
+        }
+      ]
+    },
+    {
+      "name": "mp.npc-property-save-load.e3aeb0",
+      "rva": 14921392,
+      "shared": false,
+      "groups": [
+        {
+          "feature": "NPC property save/load",
+          "phase": "initialize, after native exact-image binding, before global enable",
+          "site": "src/core/dll_main.cpp:2307"
+        }
+      ]
+    },
+    {
+      "name": "mp.npc-property-save-load.e3af60",
+      "rva": 14921568,
+      "shared": false,
+      "groups": [
+        {
+          "feature": "NPC property save/load",
+          "phase": "initialize, after native exact-image binding, before global enable",
+          "site": "src/core/dll_main.cpp:2307"
+        }
+      ]
+    },
+    {
+      "name": "mp.quest-target-property-save-load.e3c0f0",
+      "rva": 14926064,
+      "shared": false,
+      "groups": [
+        {
+          "feature": "Quest target property save/load",
+          "phase": "initialize, after native exact-image binding, before global enable",
+          "site": "src/core/dll_main.cpp:2302"
+        }
+      ]
+    },
+    {
+      "name": "mp.quest-target-property-save-load.e3c6e0",
+      "rva": 14927584,
+      "shared": false,
+      "groups": [
+        {
+          "feature": "Quest target property save/load",
+          "phase": "initialize, after native exact-image binding, before global enable",
+          "site": "src/core/dll_main.cpp:2302"
+        }
+      ]
+    },
+    {
+      "name": "mp.native-free-ownership.1264b60",
+      "rva": 19286880,
+      "shared": false,
+      "groups": [
+        {
+          "feature": "Native Free ownership",
+          "phase": "world-ready action capture enable, on bound Mainthread",
+          "site": "src/game/object_identity/native_free_runtime/native_free_runtime.cpp:196"
+        }
+      ]
+    }
+  ],
+  "unresolved": [],
+  "typed_imports": [
+    {
+      "name": "crt.free",
+      "dll": "msvcrt.dll",
+      "symbol": "free",
+      "iat_rva": 29698560,
+      "sibling_symbol": "malloc",
+      "sibling_iat_rva": 29698672,
+      "service": "MT2FW_MT2_QueryOwnership version 1",
+      "phases": "prepare, publish existing disabled observer, enable, disable with original protection, metadata remove",
+      "lifetime": "provider modules, files, originals and published native observer state remain process-owned"
+    }
+  ]
+}

@@ -2,6 +2,7 @@
 #include "mt2fw/core.h"
 namespace mt2fw::mt2 {
 void initialize(const fs::path& game,const fs::path& profile);
+void observe_world(Runtime& runtime);
 void frame(Runtime& runtime,float dt);
 Json request(const std::string& operation,const Json& args);
 bool in_world();
