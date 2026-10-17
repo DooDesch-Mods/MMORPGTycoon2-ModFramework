@@ -9,23 +9,52 @@
   "documentation": "../../docs/experimental/native-document-ui.md",
   "operations": {
     "ui.app": {
-      "arguments": {"id": "string[1..64], letters/digits/dot/hyphen/underscore", "title": "string[1..80 bytes]"},
-      "result": {"open_requested": "boolean; consumes one request from this mod's Mods-menu entry"},
+      "arguments": {
+        "id": "string[1..64], letters/digits/dot/hyphen/underscore",
+        "title": "string[1..80 bytes]"
+      },
+      "result": {
+        "open_requested": "boolean; consumes one request from this mod's Mods-menu entry"
+      },
       "ownership": "one app per active mod instance; call in render even when closed"
     },
     "ui.native": {
-      "arguments": {"id": "registered app ID", "open": "boolean", "width": "integer 400..1100", "height": "integer 300..640", "widgets": "NativeWidget[1..80]"},
-      "result": {"ready": "boolean", "open": "boolean", "clicked": "widget ID[]", "values": "Record<input ID,string>"},
+      "arguments": {
+        "id": "registered app ID",
+        "open": "boolean",
+        "width": "integer 400..1100",
+        "height": "integer 300..640",
+        "widgets": "NativeWidget[1..80]"
+      },
+      "result": {
+        "ready": "boolean",
+        "open": "boolean",
+        "clicked": "widget ID[]",
+        "values": "Record<input ID,string>"
+      },
       "layout": "immutable per app instance; native window and controls owned by the active game mode",
-      "images": "immutable mod-owned cache/<sha256>.png, <=1MiB and 2048px per dimension; session budget 128 unique previews"
+      "images": "immutable mod-owned cache/<sha256>.png, <=1MiB and 2048px per dimension; session budget 128 unique previews",
+      "appearance": "Native MT2 PanelBacking canvas; widget style button/tab/row/quiet and tone muted/error/subtle/preview. Style, tone and layout remain fixed for an instance."
     },
     "ui.document": {
-      "arguments": {"document": "Document"},
-      "result": {"clicked": "string[]", "values": "Record<string,string>", "open": "boolean"}
+      "arguments": {
+        "document": "Document"
+      },
+      "result": {
+        "clicked": "string[]",
+        "values": "Record<string,string>",
+        "open": "boolean"
+      }
     },
     "ui.image.load": {
-      "arguments": {"id": "string[1..128 bytes]", "path": "relative mod-owned data path"},
-      "result": {"id": "string", "ready": "boolean"},
+      "arguments": {
+        "id": "string[1..128 bytes]",
+        "path": "relative mod-owned data path"
+      },
+      "result": {
+        "id": "string",
+        "ready": "boolean"
+      },
       "format": "M2RGBA1 NUL; uint32 LE width; uint32 LE height; RGBA8 pixels",
       "max_dimension": 2048,
       "max_textures_per_mod": 16
@@ -48,7 +77,13 @@
       "disabled?": "boolean, buttons only",
       "selected?": "boolean, buttons only"
     },
-    "Document": {"id": "string <=128 bytes", "title": "string <=128 bytes", "width?": "number", "height?": "number", "content": "Widget"},
+    "Document": {
+      "id": "string <=128 bytes",
+      "title": "string <=128 bytes",
+      "width?": "number",
+      "height?": "number",
+      "content": "Widget"
+    },
     "Widget": {
       "type": "text|button|input|selectable|image|separator|space|panel|columns",
       "id?": "stable string",
@@ -67,5 +102,11 @@
       "children?": "Widget[]; required for panel/columns"
     }
   },
-  "budgets": {"widgets": 200, "depth": 8, "columns": 4, "widget_string_bytes": 2048, "input_utf8_bytes": 256}
+  "budgets": {
+    "widgets": 200,
+    "depth": 8,
+    "columns": 4,
+    "widget_string_bytes": 2048,
+    "input_utf8_bytes": 256
+  }
 }

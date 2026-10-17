@@ -34,6 +34,8 @@ Call `ui.native` while open to display an actual game-owned window:
 
 The response contains `ready`, `open`, `clicked` and `values`. Wait if `ready` is false during a mode transition. Store input changes from `values`, process `clicked` once, and stop submitting after the user closes the window. To reopen, wait for the next launcher request. The native close button, window placement, text fields, button activation and Escape handling belong to MT2. Framework management temporarily hides the app window and restores it when closed.
 
+The window uses native MT2 blue panel materials. Buttons support style button (primary action), tab, row and quiet. Panels use tone subtle for recessed content and preview for the main reading area. Text supports muted and error tones. These are bounded native styles, not arbitrary resource paths.
+
 Layout is fixed for a mod instance; changes to positions, widget types, sizes or IDs require a restart. Change text, values, visibility, disabled and selected states without rebuilding the layout. All widgets stay inside the window. The machine contract lists supported fields and budgets. No filesystem read or layout-file write occurs on unchanged frames.
 
 Native images use immutable original PNG files in the mod-owned `cache/<sha256>.png` directory. The host checks the filename hash, PNG signature, dimensions and size, then creates a namespaced material. Previews are limited to 1 MiB, 2048 pixels per dimension and 128 unique images per session. Game-owned materials remain loaded for the session. Keep card transfer and image decoding outside render callbacks. The existing document renderer below remains available for developer tools.

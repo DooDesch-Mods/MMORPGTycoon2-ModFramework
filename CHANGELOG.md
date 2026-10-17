@@ -6,7 +6,7 @@
 
 - Open Mods... from the in-game menu, just above Options....
 - Launch mod apps from their entry in Mods. Each mod can have its own Open button without needing a separate function key.
-- Native game windows, text fields, buttons and image previews for mod authors. MT2 Card Vault is the first mod to use them.
+- Native blue game windows, text fields, buttons and image previews for mod authors. MT2 Card Vault is the first mod to use them.
 
 ## 0.1.3
 

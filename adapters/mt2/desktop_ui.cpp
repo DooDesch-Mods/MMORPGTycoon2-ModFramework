@@ -680,9 +680,12 @@ Json native_window(const Json& args) {
         require(x >= 0 && y >= 0 && w > 0 && h > 0 && x + w <= width && y + h <= height && size >= 10 && size <= 30, "Native app widget is outside its window");
         for (auto field : {"text", "value"}) if (item.contains(field)) require(item[field].is_string() && item[field].get_ref<const std::string&>().size() <= 1024, "Native app text exceeds 1024 bytes");
         for (auto field : {"visible", "disabled", "selected"}) if (item.contains(field)) require(item[field].is_boolean(), "Invalid native app widget state");
-        structure.push_back({{"id",name},{"type",type},{"x",x},{"y",y},{"width",w},{"height",h},{"size",size},{"tone",item.value("tone",std::string())}});
+        auto style = item.value("style",std::string("button")), tone = item.value("tone",std::string());
+        require(style == "button" || style == "tab" || style == "row" || style == "quiet", "Unsupported native app widget style");
+        require(tone.empty() || tone == "muted" || tone == "error" || tone == "subtle" || tone == "preview", "Unsupported native app widget tone");
+        structure.push_back({{"id",name},{"type",type},{"x",x},{"y",y},{"width",w},{"height",h},{"size",size},{"tone",tone},{"style",style}});
     }
-    auto shape = digest(Json{{"format",3},{"widgets",structure},{"width",width},{"height",height},{"title",registration->second.title}}.dump());
+    auto shape = digest(Json{{"format",4},{"widgets",structure},{"width",width},{"height",height},{"title",registration->second.title}}.dump());
     auto& window = native_windows[owner];
     if (window.owner != registration->second.owner) {
         if (window.panel && window.mode == mode) check(show(window.panel, false), "Hide previous mod instance window");
@@ -694,16 +697,16 @@ Json native_window(const Json& args) {
         std::ostringstream source;
         source << "mmoWindow { id \"" << window.name << "\"; dims " << width << ' ' << height
             << "; anchorType Window; anchorPos 80 35; title " << Json(registration->second.title).dump()
-            << "; material \"mt2fw_ui_base\"; corners \"BottomRight\"; hideOnEscape true; transitionType rez; rezSpeed fast; content {\n";
+            << "; material \"PanelBacking\"; corners \"BottomRight\"; hideOnEscape true; transitionType rez; rezSpeed fast; content {\n";
         for (auto& item : structure) {
             auto type = item.at("type").get<std::string>(), name = item.at("id").get<std::string>();
             int x=item.at("x"), y=item.at("y"), w=item.at("width"), h=item.at("height"), size=item.at("size");
             const char* kind = type == "button" ? "mmoButtonPane" : type == "input" ? "mmoTextEditPane" : type == "text" ? "mmoTextPane" : "mmoPane";
             source << kind << " { id \"" << name << "\"; anchorType TopLeft; anchorPos " << x << ' ' << y << "; dims " << w << ' ' << h << "; border false; ";
             if(type == "button") source << "text \"\"; clickable true; border true; edges All; corners \"TopLeft BottomRight\"; cornerSize 5; command \"MessageTo Mode MT2FWNative " << window.name << ' ' << name << "\";";
-            else if(type == "input") source << "text \"\"; size " << size << "; clickable true; editable true; maxLength 128; margin 8; material \"DarkGrey\"; border true; edges Bottom; justify left;";
+            else if(type == "input") source << "text \"\"; size " << size << "; clickable true; editable true; maxLength 128; margin 8; material \"AltPanelBacking\"; border true; edges All; justify left;";
             else if(type == "text") source << "text \"\"; size " << size << "; clickable false; justify topleft; textColor " << (item.at("tone") == "muted" ? "0.7 0.8 0.88 1" : item.at("tone") == "error" ? "1 0.65 0.4 1" : "0.95 0.97 1 1") << ';';
-            else source << "clickable false; material \"" << (type == "panel" ? "AltPanelBacking" : "") << "\";";
+            else source << "clickable false; material \"" << (type == "panel" ? (item.at("tone") == "subtle" ? "DarkPanelBacking" : "PanelBacking") : "") << "\";";
             source << " }\n";
             if(type == "button") source << "mmoTextPane { id \"" << name << "_label\"; anchorType TopLeft; anchorPos " << x+10 << ' ' << y+6 << "; dims " << w-20 << ' ' << h-6 << "; text \"\"; size " << size << "; justify topleft; clickable false; border false; }\n";
         }
@@ -729,6 +732,12 @@ Json native_window(const Json& args) {
         check(string_call(0xbbe090, static_cast<unsigned char*>(mode) + (mode_index == 2 ? 0x40 : 0x98), ("mt2fw_native/" + window.path).c_str()), "Append native app window");
         check(window_lookup(&window.panel, window.name.c_str()), "Native app registry lookup"); require(window.panel, "Native app window registration not acknowledged");
         check(show(window.panel, false), "Initialize native app visibility");
+        for (auto& item : window.widgets) if (item.at("type") == "button" && item.at("style") != "button") {
+            auto name = item.at("id").get<std::string>(); auto* target = native_pane(window.panel,name);
+            const char* normal = item.at("style") == "tab" ? "TabNormalBackground" : "PanelButtonBackground";
+            check(string_call(0x670ef0,target,normal), "Native app button material");
+            check(string_call(0x671030,target,"ButtonBackgroundActive"), "Native app selected material");
+        }
     }
     Json events{{"ready", true},{"open",desired},{"clicked",Json::array()},{"values",Json::object()}};
     if (!window.panel) return events;

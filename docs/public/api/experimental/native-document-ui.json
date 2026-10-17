@@ -33,7 +33,8 @@
         "values": "Record<input ID,string>"
       },
       "layout": "immutable per app instance; native window and controls owned by the active game mode",
-      "images": "immutable mod-owned cache/<sha256>.png, <=1MiB and 2048px per dimension; session budget 128 unique previews"
+      "images": "immutable mod-owned cache/<sha256>.png, <=1MiB and 2048px per dimension; session budget 128 unique previews",
+      "appearance": "Native MT2 PanelBacking canvas; widget style button/tab/row/quiet and tone muted/error/subtle/preview. Style, tone and layout remain fixed for an instance."
     },
     "ui.document": {
       "arguments": {
