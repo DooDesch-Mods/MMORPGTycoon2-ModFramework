@@ -34,7 +34,7 @@ for source_root,folder in ((offline,'docs'),(ROOT/'sdk','sdk'),(ROOT/'include','
     for source in sorted(source_root.rglob('*')):
         if folder=='include' and source.is_file() and source.relative_to(source_root).as_posix()!='mt2fw/plugin.h':continue
         if source.is_file() and not any(part in ('__pycache__','build') for part in source.relative_to(source_root).parts):copy(source,destination/'mt2fw'/folder/source.relative_to(source_root))
-for name in ('native_services.h','native_routes.h','native_ownership.h'):
+for name in ('native_services.h','native_routes.h','native_ownership.h','native_patches.h'):
     copy(ROOT/'adapters/mt2/sdk'/name,destination/'mt2fw/sdk/native/mt2'/name)
 for name in ('LICENSE','README.md','THIRD_PARTY_NOTICES.md'):copy(ROOT/name,destination/'mt2fw'/name)
 copy(ROOT/'integrations/vortex/README.md',destination/'mt2fw/integrations/vortex/README.md')

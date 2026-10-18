@@ -80,6 +80,8 @@ Lua wrappers use the following operations. `ui.begin` and `ui.end` are native ho
 - `objects.persist`
 - `objects.resolve`
 - `objects.selected`
+- `patches.status`
+- `patches.targets`
 - `storage.get`
 - `storage.set`
 - `time.get`

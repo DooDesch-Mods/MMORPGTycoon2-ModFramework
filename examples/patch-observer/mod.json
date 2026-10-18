@@ -1,0 +1,13 @@
+{
+  "id": "example.patch-observer",
+  "name": "Native create observer",
+  "version": "1.0.0",
+  "api_version": "1.0.0",
+  "type": "lua",
+  "entry": "main.lua",
+  "capabilities": [
+    "ui",
+    "world.read"
+  ],
+  "multiplayer": "local"
+}

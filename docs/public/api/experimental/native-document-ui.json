@@ -6,7 +6,7 @@
   "abi_version": 1,
   "capability": "ui",
   "thread": "render callback",
-  "documentation": "https://doodesch-mods.github.io/MMORPGTycoon2-ModFramework/experimental/native-document-ui.html",
+  "documentation": "https://doodesch-mods.github.io/MMORPGTycoon2-ModFramework/../../docs/experimental/native-document-ui.md",
   "operations": {
     "ui.app": {
       "arguments": {

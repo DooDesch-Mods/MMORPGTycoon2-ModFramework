@@ -1,0 +1,12 @@
+{
+  "id": "example.native-patches",
+  "name": "Native patch observer",
+  "version": "1.0.0",
+  "api_version": "1.0.0",
+  "type": "native",
+  "entry": "ExampleNativePatches.dll",
+  "capabilities": [
+    "world.read"
+  ],
+  "multiplayer": "local"
+}

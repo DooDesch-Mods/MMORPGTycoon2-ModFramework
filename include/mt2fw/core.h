@@ -1,6 +1,7 @@
 #pragma once
 // Internal runtime declarations. The supported native DLL boundary is plugin.h.
 #include "plugin.h"
+#include "patches.h"
 #include <nlohmann/json.hpp>
 #include <filesystem>
 #include <functional>
@@ -11,6 +12,7 @@
 #include <vector>
 #include <deque>
 #include <mutex>
+#include <atomic>
 
 namespace mt2fw {
 using Json = nlohmann::json;
@@ -47,6 +49,7 @@ struct Plugin {
     bool native_shutdown_pending = false, native_retirement_failed = false;
     bool native_retained = false;
     std::vector<Subscription> subscriptions;
+    std::vector<PatchRegistration> patch_registrations;
     Json config = Json::object(), config_schema = Json::object();
     Json profile_data = Json::object(), world_data = Json::object();
     Json fingerprint;
@@ -55,6 +58,7 @@ struct Plugin {
     std::map<std::string,int> hotkeys;
     std::string error;
     bool active = false, staging = true;
+    bool patch_staging = true;
     bool provisional = false;
     uint64_t calls = 0;
     double last_ms = 0, total_ms = 0;
@@ -70,6 +74,14 @@ public:
     bool reload(const std::string& id);
     void request_reload(const std::string& id);
     void end_frame();
+    PatchRegistry patches;
+    void add_patch(Plugin&,PatchSpec,PatchCallbacks);
+    bool remove_patch(Plugin&,const std::string& id);
+    Json patch_status() const;
+    void set_patch_authority(std::function<bool(const std::string&,std::string&)>);
+    bool patch_authorized(const std::string&,std::string&) const;
+    uint64_t patch_epoch() const { return patch_epoch_.load(std::memory_order_acquire); }
+    void queue_patch_error(const std::string& owner,const std::string& cause);
     void emit(const std::string& event, const Json& args = Json::object());
     Json request(Plugin& plugin, const std::string& operation, const Json& args);
     Json status() const;
@@ -102,6 +114,10 @@ public:
 private:
     fs::path root_;
     Adapter adapter_;
+    std::function<bool(const std::string&,std::string&)> patch_authority_;
+    mutable std::mutex patch_errors_gate_;
+    std::vector<std::pair<std::string,std::string>> patch_errors_;
+    std::atomic<uint64_t> patch_epoch_{0};
     std::vector<std::unique_ptr<Plugin>> plugins_;
     std::vector<void*> pinned_modules_;
     std::deque<LogEntry> logs_;

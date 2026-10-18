@@ -1,6 +1,6 @@
 # MT2 Mod Framework
 
-> Framework 0.1.5, Lua API 1.0.0, native ABI 1. Windows x64 Steam. Multiplayer compatibility is not established.
+> Framework 0.2.0, Lua API 1.0.0, native ABI 1. Windows x64 Steam. Multiplayer compatibility is not established.
 
 Use the version matching the installed framework. World mutations need confirmed acknowledgement; never automatically retry unknown results.
 
@@ -10,11 +10,13 @@ Use the version matching the installed framework. World mutations need confirmed
 - [Agent guide](agents/start.md): lifecycle rules and validation.
 - [API reference](reference/index.md): generated public functions.
 - [Events](reference/events.md): exact event payload types.
+- [Experimental patches](experimental/patches.md): named targets, ordering and typed changes.
 - [Native C ABI](reference/native.md): authoritative header and ownership.
 - [Compatibility](compatibility.md): supported executable and current limits.
 
 ## Machine contracts
 
 - [API JSON](api/1.0.0/api.json): functions, types, capabilities, errors and examples.
+- [Patch target contract](api/experimental/patches.json): experimental protocol 1, requires Framework 0.2.0.
 - [Mod schema](api/1.0.0/mod.schema.json): structure; mt2fw check adds semantic validation.
 - [Versioned Markdown](versions/1.0.0/reference/index.md): documentation snapshot for this API.

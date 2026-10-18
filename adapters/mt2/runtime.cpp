@@ -5,6 +5,7 @@
 #include "native_services.h"
 #include "native_routes_windows.h"
 #include "native_ownership.h"
+#include "native_patches.h"
 #include "shared_operations.h"
 #include "native_extensions.h"
 #include "initial_save_path.h"
@@ -26,6 +27,7 @@
 #include <iomanip>
 #include <sstream>
 #include <new>
+#include <optional>
 
 namespace {
 using namespace mt2fw;
@@ -33,18 +35,20 @@ std::unique_ptr<Runtime> runtime;
 std::unique_ptr<mt2fw::mt2::NativeServices> native_services;
 std::shared_ptr<mt2fw::mt2::NativeRoutes> native_routes;
 std::unique_ptr<mt2fw::mt2::NativeOwnership> native_ownership;
+std::unique_ptr<mt2fw::mt2::NativePatches> native_patches;
 struct ProcessStorage {
     std::unique_ptr<Runtime> runtime;
     std::unique_ptr<mt2::NativeServices> services;
     std::shared_ptr<mt2::NativeRoutes> routes;
     std::unique_ptr<mt2::NativeOwnership> ownership;
+    std::unique_ptr<mt2::NativePatches> patches;
 };
 alignas(ProcessStorage) unsigned char process_storage[sizeof(ProcessStorage)]{};
 ProcessStorage* retained_storage=nullptr;
 void retain_process_storage(){
     // A placement-owned holder has no static destructor. Late native entries
     // keep their host/receiver storage through DLL teardown until OS cleanup.
-    if(!retained_storage)retained_storage=new(process_storage)ProcessStorage{std::move(runtime),std::move(native_services),std::move(native_routes),std::move(native_ownership)};
+    if(!retained_storage)retained_storage=new(process_storage)ProcessStorage{std::move(runtime),std::move(native_services),std::move(native_routes),std::move(native_ownership),std::move(native_patches)};
 }
 std::vector<mt2fw::mt2::Hook> framework_hooks;
 bool shutdown_requested=false;
@@ -294,6 +298,7 @@ void drain_saves() {
 }
 Json status() {
     auto value=runtime->status();value["pid"]=GetCurrentProcessId();value["frames"]=frames;value["running"]=running;value["ui_ready"]=ui_ready;value["menu_open"]=show_menu||mt2::desktop::visible();
+    value["patches"]=runtime->patch_status();if(native_patches)value["patches"]["session_authority"]=native_patches->status();
     value["desktop_app"]=mt2::desktop::status();
     value["error"]=last_error;value["process_start_time"]=process_started;value["confirmed_saves"]=confirmed_saves;value["last_save"]=last_save;value["confirmed_initial_saves"]=confirmed_initial_saves;value["last_initial_save"]=last_initial_save;
     value["menu_input_active"]=menu_input_active;
@@ -371,6 +376,25 @@ void render_menu() {
         }
         if(runtime->plugins().empty())ImGui::TextWrapped("%s",tr("Noch keine Mods. Erstelle eine Mod im MT2FW-Helfer oder installiere ein Mod-ZIP.","No mods installed. Create a mod in the MT2FW helper or install a mod ZIP."));
         if(developer) {
+            if(ImGui::CollapsingHeader(tr("Patch-Callbacks","Patch callbacks"))) {
+                auto snapshot=runtime->patches.status();
+                ImGui::Text("%s: %s",tr("Generation","Generation"),snapshot.at("generation").get_ref<const std::string&>().c_str());
+                if(native_patches) {
+                    auto authority=native_patches->status();
+                    ImGui::TextWrapped("%s: %s",tr("Schreibfreigabe","Write authority"),authority.at("role").get_ref<const std::string&>().c_str());
+                    ImGui::TextWrapped("%s",authority.at("reason").get_ref<const std::string&>().c_str());
+                }
+                ImGui::BeginChild("patch-order",ImVec2(0,180),true);
+                if(snapshot.at("patches").empty())ImGui::TextUnformatted(tr("Keine Patches registriert","No patches registered"));
+                for(auto& patch:snapshot.at("patches")) {
+                    ImGui::TextWrapped("%s | %s | %s",patch.at("key").get_ref<const std::string&>().c_str(),patch.at("target").get_ref<const std::string&>().c_str(),patch.at("mode").get_ref<const std::string&>().c_str());
+                    ImGui::Text("%s: %llu | %s: %d",tr("Reihenfolge","Order"),patch.at("order").get<unsigned long long>(),tr("Priorität","Priority"),patch.at("priority").get<int>());
+                    for(auto& reference:patch.at("unresolved"))ImGui::TextWrapped("%s: %s",tr("Referenz fehlt","Missing reference"),reference.get_ref<const std::string&>().c_str());
+                    if(!patch.at("last_error").get_ref<const std::string&>().empty())ImGui::TextWrapped("%s",patch.at("last_error").get_ref<const std::string&>().c_str());
+                    ImGui::Separator();
+                }
+                ImGui::EndChild();
+            }
             if(ImGui::CollapsingHeader(tr("API-Konsole","API console"))) {
                 ImGui::TextWrapped("%s",tr("JSON-Anfrage an eine aktive Mod. Fähigkeiten und Spielthread-Prüfungen gelten auch hier.","JSON request for an active mod. Capability and game-thread checks also apply here."));
                 ImGui::InputTextMultiline("##console",console_input,sizeof(console_input),ImVec2(-1,70));
@@ -458,13 +482,26 @@ void update(void* game,float dt) {
     {std::lock_guard lock(gate);if(running&&native_services){
         if(!engine_thread)engine_thread=GetCurrentThreadId();
         if(engine_thread!=GetCurrentThreadId()){report("Native frame update changed thread identity");}
-        else {if(native_routes)native_routes->set_game_thread(engine_thread);try{native_services->begin_frame(game,dt);paired=true;}catch(const std::exception& error){report(std::string("Native frame begin failed: ")+error.what());}}
+        else {if(native_routes)native_routes->set_game_thread(engine_thread);if(native_patches)native_patches->set_game_thread(engine_thread);try{native_services->begin_frame(game,dt);paired=true;}catch(const std::exception& error){report(std::string("Native frame begin failed: ")+error.what());}}
     }}
+    std::optional<PatchRegistry::Run> patch_run;
+    {std::lock_guard lock(gate);if(running&&runtime&&runtime->patches.has_subscribers("game.update")){
+        try{patch_run.emplace(runtime->patches.begin("game.update",{{"epoch",std::to_string(runtime->patch_epoch())},{"thread",std::to_string(GetCurrentThreadId())},{"dt",dt},{"lua_allowed",engine_thread==GetCurrentThreadId()}},nullptr,false));}
+        catch(const std::exception& error){report(std::string("Native Update patch begin failed: ")+error.what());}
+        catch(...){report("Native Update patch begin failed: unknown native exception");}
+    }}
+    auto end_patches=[&](bool returned) noexcept {
+        if(!patch_run)return;
+        try{runtime->patches.end(*patch_run,{{"original_returned",returned}});}
+        catch(const std::exception& error){report(std::string("Native Update patch end failed: ")+error.what());}
+        catch(...){report("Native Update patch end failed: unknown native exception");}
+    };
     auto original_begin=std::chrono::steady_clock::now();
     try{original_update(game,dt);}
-    catch(...){std::lock_guard lock(gate);if(paired)native_services->end_frame(false);if(shutdown_requested&&!native_services->in_frame())finish_shutdown();throw;}
+    catch(...){std::lock_guard lock(gate);end_patches(false);if(paired)native_services->end_frame(false);if(shutdown_requested&&!native_services->in_frame())finish_shutdown();throw;}
     auto original_end=std::chrono::steady_clock::now();
     std::lock_guard lock(gate);
+    end_patches(true);
     if(paired)native_services->end_frame(true);
     if(native_routes)for(auto& [owner,cause]:native_routes->drain_errors())runtime->log(owner->manifest.id,"error",cause);
     if(native_ownership)for(auto& [owner,cause]:native_ownership->drain_errors())runtime->log(owner->manifest.id,"error",cause);
@@ -567,14 +604,15 @@ void finish_shutdown(){
     if(save_worker.joinable()){save_worker.request_stop();save_wake.notify_all();save_worker.join();}
     try{if(runtime){runtime->world_leave();runtime->stop_plugins();
         mt2::configure_shared_operations({});
+        bool patch_runtime_detached=!native_routes||native_routes->detach_patch_runtime();
         if(native_routes)for(auto& [owner,cause]:native_routes->drain_errors())runtime->log(owner->manifest.id,"error",cause);
         if(native_ownership)for(auto& [owner,cause]:native_ownership->drain_errors())runtime->log(owner->manifest.id,"error",cause);
         bool retirement_failed=false;for(auto& plugin:runtime->plugins())retirement_failed|=plugin->native_retirement_failed;
-        if(retirement_failed||native_services->has_hooks()||(native_routes&&native_routes->retirement_blocked())||(native_ownership&&native_ownership->retirement_blocked())){report("Framework shutdown retained native runtime: an owned route has not retired");retain_process_storage();return;}
+        if(!patch_runtime_detached||retirement_failed||native_services->has_hooks()||(native_routes&&native_routes->retirement_blocked())||(native_ownership&&native_ownership->retirement_blocked())||(native_patches&&native_patches->busy())){report("Framework shutdown retained native runtime: an owned route has not retired");retain_process_storage();return;}
         bool retained=false;for(auto& plugin:runtime->plugins())retained|=plugin->native_retained;
         if(retained){auto disabled=MH_DisableHook(MH_ALL_HOOKS);if(disabled!=MH_OK&&disabled!=MH_ERROR_NOT_INITIALIZED){report(std::string("Retained native shutdown disable failed: ")+MH_StatusToString(disabled));retain_process_storage();return;}
             runtime->log("framework","info","Native originals and owner state retained until process exit");retain_process_storage();return;}
-        runtime.reset();native_services.reset();native_routes.reset();native_ownership.reset();}}
+        runtime->set_patch_authority({});native_patches.reset();runtime.reset();native_services.reset();native_routes.reset();native_ownership.reset();}}
     catch(const std::exception& error){report(std::string("Framework shutdown failed: ")+error.what());return;}
     auto result=MH_DisableHook(MH_ALL_HOOKS);if(result!=MH_OK&&result!=MH_ERROR_NOT_INITIALIZED)OutputDebugStringA(MH_StatusToString(result));
 }
@@ -594,6 +632,11 @@ extern "C" __declspec(dllexport) MT2FW_MT2_Result MT2FW_CALL MT2FW_MT2_QueryOwne
     catch(const std::exception& error){report(std::string("Native ownership discovery failed: ")+error.what());return MT2FW_MT2_FAILED;}
     catch(...){report("Native ownership discovery failed: unknown native exception");return MT2FW_MT2_FAILED;}
 }
+extern "C" __declspec(dllexport) MT2FW_MT2_Result MT2FW_CALL MT2FW_MT2_QueryPatches(const MT2FW_Host* owner,uint32_t version,MT2FW_MT2_PatchesV1* output,uint32_t capacity){
+    try{std::lock_guard lock(gate);if(!running||!native_patches)return MT2FW_MT2_UNAVAILABLE;return native_patches->query(owner,version,output,capacity);}
+    catch(const std::exception& error){report(std::string("Native patch discovery failed: ")+error.what());return MT2FW_MT2_FAILED;}
+    catch(...){report("Native patch discovery failed: unknown native exception");return MT2FW_MT2_FAILED;}
+}
 extern "C" __declspec(dllexport) bool MT2FW_InitInstalled(const MT2FW_Bootstrap* receipt) {
     if(runtime||retained_storage){report("Framework runtime is already initialized or retained; restart required");return false;}
     try {
@@ -604,10 +647,22 @@ extern "C" __declspec(dllexport) bool MT2FW_InitInstalled(const MT2FW_Bootstrap*
         runtime=std::make_unique<Runtime>(root,[](const std::string& op,const Json& args){if(op.starts_with("ui."))return ui_request(op,args);return mt2::request(op,args);});
         native_services=std::make_unique<mt2::NativeServices>(receipt->game,root,[](const MT2FW_Host* host){return runtime?runtime->native_plugin(host):nullptr;});
         native_routes=std::make_shared<mt2::NativeRoutes>([](const MT2FW_Host* host){return runtime?runtime->native_plugin(host):nullptr;});
+        native_routes->set_patch_runtime(runtime.get());
+        native_patches=std::make_unique<mt2::NativePatches>(*runtime,[]{return uint64_t(GetCurrentThreadId());},[](uint64_t& epoch,std::string& cause){
+            namespace native=mt2mp::game::native;
+            native::WorldStatus world;std::string folder;
+            if(!runtime||!native::read_world_status(world,cause))return false;
+            if(world.active_mode_index!=3||world.in_game_state!=4||!world.world_present||world.quitting||!native::in_game()){cause="native active world mode/state is not ready";return false;}
+            if(!native::read_active_world_folder(folder,cause))return false;
+            auto acknowledged=mt2::request("world.status",Json::object());
+            if(!acknowledged.value("loaded",false)||acknowledged.value("name",std::string())!=folder||acknowledged.value("epoch",uint64_t(0))!=runtime->epoch||!runtime->epoch){cause="native world identity differs from Framework world epoch";return false;}
+            epoch=runtime->epoch;cause="native world mode 3/state 4, identity and epoch acknowledged";return true;
+        });
+        runtime->set_patch_authority([](const std::string& operation,std::string& cause){if(!native_patches){cause="Native session authority is unavailable";return false;}return native_patches->authorize(operation,cause);});
         native_routes->configure(reinterpret_cast<uintptr_t>(GetModuleHandleW(nullptr)),mt2::windows_route_backend(fs::path(receipt->game)/"MT2.exe"));
         mt2::load_multiplayer_catalog(*native_routes);
         native_ownership=std::make_unique<mt2::NativeOwnership>(reinterpret_cast<uintptr_t>(GetModuleHandleW(nullptr)),*native_routes,[](const MT2FW_Host* host){return runtime?runtime->native_plugin(host):nullptr;},mt2::windows_free_backend(reinterpret_cast<uintptr_t>(GetModuleHandleW(nullptr)),fs::path(receipt->game)/"MT2.exe"));
-        runtime->native_retire=[](Plugin& owner){auto ownership_ok=native_ownership->retire(owner);auto routes_ok=native_routes->retire(owner);auto services_ok=native_services->retire(owner);return services_ok&&routes_ok&&ownership_ok;};
+        runtime->native_retire=[](Plugin& owner){auto patches_ok=native_patches->retire(owner);auto ownership_ok=native_ownership->retire(owner);auto routes_ok=native_routes->retire(owner);auto services_ok=native_services->retire(owner);return patches_ok&&services_ok&&routes_ok&&ownership_ok;};
         for(const char* name:{"game.update","title.command","ingame.command","save.command","save.blocking","desktop.launch","desktop.destroy","startmenu.elements","startmenu.select","objects.create","objects.move","objects.remove","sdl.swap","sdl.poll","sdl.hide_cursor","sdl.relative_mouse","physfs.open_read","physfs.open_write","physfs.close","win32.move_file"})native_services->reserve(name);
         mt2::desktop::configure(*runtime,root,[](const std::string& id,bool tools){details_mod=id;developer=tools;menu_state(true);},[]{german=!german;});
         if(fs::exists(root/"benchmark.json"))benchmark_mode=read_json(root/"benchmark.json").at("mode");

@@ -17,6 +17,7 @@ Build mods for **MMORPG Tycoon 2**. Start with Lua and a text editor, extend wit
 | Import my own static scenery | [GLB guide](docs/guides/scenery.md) |
 | Add settings, shortcuts or world actions | [Recipes](docs/guides/config-storage.md) |
 | Manage framework packages with Vortex | [Vortex support and installation](integrations/vortex/README.md) |
+| Observe native calls or apply an API time policy | [Experimental patch API](docs/experimental/patches.md) |
 | Contribute to the framework | [Build and checks](docs/contributing/build.md) |
 
 This is a **development preview** for Windows x64 and the verified Steam game build. Multiplayer compatibility is not established. See [compatibility and acceptance](docs/compatibility.md). Players need only the **Runtime** from [Nexus](https://www.nexusmods.com/mmorpgtycoon2/mods/25) or [GitHub Releases](https://github.com/DooDesch-Mods/MMORPGTycoon2-ModFramework/releases). Modders download the separate **MT2Framework-SDK** from GitHub. The SDK includes the runtime, portable helper, full CLI, GLB importer, templates, editor types and offline documentation. Install the separate [Vortex extension](https://www.nexusmods.com/site/mods/2465) to manage runtime and mod ZIPs. [GitHub Actions](https://github.com/DooDesch-Mods/MMORPGTycoon2-ModFramework/actions/workflows/checks.yml) builds and verifies the packages and offline documentation.

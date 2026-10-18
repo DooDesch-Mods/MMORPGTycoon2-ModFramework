@@ -1,0 +1,340 @@
+{
+  "contract": "mt2-patches",
+  "version": 1,
+  "stability": "experimental",
+  "minimum_framework_version": "0.2.0",
+  "stable_lua_api": "1.0.0",
+  "stable_native_abi": 1,
+  "documentation": "experimental/patches.html",
+  "owner": "Authenticated manifest ID, injected by the framework",
+  "functions": {
+    "mt2.patches.add": {
+      "parameters": [
+        "spec",
+        "callbacks"
+      ],
+      "effects": "Register one mod-owned patch; stage during preparation",
+      "returns": "string patch ID"
+    },
+    "mt2.patches.remove": {
+      "parameters": [
+        "id"
+      ],
+      "effects": "Remove one patch belonging to the caller",
+      "returns": "boolean quiescence acknowledgement"
+    },
+    "mt2.patches.targets": {
+      "parameters": [],
+      "effects": "Read target discovery metadata; permitted during preparation"
+    },
+    "mt2.patches.status": {
+      "parameters": [],
+      "effects": "Read the published generation, order and unresolved references; permitted during preparation"
+    }
+  },
+  "spec_schema": {
+    "type": "object",
+    "required": [
+      "id",
+      "target"
+    ],
+    "properties": {
+      "id": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 159,
+        "pattern": "^[a-zA-Z0-9_.-]+$",
+        "description": "Unique patch ID within the calling mod"
+      },
+      "target": {
+        "enum": [
+          "game.update",
+          "objects.create",
+          "api.time.set"
+        ]
+      },
+      "priority": {
+        "type": "integer",
+        "minimum": -2147483648,
+        "maximum": 2147483647,
+        "default": 0
+      },
+      "before": {
+        "type": "array",
+        "maxItems": 16,
+        "uniqueItems": true,
+        "items": {
+          "type": "string",
+          "pattern": "^[a-zA-Z0-9_.-]+:[a-zA-Z0-9_.-]+$",
+          "description": "Fully qualified manifest-id:patch-id"
+        },
+        "default": []
+      },
+      "after": {
+        "type": "array",
+        "maxItems": 16,
+        "uniqueItems": true,
+        "items": {
+          "type": "string",
+          "pattern": "^[a-zA-Z0-9_.-]+:[a-zA-Z0-9_.-]+$",
+          "description": "Fully qualified manifest-id:patch-id"
+        },
+        "default": []
+      },
+      "mode": {
+        "enum": [
+          "observe",
+          "modify"
+        ],
+        "default": "observe"
+      }
+    },
+    "additionalProperties": false
+  },
+  "callback_contract": {
+    "before": "Optional function receiving a copied target-specific Before record",
+    "after": "Optional function receiving a copied target-specific After record",
+    "required": "At least one callback",
+    "observe_return": "nil",
+    "modify_before_return": "nil or a partial replacement object supported by the target",
+    "after_return": "Ignored; return no value",
+    "world_write_calls": "World-write APIs are rejected from all patch Before/After callbacks; modify callbacks return proposed values instead of issuing another write",
+    "copies": "Editing a received table does not change native arguments, other observers or the original result",
+    "raw_addresses": false
+  },
+  "common_payload": {
+    "target": {
+      "type": "string"
+    },
+    "invocation": {
+      "type": "string",
+      "pattern": "^[0-9]+$",
+      "description": "Exact invocation identity; never convert to a floating-point number"
+    },
+    "generation": {
+      "type": "string",
+      "pattern": "^[0-9]+$"
+    },
+    "phase": {
+      "enum": [
+        "before",
+        "after"
+      ]
+    }
+  },
+  "targets": [
+    {
+      "id": "game.update",
+      "origin": "native",
+      "summary": "Observe the framework-owned native Update envelope",
+      "phases": [
+        "before",
+        "after"
+      ],
+      "modes": [
+        "observe"
+      ],
+      "capabilities": {
+        "observe": [
+          "world.read"
+        ]
+      },
+      "thread": "Bound game thread for Lua; native callbacks retain the typed native contract",
+      "before_payload": {
+        "dt": {
+          "type": "number",
+          "finite": true
+        },
+        "epoch": {
+          "type": "string",
+          "pattern": "^[0-9]+$"
+        }
+      },
+      "after_payload_additions": {
+        "original_returned": {
+          "type": "boolean"
+        }
+      },
+      "original": "One unchanged native call; true original_returned means normal return only",
+      "write_slots": []
+    },
+    {
+      "id": "objects.create",
+      "origin": "native",
+      "summary": "Observe the framework-owned native object creation envelope",
+      "phases": [
+        "before",
+        "after"
+      ],
+      "modes": [
+        "observe"
+      ],
+      "capabilities": {
+        "observe": [
+          "world.read"
+        ]
+      },
+      "thread": "Lua observes bound-game-thread calls only; worker calls are not deferred into false Before/After pairs",
+      "before_payload": {
+        "thread": {
+          "type": "string",
+          "pattern": "^[0-9]+$"
+        },
+        "flag": {
+          "type": "boolean"
+        },
+        "epoch": {
+          "type": "string",
+          "pattern": "^[0-9]+$"
+        }
+      },
+      "after_payload_additions": {
+        "original_returned": {
+          "type": "boolean"
+        },
+        "result_available": {
+          "type": "boolean",
+          "description": "Native result was non-null; no pointer or UID is exposed and no world action is confirmed"
+        }
+      },
+      "original": "One unchanged native call; result availability is not world-action confirmation",
+      "write_slots": [],
+      "example": "examples/patch-observer/main.lua"
+    },
+    {
+      "id": "api.time.set",
+      "origin": "framework_request",
+      "summary": "Mediate Framework time.set requests; does not intercept native clock/UI calls",
+      "phases": [
+        "before",
+        "after"
+      ],
+      "modes": [
+        "observe",
+        "modify"
+      ],
+      "capabilities": {
+        "observe": [
+          "world.read"
+        ],
+        "modify": [
+          "time.write"
+        ]
+      },
+      "thread": "Active Framework callback on the bound game thread",
+      "before_payload": {
+        "paused": {
+          "type": "boolean"
+        },
+        "speed": {
+          "type": "number",
+          "finite": true,
+          "minimum": 0
+        },
+        "epoch": {
+          "type": "string",
+          "pattern": "^[0-9]+$"
+        }
+      },
+      "after_payload_additions": {
+        "original_returned": {
+          "type": "boolean"
+        },
+        "outcome": {
+          "enum": [
+            "confirmed",
+            "rejected",
+            "unknown"
+          ]
+        },
+        "result": {
+          "type": "object",
+          "optional": true,
+          "description": "Stable MT2Clock readback after the adapter returned successfully"
+        }
+      },
+      "modify_before_return_schema": {
+        "type": [
+          "object",
+          "null"
+        ],
+        "properties": {
+          "paused": {
+            "type": "boolean"
+          },
+          "speed": {
+            "type": "number",
+            "finite": true,
+            "minimum": 0
+          }
+        },
+        "additionalProperties": false
+      },
+      "write_slots": [
+        {
+          "id": "paused/speed",
+          "fields": [
+            "paused",
+            "speed"
+          ],
+          "ownership": "One exclusive writer per target; conflicting registration rejects atomically"
+        }
+      ],
+      "authority": "Only proven standalone permits execution. Unknown, Client and acknowledged Host deny; the shared Host-action bridge is unavailable in this version.",
+      "example": "examples/time-policy/main.lua"
+    }
+  ],
+  "ordering": {
+    "references": "Fully qualified manifest-id:patch-id on the same target",
+    "precedence": [
+      "Explicit before/after edges",
+      "Descending priority",
+      "Byte-ordinal manifest ID",
+      "Byte-ordinal patch ID"
+    ],
+    "before": "Published order",
+    "after": "Reverse order of entered callbacks in the same invocation snapshot",
+    "missing_references": "Dormant and visible; not an implicit manifest dependency",
+    "cycle": "Candidate rejected with a concrete cycle path; previous generation retained",
+    "languages": "Lua and native registrations through this patch service share one order; existing legacy services retain their outer envelopes"
+  },
+  "status": {
+    "generation": "Exact decimal string",
+    "targets": "Runtime target discovery records",
+    "patches": "Published records with id, owner, key, target, mode, priority, zero-based order, unresolved reference array, last_error and suppressed_errors",
+    "authority": {
+      "api.time.set": {
+        "allowed": "boolean",
+        "reason": "Readable authority acknowledgement or original rejection reason"
+      }
+    }
+  },
+  "limits": {
+    "subscriptions_per_target": 128,
+    "references_per_relation": 16
+  },
+  "diagnostics": {
+    "PATCH_TARGET": "Unknown target",
+    "PATCH_READ_ONLY": "Unsupported native mutation, observer return value or world-write call from any patch callback",
+    "PATCH_VALUES": "Invalid typed writer result or time arguments; original request not executed on writer rejection",
+    "PATCH_WRITER_CONFLICT": "Combined paused/speed slot already has an exclusive owner",
+    "PATCH_CYCLE": "Ordering cycle; previous published generation retained",
+    "PATCH_REFERENCE_TARGET": "Ordering reference points to another target",
+    "PATCH_AUTHORITY_UNKNOWN": "No acknowledged session authority; mutation not executed",
+    "PATCH_AUTHORITY_DENIED": "Session authority denied the operation; mutation not executed"
+  },
+  "lifecycle": {
+    "lua_reload": "Replace the owner's complete set after candidate validation and activation; rejected candidate retains the old Lua instance and order",
+    "native": "Native plugins require restart",
+    "world_changes": "Reload does not undo confirmed changes or replay unknown actions",
+    "callback_failure": "Lua runtime callback errors disable only the owning mod and retain the original cause; other owners continue and native original observation remains once",
+    "initial_authority_denial": "No Before or After is entered",
+    "time_after": "Confirmed adapter return: original_returned true, outcome confirmed and result. Writer rejection or authority change after Before: original_returned false, outcome rejected. Adapter exception: original_returned false, outcome unknown. A failed Before does not enter its own After."
+  },
+  "examples": [
+    "examples/patch-observer",
+    "examples/time-policy",
+    "examples/native-patches"
+  ],
+  "schema_version": 1
+}

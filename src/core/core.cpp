@@ -5,6 +5,8 @@
 #include <algorithm>
 #include <array>
 #include <chrono>
+#include <cmath>
+#include <cstdio>
 #include <cstring>
 #include <fstream>
 #include <regex>
@@ -130,7 +132,7 @@ Manifest Manifest::parse(const Json& value) {
 }
 Plugin::Plugin(Runtime* owner):runtime(owner) { host={sizeof(MT2FW_Host),MT2FW_ABI_VERSION,this,native_request,native_subscribe,native_unsubscribe}; }
 Plugin::~Plugin(){if(native_loaded&&native_shutdown&&!native_retirement_failed&&!native_retained&&!native_pins)native_shutdown();}
-Runtime::Runtime(fs::path root,Adapter adapter):root_(fs::absolute(root)),adapter_(std::move(adapter)) {
+Runtime::Runtime(fs::path root,Adapter adapter):patches([this](const std::string& owner,const std::string& cause){queue_patch_error(owner,cause);}),root_(fs::absolute(root)),adapter_(std::move(adapter)) {
     fs::create_directories(root_/"mods");
     if (fs::exists(root_/"settings.json")) settings_=read_json(root_/"settings.json");
     if (!settings_.is_object()) throw std::runtime_error("settings.json must contain an object");
@@ -213,6 +215,7 @@ void Runtime::load() {
     }
 }
 void Runtime::activate(Plugin& plugin) {
+    patches.validate(&plugin,plugin.manifest.id,plugin.patch_registrations);
     plugin.staging=false; plugin.active=true;
     if(plugin.manifest.type=="content") request(plugin,"content.register",{{"definitions",read_json(confined(plugin.directory,plugin.manifest.entry))},{"directory",path_text(plugin.directory)}});
     else if(!plugin.content_definitions.empty())request(plugin,"content.register",{{"definitions",plugin.content_definitions}});
@@ -220,10 +223,12 @@ void Runtime::activate(Plugin& plugin) {
     if(!plugin.profile_data.empty())atomic_json(confined(root_,"data/"+plugin.manifest.id+"/profile.json"),plugin.profile_data);
     if(plugin.active&&!world_.empty())dispatch(plugin,"world_ready",{{"epoch",epoch},{"name",world_}});
     log(plugin.manifest.id,"info",plugin.active?"Mod started":"Mod start failed");
+    if(plugin.active){patches.replace(&plugin,plugin.manifest.id,plugin.patch_registrations);plugin.patch_staging=false;}
 }
 void Runtime::deactivate(Plugin& plugin) {
     if(plugin.active)dispatch(plugin,"stop",Json::object());
     plugin.active=false; plugin.subscriptions.clear(); plugin.hotkeys.clear();
+    patches.retire(&plugin);plugin.patch_registrations.clear();
     if(native_retire)plugin.native_retirement_failed=!native_retire(plugin);
     if(plugin.native_loaded&&plugin.native_shutdown) {
         if(plugin.native_pins||plugin.native_retirement_failed||plugin.native_retained)plugin.native_shutdown_pending=true;
@@ -231,7 +236,7 @@ void Runtime::deactivate(Plugin& plugin) {
     }
 }
 void Runtime::disable(Plugin& plugin,const std::string& cause) {
-    plugin.active=false; plugin.error=cause; plugin.subscriptions.clear(); plugin.hotkeys.clear(); log(plugin.manifest.id,"error",cause);
+    plugin.active=false; plugin.error=cause; plugin.subscriptions.clear(); plugin.hotkeys.clear(); patches.retire(&plugin);plugin.patch_registrations.clear();log(plugin.manifest.id,"error",cause);
     if(native_retire)plugin.native_retirement_failed=!native_retire(plugin);
     if(!plugin.staging&&!plugin.provisional)for(auto& other:plugins_)if(other->active&&other->manifest.dependencies.contains(plugin.manifest.id))disable(*other,"Dependency failed: "+plugin.manifest.id);
 }
@@ -266,11 +271,17 @@ void Runtime::dispatch(Plugin& plugin,const std::string& event,const Json& args)
 }
 void Runtime::emit(const std::string& event,const Json& args) { for(auto& p:plugins_)if(p->active&&(event!="input"||args.value("owner",std::string())==p->manifest.id))dispatch(*p,event,args); }
 void Runtime::request_reload(const std::string& id) { if(std::find(pending_reload_.begin(),pending_reload_.end(),id)==pending_reload_.end())pending_reload_.push_back(id); }
-void Runtime::end_frame() { auto pending=std::move(pending_reload_);pending_reload_.clear();for(auto& id:pending)reload(id); }
+void Runtime::end_frame() {
+    std::vector<std::pair<std::string,std::string>> errors;
+    {std::lock_guard lock(patch_errors_gate_);errors=std::move(patch_errors_);patch_errors_.clear();}
+    for(auto& [owner,cause]:errors)log(owner,"error",cause);
+    auto pending=std::move(pending_reload_);pending_reload_.clear();for(auto& id:pending)reload(id);
+}
 bool Runtime::reload(const std::string& id) {
     auto old=std::find_if(plugins_.begin(),plugins_.end(),[&](auto& p){return p->manifest.id==id;});
     if(old==plugins_.end())return false;
     if((*old)->manifest.type!="lua"||(*old)->manifest.capabilities.contains("content")) {log(id,"warn","Content and native plugins require restart");return false;}
+    if(patches.busy(old->get())){log(id,"warn","Reload deferred: patch callback still owns the current instance");request_reload(id);return false;}
     try {
         auto manifest=Manifest::parse(read_json((*old)->directory/"mod.json"));
         if(manifest.source!=(*old)->manifest.source)throw std::runtime_error("Manifest changed; restart required");
@@ -279,7 +290,7 @@ bool Runtime::reload(const std::string& id) {
         try {
             activate(*candidate);if(!candidate->active)throw std::runtime_error(candidate->error);
         }catch(...) {
-            candidate->active=false;candidate->subscriptions.clear();candidate->hotkeys.clear();
+            candidate->active=false;candidate->subscriptions.clear();candidate->hotkeys.clear();patches.retire(candidate.get());
             atomic_json(confined(root_,"data/"+id+"/config.json"),(*old)->config);
             atomic_json(confined(root_,"data/"+id+"/profile.json"),(*old)->profile_data);
             throw;
@@ -297,8 +308,36 @@ bool Runtime::set_enabled(const std::string& id,bool enabled) {
     return true;
 }
 bool Runtime::enabled(const std::string& id)const {return !settings_.contains("disabled")||!settings_["disabled"].value(id,false);}
+void Runtime::add_patch(Plugin& plugin,PatchSpec spec,PatchCallbacks callbacks) {
+    auto capability=spec.mode=="modify"?"time.write":"world.read";
+    if(!plugin.manifest.capabilities.contains(capability))throw std::runtime_error(std::string("Missing capability: ")+capability);
+    auto registrations=plugin.patch_registrations;registrations.push_back({std::move(spec),std::move(callbacks)});
+    patches.validate(&plugin,plugin.manifest.id,registrations);
+    if(!plugin.patch_staging)patches.replace(&plugin,plugin.manifest.id,registrations);
+    plugin.patch_registrations=std::move(registrations);
+}
+bool Runtime::remove_patch(Plugin& plugin,const std::string& id) {
+    auto registrations=plugin.patch_registrations;
+    if(!std::erase_if(registrations,[&](auto& registration){return registration.spec.id==id;}))throw std::runtime_error("PATCH_NOT_FOUND: patch ID is not owned: "+id);
+    if(!plugin.patch_staging)patches.replace(&plugin,plugin.manifest.id,registrations);
+    plugin.patch_registrations=std::move(registrations);return !patches.busy(&plugin);
+}
+void Runtime::set_patch_authority(std::function<bool(const std::string&,std::string&)> guard){patch_authority_=std::move(guard);}
+void Runtime::queue_patch_error(const std::string& owner,const std::string& cause){std::lock_guard lock(patch_errors_gate_);if(patch_errors_.size()<512)patch_errors_.emplace_back(owner,cause);else std::fprintf(stderr,"Patch error queue full: %s %s\n",owner.c_str(),cause.c_str());}
+bool Runtime::patch_authorized(const std::string& operation,std::string& reason) const {
+    reason.clear();
+    if(!patch_authority_){reason="PATCH_AUTHORITY_UNKNOWN: no acknowledged session authority";return false;}
+    auto allowed=patch_authority_(operation,reason);if(!allowed&&reason.empty())reason="PATCH_AUTHORITY_DENIED: operation denied by session authority";return allowed;
+}
+Json Runtime::patch_status() const {
+    auto result=patches.status();std::string reason;bool allowed=patch_authorized("api.time.set",reason);
+    result["authority"]={{"api.time.set",{{"allowed",allowed},{"reason",reason}}}};return result;
+}
 Json Runtime::request(Plugin& p,const std::string& op,const Json& args) {
     if(!args.is_object())throw std::runtime_error("API arguments must be an object");
+    if(op=="patches.targets")return patches.targets();
+    if(op=="patches.status")return patch_status();
+    if(patches.in_callback()&&((op.starts_with("actions.")&&op!="actions.status")||op=="time.set"||op=="content.register"))throw std::runtime_error("PATCH_READ_ONLY: patch callbacks cannot call shared-world write APIs; modifiers return writable values");
     if(op=="log") {auto level=args.value("level","info");if(level!="debug"&&level!="info"&&level!="warn"&&level!="error")throw std::runtime_error("Invalid log level");log(p.manifest.id,level,args.at("message").get<std::string>());return true;}
     if(op=="config.define") {
         auto key=text(args,"key");if(key.find('/')!=std::string::npos)throw std::runtime_error("Invalid setting key");
@@ -349,10 +388,21 @@ Json Runtime::request(Plugin& p,const std::string& op,const Json& args) {
     if(!adapter_)throw std::runtime_error("Game adapter unavailable: "+op);
     auto forwarded=args;forwarded["mod_id"]=p.manifest.id;
     if(op=="content.register")forwarded["directory"]=path_text(p.directory);
+    if(op=="time.set"){
+        std::string reason;if(!patch_authorized("api.time.set",reason))throw std::runtime_error(reason);
+        if(!args.contains("paused")||!args.at("paused").is_boolean()||!args.contains("speed")||!args.at("speed").is_number()||!std::isfinite(args.at("speed").get<double>())||args.at("speed").get<double>()<0)
+            throw std::runtime_error("PATCH_VALUES: time.set requires boolean paused and finite nonnegative speed");
+        auto run=patches.begin("api.time.set",{{"paused",args.at("paused")},{"speed",args.at("speed")},{"epoch",std::to_string(epoch)}},nullptr,true);
+        if(run.failed){patches.end(run,{{"original_returned",false},{"outcome","rejected"}});throw std::runtime_error("PATCH_VALUES: api.time.set writer failed; original request was not executed");}
+        forwarded["paused"]=run.data.at("paused");forwarded["speed"]=run.data.at("speed");
+        if(!patch_authorized("api.time.set",reason)){patches.end(run,{{"original_returned",false},{"outcome","rejected"}});throw std::runtime_error(reason);}
+        try{auto result=adapter_(op,forwarded);patches.end(run,{{"original_returned",true},{"outcome","confirmed"},{"result",result}});return result;}
+        catch(...){patches.end(run,{{"original_returned",false},{"outcome","unknown"}});throw;}
+    }
     auto result=adapter_(op,forwarded);if(op=="content.register")p.content_registered=true;return result;
 }
 void Runtime::world_ready(const std::string& identity) {
-    if(world_==identity)return;if(!world_.empty())world_leave();world_=identity;++epoch;
+    if(world_==identity)return;if(!world_.empty())world_leave();world_=identity;++epoch;patch_epoch_.store(epoch,std::memory_order_release);
     for(auto& p:plugins_)p->world_data=Json::object();
     object_bindings=Json::object();
     if(pending_world_metadata_.is_object()&&pending_world_metadata_.value("world",std::string())==identity) {
@@ -365,7 +415,7 @@ void Runtime::world_ready(const std::string& identity) {
     pending_world_metadata_=Json();
     emit("world_ready",{{"epoch",epoch},{"name",identity}});
 }
-void Runtime::world_leave() {if(world_.empty())return;emit("world_leave",{{"epoch",epoch},{"name",world_}});last_world_metadata_=capture_save(world_);world_.clear();++epoch;for(auto& p:plugins_)p->world_data=Json::object();}
+void Runtime::world_leave() {if(world_.empty())return;emit("world_leave",{{"epoch",epoch},{"name",world_}});last_world_metadata_=capture_save(world_);world_.clear();++epoch;patch_epoch_.store(epoch,std::memory_order_release);for(auto& p:plugins_)p->world_data=Json::object();}
 Json Runtime::capture_save(const std::string& name) const {
     if(world_.empty()||name!=world_) {
         if(last_world_metadata_.is_object()&&last_world_metadata_.value("world",std::string())==name)return last_world_metadata_;

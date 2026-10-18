@@ -1,14 +1,22 @@
 #include "native_routes.h"
 #include <algorithm>
 #include <cstring>
+#include <optional>
 
 namespace mt2fw::mt2 {
 namespace {
 constexpr const char* game_sha="bbab2dc68babcc644d0a1679548bf1e334b6c52aea669c3f61f6cb9d45c1aaf6";
 template<size_t N>void copy(char(&output)[N],const std::string& value){auto length=std::min(value.size(),N-1);std::memcpy(output,value.data(),length);output[length]=0;}
 bool output_ok(MT2FW_MT2_RouteReceipt* out){return out&&out->size>=sizeof(*out);}
+void patch_error(Runtime& runtime,const std::string& cause) noexcept {
+    try{runtime.queue_patch_error("framework",cause);}
+    catch(const std::exception& error){std::fprintf(stderr,"Native Create patch: %s; logging failed: %s\n",cause.c_str(),error.what());}
+    catch(...){std::fprintf(stderr,"Native Create patch: %s; logging failed with unknown native exception\n",cause.c_str());}
+}
 }
 NativeRoutes::NativeRoutes(std::function<Plugin*(const MT2FW_Host*)> lookup):lookup_(std::move(lookup)){create_pairs_.reserve(64);errors_.reserve(128);}
+NativeRoutes::PatchLease::PatchLease(NativeRoutes& value):service(value){std::lock_guard lock(service.gate_);runtime=service.patch_runtime_;if(runtime)++service.patch_inflight_;}
+NativeRoutes::PatchLease::~PatchLease(){if(runtime){std::lock_guard lock(service.gate_);--service.patch_inflight_;}}
 void NativeRoutes::configure(uintptr_t image,Backend backend){image_=image;backend_=std::move(backend);}
 void NativeRoutes::catalog(const std::string& name,uint64_t rva,bool shared){
     std::lock_guard lock(gate_);if(!rva||targets_.contains(name))throw std::runtime_error("Native route catalog target absent or duplicated: "+name);
@@ -53,6 +61,7 @@ MT2FW_MT2_Result MT2FW_CALL NativeRoutes::create_unsubscribe(void* context,uint6
     if(value->inflight)return MT2FW_MT2_BUSY;service.create_pairs_.erase(found);return MT2FW_MT2_OK;
 }
 void* NativeRoutes::create(const MT2FW_MT2_CreateCall& input,CreateOriginal original){
+    PatchLease patch_lease(*this);auto patch_runtime=patch_lease.runtime;
     auto call=input;call.invocation=next_invocation_.fetch_add(1);
     std::array<CreatePair,64> snapshot{};size_t count=0;
     {std::lock_guard lock(gate_);for(auto& pair:create_pairs_)if(pair.active&&pair.owner->active){snapshot[count++]=pair;++pair.owner->inflight;}}
@@ -60,8 +69,19 @@ void* NativeRoutes::create(const MT2FW_MT2_CreateCall& input,CreateOriginal orig
     for(size_t i=0;i<count;++i){try{snapshot[i].before(snapshot[i].user,&call);entered[i]=true;}
         catch(const std::exception& problem){report(*snapshot[i].owner,std::string("CreateBuilding before failed: ")+problem.what());}
         catch(...){report(*snapshot[i].owner,"CreateBuilding before failed: unknown native exception");}}
+    std::optional<PatchRegistry::Run> patch_run;
+    if(patch_runtime){
+        try{patch_run.emplace(patch_runtime->patches.begin("objects.create",{{"epoch",std::to_string(patch_runtime->patch_epoch())},{"thread",std::to_string(call.thread)},{"flag",call.flag!=0},{"lua_allowed",game_thread_.load()==call.thread}},nullptr,false));}
+        catch(const std::exception& error){patch_error(*patch_runtime,std::string("Native Create patch begin failed: ")+error.what());}
+        catch(...){patch_error(*patch_runtime,"Native Create patch begin failed: unknown native exception");}
+    }
     void* result=nullptr;std::exception_ptr exception;
     try{result=original(input.manager,input.type,input.variant,input.pose,input.a,input.b,input.c,input.flag!=0);}catch(...){exception=std::current_exception();}
+    if(patch_run){
+        try{patch_runtime->patches.end(*patch_run,{{"original_returned",!exception},{"result_available",result!=nullptr}});}
+        catch(const std::exception& error){patch_error(*patch_runtime,std::string("Native Create patch end failed: ")+error.what());}
+        catch(...){patch_error(*patch_runtime,"Native Create patch end failed: unknown native exception");}
+    }
     for(size_t i=count;i>0;--i){auto& pair=snapshot[i-1];if(entered[i-1]){
         try{pair.after(pair.user,&call,result,exception?0:1);}
         catch(const std::exception& problem){report(*pair.owner,std::string("CreateBuilding after failed: ")+problem.what());}
@@ -187,10 +207,10 @@ bool NativeRoutes::retire(Plugin& plugin){
         if(result!=MT2FW_MT2_OK)okay=false;
     }return okay;
 }
-bool NativeRoutes::busy()const{std::lock_guard lock(gate_);for(auto& [plugin,owner]:owners_)if(owner->inflight)return true;for(auto& [name,target]:targets_)if(target.owner)return true;return false;}
+bool NativeRoutes::busy()const{std::lock_guard lock(gate_);if(patch_inflight_)return true;for(auto& [plugin,owner]:owners_)if(owner->inflight)return true;for(auto& [name,target]:targets_)if(target.owner)return true;return false;}
 bool NativeRoutes::has_retention()const{std::lock_guard lock(gate_);for(auto& [name,target]:targets_)if(target.owner&&target.retained)return true;return false;}
 bool NativeRoutes::retirement_blocked()const{
-    std::lock_guard lock(gate_);for(auto& [plugin,owner]:owners_)if(owner->inflight)return true;
+    std::lock_guard lock(gate_);if(patch_inflight_)return true;for(auto& [plugin,owner]:owners_)if(owner->inflight)return true;
     for(auto& [name,target]:targets_)if(target.owner&&(!target.retained||target.state!=MT2FW_MT2_ROUTE_DISABLED_RETAINED))return true;return false;
 }
 MT2FW_MT2_Result NativeRoutes::disable(Plugin& plugin,const char* name,MT2FW_MT2_RouteReceipt* output){

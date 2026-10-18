@@ -25,6 +25,8 @@ public:
     explicit NativeRoutes(std::function<Plugin*(const MT2FW_Host*)> lookup);
     void configure(uintptr_t image,Backend backend);
     void set_game_thread(uint64_t thread){game_thread_.store(thread);}
+    void set_patch_runtime(Runtime* runtime){std::lock_guard lock(gate_);patch_runtime_=runtime;}
+    bool detach_patch_runtime(){std::lock_guard lock(gate_);patch_runtime_=nullptr;return patch_inflight_==0;}
     void catalog(const std::string& name,uint64_t rva,bool shared=false);
     bool publish_shared(const std::string& name,void* detour,void* trampoline,std::string& cause);
     bool publish_framework_hook(void* target,void* detour,void* trampoline,std::string& cause);
@@ -55,6 +57,16 @@ private:
     std::vector<std::pair<Plugin*,std::string>> errors_;
     uint64_t next_token_=1;
     std::atomic<uint64_t> next_invocation_{1},game_thread_{0};
+    Runtime* patch_runtime_=nullptr;
+    size_t patch_inflight_=0;
+    struct PatchLease {
+        NativeRoutes& service;
+        Runtime* runtime=nullptr;
+        explicit PatchLease(NativeRoutes&);
+        ~PatchLease();
+        PatchLease(const PatchLease&)=delete;
+        PatchLease& operator=(const PatchLease&)=delete;
+    };
     static Owner* owner(void*);
     void report(Owner&,const std::string&);
     static void boundary_error(void* context,const char* cause) noexcept {

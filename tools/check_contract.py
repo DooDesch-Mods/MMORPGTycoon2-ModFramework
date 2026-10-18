@@ -9,6 +9,10 @@ def main():
     parser=argparse.ArgumentParser(description=__doc__);parser.add_argument('--probe',type=Path,default=ROOT/'build/bin/Release/mt2fw_docs_probe.exe');args=parser.parse_args()
     evidence=ROOT/'artifacts/contracts'/datetime.now(timezone.utc).strftime('%Y%m%dT%H%M%S%fZ');evidence.mkdir(parents=True)
     contract=packages.read_json(ROOT/'api/contract.json')
+    patch_contract=packages.read_json(ROOT/'api/experimental/patches.json')
+    native_patch_header=(ROOT/'adapters/mt2/sdk/native_patches.h').read_text(encoding='utf-8')
+    if '#define MT2FW_MT2_PATCHES_VERSION '+str(patch_contract['version'])+'u' not in native_patch_header:
+        raise RuntimeError('Native patch protocol version differs from its machine contract')
     bridge=(ROOT/'src/core/lua_mod.cpp').read_text(encoding='utf-8')
     host_names=set(re.findall(r"call\('([^']+)'",bridge))
     described={op for f in contract['functions'] for op in f['host_operations']}
@@ -32,8 +36,17 @@ def main():
         if directory==probe:
             expected={f['name'][4:] for f in contract['functions']}
             if set(value['exports'])!=expected:raise RuntimeError('Actual loaded Lua exports differ: '+str(set(value['exports'])^expected))
+            actual_targets={target['id']:target for target in value['patch_targets']}
+            documented_targets={target['id']:target for target in patch_contract['targets']}
+            if actual_targets.keys()!=documented_targets.keys():raise RuntimeError('Patch target catalog differs from runtime discovery')
+            for target_id,actual in actual_targets.items():
+                documented=documented_targets[target_id]
+                for field in ('origin','phases','modes'):
+                    if actual[field]!=documented[field]:raise RuntimeError('Patch target '+target_id+' differs in '+field)
+                slots=[slot['id'] for slot in documented['write_slots']]
+                if slots!=([actual['write_slot']] if 'write_slot' in actual else []):raise RuntimeError('Patch target '+target_id+' writable slot differs')
         rows.append({'example':directory.name,'active':all(m['active'] for m in value['mods']),'receipt':output.name})
-    summary={'exports':len(contract['functions']),'events':len(actual_events),'host_operations':len(host_names),'examples':rows,'fixture_only':True,'native_game_effects':'Retained game acceptance is separate; these checks run real Lua with a synthetic host.'}
+    summary={'exports':len(contract['functions']),'patch_targets':len(patch_contract['targets']),'patch_protocol_version':patch_contract['version'],'events':len(actual_events),'host_operations':len(host_names),'examples':rows,'fixture_only':True,'native_game_effects':'Retained game acceptance is separate; these checks run real Lua with a synthetic host.'}
     packages.atomic_json(evidence/'summary.json',summary);packages.atomic_json(ROOT/'artifacts/contract-current.json',{'evidence':str(evidence),'summary':summary})
     print('info: actual exports/events/bridge and '+str(len(rows)-1)+' complete Lua examples checked; evidence='+str(evidence))
 if __name__=='__main__':

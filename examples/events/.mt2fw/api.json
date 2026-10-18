@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "framework_version": "0.1.6",
+  "framework_version": "0.2.0",
   "api_version": "1.0.0",
   "abi_version": 1,
   "capabilities": [
@@ -99,6 +99,69 @@
       "operation": "'actions.place'|'actions.move'|'actions.remove'",
       "source": "'native'",
       "object": "MT2Object"
+    },
+    "MT2PatchSpec": {
+      "id": "string",
+      "target": "'game.update'|'objects.create'|'api.time.set'",
+      "mode?": "'observe'|'modify'",
+      "priority?": "integer",
+      "before?": "string[]",
+      "after?": "string[]"
+    },
+    "MT2PatchCall": {
+      "target": "string",
+      "phase": "'before'|'after'",
+      "invocation": "string",
+      "generation": "string",
+      "epoch": "string",
+      "dt?": "number",
+      "thread?": "string",
+      "flag?": "boolean",
+      "paused?": "boolean",
+      "speed?": "number",
+      "original_returned?": "boolean",
+      "result_available?": "boolean",
+      "outcome?": "'confirmed'|'rejected'|'unknown'",
+      "result?": "MT2Clock"
+    },
+    "MT2PatchEdit": {
+      "paused?": "boolean",
+      "speed?": "number"
+    },
+    "MT2PatchCallbacks": {
+      "before?": "fun(call:MT2PatchCall):MT2PatchEdit|nil",
+      "after?": "fun(call:MT2PatchCall)"
+    },
+    "MT2PatchTarget": {
+      "id": "string",
+      "origin": "'native'|'framework_request'",
+      "phases": "string[]",
+      "modes": "string[]",
+      "write_slot?": "string",
+      "authority?": "string",
+      "lua_thread?": "string"
+    },
+    "MT2PatchRecord": {
+      "id": "string",
+      "owner": "string",
+      "key": "string",
+      "target": "string",
+      "mode": "string",
+      "priority": "integer",
+      "order": "integer",
+      "unresolved": "string[]",
+      "last_error": "string",
+      "suppressed_errors": "integer"
+    },
+    "MT2PatchAuthority": {
+      "allowed": "boolean",
+      "reason": "string"
+    },
+    "MT2PatchStatus": {
+      "generation": "string",
+      "targets": "MT2PatchTarget[]",
+      "patches": "MT2PatchRecord[]",
+      "authority": "table<string, MT2PatchAuthority>"
     }
   },
   "events": [
@@ -741,7 +804,9 @@
       "reload": "Subscriptions owned by the old instance are removed on a successful replacement.",
       "persistence": "No implicit persistence.",
       "errors": [
-        "Invalid speed, unavailable world and shared writes without the multiplayer bridge are rejected."
+        "Invalid speed, unavailable world and shared writes without the multiplayer bridge are rejected.",
+        "Framework 0.2.0 requires acknowledged standalone or trusted Host authority; Unknown and Client never execute the request.",
+        "An invalid or failing experimental api.time.set writer rejects before the original request. Existing multiplayer bridge fences still apply."
       ],
       "host_operations": [
         "time.set"
@@ -1218,6 +1283,121 @@
         "log"
       ],
       "example": "examples/log/main.lua"
+    },
+    {
+      "group": "patches",
+      "capabilities": [],
+      "since": "1.0.0",
+      "minimum_framework_version": "0.2.0",
+      "experimental_contract": "patches",
+      "experimental_contract_version": 1,
+      "stability": "experimental-patches-1",
+      "thread": "Framework game-thread callback; Lua skips native worker invocations.",
+      "lifecycle": "Script preparation or an active callback.",
+      "persistence": "No implicit persistence.",
+      "reload": "A successful Lua replacement exchanges the complete owner set at frame end. A rejected candidate retains the previous instance and order.",
+      "name": "mt2.patches.add",
+      "parameters": [
+        {
+          "name": "spec",
+          "type": "MT2PatchSpec",
+          "description": "Mod-local ID, named target, mode and optional ordering. References use manifest-id:patch-id."
+        },
+        {
+          "name": "callbacks",
+          "type": "MT2PatchCallbacks",
+          "description": "At least one callback. Observe returns nil; modify Before may return typed replacement fields."
+        }
+      ],
+      "returns": "string",
+      "summary": "Register an owned experimental Before/After patch on a named target.",
+      "side_effects": "Stages during preparation, otherwise atomically publishes a validated order. Observe requires world.read; api.time.set modify requires time.write.",
+      "errors": [
+        "Invalid target, unsupported mode, ordering cycle, cross-target reference or duplicate ID rejects registration.",
+        "A second api.time.set writer rejects with PATCH_WRITER_CONFLICT; previous generation remains active.",
+        "Patch callbacks cannot issue world-write API calls; modifiers return typed values. Unknown or Client authority rejects time mutation."
+      ],
+      "host_operations": [],
+      "example": "examples/patch-observer/main.lua"
+    },
+    {
+      "group": "patches",
+      "capabilities": [],
+      "since": "1.0.0",
+      "minimum_framework_version": "0.2.0",
+      "experimental_contract": "patches",
+      "experimental_contract_version": 1,
+      "stability": "experimental-patches-1",
+      "thread": "Framework game-thread callback; Lua skips native worker invocations.",
+      "lifecycle": "Script preparation or an active callback.",
+      "persistence": "No implicit persistence.",
+      "reload": "A successful Lua replacement exchanges the complete owner set at frame end. A rejected candidate retains the previous instance and order.",
+      "name": "mt2.patches.remove",
+      "parameters": [
+        {
+          "name": "id",
+          "type": "string",
+          "description": "Mod-local patch ID owned by this instance."
+        }
+      ],
+      "returns": "boolean",
+      "summary": "Remove an owned patch and return whether its owner has no in-flight callbacks.",
+      "side_effects": "Removes future entries. An already entered snapshot completes in reverse order.",
+      "errors": [
+        "An unknown or foreign ID raises PATCH_NOT_FOUND."
+      ],
+      "host_operations": [],
+      "example": "examples/patch-observer/main.lua"
+    },
+    {
+      "group": "patches",
+      "capabilities": [],
+      "since": "1.0.0",
+      "minimum_framework_version": "0.2.0",
+      "experimental_contract": "patches",
+      "experimental_contract_version": 1,
+      "stability": "experimental-patches-1",
+      "thread": "Framework game-thread callback; Lua skips native worker invocations.",
+      "lifecycle": "Script preparation or an active callback.",
+      "persistence": "No implicit persistence.",
+      "reload": "A successful Lua replacement exchanges the complete owner set at frame end. A rejected candidate retains the previous instance and order.",
+      "name": "mt2.patches.targets",
+      "parameters": [],
+      "returns": "MT2PatchTarget[]",
+      "summary": "Discover supported experimental patch targets, phases and modes.",
+      "side_effects": "Reads target metadata without changing registrations or the world.",
+      "errors": [
+        "Invalid host arguments raise a Lua error."
+      ],
+      "host_operations": [
+        "patches.targets"
+      ],
+      "example": "examples/patch-observer/main.lua"
+    },
+    {
+      "group": "patches",
+      "capabilities": [],
+      "since": "1.0.0",
+      "minimum_framework_version": "0.2.0",
+      "experimental_contract": "patches",
+      "experimental_contract_version": 1,
+      "stability": "experimental-patches-1",
+      "thread": "Framework game-thread callback; Lua skips native worker invocations.",
+      "lifecycle": "Script preparation or an active callback.",
+      "persistence": "No implicit persistence.",
+      "reload": "A successful Lua replacement exchanges the complete owner set at frame end. A rejected candidate retains the previous instance and order.",
+      "name": "mt2.patches.status",
+      "parameters": [],
+      "returns": "MT2PatchStatus",
+      "summary": "Read published patch order, diagnostics and current time-write authority.",
+      "side_effects": "Reads current order and asks the trusted native session provider for authority. It does not execute a world action.",
+      "errors": [
+        "A failed authority check remains visible in authority[\"api.time.set\"].reason."
+      ],
+      "host_operations": [
+        "patches.status"
+      ],
+      "example": "examples/time-policy/main.lua"
     }
   ],
   "limits": {
@@ -1229,5 +1409,12 @@
     "completed_actions": 256,
     "persistent_objects": 1024,
     "storage_bytes": 1048576
+  },
+  "experimental_contracts": {
+    "patches": {
+      "version": 1,
+      "since_framework": "0.2.0",
+      "path": "api/experimental/patches.json"
+    }
   }
 }

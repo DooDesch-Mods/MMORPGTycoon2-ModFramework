@@ -34,6 +34,8 @@ mt2.time.set(paused: boolean, speed?: number): MT2Clock
 ## Errors
 
 - Invalid speed, unavailable world and shared writes without the multiplayer bridge are rejected.
+- Framework 0.2.0 requires acknowledged standalone or trusted Host authority; Unknown and Client never execute the request.
+- An invalid or failing experimental api.time.set writer rejects before the original request. Existing multiplayer bridge fences still apply.
 
 ## Example
 

@@ -28,12 +28,13 @@ int main(int argc,char** argv) {
             if(op=="ui.number"||op=="ui.checkbox")return args.at("value");
             throw std::runtime_error("Fixture has no operation: "+op);
         });
+        runtime.set_patch_authority([](const std::string&, std::string&) { return true; });
         runtime.load();runtime.world_ready("Documentation fixture");runtime.emit("update",{{"dt",0.016},{"epoch",1}});
         runtime.rendering=true;runtime.emit("render");runtime.rendering=false;
         runtime.emit("input",{{"owner",manifest.id},{"name","show_message"},{"scancode",66}});
         Json exports=Json::array();
         for(auto& log:runtime.logs())if(log.message.starts_with("@export "))exports.push_back(log.message.substr(8));
-        Json result={{"mods",runtime.status().at("mods")},{"exports",exports},{"host_calls",calls},{"fixture_only",true}};
+        Json result={{"mods",runtime.status().at("mods")},{"exports",exports},{"host_calls",calls},{"patch_targets",runtime.patches.targets()},{"fixture_only",true}};
         atomic_json(fs::u8path(argv[2]),result);
         if(runtime.plugins().size()!=1||!runtime.plugins()[0]->active)throw std::runtime_error("Example did not remain active: "+result.dump());
         std::cout<<"info: real Lua example executed with controlled host; result="<<argv[2]<<"\n";

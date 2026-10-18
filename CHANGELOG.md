@@ -1,5 +1,24 @@
 # Changelog
 
+## 0.2.0
+
+### Added
+
+- Experimental patches for Lua and C++ plugins. Run Before/After callbacks around game updates and object creation through named targets.
+- One shared callback order across Lua and native plugins, with priorities, explicit ordering rules and readable conflict diagnostics.
+- A typed time policy for Framework requests, with one writer per target and visible rejection reasons.
+- Complete Lua observer, time-policy and native C++ examples, with editor types and an agent-readable patch contract.
+
+### Changed
+
+- Lua reload validates the replacement patch set before switching. A rejected replacement keeps the previous mod and callback order active.
+- Empty Update targets skip patch payload construction when no mod subscribes.
+
+### Compatibility
+
+- Lua API 1.0.0 and native ABI 1 remain unchanged. The patch extension is experimental and requires Framework 0.2.0.
+- Time policies require a proven standalone session. They affect Framework requests; native game clock controls keep their behavior.
+
 ## 0.1.6
 
 ### Added

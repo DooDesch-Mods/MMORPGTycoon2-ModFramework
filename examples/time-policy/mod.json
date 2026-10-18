@@ -1,0 +1,13 @@
+{
+  "id": "example.time-policy",
+  "name": "API time policy",
+  "version": "1.0.0",
+  "api_version": "1.0.0",
+  "type": "lua",
+  "entry": "main.lua",
+  "capabilities": [
+    "ui",
+    "time.write"
+  ],
+  "multiplayer": "singleplayer"
+}

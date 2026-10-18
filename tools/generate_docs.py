@@ -73,6 +73,10 @@ def outputs(c):
     for directory in sorted((ROOT/'examples').glob('*/.mt2fw')):
         result[directory.relative_to(ROOT).as_posix()+'/mt2.lua']=result['sdk/mt2.lua']
         result[directory.relative_to(ROOT).as_posix()+'/api.json']=encoded(c)
+    native_example='examples/native-patches/.mt2fw/'
+    result[native_example+'mt2fw/plugin.h']=(ROOT/'include/mt2fw/plugin.h').read_text(encoding='utf-8')
+    for name in ('native_services.h','native_patches.h'):
+        result[native_example+'native/mt2/'+name]=(ROOT/'adapters/mt2/sdk'/name).read_text(encoding='utf-8')
     result['docs/public/api/1.0.0/api.json']=encoded(c)
     result['api/generated/mod.schema.json']=encoded(schema(c))
     result['api/generated/content.schema.json']=encoded(schema(c,True))
@@ -97,6 +101,8 @@ def outputs(c):
         body+='\n## Contract\n\n'
         for label,key in [('Returns','returns'),('Thread','thread'),('When to call','lifecycle'),('Effects','side_effects'),('Reload','reload'),('Persistence','persistence')]:body+='- **'+label+':** '+f[key]+'\n'
         body+='- **Capabilities:** '+(', '.join('`'+v+'`' for v in f['capabilities']) or 'None')+'\n- **Since:** '+f['since']+'\n- **Stability:** '+f['stability']+'\n\n## Errors\n\n'+''.join('- '+error+'\n' for error in f['errors'])
+        if f.get('minimum_framework_version'):
+            body+='\nRequires Framework **'+f['minimum_framework_version']+'** or newer, experimental **'+f['experimental_contract']+' protocol '+str(f['experimental_contract_version'])+'**. See the [target contract](../../public/api/experimental/'+f['experimental_contract']+'.json).\n'
         body+='\n## Example\n\nThis complete example is also available under `'+f['example']+'` in the source and SDK documentation bundle. Native effects require the real game.\n\n```lua\n'+example.read_text(encoding='utf-8').rstrip()+'\n```\n'
         result['docs/reference/functions/'+f['name'][4:].replace('.','-')+'.md']=page(f['name'],body)
     body='Subscribe with `mt2.events.on`. Callback errors retain their cause and disable the owner. A failed staged replacement keeps the previous instance.\n\n'
@@ -133,8 +139,9 @@ def outputs(c):
     result['docs/reference/cli.md']=page('Command-line reference',cli)
     for source in sorted((ROOT/'api/experimental').glob('*.json')):
         contract = read(source)
-        contract['documentation'] = 'https://doodesch-mods.github.io/MMORPGTycoon2-ModFramework/experimental/native-document-ui.html'
+        contract['documentation'] = 'https://doodesch-mods.github.io/MMORPGTycoon2-ModFramework/' + contract.get('documentation', 'experimental/native-document-ui.html')
         result['docs/public/api/experimental/'+source.name] = encoded(contract)
+    result['docs/public/evidence/patches-acceptance.json']=encoded(read(ROOT/'evidence/patches-acceptance.json'))
     return result
 
 def main():

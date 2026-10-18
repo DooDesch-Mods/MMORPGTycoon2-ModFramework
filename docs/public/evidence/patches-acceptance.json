@@ -1,0 +1,38 @@
+{
+  "schema_version": 1,
+  "framework_version": "0.2.0",
+  "lua_api_version": "1.0.0",
+  "native_abi_version": 1,
+  "patch_protocol_version": 1,
+  "game_sha256": "bbab2dc68babcc644d0a1679548bf1e334b6c52aea669c3f61f6cb9d45c1aaf6",
+  "binary_sha256": {
+    "MT2Framework.dll": "9a7b129e3ce745e719ab5556f19098559829658aecdd4db9ad1a3169171bf911",
+    "WSOCK32.dll": "b559d29ab3764d68f340d4e2d876e1cd2131c6f0560c2ac238617c89a4bbeea7"
+  },
+  "binary_scope": "Exact binaries used for the native callback acceptance. Later candidate changes and measurements are recorded separately; this is not a claim that the complete final binary ran all acceptance steps.",
+  "native_example_sha256": "5db44ed8da2d6d7a93b9b4ea82ef32a2ec337c112f92790bf701cc0165a9a1b9",
+  "environment": "Windows x64 Steam, isolated owned profile and copied test world",
+  "game_confirmed": {
+    "update_before_after": true,
+    "shared_lua_native_create_observation": true,
+    "published_order_with_lua_before_native": true,
+    "create_action_confirmed_and_object_read_back": true,
+    "framework_time_request_4_limited_to_2": true,
+    "original_time_controls_restored": true,
+    "rejected_lua_replacement_preserves_instance_and_generation": true,
+    "valid_lua_replacement_publishes_new_generation": true,
+    "callback_failure_disables_only_owner": true,
+    "world_leave_advances_epoch_and_revokes_time_authority": true,
+    "public_examples_render_in_english": true
+  },
+  "controlled_checks": {
+    "ctest_targets": 14,
+    "ctest_passed": 14,
+    "core_patch_checks": 93,
+    "lua_exports": 36,
+    "complete_lua_examples": 14,
+    "native_session_roles": "Standalone, Host, Client, Unknown, stale epoch, provider errors and inactive/retained bridge are covered by controlled native fixtures.",
+    "ownership": "Original-once, nesting, retirement, worker rejection and zero-subscriber Runtime lifetime are covered by controlled native fixtures."
+  },
+  "scope": "api.time.set mediates Framework requests. It is not a native Clock detour. This record does not establish two-account multiplayer compatibility or native memory isolation."
+}

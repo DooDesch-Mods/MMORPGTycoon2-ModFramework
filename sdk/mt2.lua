@@ -91,6 +91,69 @@
 ---@field source 'native'
 ---@field object MT2Object
 
+---@class MT2PatchSpec
+---@field id string
+---@field target 'game.update'|'objects.create'|'api.time.set'
+---@field mode? 'observe'|'modify'
+---@field priority? integer
+---@field before? string[]
+---@field after? string[]
+
+---@class MT2PatchCall
+---@field target string
+---@field phase 'before'|'after'
+---@field invocation string
+---@field generation string
+---@field epoch string
+---@field dt? number
+---@field thread? string
+---@field flag? boolean
+---@field paused? boolean
+---@field speed? number
+---@field original_returned? boolean
+---@field result_available? boolean
+---@field outcome? 'confirmed'|'rejected'|'unknown'
+---@field result? MT2Clock
+
+---@class MT2PatchEdit
+---@field paused? boolean
+---@field speed? number
+
+---@class MT2PatchCallbacks
+---@field before? fun(call:MT2PatchCall):MT2PatchEdit|nil
+---@field after? fun(call:MT2PatchCall)
+
+---@class MT2PatchTarget
+---@field id string
+---@field origin 'native'|'framework_request'
+---@field phases string[]
+---@field modes string[]
+---@field write_slot? string
+---@field authority? string
+---@field lua_thread? string
+
+---@class MT2PatchRecord
+---@field id string
+---@field owner string
+---@field key string
+---@field target string
+---@field mode string
+---@field priority integer
+---@field order integer
+---@field unresolved string[]
+---@field last_error string
+---@field suppressed_errors integer
+
+---@class MT2PatchAuthority
+---@field allowed boolean
+---@field reason string
+
+---@class MT2PatchStatus
+---@field generation string
+---@field targets MT2PatchTarget[]
+---@field patches MT2PatchRecord[]
+---@field authority table<string, MT2PatchAuthority>
+
 ---@class MT2Actions
 ---@field place fun(definition:string, x:number, y:number, z:number):MT2Action Queue a checked native building placement.
 ---@field move fun(handle:MT2Handle, x:number, y:number, z:number):MT2Action Queue a checked native move.
@@ -129,6 +192,12 @@
 ---@field persist fun(handle:MT2Handle):string Create a mod-owned persistent building reference.
 ---@field resolve fun(id:string):MT2Object Resolve a saved reference to a fresh session handle.
 
+---@class MT2Patches
+---@field add fun(spec:MT2PatchSpec, callbacks:MT2PatchCallbacks):string Register an owned experimental Before/After patch on a named target.
+---@field remove fun(id:string):boolean Remove an owned patch and return whether its owner has no in-flight callbacks.
+---@field targets fun():MT2PatchTarget[] Discover supported experimental patch targets, phases and modes.
+---@field status fun():MT2PatchStatus Read published patch order, diagnostics and current time-write authority.
+
 ---@class MT2Storage
 ---@field get fun(key:string, default?:any, scope?:'profile'|'world'):any Read mod-owned profile or world data.
 ---@field set fun(key:string, value:any, scope?:'profile'|'world'):boolean Store mod-owned profile or world data.
@@ -156,6 +225,7 @@
 ---@field input MT2Input
 ---@field log MT2Log
 ---@field objects MT2Objects
+---@field patches MT2Patches
 ---@field storage MT2Storage
 ---@field time MT2Time
 ---@field ui MT2UI

@@ -6,7 +6,7 @@ title: "API reference"
 
 # API reference
 
-Public Lua API **1.0.0**, native ABI **1**, framework **0.1.6**.
+Public Lua API **1.0.0**, native ABI **1**, framework **0.2.0**.
 
 [Events](events.md) | [Types](types.md) | [Capabilities](capabilities.md) | [Native ABI](native.md) | [Manifests](manifests.md)
 
@@ -55,6 +55,13 @@ Public Lua API **1.0.0**, native ABI **1**, framework **0.1.6**.
 - [`mt2.objects.selected`](functions/objects-selected.md): Read the first supported selected object, or nil.
 - [`mt2.objects.persist`](functions/objects-persist.md): Create a mod-owned persistent building reference.
 - [`mt2.objects.resolve`](functions/objects-resolve.md): Resolve a saved reference to a fresh session handle.
+
+## patches
+
+- [`mt2.patches.add`](functions/patches-add.md): Register an owned experimental Before/After patch on a named target.
+- [`mt2.patches.remove`](functions/patches-remove.md): Remove an owned patch and return whether its owner has no in-flight callbacks.
+- [`mt2.patches.targets`](functions/patches-targets.md): Discover supported experimental patch targets, phases and modes.
+- [`mt2.patches.status`](functions/patches-status.md): Read published patch order, diagnostics and current time-write authority.
 
 ## storage
 

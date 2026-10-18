@@ -139,4 +139,91 @@ Handles carry a world epoch and an exact string UID. Never convert the UID to a 
 | `source` | `'native'` |
 | `object` | `MT2Object` |
 
+## MT2PatchSpec
+
+| Field | Type |
+| --- | --- |
+| `id` | `string` |
+| `target` | `'game.update'\|'objects.create'\|'api.time.set'` |
+| `mode?` | `'observe'\|'modify'` |
+| `priority?` | `integer` |
+| `before?` | `string[]` |
+| `after?` | `string[]` |
+
+## MT2PatchCall
+
+| Field | Type |
+| --- | --- |
+| `target` | `string` |
+| `phase` | `'before'\|'after'` |
+| `invocation` | `string` |
+| `generation` | `string` |
+| `epoch` | `string` |
+| `dt?` | `number` |
+| `thread?` | `string` |
+| `flag?` | `boolean` |
+| `paused?` | `boolean` |
+| `speed?` | `number` |
+| `original_returned?` | `boolean` |
+| `result_available?` | `boolean` |
+| `outcome?` | `'confirmed'\|'rejected'\|'unknown'` |
+| `result?` | `MT2Clock` |
+
+## MT2PatchEdit
+
+| Field | Type |
+| --- | --- |
+| `paused?` | `boolean` |
+| `speed?` | `number` |
+
+## MT2PatchCallbacks
+
+| Field | Type |
+| --- | --- |
+| `before?` | `fun(call:MT2PatchCall):MT2PatchEdit\|nil` |
+| `after?` | `fun(call:MT2PatchCall)` |
+
+## MT2PatchTarget
+
+| Field | Type |
+| --- | --- |
+| `id` | `string` |
+| `origin` | `'native'\|'framework_request'` |
+| `phases` | `string[]` |
+| `modes` | `string[]` |
+| `write_slot?` | `string` |
+| `authority?` | `string` |
+| `lua_thread?` | `string` |
+
+## MT2PatchRecord
+
+| Field | Type |
+| --- | --- |
+| `id` | `string` |
+| `owner` | `string` |
+| `key` | `string` |
+| `target` | `string` |
+| `mode` | `string` |
+| `priority` | `integer` |
+| `order` | `integer` |
+| `unresolved` | `string[]` |
+| `last_error` | `string` |
+| `suppressed_errors` | `integer` |
+
+## MT2PatchAuthority
+
+| Field | Type |
+| --- | --- |
+| `allowed` | `boolean` |
+| `reason` | `string` |
+
+## MT2PatchStatus
+
+| Field | Type |
+| --- | --- |
+| `generation` | `string` |
+| `targets` | `MT2PatchTarget[]` |
+| `patches` | `MT2PatchRecord[]` |
+| `authority` | `table<string, MT2PatchAuthority>` |
+
 

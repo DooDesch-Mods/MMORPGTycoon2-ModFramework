@@ -11,7 +11,12 @@ Baseline: API 1.0.0. Generated comparison covers names, parameter types/default 
 ```json
 {
   "api_version": "1.0.0",
-  "added": [],
+  "added": [
+    "mt2.patches.add",
+    "mt2.patches.remove",
+    "mt2.patches.status",
+    "mt2.patches.targets"
+  ],
   "removed": [],
   "changed_signatures": []
 }
