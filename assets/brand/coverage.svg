@@ -1,4 +1,4 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 560" role="img" aria-labelledby="title description">
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="560" viewBox="0 0 1200 560" role="img" aria-labelledby="title description">
 <title id="title">Framework feature coverage</title>
 <desc id="description">available: 7 of 10; partial: 1 of 10; experimental: 1 of 10; planned: 1 of 10. Each tile is one tracked feature area. Percentages describe the listed areas, not overall project completion or stability.</desc>
 <path fill="#0b1723" d="M0 0h1200v560H0z"/>

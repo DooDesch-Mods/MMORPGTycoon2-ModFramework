@@ -28,7 +28,7 @@ def graphic(data, mobile=False):
     title = f"{data['product']} roadmap"
     description = '. '.join(f"{stage['label']}: {stage['title']}. " + '; '.join(stage['items'])
                             for stage in data['stages'])
-    parts = [f'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 {width} {height}" '
+    parts = [f'<svg xmlns="http://www.w3.org/2000/svg" width="{width}" height="{height}" viewBox="0 0 {width} {height}" '
              'role="img" aria-labelledby="title description">',
              f'<title id="title">{html.escape(title)}</title>',
              f'<desc id="description">{html.escape(description)}</desc>',
@@ -96,7 +96,7 @@ def coverage_graphic(data, mobile=False):
     statuses = [status for status in STATES if counts[status]]
     width, height = (600, 1040 + 38 * (len(statuses) - 3)) if mobile else (1200, 560)
     description = '; '.join(f'{status}: {counts[status]} of {total}' for status in statuses)
-    out = [f'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 {width} {height}" '
+    out = [f'<svg xmlns="http://www.w3.org/2000/svg" width="{width}" height="{height}" viewBox="0 0 {width} {height}" '
            'role="img" aria-labelledby="title description">',
            f'<title id="title">{html.escape(data["coverage_title"])}</title>',
            f'<desc id="description">{html.escape(description)}. Each tile is one tracked feature area. '
