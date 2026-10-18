@@ -12,22 +12,6 @@ import urllib.request
 
 from nexus_release import API, REPOSITORY, gh, targets
 
-ANNOUNCEMENTS = Path(__file__).resolve().parents[1] / 'integrations/nexus/announcements'
-
-
-def player_announcement(plan):
-    product, version = plan['product'], plan['version']
-    if product not in targets() or not re.fullmatch(r'[0-9A-Za-z.+-]+', version):
-        raise ValueError('Invalid player announcement identity')
-    path = ANNOUNCEMENTS / product / (version + '.md')
-    if not path.is_file():
-        raise ValueError(f'{product} {version}: missing player announcement; do not reuse the technical changelog')
-    text = path.read_text(encoding='utf-8').strip()
-    if not text or len(text) > 1400:
-        raise ValueError(f'{product} {version}: player announcement must contain 1-1400 characters')
-    return re.sub(r'^#{1,6}\s+(.+)$', r'**\1**', text, flags=re.M)
-
-
 def announcement_title(plan):
     name = targets()[plan['product']]['name']
     beta = re.fullmatch(r'0\.1\.0-beta\.(\d+)', plan['version'])
@@ -87,7 +71,9 @@ def sync_changelog(plan, directory, request=request_json):
 
 def discord_payload(plan):
     target = targets()[plan['product']]
-    notes = player_announcement(plan)
+    notes = re.sub(r'^#{1,6}\s+(.+)$', r'**\1**', plan['notes'], flags=re.M)
+    if len(notes) > 1400:
+        notes = notes[:1396].rsplit(' ', 1)[0] + '\n...'
     return {'allowed_mentions': {'parse': []}, 'embeds': [{
         'title': announcement_title(plan), 'url': plan['release_url'],
         'description': notes, 'color': 8256434,
@@ -195,17 +181,12 @@ def main():
     parser.add_argument('--announce', action='store_true')
     parser.add_argument('--message-id', help='Read and reconcile this existing Discord message; never send a replacement')
     parser.add_argument('--update-announcement', action='store_true', help='Update the identified existing release post and read it back')
-    parser.add_argument('--validate-announcement', action='store_true', help='Validate player copy without external writes')
     args = parser.parse_args()
     if args.update_announcement and not (args.announce and args.message_id):
         raise ValueError('Updating a Discord post requires --announce and its existing --message-id')
     plan = json.loads((args.directory / 'plan.json').read_text(encoding='utf-8'))
     if plan['status'] not in ('ready', 'already-present'):
         raise ValueError('Release has no deployable product')
-    if args.validate_announcement:
-        discord_payload(plan)
-        print(f"Player announcement {plan['product']} {plan['version']}: ready")
-        return
     sync_changelog(plan, args.directory)
     if args.announce:
         if args.message_id and not re.fullmatch(r'\d+', args.message_id):

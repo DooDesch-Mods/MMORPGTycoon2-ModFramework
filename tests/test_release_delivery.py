@@ -26,13 +26,6 @@ class ReleaseDeliveryTests(unittest.TestCase):
         self.folder = tempfile.TemporaryDirectory(dir=test_root)
         self.addCleanup(self.folder.cleanup)
         self.directory = Path(self.folder.name)
-        self.announcements = self.directory / 'announcements'
-        self.copy_path = self.announcements / 'framework/0.1.2.md'
-        self.copy_path.parent.mkdir(parents=True)
-        self.copy_path.write_text('### Fixed\n\n- Open Mods and get back to playing.', encoding='utf-8')
-        patched = patch.object(delivery, 'ANNOUNCEMENTS', self.announcements)
-        patched.start()
-        self.addCleanup(patched.stop)
 
     def test_product_sections_are_exact_and_missing_or_duplicates_fail(self):
         text = '## 0.1.2\n\n- Framework\n## Vortex extension 0.1.2\n\n- Extension\n'
@@ -84,19 +77,19 @@ class ReleaseDeliveryTests(unittest.TestCase):
         self.assertIn('/mmorpgtycoon2/mods/25', payload['embeds'][0]['fields'][0]['value'])
         self.assertIn('thumbnail', payload['embeds'][0])
         self.assertNotIn('image', payload['embeds'][0])
-        self.assertTrue(delivery.discord_payload(self.plan)['embeds'][0]['description'].startswith('**Fixed**'))
+        self.plan['notes'] = '### Added\n\n- Edit monsters with a friend.\n\n### Fixed\n\n- Switch tools after editing.'
+        self.assertEqual(delivery.discord_payload(self.plan)['embeds'][0]['description'],
+            '**Added**\n\n- Edit monsters with a friend.\n\n**Fixed**\n\n- Switch tools after editing.')
         self.plan['notes'] = 'x ' * 3000
-        self.assertIn('get back to playing', delivery.discord_payload(self.plan)['embeds'][0]['description'])
+        self.assertLessEqual(len(delivery.discord_payload(self.plan)['embeds'][0]['description']), 1400)
         for invalid in ('http://discord.com/api/webhooks/1/token', 'https://evil.example/api/webhooks/1/token'):
             with self.assertRaises(ValueError): delivery.webhook_url(invalid)
 
-    def test_player_copy_is_required_and_is_never_silently_truncated(self):
-        self.copy_path.write_text('x' * 1401, encoding='utf-8')
-        with self.assertRaisesRegex(ValueError, '1-1400'):
-            delivery.discord_payload(self.plan)
-        self.copy_path.unlink()
-        with self.assertRaisesRegex(ValueError, 'missing player announcement'):
-            delivery.discord_payload(self.plan)
+    def test_discord_uses_the_same_changelog_without_a_separate_copy_file(self):
+        for version in ('0.1.2', '0.9.0'):
+            self.plan.update(version=version, notes='### Changed\n\n- Build together.')
+            self.assertEqual(delivery.discord_payload(self.plan)['embeds'][0]['description'],
+                '**Changed**\n\n- Build together.')
 
     def test_multiplayer_title_uses_readable_beta_number(self):
         self.plan.update(product='multiplayer', version='0.1.0-beta.15')
@@ -181,9 +174,6 @@ class ReleaseDeliveryTests(unittest.TestCase):
     def test_update_accepts_exact_legacy_title_but_rejects_other_release_url(self):
         self.plan.update(product='multiplayer', version='0.1.0-beta.15', tag='v0.1.0-beta.15',
             release_url='https://github.com/DooDesch/MMORPGTycoon2-Multiplayer/releases/tag/v0.1.0-beta.15')
-        path = self.announcements / 'multiplayer/0.1.0-beta.15.md'
-        path.parent.mkdir()
-        path.write_text('Build your monster encounters together.', encoding='utf-8')
         previous = {**{key: self.plan[key] for key in ('product', 'version', 'tag', 'sha256')}, 'status': 'confirmed', 'message_id': '123'}
         message = {'id': '123', 'channel_id': '456', 'embeds': [{
             'title': 'MMORPG Tycoon 2 Multiplayer - Early Beta 0.1.0-beta.15', 'url': self.plan['release_url']}]}

@@ -81,9 +81,6 @@ jobs:
           optional=()
           if [[ "$TARGET" == all ]]; then optional+=(--optional); fi
           python tools/nexus_release.py prepare --product "${{ matrix.product }}" --tag "$RELEASE_TAG" --directory "artifacts/nexus/${{ matrix.product }}" "${optional[@]}"
-      - name: Validate player announcement before publishing
-        if: (steps.prepare.outputs.status == 'ready' || steps.prepare.outputs.status == 'already-present') && (github.event_name == 'release' || inputs.announce)
-        run: python tools/release_delivery.py --directory "artifacts/nexus/${{ matrix.product }}" --validate-announcement
       - name: Upload file version
         id: upload
         if: steps.prepare.outputs.status == 'ready' && (github.event_name == 'release' || inputs.publish)
