@@ -884,6 +884,18 @@
       ]
     },
     {
+      "name": "mp.monster-release-capture.5bf3c0",
+      "rva": 6026176,
+      "shared": false,
+      "groups": [
+        {
+          "feature": "Monster Release capture",
+          "phase": "typed_action_runtime::start, bound Mainthread, once per process",
+          "site": "src/game/monster_action_runtime.inc:208"
+        }
+      ]
+    },
+    {
       "name": "mp.move-purchase-capture.5c25b0",
       "rva": 6038960,
       "shared": false,

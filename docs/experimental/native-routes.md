@@ -8,7 +8,7 @@ Framework 0.1.5 provides experimental shared routes through `MT2FW_MT2_QueryRout
 
 ## Named catalog and phased hooks
 
-`adapters/mt2/multiplayer-catalog.json` maps 130 unique EXE targets to stable private names, source groups and installation phases from the sealed Multiplayer inventory. Eleven existing EXE hooks remain Framework-owned. Catalog admission does not install or enable any Multiplayer hook. Existing initial, world-ready and lazy owner guards still apply. Dormant pattern scanners, debug-register probes and exception traps are excluded.
+`adapters/mt2/multiplayer-catalog.json` maps 131 unique EXE targets to stable private names, source groups and installation phases. It retains the sealed Multiplayer inventory and adds the verified Monster Release capture route. Eleven existing EXE hooks remain Framework-owned. Catalog admission does not install or enable any Multiplayer hook. Existing initial, world-ready and lazy owner guards still apply. Dormant pattern scanners, debug-register probes and exception traps are excluded.
 
 1. Query the route service in an active Framework callback.
 2. Call `hook_prepare` with a catalog name and your detour. Require `OK`, `PREPARED`, the expected owner/entry and a nonzero actual trampoline.

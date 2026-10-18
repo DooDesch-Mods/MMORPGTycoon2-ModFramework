@@ -4,7 +4,7 @@ title: Build a mod with an agent
 
 # Build a mod with an agent
 
-Use the same public contract and complete examples as a human modder. The current Lua API is **1.0.0**; the framework is **0.2.0** and native C ABI is **1**. The [compatibility page](../compatibility.md) identifies the supported game build.
+Use the same public contract and complete examples as a human modder. The current Lua API is **1.0.0**; the framework is **0.2.1** and native C ABI is **1**. The [compatibility page](../compatibility.md) identifies the supported game build.
 
 ## Context to give your agent
 

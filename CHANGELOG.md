@@ -1,5 +1,15 @@
 # Changelog
 
+## 0.2.1
+
+### Added
+
+- Add the named Monster placement route used by the next Multiplayer Early Beta. The Framework keeps hook ownership and exact game-version checks in one place.
+
+### Compatibility
+
+- Lua API 1.0.0 and native ABI 1 remain unchanged. Existing Lua mods and native plugin interfaces keep their contracts.
+
 ## 0.2.0
 
 ### Added
