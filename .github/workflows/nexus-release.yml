@@ -11,7 +11,7 @@ on:
       target:
         description: Nexus destination
         type: choice
-        options: [all, framework, vortex]
+        options: [all, framework, vortex, multiplayer]
         default: all
       publish:
         description: Upload or complete Nexus changelog metadata after validation

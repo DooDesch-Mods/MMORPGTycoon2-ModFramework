@@ -2,12 +2,13 @@
 
 > 🛟 **Need help or found a bug?** Get support at [support.doodesch.de/modframework](https://support.doodesch.de/modframework).
 
-The **Publish Nexus files** workflow uploads versions of the two existing Nexus files using the official [Nexus upload action](https://github.com/Nexus-Mods/upload-action). It runs when a GitHub release is published, including a prerelease, and supports a manual validation run.
+The **Publish Nexus files** workflow updates the existing Nexus files using the official [Nexus upload action](https://github.com/Nexus-Mods/upload-action). Framework and Vortex releases run when their GitHub release is published, including a prerelease. Multiplayer uses an explicit manual target. Every target supports validation before upload.
 
 | Product | Nexus page | Unique Mod ID for the API | Persistent File ID |
 | --- | --- | --- | --- |
 | Framework | [MMORPG Tycoon 2 / 25](https://www.nexusmods.com/mmorpgtycoon2/mods/25) | `19121194401817` | `8170305` |
 | Vortex extension | [Modding Tools / 2465](https://www.nexusmods.com/site/mods/2465) | `9856949946785` | `8170257` |
+| Multiplayer | [MMORPG Tycoon 2 / 28](https://www.nexusmods.com/mmorpgtycoon2/mods/28) | `19121194401820` | `8177136` |
 
 `targets.json` records these destinations. The API uses the Unique Mod ID, not the page ID. File IDs identify the existing update chains and stay fixed when a new version is uploaded. Short Unique File IDs from the website are not action inputs.
 
@@ -19,6 +20,10 @@ The organization secrets `NEXUSMODS_API_KEY` and `DISCORD_RELEASE_WEBHOOK` are a
 - `NEXUS_FRAMEWORK_FILE_ID=8170305`
 - `NEXUS_VORTEX_MOD_ID=9856949946785`
 - `NEXUS_VORTEX_FILE_ID=8170257`
+- `NEXUS_MULTIPLAYER_MOD_ID=19121194401820`
+- `NEXUS_MULTIPLAYER_FILE_ID=8177136`
+
+Multiplayer is an explicit manual target. Select `multiplayer` and its published beta tag to validate the public Multiplayer repository's native plugin ZIP and per-ZIP checksum. Its matching changelog comes from that exact source tag. It is excluded from `all`, so Framework releases cannot publish a Multiplayer version accidentally. Discord intent and acknowledgement assets stay on the configured Framework cohort release (`v0.2.0`); the announcement links to the Multiplayer release. This reuses the existing publisher's organization credentials without transferring credentials or repository ownership.
 
 The workflow rejects variables that differ from the tracked destinations. Keys are only passed to API/action steps, never stored in source or receipts.
 

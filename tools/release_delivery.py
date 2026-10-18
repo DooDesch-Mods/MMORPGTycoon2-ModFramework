@@ -70,9 +70,9 @@ def discord_payload(plan):
     return {'allowed_mentions': {'parse': []}, 'embeds': [{
         'title': f"{target['name']} {plan['version']}", 'url': plan['release_url'],
         'description': notes, 'color': 8256434,
-        'thumbnail': {'url': f'https://raw.githubusercontent.com/{REPOSITORY}/main/assets/brand/icon.png'},
+        'thumbnail': {'url': target.get('icon_url', f'https://raw.githubusercontent.com/{REPOSITORY}/main/assets/brand/icon.png')},
         'fields': [{'name': 'Get it', 'value': f"[Nexus]({plan['nexus_url']}) - [GitHub]({plan['release_url']})"}],
-        'footer': {'text': 'MMORPG Tycoon 2 - MMORPGTycoon2-ModFramework'}
+        'footer': {'text': target.get('footer', 'MMORPG Tycoon 2 - MMORPGTycoon2-ModFramework')}
     }]}
 
 
@@ -97,12 +97,12 @@ def canonical_embeds(embeds):
 
 
 def remote_receipt(plan, filename, directory):
-    release = json.loads(gh('release', 'view', plan['tag'], '--json', 'assets'))
+    release = json.loads(gh('release', 'view', plan.get('receipt_tag', plan['tag']), '--json', 'assets'))
     if not any(row['name'] == filename for row in release['assets']):
         return None
     receipt_dir = directory / 'previous'
     receipt_dir.mkdir(parents=True, exist_ok=True)
-    gh('release', 'download', plan['tag'], '--dir', str(receipt_dir), '--pattern', filename)
+    gh('release', 'download', plan.get('receipt_tag', plan['tag']), '--dir', str(receipt_dir), '--pattern', filename)
     return json.loads((receipt_dir / filename).read_text(encoding='utf-8'))
 
 
@@ -133,7 +133,7 @@ def announce(plan, directory, request=request_json, message_id=None, update=Fals
             (directory / 'discord-before.json').write_text(json.dumps(message, indent=2) + '\n', encoding='utf-8')
             previous.update(status='updating', message_id=message_id)
             path.write_text(json.dumps(previous, indent=2) + '\n', encoding='utf-8')
-            gh('release', 'upload', plan['tag'], str(path), '--clobber')
+            gh('release', 'upload', plan.get('receipt_tag', plan['tag']), str(path), '--clobber')
             message = request(webhook + '/messages/' + message_id, 'PATCH', discord_payload(plan), service='Discord')
             (directory / 'discord-message.json').write_text(json.dumps(message, indent=2) + '\n', encoding='utf-8')
             message = request(webhook + '/messages/' + message_id, service='Discord')
@@ -142,7 +142,7 @@ def announce(plan, directory, request=request_json, message_id=None, update=Fals
         if previous.get('status') != 'confirmed' or previous.get('embeds') != expected:
             previous.update(status='confirmed', message_id=message_id, channel_id=message['channel_id'], embeds=expected)
             path.write_text(json.dumps(previous, indent=2) + '\n', encoding='utf-8')
-            gh('release', 'upload', plan['tag'], str(path), '--clobber')
+            gh('release', 'upload', plan.get('receipt_tag', plan['tag']), str(path), '--clobber')
         print(f"Discord {plan['product']} {plan['version']}: already confirmed ({message['id']})")
         return
     if message_id:
@@ -150,19 +150,19 @@ def announce(plan, directory, request=request_json, message_id=None, update=Fals
     receipt = {**identity, 'status': 'pending', 'run_id': os.environ.get('GITHUB_RUN_ID')}
     path.write_text(json.dumps(receipt, indent=2) + '\n', encoding='utf-8')
     # Persist intent before sending. An ambiguous POST blocks replay across workflow reruns.
-    gh('release', 'upload', plan['tag'], str(path))
+    gh('release', 'upload', plan.get('receipt_tag', plan['tag']), str(path))
     message = request(webhook + '?wait=true', 'POST', discord_payload(plan), service='Discord')
     (directory / 'discord-message.json').write_text(json.dumps(message, indent=2) + '\n', encoding='utf-8')
     if not message or not re.fullmatch(r'\d+', message.get('id', '')):
         raise RuntimeError('Discord did not acknowledge a message ID; send intent remains pending')
     receipt.update(status='acknowledged', message_id=message['id'], channel_id=message['channel_id'])
     path.write_text(json.dumps(receipt, indent=2) + '\n', encoding='utf-8')
-    gh('release', 'upload', plan['tag'], str(path), '--clobber')
+    gh('release', 'upload', plan.get('receipt_tag', plan['tag']), str(path), '--clobber')
     if canonical_embeds(message['embeds']) != expected:
         raise ValueError('Discord acknowledged a message with different release content; inspect send intent before retrying')
     receipt.update(status='confirmed', message_id=message['id'], channel_id=message['channel_id'], embeds=expected)
     path.write_text(json.dumps(receipt, indent=2) + '\n', encoding='utf-8')
-    gh('release', 'upload', plan['tag'], str(path), '--clobber')
+    gh('release', 'upload', plan.get('receipt_tag', plan['tag']), str(path), '--clobber')
     print(f"Discord {plan['product']} {plan['version']}: confirmed ({message['id']})")
 
 

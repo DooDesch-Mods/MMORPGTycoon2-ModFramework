@@ -11,6 +11,22 @@
     "asset_pattern": "MT2Framework-[0-9]*-windows-x64.zip",
     "description": "Player runtime for Lua mods, native plugins and custom scenery. Install this ZIP through the MMORPG Tycoon 2 Vortex Extension, or follow the included manual installation guide. Developer tools and the SDK are available separately on GitHub. Requires Windows x64 and a supported Steam game build."
   },
+  "multiplayer": {
+    "name": "MMORPG Tycoon 2 Multiplayer - Early Beta",
+    "domain": "mmorpgtycoon2",
+    "game_id": 4452,
+    "page_id": 28,
+    "mod_uid": "19121194401820",
+    "file_id": "8177136",
+    "file_variable": "NEXUS_MULTIPLAYER_FILE_ID",
+    "mod_variable": "NEXUS_MULTIPLAYER_MOD_ID",
+    "asset_pattern": "MMORPGTycoon2-Multiplayer-v*-windows-x64.zip",
+    "source_repository": "DooDesch/MMORPGTycoon2-Multiplayer",
+    "receipt_tag": "v0.2.0",
+    "manual_only": true,
+    "icon_url": "https://raw.githubusercontent.com/DooDesch/MMORPGTycoon2-Multiplayer/main/assets/ui/desktop_multiplayer/multiplayer.png",
+    "footer": "MMORPG Tycoon 2 - MMORPGTycoon2-Multiplayer"
+  },
   "vortex": {
     "name": "MMORPG Tycoon 2 Vortex Extension",
     "domain": "site",

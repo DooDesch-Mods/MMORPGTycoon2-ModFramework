@@ -59,10 +59,31 @@ def archive_version(path, product):
                 if hashlib.sha256(archive.read(name)).hexdigest() != expected:
                     raise ValueError('Framework file checksum differs: ' + name)
             verify_runtime(path)
-        else:
+        elif product == 'multiplayer':
+            metadata = json.loads(archive.read('package.json'))
+            mod = json.loads(archive.read('mod.json'))
+            required = {'MT2MultiplayerPlugin.dll', 'mod.json', 'assets/multiplayer.png', 'README.md',
+                        'LICENSE.md', 'THIRD_PARTY_NOTICES.md', 'licenses/MinHook.txt',
+                        'licenses/DearImGui.txt', 'licenses/nlohmann-json.txt', 'licenses/SDL3.txt'}
+            if set(names) != required | {'package.json'} or set(metadata.get('files', {})) != required:
+                raise ValueError('Multiplayer inventory differs')
+            if (mod.get('id') != 'doodesch.multiplayer' or mod.get('type') != 'native'
+                    or mod.get('entry') != 'MT2MultiplayerPlugin.dll' or mod.get('api_version') != '1.0.0'
+                    or mod.get('version') != metadata.get('version') or metadata.get('package_mode') != 'vortex'
+                    or metadata.get('release_tag') != 'v' + str(metadata.get('version'))
+                    or not re.fullmatch(r'[0-9a-f]{40}', str(metadata.get('source_commit', '')))):
+                raise ValueError('Multiplayer release identity differs')
+            for name in required:
+                data = archive.read(name)
+                record = metadata['files'][name]
+                if not data or record.get('size') != len(data) or record.get('sha256') != hashlib.sha256(data).hexdigest():
+                    raise ValueError('Multiplayer file checksum differs: ' + name)
+        elif product == 'vortex':
             metadata = json.loads(archive.read('info.json'))
             if metadata['gameId'] != 4452 or metadata['id'] != 'game-mmorpgtycoon2':
                 raise ValueError('Wrong Vortex game extension')
+        else:
+            raise ValueError('Unknown release product: ' + product)
         version_key(metadata['version'])
         return metadata['version']
 
@@ -81,7 +102,13 @@ def checksum_for(text, filename):
 
 
 def gh(*args):
-    result = subprocess.run(['gh', *args, '--repo', REPOSITORY], capture_output=True, text=True, timeout=600)
+    return gh_repository(REPOSITORY, *args)
+
+
+def gh_repository(repository, *args):
+    if repository not in (REPOSITORY, 'DooDesch/MMORPGTycoon2-Multiplayer'):
+        raise ValueError('Release source repository is not allowlisted')
+    result = subprocess.run(['gh', *args, '--repo', repository], capture_output=True, text=True, timeout=600)
     if result.returncode:
         cause = result.stderr.strip()
         for name in ('GH_TOKEN', 'GITHUB_TOKEN', 'NEXUSMODS_API_KEY', 'DISCORD_RELEASE_WEBHOOK'):
@@ -93,31 +120,50 @@ def gh(*args):
 def fetch_release(tag, product, directory, optional=False):
     if not re.fullmatch(r'[A-Za-z0-9][A-Za-z0-9._-]{0,127}', tag):
         raise ValueError('Invalid release tag')
-    metadata = json.loads(gh('release', 'view', tag, '--json', 'tagName,isDraft,assets,url'))
+    selected = targets()[product]
+    repository = selected.get('source_repository', REPOSITORY)
+    call = gh if repository == REPOSITORY else lambda *args: gh_repository(repository, *args)
+    metadata = json.loads(call('release', 'view', tag, '--json', 'tagName,isDraft,assets,url,targetCommitish'))
     if metadata['isDraft'] or metadata['tagName'] != tag:
         raise ValueError('Expected a published GitHub release')
-    selected = targets()[product]
     matches = [row for row in metadata['assets'] if fnmatch.fnmatchcase(row['name'], selected['asset_pattern'])]
     if not matches and optional:
         return None
     if len(matches) != 1:
         raise ValueError(f'{product}: expected one release archive, found {len(matches)}')
     asset = matches[0]
-    if not any(row['name'] == 'SHA256SUMS.txt' for row in metadata['assets']):
-        raise ValueError('Release is missing SHA256SUMS.txt')
+    checksum_name = asset['name'] + '.sha256' if product == 'multiplayer' else 'SHA256SUMS.txt'
+    if not any(row['name'] == checksum_name for row in metadata['assets']):
+        raise ValueError('Release is missing ' + checksum_name)
     directory.mkdir(parents=True, exist_ok=True)
-    gh('release', 'download', tag, '--dir', str(directory), '--pattern', asset['name'], '--pattern', 'SHA256SUMS.txt')
+    call('release', 'download', tag, '--dir', str(directory), '--pattern', asset['name'], '--pattern', checksum_name)
     path = directory / asset['name']
-    expected = checksum_for((directory / 'SHA256SUMS.txt').read_text(encoding='utf-8'), path.name)
+    expected = checksum_for((directory / checksum_name).read_text(encoding='utf-8'), path.name)
     actual = hashlib.sha256(path.read_bytes()).hexdigest()
     if actual != expected or path.stat().st_size != asset['size']:
         raise ValueError('GitHub release asset integrity differs: ' + path.name)
     version = archive_version(path, product)
-    expected_name = f'MT2Framework-{version}-windows-x64.zip' if product == 'framework' else f'MMORPGTycoon2-Vortex-{version}.zip'
+    expected_name = (f'MMORPGTycoon2-Multiplayer-v{version}-windows-x64.zip' if product == 'multiplayer' else
+                     f'MT2Framework-{version}-windows-x64.zip' if product == 'framework' else f'MMORPGTycoon2-Vortex-{version}.zip')
     if path.name != expected_name:
         raise ValueError('Archive filename differs from embedded product version')
-    return {'product': product, 'tag': tag, 'release_url': metadata['url'], 'version': version,
+    plan = {'product': product, 'tag': tag, 'release_url': metadata['url'], 'version': version,
             'filename': str(path), 'sha256': actual, 'bytes': path.stat().st_size}
+    if product == 'multiplayer':
+        with zipfile.ZipFile(path) as archive:
+            manifest = json.loads(archive.read('package.json'))
+        if tag != 'v' + version or metadata.get('targetCommitish') != manifest['source_commit']:
+            raise ValueError('Multiplayer source commit differs from its published release')
+        notes_request = urllib.request.Request(f'https://raw.githubusercontent.com/{repository}/{tag}/CHANGELOG.md',
+                                               headers={'User-Agent': 'MT2-release-validation'})
+        with urllib.request.urlopen(notes_request, timeout=30) as response:
+            plan['notes_source'] = response.read().decode('utf-8')
+        plan['source_repository'] = repository
+        plan['receipt_tag'] = selected['receipt_tag']
+        receipt_release = json.loads(gh('release', 'view', plan['receipt_tag'], '--json', 'tagName,isDraft'))
+        if receipt_release['isDraft'] or receipt_release['tagName'] != plan['receipt_tag']:
+            raise ValueError('Receipt release is not published')
+    return plan
 
 
 def api_get(endpoint):
@@ -177,7 +223,8 @@ def prepare(args):
     else:
         plan.update({'status': check_destination(target, plan['version']), 'file_id': target['file_id'],
                      'mod_uid': target['mod_uid'], 'nexus_url': f"https://www.nexusmods.com/{target['domain']}/mods/{target['page_id']}"})
-        notes = section((ROOT / 'CHANGELOG.md').read_text(encoding='utf-8'), args.product, plan['version'])
+        notes_source = plan.pop('notes_source', None)
+        notes = section(notes_source if notes_source is not None else (ROOT / 'CHANGELOG.md').read_text(encoding='utf-8'), args.product, plan['version'])
         plan.update(notes=notes, notes_plain=plain(notes), notes_bbcode=bbcode(notes))
     directory.mkdir(parents=True, exist_ok=True)
     (directory / 'plan.json').write_text(json.dumps(plan, indent=2) + '\n', encoding='utf-8')
@@ -209,16 +256,16 @@ def verify(args):
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     commands = parser.add_subparsers(dest='command', required=True)
-    plan = commands.add_parser('matrix');plan.add_argument('--target', choices=['all', 'framework', 'vortex'], default='all')
+    plan = commands.add_parser('matrix');plan.add_argument('--target', choices=['all', 'framework', 'vortex', 'multiplayer'], default='all')
     command = commands.add_parser('prepare')
-    command.add_argument('--product', choices=['framework', 'vortex'], required=True)
+    command.add_argument('--product', choices=['framework', 'vortex', 'multiplayer'], required=True)
     command.add_argument('--tag', required=True);command.add_argument('--directory', required=True)
     command.add_argument('--optional', action='store_true')
     command = commands.add_parser('verify')
     command.add_argument('--directory', required=True);command.add_argument('--version-id', required=True)
     args = parser.parse_args()
     if args.command == 'matrix':
-        selected = [{'product': key, 'file_variable': value['file_variable'], 'mod_variable': value['mod_variable']} for key, value in targets().items() if args.target in ('all', key)]
+        selected = [{'product': key, 'file_variable': value['file_variable'], 'mod_variable': value['mod_variable']} for key, value in targets().items() if args.target == key or args.target == 'all' and not value.get('manual_only', False)]
         value = json.dumps({'include': selected}, separators=(',', ':'));outputs({'matrix': value});print(value)
     elif args.command == 'prepare':
         prepare(args)
