@@ -1,5 +1,6 @@
 """Render the public roadmap and feature overview from docs/roadmap.json."""
 import argparse
+from collections import Counter
 import html
 import json
 from pathlib import Path
@@ -13,6 +14,8 @@ START, END = '<!-- roadmap:start -->', '<!-- roadmap:end -->'
 COLORS = ('#64e4d5', '#ffca67', '#a8c1d5')
 STATES = {'available': '✅ Available', 'partial': '◐ Partial',
           'experimental': '◇ Experimental', 'planned': '○ Planned'}
+COVERAGE_COLORS = {'available': ('#64e4d5', '#15383d'), 'partial': ('#ffca67', '#3e321f'),
+                   'experimental': ('#8cb9ff', '#1b304a'), 'planned': ('#a8c1d5', '#21303e')}
 
 
 def text(x, y, value, size=22, fill='#b8cad8', weight=400):
@@ -62,6 +65,83 @@ def graphic(data, mobile=False):
     return '\n'.join(parts) + '\n'
 
 
+def tiles(rows, x, y, width, height):
+    """Split equal-weight feature areas without weighting broad systems as complete."""
+    if len(rows) == 1:
+        return [(rows[0], x, y, width, height)]
+    count = len(rows) // 2
+    ratio = count / len(rows)
+    if width >= height:
+        split = width * ratio
+        return tiles(rows[:count], x, y, split, height) + tiles(rows[count:], x + split, y, width - split, height)
+    split = height * ratio
+    return tiles(rows[:count], x, y, width, split) + tiles(rows[count:], x, y + split, width, height - split)
+
+
+def coverage_counts(data):
+    if not data['features']:
+        raise ValueError('Coverage requires a nonempty feature inventory')
+    names = [row['name'] for row in data['features']]
+    if len(set(names)) != len(names):
+        raise ValueError('Duplicate feature areas would inflate coverage counts')
+    counts = Counter(row['status'] for row in data['features'])
+    if counts.keys() - STATES.keys():
+        raise ValueError('Coverage contains an unknown feature status')
+    return counts
+
+
+def coverage_graphic(data, mobile=False):
+    counts = coverage_counts(data)
+    total = sum(counts.values())
+    statuses = [status for status in STATES if counts[status]]
+    width, height = (600, 1040 + 38 * (len(statuses) - 3)) if mobile else (1200, 560)
+    description = '; '.join(f'{status}: {counts[status]} of {total}' for status in statuses)
+    out = [f'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 {width} {height}" '
+           'role="img" aria-labelledby="title description">',
+           f'<title id="title">{html.escape(data["coverage_title"])}</title>',
+           f'<desc id="description">{html.escape(description)}. Each tile is one tracked feature area. '
+           'Percentages describe the listed areas, not overall project completion or stability.</desc>',
+           f'<path fill="#0b1723" d="M0 0h{width}v{height}H0z"/>',
+           text(28, 44, data['coverage_title'], 30, '#f2f7fb', 700),
+           text(28, 78, data['release_label'], 22)]
+    for index, status in enumerate(statuses):
+        color = COVERAGE_COLORS[status][0]
+        percent = 100 * counts[status] / total
+        label = status.capitalize()
+        if mobile:
+            out.append(text(28, 124 + index * 38, f'{percent:.1f}% {label} ({counts[status]}/{total})', 26, color, 700))
+        else:
+            x = 28 + index * (1144 / len(statuses))
+            out.extend([text(x, 126, f'{percent:.1f}%', 37, color, 700),
+                        text(x, 155, label, 23, color, 700),
+                        text(x, 184, f'{counts[status]} of {total} tracked areas', 20)])
+    gx, gy, gw, gh = (28, 240 + 38 * (len(statuses) - 3), 544, 680) if mobile else (28, 210, 1144, 264)
+    offset = 0
+    for status in statuses:
+        rows = [row for row in data['features'] if row['status'] == status]
+        size = (gh if mobile else gw) * len(rows) / total
+        area = (gx, gy + offset, gw, size) if mobile else (gx + offset, gy, size, gh)
+        color, fill = COVERAGE_COLORS[status]
+        for row, x, y, w, h in tiles(rows, *area):
+            x, y, w, h = x + 3, y + 3, w - 6, h - 6
+            out.append(f'<rect x="{x:.2f}" y="{y:.2f}" width="{w:.2f}" height="{h:.2f}" fill="{fill}" stroke="{color}" stroke-opacity=".65"/>')
+            out.append(f'<g><title>{html.escape(row["name"] + ": " + status)}</title>')
+            size_text = 25 if mobile else 20
+            label = row.get('short_name', row['name'])
+            lines = textwrap.wrap(label, width=max(8, int((w - 24) / (size_text * .56))), break_long_words=False)
+            if len(lines) * (size_text + 5) > h - 20:
+                raise ValueError('Coverage tile label does not fit: ' + label)
+            baseline = y + (h - len(lines) * (size_text + 5)) / 2 + size_text
+            for line in lines:
+                out.append(text(round(x + 12, 2), round(baseline, 2), line, size_text, '#f2f7fb', 600))
+                baseline += size_text + 5
+            out.append('</g>')
+        offset += size
+    out.extend([text(28, height - 44, 'Each tile is one tracked feature area.', 20),
+                text(28, height - 16, 'Partial scope is shown in the table below.', 20), '</svg>'])
+    return '\n'.join(out) + '\n'
+
+
 def feature_table(data, from_docs=False):
     lines = [f"| Feature | {data['version_label']} | What is covered |", '| --- | --- | --- |']
     for row in data['features']:
@@ -81,12 +161,21 @@ def feature_table(data, from_docs=False):
 
 def readme_block(data):
     assets = data['asset_directory']
+    raw = data['repository_url'].replace('https://github.com/', 'https://raw.githubusercontent.com/') + '/main/'
     alt = 'Roadmap: ' + '. '.join(f"{stage['label']} - {stage['title']}" for stage in data['stages'])
+    counts = coverage_counts(data)
+    total = sum(counts.values())
+    summary = ', '.join(f'{counts[status]} {status}' for status in STATES if counts[status])
     return '\n'.join([START, f"## {data['overview_heading']}", '', data['overview_intro'], '',
-        feature_table(data), '', '## Roadmap', '',
-        '<picture>', f'  <source media="(max-width: 600px)" srcset="{assets}/roadmap-mobile.svg">',
+        '<picture>', f'  <source media="(max-width: 600px)" srcset="{raw}{assets}/coverage-mobile.svg">',
+        f'  <img src="{assets}/coverage.svg" alt="Feature coverage: {summary}, across {total} tracked areas" width="1200">',
+        '</picture>', '',
+        'Percentages count the listed areas equally. They describe feature coverage, not overall project completion or stability.', '',
+        '<details>', '<summary>Feature details - what is included</summary>', '',
+        feature_table(data), '', '</details>', '', '## Roadmap', '',
+        '<picture>', f'  <source media="(max-width: 600px)" srcset="{raw}{assets}/roadmap-mobile.svg">',
         f'  <img src="{assets}/roadmap.svg" alt="{html.escape(alt, quote=True)}" width="1200">',
-        '</picture>', '', '[Read the roadmap in text](docs/ROADMAP.md). Priorities can change; no release dates are promised.', END])
+        '</picture>', '', '[Read the roadmap in text](docs/ROADMAP.md).', END])
 
 
 def roadmap_text(data):
@@ -98,6 +187,14 @@ def roadmap_text(data):
         lines.extend('- ' + item for item in stage['items'])
         lines.append('')
     lines.extend(['Priorities can change. No release dates are promised.', '', '## Feature coverage', '', feature_table(data, from_docs=True), ''])
+    counts = coverage_counts(data)
+    total = sum(counts.values())
+    lines.extend(['## How coverage is counted', '',
+                  'Each listed feature area counts once. The categories have equal weight. Partial and experimental areas do not count as fully available.', ''])
+    lines.extend(f'- {status.capitalize()}: {count}/{total} ({100 * count / total:.1f}%)'
+                 for status, count in counts.items())
+    lines.extend(['', 'This measures the listed feature areas, not overall project completion or stability. '
+                  'The denominator changes when the inventory changes.', ''])
     return '\n'.join(lines)
 
 
@@ -115,7 +212,9 @@ def main():
     outputs = {'README.md': readme[:start] + readme_block(data) + readme[end:],
                'docs/ROADMAP.md': roadmap_text(data),
                data['asset_directory'] + '/roadmap.svg': graphic(data),
-               data['asset_directory'] + '/roadmap-mobile.svg': graphic(data, mobile=True)}
+               data['asset_directory'] + '/roadmap-mobile.svg': graphic(data, mobile=True),
+               data['asset_directory'] + '/coverage.svg': coverage_graphic(data),
+               data['asset_directory'] + '/coverage-mobile.svg': coverage_graphic(data, mobile=True)}
     stale = []
     for name, expected in outputs.items():
         path = ROOT / name

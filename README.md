@@ -15,6 +15,16 @@ Build mods for **MMORPG Tycoon 2**. Start with Lua and a text editor, extend wit
 
 Included in [Framework 0.2.1](https://github.com/DooDesch-Mods/MMORPGTycoon2-ModFramework/releases/tag/v0.2.1). Experimental features can change between releases.
 
+<picture>
+  <source media="(max-width: 600px)" srcset="https://raw.githubusercontent.com/DooDesch-Mods/MMORPGTycoon2-ModFramework/main/assets/brand/coverage-mobile.svg">
+  <img src="assets/brand/coverage.svg" alt="Feature coverage: 7 available, 1 partial, 1 experimental, 1 planned, across 10 tracked areas" width="1200">
+</picture>
+
+Percentages count the listed areas equally. They describe feature coverage, not overall project completion or stability.
+
+<details>
+<summary>Feature details - what is included</summary>
+
 | Feature | 0.2.1 | What is covered |
 | --- | --- | --- |
 | Lua mods and reload | ✅ Available | Use a text editor; reload scripts without restarting. A rejected replacement keeps the previous mod running. [Start here](docs/quickstart.md). |
@@ -28,14 +38,16 @@ Included in [Framework 0.2.1](https://github.com/DooDesch-Mods/MMORPGTycoon2-Mod
 | Multiplayer mods | ◐ Partial | Runtime for Multiplayer Early Beta 15. Other mods need explicit multiplayer integration; installing the Framework alone does not synchronize them. |
 | Animated models and C# | ○ Planned | Future extensions. The current release uses static scenery, Lua and native C++. |
 
+</details>
+
 ## Roadmap
 
 <picture>
-  <source media="(max-width: 600px)" srcset="assets/brand/roadmap-mobile.svg">
+  <source media="(max-width: 600px)" srcset="https://raw.githubusercontent.com/DooDesch-Mods/MMORPGTycoon2-ModFramework/main/assets/brand/roadmap-mobile.svg">
   <img src="assets/brand/roadmap.svg" alt="Roadmap: Available now - Start creating. Next priorities - Reach more of MT2. Longer term - More ways to create" width="1200">
 </picture>
 
-[Read the roadmap in text](docs/ROADMAP.md). Priorities can change; no release dates are promised.
+[Read the roadmap in text](docs/ROADMAP.md).
 <!-- roadmap:end -->
 
 This is a **development preview** for Windows x64 and the verified Steam game build. Multiplayer support must be implemented by each mod. See [compatibility and acceptance](docs/compatibility.md). Players need only the **Runtime** from [Nexus](https://www.nexusmods.com/mmorpgtycoon2/mods/25) or [GitHub Releases](https://github.com/DooDesch-Mods/MMORPGTycoon2-ModFramework/releases). Modders download the separate **MT2Framework-SDK** from GitHub. The SDK includes the runtime, portable helper, full CLI, GLB importer, templates, editor types and offline documentation. Install the separate [Vortex extension](https://www.nexusmods.com/site/mods/2465) to manage runtime and mod ZIPs. [GitHub Actions](https://github.com/DooDesch-Mods/MMORPGTycoon2-ModFramework/actions/workflows/checks.yml) builds and verifies the packages and offline documentation.

@@ -1,0 +1,71 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 560" role="img" aria-labelledby="title description">
+<title id="title">Framework feature coverage</title>
+<desc id="description">available: 7 of 10; partial: 1 of 10; experimental: 1 of 10; planned: 1 of 10. Each tile is one tracked feature area. Percentages describe the listed areas, not overall project completion or stability.</desc>
+<path fill="#0b1723" d="M0 0h1200v560H0z"/>
+<text x="28" y="44" font-family="Arial" font-size="30" fill="#f2f7fb" font-weight="700">Framework feature coverage</text>
+<text x="28" y="78" font-family="Arial" font-size="22" fill="#b8cad8" font-weight="400">Framework 0.2.1 - Development preview</text>
+<text x="28.0" y="126" font-family="Arial" font-size="37" fill="#64e4d5" font-weight="700">70.0%</text>
+<text x="28.0" y="155" font-family="Arial" font-size="23" fill="#64e4d5" font-weight="700">Available</text>
+<text x="28.0" y="184" font-family="Arial" font-size="20" fill="#b8cad8" font-weight="400">7 of 10 tracked areas</text>
+<text x="314.0" y="126" font-family="Arial" font-size="37" fill="#ffca67" font-weight="700">10.0%</text>
+<text x="314.0" y="155" font-family="Arial" font-size="23" fill="#ffca67" font-weight="700">Partial</text>
+<text x="314.0" y="184" font-family="Arial" font-size="20" fill="#b8cad8" font-weight="400">1 of 10 tracked areas</text>
+<text x="600.0" y="126" font-family="Arial" font-size="37" fill="#8cb9ff" font-weight="700">10.0%</text>
+<text x="600.0" y="155" font-family="Arial" font-size="23" fill="#8cb9ff" font-weight="700">Experimental</text>
+<text x="600.0" y="184" font-family="Arial" font-size="20" fill="#b8cad8" font-weight="400">1 of 10 tracked areas</text>
+<text x="886.0" y="126" font-family="Arial" font-size="37" fill="#a8c1d5" font-weight="700">10.0%</text>
+<text x="886.0" y="155" font-family="Arial" font-size="23" fill="#a8c1d5" font-weight="700">Planned</text>
+<text x="886.0" y="184" font-family="Arial" font-size="20" fill="#b8cad8" font-weight="400">1 of 10 tracked areas</text>
+<rect x="31.00" y="213.00" width="108.40" height="258.00" fill="#15383d" stroke="#64e4d5" stroke-opacity=".65"/>
+<g><title>Lua mods and reload: available</title>
+<text x="43" y="324.5" font-family="Arial" font-size="20" fill="#f2f7fb" font-weight="600">Lua mods</text>
+<text x="43" y="349.5" font-family="Arial" font-size="20" fill="#f2f7fb" font-weight="600">and</text>
+<text x="43" y="374.5" font-family="Arial" font-size="20" fill="#f2f7fb" font-weight="600">reload</text>
+</g>
+<rect x="145.40" y="213.00" width="222.80" height="126.00" fill="#15383d" stroke="#64e4d5" stroke-opacity=".65"/>
+<g><title>Native C++ plugins: available</title>
+<text x="157.4" y="271.0" font-family="Arial" font-size="20" fill="#f2f7fb" font-weight="600">Native C++</text>
+<text x="157.4" y="296.0" font-family="Arial" font-size="20" fill="#f2f7fb" font-weight="600">plugins</text>
+</g>
+<rect x="145.40" y="345.00" width="222.80" height="126.00" fill="#15383d" stroke="#64e4d5" stroke-opacity=".65"/>
+<g><title>In-game mod apps: available</title>
+<text x="157.4" y="415.5" font-family="Arial" font-size="20" fill="#f2f7fb" font-weight="600">In-game mod apps</text>
+</g>
+<rect x="374.20" y="213.00" width="222.80" height="126.00" fill="#15383d" stroke="#64e4d5" stroke-opacity=".65"/>
+<g><title>Static GLB scenery: available</title>
+<text x="386.2" y="271.0" font-family="Arial" font-size="20" fill="#f2f7fb" font-weight="600">Static GLB</text>
+<text x="386.2" y="296.0" font-family="Arial" font-size="20" fill="#f2f7fb" font-weight="600">scenery</text>
+</g>
+<rect x="374.20" y="345.00" width="222.80" height="126.00" fill="#15383d" stroke="#64e4d5" stroke-opacity=".65"/>
+<g><title>Camera, objects and world actions: available</title>
+<text x="386.2" y="415.5" font-family="Arial" font-size="20" fill="#f2f7fb" font-weight="600">Game APIs</text>
+</g>
+<rect x="603.00" y="213.00" width="222.80" height="126.00" fill="#15383d" stroke="#64e4d5" stroke-opacity=".65"/>
+<g><title>Vortex installation: available</title>
+<text x="615.0" y="271.0" font-family="Arial" font-size="20" fill="#f2f7fb" font-weight="600">Vortex</text>
+<text x="615.0" y="296.0" font-family="Arial" font-size="20" fill="#f2f7fb" font-weight="600">installation</text>
+</g>
+<rect x="603.00" y="345.00" width="222.80" height="126.00" fill="#15383d" stroke="#64e4d5" stroke-opacity=".65"/>
+<g><title>Editor types and agent docs: available</title>
+<text x="615.0" y="403.0" font-family="Arial" font-size="20" fill="#f2f7fb" font-weight="600">Editor and agent</text>
+<text x="615.0" y="428.0" font-family="Arial" font-size="20" fill="#f2f7fb" font-weight="600">docs</text>
+</g>
+<rect x="831.80" y="213.00" width="108.40" height="258.00" fill="#3e321f" stroke="#ffca67" stroke-opacity=".65"/>
+<g><title>Multiplayer mods: partial</title>
+<text x="843.8" y="337.0" font-family="Arial" font-size="20" fill="#f2f7fb" font-weight="600">Co-op</text>
+<text x="843.8" y="362.0" font-family="Arial" font-size="20" fill="#f2f7fb" font-weight="600">mods</text>
+</g>
+<rect x="946.20" y="213.00" width="108.40" height="258.00" fill="#1b304a" stroke="#8cb9ff" stroke-opacity=".65"/>
+<g><title>Native patches: experimental</title>
+<text x="958.2" y="337.0" font-family="Arial" font-size="20" fill="#f2f7fb" font-weight="600">Native</text>
+<text x="958.2" y="362.0" font-family="Arial" font-size="20" fill="#f2f7fb" font-weight="600">patches</text>
+</g>
+<rect x="1060.60" y="213.00" width="108.40" height="258.00" fill="#21303e" stroke="#a8c1d5" stroke-opacity=".65"/>
+<g><title>Animated models and C#: planned</title>
+<text x="1072.6" y="324.5" font-family="Arial" font-size="20" fill="#f2f7fb" font-weight="600">Animated</text>
+<text x="1072.6" y="349.5" font-family="Arial" font-size="20" fill="#f2f7fb" font-weight="600">models</text>
+<text x="1072.6" y="374.5" font-family="Arial" font-size="20" fill="#f2f7fb" font-weight="600">and C#</text>
+</g>
+<text x="28" y="516" font-family="Arial" font-size="20" fill="#b8cad8" font-weight="400">Each tile is one tracked feature area.</text>
+<text x="28" y="544" font-family="Arial" font-size="20" fill="#b8cad8" font-weight="400">Partial scope is shown in the table below.</text>
+</svg>

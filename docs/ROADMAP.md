@@ -38,3 +38,14 @@ Priorities can change. No release dates are promised.
 | Editor types and agent docs | ✅ Available | Generated Lua types, complete examples and a versioned machine contract. [Agent entry point](agents/start.md). |
 | Multiplayer mods | ◐ Partial | Runtime for Multiplayer Early Beta 15. Other mods need explicit multiplayer integration; installing the Framework alone does not synchronize them. |
 | Animated models and C# | ○ Planned | Future extensions. The current release uses static scenery, Lua and native C++. |
+
+## How coverage is counted
+
+Each listed feature area counts once. The categories have equal weight. Partial and experimental areas do not count as fully available.
+
+- Available: 7/10 (70.0%)
+- Experimental: 1/10 (10.0%)
+- Partial: 1/10 (10.0%)
+- Planned: 1/10 (10.0%)
+
+This measures the listed feature areas, not overall project completion or stability. The denominator changes when the inventory changes.
