@@ -74,6 +74,17 @@ int main(){
         auto unicode_root=root/fs::u8path("Grüße");mod(unicode_root,"test.unicode","mt2.events.on('update',function() mt2.log.info('Grüße') end)");
         Runtime unicode(unicode_root);unicode.load();write(unicode_root/"mods/test.unicode/main.lua","this is invalid Lua!");
         CHECK(!unicode.reload("test.unicode"));CHECK(unicode.plugins()[0]->active);++checks;
+        std::string forwarded_owner;
+        Runtime marker_runtime(root/"markers",[&](const std::string& operation,const Json& args){CHECK(operation=="ui.world_marker"||operation=="ui.world_project");forwarded_owner=args.at("mod_id");return Json(true);});
+        Plugin marker_owner(&marker_runtime);auto marker_manifest=manifest("test.markers");marker_manifest["type"]="native";marker_manifest["entry"]="plugin.dll";
+        marker_owner.manifest=Manifest::parse(marker_manifest);marker_owner.active=true;marker_owner.staging=false;marker_owner.native_loaded=true;
+        marker_runtime.request(marker_owner,"ui.world_marker",{{"mod_id","spoof.other"}});CHECK(forwarded_owner=="test.markers");++checks;
+        marker_runtime.request(marker_owner,"ui.world_project",Json::object());++checks;
+        rejects([&]{marker_runtime.request(marker_owner,"ui.text",{{"text","not a render callback"}});});
+        marker_owner.manifest.capabilities.erase("world.read");rejects([&]{marker_runtime.request(marker_owner,"ui.world_marker",Json::object());});
+        marker_owner.manifest.capabilities.insert("world.read");marker_owner.manifest.capabilities.erase("ui");rejects([&]{marker_runtime.request(marker_owner,"ui.world_marker",Json::object());});
+        marker_owner.manifest.capabilities.insert("ui");marker_owner.native_loaded=false;rejects([&]{marker_runtime.request(marker_owner,"ui.world_marker",Json::object());});
+        marker_owner.native_loaded=true;marker_owner.active=false;rejects([&]{marker_runtime.request(marker_owner,"ui.world_marker",Json::object());});
         std::cout<<"info: "<<checks<<" core assertions passed; evidence="<<root.string()<<"\n";
         return 0;
     }catch(const std::exception& error){std::cerr<<"error: "<<error.what()<<" evidence="<<root.string()<<"\n";return 1;}

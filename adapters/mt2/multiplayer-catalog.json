@@ -74,6 +74,30 @@
       ]
     },
     {
+      "name": "mp.management-hire-gm.56940",
+      "rva": 354624,
+      "shared": false,
+      "groups": [
+        {
+          "feature": "Co-op source-first world and management batch",
+          "phase": "typed_action_runtime::start, bound Mainthread, once per process",
+          "site": "plugin owns capture, ordered replay and original result; admission does not install hooks"
+        }
+      ]
+    },
+    {
+      "name": "mp.management-fire-gm.56a70",
+      "rva": 354928,
+      "shared": false,
+      "groups": [
+        {
+          "feature": "Co-op source-first world and management batch",
+          "phase": "typed_action_runtime::start, bound Mainthread, once per process",
+          "site": "plugin owns capture, ordered replay and original result; admission does not install hooks"
+        }
+      ]
+    },
+    {
       "name": "mp.businessnextdayfinances.57570",
       "rva": 357744,
       "shared": false,
@@ -170,6 +194,18 @@
       ]
     },
     {
+      "name": "mp.boss-phase-reorder.93900",
+      "rva": 604416,
+      "shared": false,
+      "groups": [
+        {
+          "feature": "Co-op source-first building text, Boss phase order and statistic purchase",
+          "phase": "typed_action_runtime::start, bound Mainthread, once per process",
+          "site": "plugin owns capture, typed identity, ordered replay, full consumer guard and original result; admission does not install hooks"
+        }
+      ]
+    },
+    {
       "name": "mp.time-activate-update.20e6d0",
       "rva": 2156240,
       "shared": false,
@@ -190,6 +226,30 @@
           "feature": "Time Activate/Update",
           "phase": "after engine-bound GameUpdate, local_test or connected session",
           "site": "src/core/dll_main.cpp:339"
+        }
+      ]
+    },
+    {
+      "name": "mp.management-service-price.244f50",
+      "rva": 2379600,
+      "shared": false,
+      "groups": [
+        {
+          "feature": "Co-op source-first service pricing and character Rename UI",
+          "phase": "typed_action_runtime::start, bound Mainthread, once per process",
+          "site": "plugin owns capture, ordered replay, full consumer guard and original result; admission does not install hooks"
+        }
+      ]
+    },
+    {
+      "name": "mp.management-service-sync.245000",
+      "rva": 2379776,
+      "shared": false,
+      "groups": [
+        {
+          "feature": "Co-op source-first service pricing and character Rename UI",
+          "phase": "typed_action_runtime::start, bound Mainthread, once per process",
+          "site": "plugin owns capture, ordered replay, full consumer guard and original result; admission does not install hooks"
         }
       ]
     },
@@ -288,6 +348,66 @@
       "rva": 2966208,
       "shared": true,
       "groups": []
+    },
+    {
+      "name": "mp.selection-ungroup-selection.2d5d10",
+      "rva": 2972944,
+      "shared": false,
+      "groups": [
+        {
+          "feature": "Co-op source-first original selection Group/Ungroup commands",
+          "phase": "typed_action_runtime::start, bound Mainthread, once per process",
+          "site": "Only normal visible MultiInfoWindow/GroupInfoWindow command return74bf85, exact current SelectionManager and complete ordered Scenery/Group membership/fullUID/native world. Other callers forward once unchanged."
+        }
+      ]
+    },
+    {
+      "name": "mp.selection-ungroup-single.2d6650",
+      "rva": 2975312,
+      "shared": false,
+      "groups": [
+        {
+          "feature": "Co-op source-first original selection Group/Ungroup commands",
+          "phase": "typed_action_runtime::start, bound Mainthread, once per process",
+          "site": "Only normal visible MultiInfoWindow/GroupInfoWindow command return718fc8, exact current SelectionManager and complete ordered Scenery/Group membership/fullUID/native world. Other callers forward once unchanged."
+        }
+      ]
+    },
+    {
+      "name": "mp.selection-group.2d7380",
+      "rva": 2978688,
+      "shared": false,
+      "groups": [
+        {
+          "feature": "Co-op source-first original selection Group/Ungroup commands",
+          "phase": "typed_action_runtime::start, bound Mainthread, once per process",
+          "site": "Only normal visible MultiInfoWindow/GroupInfoWindow command return74bf65, exact current SelectionManager and complete ordered Scenery/Group membership/fullUID/native world. Other callers forward once unchanged."
+        }
+      ]
+    },
+    {
+      "name": "mp.management-logo-apply.2dcc00",
+      "rva": 3001344,
+      "shared": false,
+      "groups": [
+        {
+          "feature": "Co-op source-first native Logo editor and owned adoption",
+          "phase": "typed_action_runtime::start, bound Mainthread, once per process",
+          "site": "plugin owns matching intent capture, guarded ordered replay and original result; admission does not install hooks"
+        }
+      ]
+    },
+    {
+      "name": "mp.management-purchase-statistic.2de2d0",
+      "rva": 3007184,
+      "shared": false,
+      "groups": [
+        {
+          "feature": "Co-op source-first building text, Boss phase order and statistic purchase",
+          "phase": "typed_action_runtime::start, bound Mainthread, once per process",
+          "site": "plugin owns capture, typed identity, ordered replay, full consumer guard and original result; admission does not install hooks"
+        }
+      ]
     },
     {
       "name": "mp.softwarecalculaterating.2de360",
@@ -470,6 +590,18 @@
       ]
     },
     {
+      "name": "mp.character-adjust-attribute.39fb80",
+      "rva": 3799936,
+      "shared": false,
+      "groups": [
+        {
+          "feature": "Character AdjustAttribute authority",
+          "phase": "typed_action_runtime::start, bound Mainthread, once per process",
+          "site": "pending Multiplayer native integration; not installed by catalog admission"
+        }
+      ]
+    },
+    {
       "name": "mp.toon-visual-equip.3a1df0",
       "rva": 3808752,
       "shared": false,
@@ -478,6 +610,42 @@
           "feature": "Toon visual equip",
           "phase": "typed_action_runtime::start, bound Mainthread, once per process",
           "site": "src/game/toon_weapon_visual/native.cpp:184"
+        }
+      ]
+    },
+    {
+      "name": "mp.monster-entity-update.3c0750",
+      "rva": 3934032,
+      "shared": false,
+      "groups": [
+        {
+          "feature": "Monster EntityUpdate authority",
+          "phase": "typed_action_runtime::start, bound Mainthread, once per process",
+          "site": "pending Multiplayer native integration; not installed by catalog admission"
+        }
+      ]
+    },
+    {
+      "name": "mp.npc-online-state.3c4800",
+      "rva": 3950592,
+      "shared": false,
+      "groups": [
+        {
+          "feature": "Co-op source-first world and management batch",
+          "phase": "typed_action_runtime::start, bound Mainthread, once per process",
+          "site": "plugin owns capture, ordered replay and original result; admission does not install hooks"
+        }
+      ]
+    },
+    {
+      "name": "mp.npc-level-command.3c4c10",
+      "rva": 3951632,
+      "shared": false,
+      "groups": [
+        {
+          "feature": "Co-op source-first NPC level command and Dungeon instance Accept",
+          "phase": "typed_action_runtime::start, bound Mainthread, once per process",
+          "site": "plugin owns matching intent capture, guarded ordered replay and original result; admission does not install hooks"
         }
       ]
     },
@@ -494,6 +662,54 @@
       ]
     },
     {
+      "name": "mp.building-rename.402bf0",
+      "rva": 4205552,
+      "shared": false,
+      "groups": [
+        {
+          "feature": "Co-op source-first building text, Boss phase order and statistic purchase",
+          "phase": "typed_action_runtime::start, bound Mainthread, once per process",
+          "site": "plugin owns capture, typed identity, ordered replay, full consumer guard and original result; admission does not install hooks"
+        }
+      ]
+    },
+    {
+      "name": "mp.building-service-remove.405510",
+      "rva": 4216080,
+      "shared": false,
+      "groups": [
+        {
+          "feature": "Co-op source-first original Building Service membership",
+          "phase": "typed_action_runtime::start, bound Mainthread, once per process",
+          "site": "plugin owns matching intent capture, guarded ordered replay and original result; admission does not install hooks"
+        }
+      ]
+    },
+    {
+      "name": "mp.building-fluff.406290",
+      "rva": 4219536,
+      "shared": false,
+      "groups": [
+        {
+          "feature": "Co-op source-first building text, Boss phase order and statistic purchase",
+          "phase": "typed_action_runtime::start, bound Mainthread, once per process",
+          "site": "plugin owns capture, typed identity, ordered replay, full consumer guard and original result; admission does not install hooks"
+        }
+      ]
+    },
+    {
+      "name": "mp.building-user-state.40b200",
+      "rva": 4239872,
+      "shared": false,
+      "groups": [
+        {
+          "feature": "Co-op source-first native Building UserSetState",
+          "phase": "typed_action_runtime::start, bound Mainthread, once per process",
+          "site": "plugin owns matching intent capture, guarded ordered replay and original result; admission does not install hooks"
+        }
+      ]
+    },
+    {
       "name": "mp.building-and-scenery-capture.40bb10",
       "rva": 4242192,
       "shared": false,
@@ -502,6 +718,42 @@
           "feature": "Building and Scenery capture",
           "phase": "world-ready action capture enable, on bound Mainthread",
           "site": "src/game/ui_build_runtime.cpp:387"
+        }
+      ]
+    },
+    {
+      "name": "mp.district-description.4173b0",
+      "rva": 4289456,
+      "shared": false,
+      "groups": [
+        {
+          "feature": "Co-op source-first District name and description setters",
+          "phase": "typed_action_runtime::start, bound Mainthread, once per process",
+          "site": "plugin owns matching intent capture, guarded ordered replay and original result; admission does not install hooks"
+        }
+      ]
+    },
+    {
+      "name": "mp.district-title-position.4173c0",
+      "rva": 4289472,
+      "shared": false,
+      "groups": [
+        {
+          "feature": "Co-op source-first original District title position setter",
+          "phase": "typed_action_runtime::start, bound Mainthread, once per process",
+          "site": "plugin owns matching intent capture, guarded ordered replay and original result; admission does not install hooks"
+        }
+      ]
+    },
+    {
+      "name": "mp.district-name.418360",
+      "rva": 4293472,
+      "shared": false,
+      "groups": [
+        {
+          "feature": "Co-op source-first District name and description setters",
+          "phase": "typed_action_runtime::start, bound Mainthread, once per process",
+          "site": "plugin owns matching intent capture, guarded ordered replay and original result; admission does not install hooks"
         }
       ]
     },
@@ -662,6 +914,18 @@
       "groups": []
     },
     {
+      "name": "mp.prop-rename.4cf710",
+      "rva": 5043984,
+      "shared": false,
+      "groups": [
+        {
+          "feature": "Co-op source-first world and management batch",
+          "phase": "typed_action_runtime::start, bound Mainthread, once per process",
+          "site": "plugin owns capture, ordered replay and original result; admission does not install hooks"
+        }
+      ]
+    },
+    {
       "name": "mp.remove-ownership-observers.4d05c0",
       "rva": 5047744,
       "shared": false,
@@ -670,6 +934,66 @@
           "feature": "Remove ownership observers",
           "phase": "world-ready action capture enable, on bound Mainthread",
           "site": "src/game/object_identity/remove_runtime/remove_runtime.cpp:75"
+        }
+      ]
+    },
+    {
+      "name": "mp.quest-recalculate-rating.4d6a10",
+      "rva": 5073424,
+      "shared": false,
+      "groups": [
+        {
+          "feature": "Quest rating completion authority",
+          "phase": "typed_action_runtime::start, bound Mainthread, once per process",
+          "site": "pending Multiplayer native integration; not installed by catalog admission"
+        }
+      ]
+    },
+    {
+      "name": "mp.quest-display-set-destination.4db150",
+      "rva": 5091664,
+      "shared": false,
+      "groups": [
+        {
+          "feature": "Quest display destination authoring",
+          "phase": "typed_action_runtime::start, bound Mainthread, once per process",
+          "site": "pending Multiplayer native integration; not installed by catalog admission"
+        }
+      ]
+    },
+    {
+      "name": "mp.management-release-kind.4dee30",
+      "rva": 5107248,
+      "shared": false,
+      "groups": [
+        {
+          "feature": "Co-op source-first management batch",
+          "phase": "typed_action_runtime::start, bound Mainthread, once per process",
+          "site": "plugin owns capture, ordered replay and original result; admission does not install hooks"
+        }
+      ]
+    },
+    {
+      "name": "mp.management-release-host-frame-postresolve.4dfed0",
+      "rva": 5111504,
+      "shared": false,
+      "groups": [
+        {
+          "feature": "Private Host-authoritative Client Release Frame adoption",
+          "phase": "exact saved Client Frame apply Context and newly loaded current Release only",
+          "site": "No player command capture at this route. Preserve normal original outside exact Host-authoritative Client Frame value load. Inside that scope, admit one exact new current Release/current private Context callback after the original full value loader returned and before its Context resolve/destroy returned."
+        }
+      ]
+    },
+    {
+      "name": "mp.management-release-funds.4ec880",
+      "rva": 5163136,
+      "shared": false,
+      "groups": [
+        {
+          "feature": "Co-op source-first world and management batch",
+          "phase": "typed_action_runtime::start, bound Mainthread, once per process",
+          "site": "plugin owns capture, ordered replay and original result; admission does not install hooks"
         }
       ]
     },
@@ -848,6 +1172,18 @@
       "groups": []
     },
     {
+      "name": "mp.ability-edit-ui.5714c0",
+      "rva": 5706944,
+      "shared": false,
+      "groups": [
+        {
+          "feature": "Co-op source-first Character-owned Ability Apply UI transaction",
+          "phase": "typed_action_runtime::start, bound Mainthread, once per process",
+          "site": "plugin captures normal Apply before native mutation; local draft controls and unrelated records forward original"
+        }
+      ]
+    },
+    {
       "name": "mp.building-and-scenery-capture.593cc0",
       "rva": 5848256,
       "shared": false,
@@ -868,6 +1204,18 @@
           "feature": "Region properties",
           "phase": "world-ready action capture enable, on bound Mainthread",
           "site": "src/game/region_properties_runtime.inc:165"
+        }
+      ]
+    },
+    {
+      "name": "mp.dungeon-palette-command.59e990",
+      "rva": 5892496,
+      "shared": false,
+      "groups": [
+        {
+          "feature": "Co-op source-first Dungeon palette command capture",
+          "phase": "typed_action_runtime::start, bound Mainthread, once per process",
+          "site": "Dungeon palette pre-effect command capture; execution uses ordered explicit-owner leaves rather than current-Shard outer replay"
         }
       ]
     },
@@ -1160,6 +1508,18 @@
       ]
     },
     {
+      "name": "mp.building-service-menu.66a790",
+      "rva": 6727568,
+      "shared": false,
+      "groups": [
+        {
+          "feature": "Co-op source-first original Building Service membership",
+          "phase": "typed_action_runtime::start, bound Mainthread, once per process",
+          "site": "plugin owns matching intent capture, guarded ordered replay and original result; admission does not install hooks"
+        }
+      ]
+    },
+    {
       "name": "mp.monster-zone-action-capture.67fb40",
       "rva": 6814528,
       "shared": false,
@@ -1172,6 +1532,54 @@
       ]
     },
     {
+      "name": "mp.character-rename-ui.689e80",
+      "rva": 6856320,
+      "shared": false,
+      "groups": [
+        {
+          "feature": "Co-op source-first service pricing and character Rename UI",
+          "phase": "typed_action_runtime::start, bound Mainthread, once per process",
+          "site": "plugin owns capture, ordered replay, full consumer guard and original result; admission does not install hooks"
+        }
+      ]
+    },
+    {
+      "name": "mp.boss-phase-create.6961b0",
+      "rva": 6906288,
+      "shared": false,
+      "groups": [
+        {
+          "feature": "Co-op source-first original Boss phase creation",
+          "phase": "typed_action_runtime::start, bound Mainthread, once per process",
+          "site": "plugin owns matching intent capture, guarded ordered replay and original result; admission does not install hooks"
+        }
+      ]
+    },
+    {
+      "name": "mp.boss-phase-ability-menu.697bf0",
+      "rva": 6913008,
+      "shared": false,
+      "groups": [
+        {
+          "feature": "Co-op source-first native Boss phase ability menu",
+          "phase": "typed_action_runtime::start, bound Mainthread, once per process",
+          "site": "plugin owns matching intent capture, guarded ordered replay and original result; admission does not install hooks"
+        }
+      ]
+    },
+    {
+      "name": "mp.boss-phase-command.698960",
+      "rva": 6916448,
+      "shared": false,
+      "groups": [
+        {
+          "feature": "Co-op source-first Boss phase UICommand transaction",
+          "phase": "typed_action_runtime::start, bound Mainthread, once per process",
+          "site": "plugin owns matching intent capture, guarded ordered replay and original result; admission does not install hooks"
+        }
+      ]
+    },
+    {
       "name": "mp.bug-manual-uicommand.69df50",
       "rva": 6938448,
       "shared": false,
@@ -1180,6 +1588,42 @@
           "feature": "Bug manual UICommand",
           "phase": "typed_action_runtime::start, bound Mainthread, once per process",
           "site": "src/game/bug_authority/manual_action.cpp:135"
+        }
+      ]
+    },
+    {
+      "name": "mp.management-release-celebration-command.69ef10",
+      "rva": 6942480,
+      "shared": false,
+      "groups": [
+        {
+          "feature": "Co-op source-first Management release window capture",
+          "phase": "typed_action_runtime::start, bound Mainthread, once per process",
+          "site": "Abort/DoRelease/DoSkip. RateUpButton/RateDownButton are local presentation-rate controls and remain original. Capture at owned outer entry before native mutation, borrow actual original token/pane values only."
+        }
+      ]
+    },
+    {
+      "name": "mp.dungeon-instance-config-ui.6aea60",
+      "rva": 7006816,
+      "shared": false,
+      "groups": [
+        {
+          "feature": "Co-op source-first NPC level command and Dungeon instance Accept",
+          "phase": "typed_action_runtime::start, bound Mainthread, once per process",
+          "site": "plugin owns matching intent capture, guarded ordered replay and original result; admission does not install hooks"
+        }
+      ]
+    },
+    {
+      "name": "mp.costume-edit-ui.6b51c0",
+      "rva": 7033280,
+      "shared": false,
+      "groups": [
+        {
+          "feature": "Co-op source-first Character-owned Costume Apply UI transaction",
+          "phase": "typed_action_runtime::start, bound Mainthread, once per process",
+          "site": "plugin owns matching intent capture, guarded ordered replay and original result; admission does not install hooks"
         }
       ]
     },
@@ -1208,6 +1652,42 @@
       ]
     },
     {
+      "name": "mp.dungeon-light-config.6d40b0",
+      "rva": 7159984,
+      "shared": false,
+      "groups": [
+        {
+          "feature": "Co-op source-first original Dungeon light configuration",
+          "phase": "typed_action_runtime::start, bound Mainthread, once per process",
+          "site": "plugin owns matching intent capture, guarded ordered replay and original result; admission does not install hooks"
+        }
+      ]
+    },
+    {
+      "name": "mp.dungeon-sound-ui.6d4ff0",
+      "rva": 7163888,
+      "shared": false,
+      "groups": [
+        {
+          "feature": "Co-op source-first native Dungeon sound SetAtmos UI",
+          "phase": "typed_action_runtime::start, bound Mainthread, once per process",
+          "site": "plugin owns matching intent capture, guarded ordered replay and original result; admission does not install hooks"
+        }
+      ]
+    },
+    {
+      "name": "mp.management-logo-editor-command.735800",
+      "rva": 7559168,
+      "shared": false,
+      "groups": [
+        {
+          "feature": "Co-op source-first native Logo editor and owned adoption",
+          "phase": "typed_action_runtime::start, bound Mainthread, once per process",
+          "site": "plugin owns matching intent capture, guarded ordered replay and original result; admission does not install hooks"
+        }
+      ]
+    },
+    {
       "name": "startmenu.elements",
       "rva": 7586304,
       "shared": true,
@@ -1218,6 +1698,42 @@
       "rva": 7592096,
       "shared": true,
       "groups": []
+    },
+    {
+      "name": "mp.npc-quest-list-ui.759ad0",
+      "rva": 7707344,
+      "shared": false,
+      "groups": [
+        {
+          "feature": "NPC Quest list outer UI transaction",
+          "phase": "typed_action_runtime::start, bound Mainthread, once per process",
+          "site": "pending Multiplayer Q01 outer UI integration; admission does not install hooks"
+        }
+      ]
+    },
+    {
+      "name": "mp.management-overview-command.76bd40",
+      "rva": 7781696,
+      "shared": false,
+      "groups": [
+        {
+          "feature": "Co-op source-first management batch",
+          "phase": "typed_action_runtime::start, bound Mainthread, once per process",
+          "site": "plugin owns capture, ordered replay and original result; admission does not install hooks"
+        }
+      ]
+    },
+    {
+      "name": "mp.npc-quest-list-ui.78ed30",
+      "rva": 7925040,
+      "shared": false,
+      "groups": [
+        {
+          "feature": "NPC Quest list outer UI transaction",
+          "phase": "typed_action_runtime::start, bound Mainthread, once per process",
+          "site": "pending Multiplayer Q01 outer UI integration; admission does not install hooks"
+        }
+      ]
     },
     {
       "name": "mp.region-styles.797850",
@@ -1232,6 +1748,30 @@
       ]
     },
     {
+      "name": "mp.management-release-ui-command.79baa0",
+      "rva": 7977632,
+      "shared": false,
+      "groups": [
+        {
+          "feature": "Co-op source-first Management release window capture",
+          "phase": "typed_action_runtime::start, bound Mainthread, once per process",
+          "site": "Entry before original command parsing. Match only complete genuine DoCelebration, ConfirmResetCustomText, EditedChangelog, EditedAnnounceTitle and ToggleCustomText records. Close remains local; MinorMajor remains existing Management128. No original CanReleaseNow call is made in discovery or pre-order capture."
+        }
+      ]
+    },
+    {
+      "name": "mp.management-release-planner-command.79d8b0",
+      "rva": 7985328,
+      "shared": false,
+      "groups": [
+        {
+          "feature": "Co-op source-first Management release window capture",
+          "phase": "typed_action_runtime::start, bound Mainthread, once per process",
+          "site": "SetHotfix/SetMinor/SetMajor/SetCustomTitle. AllocatePayment reuses existing Management128 funds capture. Capture at owned outer entry before native mutation, borrow actual original token/pane values only."
+        }
+      ]
+    },
+    {
       "name": "mp.path-actions.7b04b0",
       "rva": 8062128,
       "shared": false,
@@ -1240,6 +1780,18 @@
           "feature": "Path actions",
           "phase": "world-ready action capture enable, on bound Mainthread",
           "site": "src/game/path_execution.inc:44"
+        }
+      ]
+    },
+    {
+      "name": "mp.management-statistics-apply.7d2a40",
+      "rva": 8202816,
+      "shared": false,
+      "groups": [
+        {
+          "feature": "Co-op source-first world and management batch",
+          "phase": "typed_action_runtime::start, bound Mainthread, once per process",
+          "site": "plugin owns capture, ordered replay and original result; admission does not install hooks"
         }
       ]
     },
@@ -1532,6 +2084,30 @@
       ]
     },
     {
+      "name": "mp.monster-property-save-load.da79e0",
+      "rva": 14318048,
+      "shared": false,
+      "groups": [
+        {
+          "feature": "Monster property LoadStream snapshot observer",
+          "phase": "initialize, after native exact-image binding, before global enable",
+          "site": "pending Multiplayer snapshot observer integration; admission does not install hooks"
+        }
+      ]
+    },
+    {
+      "name": "mp.monster-property-save-load.da7a10",
+      "rva": 14318096,
+      "shared": false,
+      "groups": [
+        {
+          "feature": "Monster property SaveStream snapshot observer",
+          "phase": "initialize, after native exact-image binding, before global enable",
+          "site": "pending Multiplayer snapshot observer integration; admission does not install hooks"
+        }
+      ]
+    },
+    {
       "name": "mp.bug-lifecycle-and-saved-identity.dc17d0",
       "rva": 14424016,
       "shared": false,
@@ -1552,6 +2128,30 @@
           "feature": "Bug lifecycle and saved identity",
           "phase": "initialize, after native exact-image binding, before global enable",
           "site": "src/game/bug_authority/hooks.cpp:234"
+        }
+      ]
+    },
+    {
+      "name": "mp.district-property-load.ddc9c0",
+      "rva": 14535104,
+      "shared": false,
+      "groups": [
+        {
+          "feature": "District serialized identity snapshot observers",
+          "phase": "initialize, after native exact-image binding, before global enable",
+          "site": "district_saved_identity_runtime::initialize; original property Load observer, armed existing snapshot transactions only"
+        }
+      ]
+    },
+    {
+      "name": "mp.district-property-save.ddcee0",
+      "rva": 14536416,
+      "shared": false,
+      "groups": [
+        {
+          "feature": "District serialized identity snapshot observers",
+          "phase": "initialize, after native exact-image binding, before global enable",
+          "site": "district_saved_identity_runtime::initialize; original property Save observer, armed existing snapshot transactions only"
         }
       ]
     },

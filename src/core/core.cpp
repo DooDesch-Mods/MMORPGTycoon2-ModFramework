@@ -362,7 +362,12 @@ Json Runtime::request(Plugin& p,const std::string& op,const Json& args) {
         p.hotkeys[key]=code;return true;
     }
     std::string cap;
-    if(op.starts_with("ui.")) {cap="ui";if(!rendering)throw std::runtime_error("UI calls belong in ui.window/render callbacks");}
+    if(op=="ui.world_marker"||op=="ui.world_project") {
+        cap="ui";
+        if(!p.active||!p.native_loaded||p.manifest.type!="native"||p.staging)throw std::runtime_error("World markers require an active native plugin callback");
+        if(!p.manifest.capabilities.contains("world.read"))throw std::runtime_error("Missing capability: world.read");
+    }
+    else if(op.starts_with("ui.")) {cap="ui";if(!rendering)throw std::runtime_error("UI calls belong in ui.window/render callbacks");}
     else if(op.starts_with("world."))cap="world.read";
     else if(op.starts_with("objects."))cap="objects.read";
     else if(op.starts_with("camera."))cap="camera";

@@ -1,5 +1,6 @@
 #pragma once
 #include "native_routes.h"
+#include "sdk/native_release.h"
 
 namespace mt2fw::mt2 {
 class NativeOwnership {
@@ -17,8 +18,11 @@ public:
         std::function<bool(uintptr_t,std::string&)> replacement;
         std::function<Exchange(uintptr_t,uintptr_t,uint32_t,bool)> exchange;
     };
-    NativeOwnership(uintptr_t image,NativeRoutes& routes,std::function<Plugin*(const MT2FW_Host*)> lookup,Backend backend);
+    NativeOwnership(uintptr_t image,NativeRoutes& routes,std::function<Plugin*(const MT2FW_Host*)> lookup,Backend backend,uintptr_t release_caller=0);
     MT2FW_MT2_Result query(const MT2FW_Host*,uint32_t,MT2FW_MT2_OwnershipV1*,uint32_t);
+    MT2FW_MT2_Result query_release(const MT2FW_Host*,uint32_t,MT2FW_MT2_ReleaseV1*,uint32_t);
+    void set_game_thread(uint64_t thread){game_thread_.store(thread);}
+    uint32_t release_command(const MT2FW_MT2_ReleaseCall&);
     bool retire(Plugin&);
     bool has_retention() const;
     bool retirement_blocked() const;
@@ -37,6 +41,19 @@ private:
     std::map<Plugin*,std::unique_ptr<Owner>> owners_;
     std::vector<Command> commands_;
     std::vector<Input> inputs_;
+    struct Release {
+        Owner* owner=nullptr;
+        MT2FW_MT2_ReleaseDelegate callback=nullptr;
+        void* user=nullptr;
+        uint64_t token=0,last_invocation=0;
+        uint32_t last_disposition=0;
+        uint32_t inflight=0;
+        bool active=false,failed=false;
+        std::string cause;
+    } release_;
+    uintptr_t release_caller_=0;
+    std::atomic<uint64_t> game_thread_{0};
+    uint64_t next_release_token_=1,next_release_invocation_=1;
     uint64_t next_observer_token_=1,next_command_invocation_=0,next_input_invocation_=0;
     Owner* free_owner_=nullptr;
     uint32_t state_=MT2FW_MT2_ROUTE_PRISTINE,initial_protection_=0;
@@ -68,6 +85,11 @@ private:
     static MT2FW_MT2_Result MT2FW_CALL command_unsubscribe(void*,uint64_t);
     static uint64_t MT2FW_CALL input_subscribe(void*,MT2FW_MT2_InputObserver,void*);
     static MT2FW_MT2_Result MT2FW_CALL input_unsubscribe(void*,uint64_t);
+    void release_receipt(MT2FW_MT2_ReleaseReceipt&);
+    uint32_t release_failed(Owner&,const std::string&);
+    static MT2FW_MT2_Result MT2FW_CALL release_bind(void*,MT2FW_MT2_ReleaseDelegate,void*,MT2FW_MT2_ReleaseReceipt*);
+    static MT2FW_MT2_Result MT2FW_CALL release_unbind(void*,uint64_t,MT2FW_MT2_ReleaseReceipt*);
+    static MT2FW_MT2_Result MT2FW_CALL release_read(void*,MT2FW_MT2_ReleaseReceipt*);
 };
 NativeOwnership::Backend windows_free_backend(uintptr_t image,const fs::path& executable);
 }

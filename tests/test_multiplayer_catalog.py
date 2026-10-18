@@ -29,5 +29,13 @@ class MultiplayerCatalogTests(unittest.TestCase):
         self.assertEqual(matches[0]['groups'][0]['phase'], 'typed_action_runtime::start, bound Mainthread, once per process')
 
 
+    def test_current_catalog_preserves_public_021_routes(self):
+        prior = json.loads((ROOT / 'tests/fixtures/multiplayer-catalog-v0.2.1.json').read_text(encoding='utf-8'))['targets']
+        previous = {row['name'] for row in prior}
+        self.assertEqual([row for row in self.targets if row['name'] in previous], prior)
+        self.assertEqual(len(self.targets), 192)
+        self.assertEqual(sum(row['shared'] for row in self.targets), 11)
+
+
 if __name__ == '__main__':
     unittest.main()

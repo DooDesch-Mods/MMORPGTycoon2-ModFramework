@@ -1,5 +1,15 @@
 # Changelog
 
+## 0.2.2
+
+### Changed
+
+- Updated for the next Multiplayer Early Beta.
+
+### Fixed
+
+- Prevent some multiplayer edits from being blocked when several mod features are active.
+
 ## 0.2.1
 
 ### Added

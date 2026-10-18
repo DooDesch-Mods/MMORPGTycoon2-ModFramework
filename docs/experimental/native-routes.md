@@ -47,3 +47,43 @@ Suspend the Multiplayer authority/session before unbinding. A busy unsubscribe/r
 The separate [ownership extension](native-ownership.md) supplies typed `msvcrt!free` import control, retained disable/resume and passive Mode/input observations. ServicesV1 and RoutesV1 remain separately versioned contracts. Plugins must preserve their native free/delete/reclamation policy when adopting shared routes. Retained game tests cover the migrated place/move/remove action cycle; they do not establish full Multiplayer compatibility or support for arbitrary native hooks.
 
 Local tests exercise Create original-once/result/exception, Remove suppression/continuation/provenance/worker/failure paths, named ownership, prepare/enable ordering, guard admission, foreign patch rejection, failed creation isolation and unknown outcomes. They use synthetic memory and functions. The Windows build confirms compilation; it does not prove caller provenance or gameplay effects in the actual game.
+
+## Private final release command delegate
+
+`MT2FW_MT2_QueryRelease` exposes version1 of the independent private
+`MT2FW_MT2_ReleaseV1` contract in `sdk/native_release.h`. Existing OwnershipV1
+and public native ABI1 are unchanged. This extension is restricted to the actual
+active native `doodesch.multiplayer` host. Other mods cannot register a delegate.
+
+One exact owner/token controls a synchronous callback at the existing physical
+Mode.Command hook. Calls preserve the original complete receiver, borrowed GNU
+string object and copied text, actual immediate native return, game thread,
+invocation and registration. Pointers are valid only during the callback. No
+native SSO object is copied by value and no second physical hook is installed.
+
+Only literal LevelUp from the original MessageTo Mode dispatcher is a candidate.
+Its immediate return identifies that shared dispatcher, not a celebration. The
+consumer must prove its retained active celebration/action and current owners.
+Known unrelated calls return FORWARD; uncertain release provenance returns FAILED.
+Do not scan arbitrary stack words or substitute an outer return.
+
+An OK result plus FORWARD continues the existing original path once; SUPPRESS
+skips it. Failure, exception or malformed output retains the first cause and
+does not forward or retry. Explicitly unbind and rebind a failed registration.
+Passive observers keep their existing behavior and run before this decision.
+
+Unbind during an in-flight callback disables later calls and returns BUSY. Wait
+for the callback to finish and confirm unbind before releasing its user storage.
+Owner retirement waits for its callbacks. A receipt acknowledges the decision,
+not confirmation of the original game effects. Native memory faults are not
+isolated from the game process.
+
+## Private Release Frame load boundary
+
+The named target `mp.management-release-host-frame-postresolve.4dfed0` supports
+one exact newly loaded current Release/private Context callback during
+Host-authoritative Client Frame adoption. Ordinary save/load PostResolve keeps
+its original repair behavior. The consumer must validate complete Host values,
+external references, current owners and record readback, and confirm old owning
+cleanup. Unexpected or duplicate private callbacks retain their first cause.
+This target does not authorize general PostResolve suppression.

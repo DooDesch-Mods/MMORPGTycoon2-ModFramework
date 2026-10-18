@@ -1,6 +1,7 @@
 #include "bootstrap.h"
 #include "adapter.h"
 #include "desktop_ui.h"
+#include "world_markers.h"
 #include "document_ui.h"
 #include "native_services.h"
 #include "native_routes_windows.h"
@@ -165,12 +166,19 @@ DWORD command_view(const void* command,const char*& bytes,size_t& length){
     __except(EXCEPTION_EXECUTE_HANDLER){return GetExceptionCode();}
 }
 DWORD command_copy(const char* input,char* output,size_t length){__try{if(length)std::memcpy(output,input,length);return 0;}__except(EXCEPTION_EXECUTE_HANDLER){return GetExceptionCode();}}
-void ingame_command(void* mode,const void* command) {
+__declspec(noinline) void ingame_command(void* mode,const void* command) {
+    const auto native_return=reinterpret_cast<uintptr_t>(_ReturnAddress());
     {std::lock_guard lock(gate);if(runtime&&running&&native_ownership){
-        try{const char* input=nullptr;size_t length=0;auto code=command_view(command,input,length);std::string text;
-            if(!code){text.resize(length);code=command_copy(input,text.data(),length);}
-            MT2FW_MT2_CommandCall observed{sizeof(observed),code?0u:1u,code,0,0,GetCurrentThreadId(),mode,code?nullptr:text.c_str(),code?0:length};native_ownership->observe_command(observed);
-        }catch(const std::exception& error){report(std::string("Mode command observation failed: ")+error.what());}
+        const char* input=nullptr;size_t length=0;auto code=command_view(command,input,length);std::string text;
+        try{if(!code){text.resize(length);code=command_copy(input,text.data(),length);}}
+        catch(const std::exception& error){code=ERROR_NOT_ENOUGH_MEMORY;report(std::string("Mode command observation failed: ")+error.what());}
+        MT2FW_MT2_CommandCall observed{sizeof(observed),code?0u:1u,code,0,0,GetCurrentThreadId(),mode,code?nullptr:text.c_str(),code?0:length};
+        try{native_ownership->observe_command(observed);}
+        catch(const std::exception& error){report(std::string("Mode command observation failed: ")+error.what());}
+        MT2FW_MT2_ReleaseCall release{sizeof(release),code?0u:1u,code,0,0,0,GetCurrentThreadId(),mode,command,native_return,code?nullptr:text.c_str(),code?0:length};
+        try{if(native_ownership->release_command(release)!=MT2FW_MT2_RELEASE_FORWARD)return;}
+        catch(const std::exception& error){report(std::string("Release LevelUp dispatch failed; original not replayed: ")+error.what());return;}
+        catch(...){report("Release LevelUp dispatch failed; original not replayed: unknown native exception");return;}
     }if(runtime&&running&&mt2::desktop::command(mode,command))return;}
     original_ingame_command(mode,command);
 }
@@ -318,6 +326,7 @@ void menu_state(bool visible) {
     show_menu=visible;menu_input(visible);
 }
 Json ui_request(const std::string& op,const Json& args) {
+    if(op=="ui.world_marker"||op=="ui.world_project")return mt2::world_markers::request(op,args);
     if(op=="ui.app")return mt2::desktop::app(args);
     if(op=="ui.new_world")return mt2::desktop::new_world(args);
     if(op=="ui.native")return mt2::desktop::native_window(args);
@@ -482,7 +491,7 @@ void update(void* game,float dt) {
     {std::lock_guard lock(gate);if(running&&native_services){
         if(!engine_thread)engine_thread=GetCurrentThreadId();
         if(engine_thread!=GetCurrentThreadId()){report("Native frame update changed thread identity");}
-        else {if(native_routes)native_routes->set_game_thread(engine_thread);if(native_patches)native_patches->set_game_thread(engine_thread);try{native_services->begin_frame(game,dt);paired=true;}catch(const std::exception& error){report(std::string("Native frame begin failed: ")+error.what());}}
+        else {if(native_routes)native_routes->set_game_thread(engine_thread);if(native_ownership)native_ownership->set_game_thread(engine_thread);if(native_patches)native_patches->set_game_thread(engine_thread);try{native_services->begin_frame(game,dt);paired=true;}catch(const std::exception& error){report(std::string("Native frame begin failed: ")+error.what());}}
     }}
     std::optional<PatchRegistry::Run> patch_run;
     {std::lock_guard lock(gate);if(running&&runtime&&runtime->patches.has_subscribers("game.update")){
@@ -514,7 +523,7 @@ void update(void* game,float dt) {
         if(!engine_thread)engine_thread=GetCurrentThreadId();
         if(engine_thread!=GetCurrentThreadId())throw std::runtime_error("Game update changed thread identity");
         if(benchmark_mode=="baseline")mt2::measurement_frame();else {
-            mt2::frame(*runtime,dt);drain_saves();runtime->end_frame();mt2::desktop::end_frame();
+            mt2::frame(*runtime,dt);mt2::world_markers::frame();drain_saves();runtime->end_frame();mt2::desktop::end_frame();
             try{mt2::desktop::frame(german);}catch(const std::exception& error){report(std::string("Mods desktop failed: ")+error.what());}
         }++frames;
         auto commands=std::move(console_requests);console_requests.clear();
@@ -603,12 +612,13 @@ void finish_shutdown(){
     running=false;shutdown_requested=false;
     if(save_worker.joinable()){save_worker.request_stop();save_wake.notify_all();save_worker.join();}
     try{if(runtime){runtime->world_leave();runtime->stop_plugins();
+        bool markers_retired=mt2::world_markers::shutdown();
         mt2::configure_shared_operations({});
         bool patch_runtime_detached=!native_routes||native_routes->detach_patch_runtime();
         if(native_routes)for(auto& [owner,cause]:native_routes->drain_errors())runtime->log(owner->manifest.id,"error",cause);
         if(native_ownership)for(auto& [owner,cause]:native_ownership->drain_errors())runtime->log(owner->manifest.id,"error",cause);
         bool retirement_failed=false;for(auto& plugin:runtime->plugins())retirement_failed|=plugin->native_retirement_failed;
-        if(!patch_runtime_detached||retirement_failed||native_services->has_hooks()||(native_routes&&native_routes->retirement_blocked())||(native_ownership&&native_ownership->retirement_blocked())||(native_patches&&native_patches->busy())){report("Framework shutdown retained native runtime: an owned route has not retired");retain_process_storage();return;}
+        if(!markers_retired||!patch_runtime_detached||retirement_failed||native_services->has_hooks()||(native_routes&&native_routes->retirement_blocked())||(native_ownership&&native_ownership->retirement_blocked())||(native_patches&&native_patches->busy())){report("Framework shutdown retained native runtime: an owned route or world marker has not retired");retain_process_storage();return;}
         bool retained=false;for(auto& plugin:runtime->plugins())retained|=plugin->native_retained;
         if(retained){auto disabled=MH_DisableHook(MH_ALL_HOOKS);if(disabled!=MH_OK&&disabled!=MH_ERROR_NOT_INITIALIZED){report(std::string("Retained native shutdown disable failed: ")+MH_StatusToString(disabled));retain_process_storage();return;}
             runtime->log("framework","info","Native originals and owner state retained until process exit");retain_process_storage();return;}
@@ -631,6 +641,11 @@ extern "C" __declspec(dllexport) MT2FW_MT2_Result MT2FW_CALL MT2FW_MT2_QueryOwne
     try{std::lock_guard lock(gate);if(!running||!native_ownership)return MT2FW_MT2_UNAVAILABLE;return native_ownership->query(owner,version,output,capacity);}
     catch(const std::exception& error){report(std::string("Native ownership discovery failed: ")+error.what());return MT2FW_MT2_FAILED;}
     catch(...){report("Native ownership discovery failed: unknown native exception");return MT2FW_MT2_FAILED;}
+}
+extern "C" __declspec(dllexport) MT2FW_MT2_Result MT2FW_CALL MT2FW_MT2_QueryRelease(const MT2FW_Host* owner,uint32_t version,MT2FW_MT2_ReleaseV1* output,uint32_t capacity){
+    try{std::lock_guard lock(gate);if(!running||!native_ownership)return MT2FW_MT2_UNAVAILABLE;return native_ownership->query_release(owner,version,output,capacity);}
+    catch(const std::exception& error){report(std::string("Native release discovery failed: ")+error.what());return MT2FW_MT2_FAILED;}
+    catch(...){report("Native release discovery failed: unknown native exception");return MT2FW_MT2_FAILED;}
 }
 extern "C" __declspec(dllexport) MT2FW_MT2_Result MT2FW_CALL MT2FW_MT2_QueryPatches(const MT2FW_Host* owner,uint32_t version,MT2FW_MT2_PatchesV1* output,uint32_t capacity){
     try{std::lock_guard lock(gate);if(!running||!native_patches)return MT2FW_MT2_UNAVAILABLE;return native_patches->query(owner,version,output,capacity);}
@@ -661,8 +676,11 @@ extern "C" __declspec(dllexport) bool MT2FW_InitInstalled(const MT2FW_Bootstrap*
         runtime->set_patch_authority([](const std::string& operation,std::string& cause){if(!native_patches){cause="Native session authority is unavailable";return false;}return native_patches->authorize(operation,cause);});
         native_routes->configure(reinterpret_cast<uintptr_t>(GetModuleHandleW(nullptr)),mt2::windows_route_backend(fs::path(receipt->game)/"MT2.exe"));
         mt2::load_multiplayer_catalog(*native_routes);
-        native_ownership=std::make_unique<mt2::NativeOwnership>(reinterpret_cast<uintptr_t>(GetModuleHandleW(nullptr)),*native_routes,[](const MT2FW_Host* host){return runtime?runtime->native_plugin(host):nullptr;},mt2::windows_free_backend(reinterpret_cast<uintptr_t>(GetModuleHandleW(nullptr)),fs::path(receipt->game)/"MT2.exe"));
-        runtime->native_retire=[](Plugin& owner){auto patches_ok=native_patches->retire(owner);auto ownership_ok=native_ownership->retire(owner);auto routes_ok=native_routes->retire(owner);auto services_ok=native_services->retire(owner);return patches_ok&&services_ok&&routes_ok&&ownership_ok;};
+        native_routes->catalog("ui.world_marker.draw",0x9c9070,true);
+        mt2::world_markers::configure(*runtime);
+        native_ownership=std::make_unique<mt2::NativeOwnership>(reinterpret_cast<uintptr_t>(GetModuleHandleW(nullptr)),*native_routes,[](const MT2FW_Host* host){return runtime?runtime->native_plugin(host):nullptr;},mt2::windows_free_backend(reinterpret_cast<uintptr_t>(GetModuleHandleW(nullptr)),fs::path(receipt->game)/"MT2.exe"),reinterpret_cast<uintptr_t>(GetModuleHandleW(nullptr))+0x4faf6a);
+        runtime->native_retire=[](Plugin& owner){auto markers_ok=mt2::world_markers::retire(owner);auto patches_ok=native_patches->retire(owner);auto ownership_ok=native_ownership->retire(owner);auto routes_ok=native_routes->retire(owner);auto services_ok=native_services->retire(owner);return markers_ok&&patches_ok&&services_ok&&routes_ok&&ownership_ok;};
+        native_services->reserve("ui.world_marker.draw");
         for(const char* name:{"game.update","title.command","ingame.command","save.command","save.blocking","desktop.launch","desktop.destroy","startmenu.elements","startmenu.select","objects.create","objects.move","objects.remove","sdl.swap","sdl.poll","sdl.hide_cursor","sdl.relative_mouse","physfs.open_read","physfs.open_write","physfs.close","win32.move_file"})native_services->reserve(name);
         mt2::desktop::configure(*runtime,root,[](const std::string& id,bool tools){details_mod=id;developer=tools;menu_state(true);},[]{german=!german;});
         if(fs::exists(root/"benchmark.json"))benchmark_mode=read_json(root/"benchmark.json").at("mode");
@@ -682,6 +700,7 @@ extern "C" __declspec(dllexport) bool MT2FW_InitInstalled(const MT2FW_Bootstrap*
         if(benchmark_mode=="baseline"){result=MH_EnableHook(MH_ALL_HOOKS);if(result!=MH_OK)throw std::runtime_error(MH_StatusToString(result));running=true;return true;}
         for(auto& item:mt2::observation_hooks())hook(item.target,item.replacement,item.original);
         for(auto& item:mt2::desktop::hooks())hook(item.target,item.replacement,item.original);
+        for(auto& item:mt2::world_markers::hooks())hook(item.target,item.replacement,item.original);
         auto command=reinterpret_cast<unsigned char*>(GetModuleHandleW(nullptr))+0x4b9be0;
         constexpr unsigned char command_guard[]={0x41,0x57,0x41,0x56,0x41,0x55,0x41,0x54,0x55,0x57,0x56,0x53,0x48,0x81,0xec,0xd8,0x03,0,0};
         if(std::memcmp(command,command_guard,sizeof(command_guard)))throw std::runtime_error("Native title command prolog differs");

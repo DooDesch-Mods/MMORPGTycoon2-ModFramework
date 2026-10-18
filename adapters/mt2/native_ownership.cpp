@@ -9,7 +9,7 @@ constexpr const char* game_sha="bbab2dc68babcc644d0a1679548bf1e334b6c52aea669c3f
 template<size_t N>void text(char(&output)[N],const std::string& value){auto length=std::min(value.size(),N-1);std::memcpy(output,value.data(),length);output[length]=0;}
 bool output_ok(MT2FW_MT2_FreeReceipt* output){return output&&output->size>=sizeof(*output);}
 }
-NativeOwnership::NativeOwnership(uintptr_t image,NativeRoutes& routes,std::function<Plugin*(const MT2FW_Host*)> lookup,Backend backend):image_(image),routes_(routes),lookup_(std::move(lookup)),backend_(std::move(backend)){errors_.reserve(32);commands_.reserve(64);inputs_.reserve(64);}
+NativeOwnership::NativeOwnership(uintptr_t image,NativeRoutes& routes,std::function<Plugin*(const MT2FW_Host*)> lookup,Backend backend,uintptr_t release_caller):image_(image),routes_(routes),lookup_(std::move(lookup)),backend_(std::move(backend)),release_caller_(release_caller){errors_.reserve(32);commands_.reserve(64);inputs_.reserve(64);}
 void NativeOwnership::report(Owner& owner,const std::string& cause){std::lock_guard lock(gate_);if(reported_==cause){++repeated_;return;}reported_=cause;if(errors_.size()<32)errors_.push_back({owner.plugin,cause});else ++repeated_;}
 void NativeOwnership::boundary_error(void* context,const char* cause)noexcept{
     auto value=static_cast<Owner*>(context);
@@ -35,6 +35,95 @@ MT2FW_MT2_Result NativeOwnership::query(const MT2FW_Host* host,uint32_t version,
         [](void* c,MT2FW_MT2_InputObserver callback,void* user)->uint64_t{try{return input_subscribe(c,callback,user);}catch(const std::exception& problem){boundary_error(c,problem.what());return 0;}catch(...){boundary_error(c,"Unknown input subscription exception");return 0;}},
         [](void* c,uint64_t token){return boundary(c,[&]{return input_unsubscribe(c,token);});}
     };return MT2FW_MT2_OK;
+}
+MT2FW_MT2_Result NativeOwnership::query_release(const MT2FW_Host* host,uint32_t version,MT2FW_MT2_ReleaseV1* output,uint32_t capacity){
+    if(!output||capacity<sizeof(*output)||version!=MT2FW_MT2_RELEASE_VERSION)return MT2FW_MT2_INVALID;
+    auto plugin=lookup_(host);
+    if(!release_caller_||!plugin||!plugin->active||plugin->staging||plugin->manifest.type!="native"||plugin->manifest.id!="doodesch.multiplayer")return MT2FW_MT2_UNAVAILABLE;
+    std::lock_guard lock(gate_);auto& value=owners_[plugin];
+    if(!value)value=std::make_unique<Owner>(Owner{this,plugin});
+    if(!value->active)return MT2FW_MT2_UNAVAILABLE;
+    *output={sizeof(*output),MT2FW_MT2_RELEASE_VERSION,value.get(),
+        [](void* c,MT2FW_MT2_ReleaseDelegate callback,void* user,MT2FW_MT2_ReleaseReceipt* receipt){return boundary(c,[&]{return release_bind(c,callback,user,receipt);});},
+        [](void* c,uint64_t token,MT2FW_MT2_ReleaseReceipt* receipt){return boundary(c,[&]{return release_unbind(c,token,receipt);});},
+        [](void* c,MT2FW_MT2_ReleaseReceipt* receipt){return boundary(c,[&]{return release_read(c,receipt);});}};
+    return MT2FW_MT2_OK;
+}
+void NativeOwnership::release_receipt(MT2FW_MT2_ReleaseReceipt& output){
+    output={};output.size=sizeof(output);output.bound=release_.active;output.failed=release_.failed;
+    output.inflight=release_.inflight;
+    output.registration=release_.token;output.last_invocation=release_.last_invocation;output.last_disposition=release_.last_disposition;
+    text(output.owner,release_.owner?release_.owner->plugin->manifest.id:"");text(output.cause,release_.cause);
+}
+uint32_t NativeOwnership::release_failed(Owner& value,const std::string& cause){
+    if(!release_.failed){release_.failed=true;release_.cause=cause;}
+    release_.last_disposition=MT2FW_MT2_RELEASE_FAILED;
+    report(value,"Release LevelUp delegate failed: "+release_.cause);
+    return MT2FW_MT2_RELEASE_FAILED;
+}
+MT2FW_MT2_Result MT2FW_CALL NativeOwnership::release_bind(void* context,MT2FW_MT2_ReleaseDelegate callback,void* user,MT2FW_MT2_ReleaseReceipt* output){
+    auto value=owner(context);if(!value)return MT2FW_MT2_UNAVAILABLE;
+    if(!callback||!output||output->size<sizeof(*output))return MT2FW_MT2_INVALID;
+    auto& service=*value->service;std::lock_guard lock(service.gate_);
+    if(!value->plugin->active||value->plugin->staging||value->plugin->manifest.type!="native"||value->plugin->manifest.id!="doodesch.multiplayer"||!service.release_caller_)return MT2FW_MT2_UNAVAILABLE;
+    if(service.release_.owner){service.release_receipt(*output);return MT2FW_MT2_BUSY;}
+    if(!service.next_release_token_){text(output->cause,"Release registration counter exhausted");service.report(*value,output->cause);return MT2FW_MT2_FAILED;}
+    service.release_={};service.release_.owner=value;service.release_.callback=callback;service.release_.user=user;
+    service.release_.token=service.next_release_token_++;service.release_.active=true;service.release_receipt(*output);
+    return MT2FW_MT2_OK;
+}
+MT2FW_MT2_Result MT2FW_CALL NativeOwnership::release_unbind(void* context,uint64_t token,MT2FW_MT2_ReleaseReceipt* output){
+    auto value=owner(context);if(!value)return MT2FW_MT2_UNAVAILABLE;
+    if(!output||output->size<sizeof(*output)||!token)return MT2FW_MT2_INVALID;
+    auto& service=*value->service;std::lock_guard lock(service.gate_);
+    if(service.release_.owner!=value||service.release_.token!=token)return MT2FW_MT2_INVALID;
+    service.release_.active=false;
+    if(service.release_.inflight){service.release_receipt(*output);return MT2FW_MT2_BUSY;}
+    service.release_={};service.release_receipt(*output);return MT2FW_MT2_OK;
+}
+MT2FW_MT2_Result MT2FW_CALL NativeOwnership::release_read(void* context,MT2FW_MT2_ReleaseReceipt* output){
+    auto value=owner(context);if(!value)return MT2FW_MT2_UNAVAILABLE;
+    if(!output||output->size<sizeof(*output))return MT2FW_MT2_INVALID;
+    auto& service=*value->service;std::lock_guard lock(service.gate_);
+    if(service.release_.owner&&service.release_.owner!=value)return MT2FW_MT2_UNAVAILABLE;
+    service.release_receipt(*output);return service.release_.failed?MT2FW_MT2_FAILED:MT2FW_MT2_OK;
+}
+uint32_t NativeOwnership::release_command(const MT2FW_MT2_ReleaseCall& input){
+    std::unique_lock lock(gate_);auto value=release_.owner;
+    if(!value||!release_.active||!value->active||input.native_return!=release_caller_)return MT2FW_MT2_RELEASE_FORWARD;
+    if(input.size<sizeof(input)||!input.readable)return release_failed(*value,"Original celebration command could not be read; code="+std::to_string(input.read_error));
+    if(input.length!=7||!input.text||std::memcmp(input.text,"LevelUp",7))return MT2FW_MT2_RELEASE_FORWARD;
+    if(!value->plugin->active||value->plugin->staging||value->plugin->manifest.type!="native"||value->plugin->manifest.id!="doodesch.multiplayer")return release_failed(*value,"Registered release owner is no longer an active native multiplayer mod");
+    if(!input.receiver||!input.native_command)return release_failed(*value,"Original celebration receiver or GNU string object is absent");
+    auto game_thread=game_thread_.load();
+    if(!game_thread||input.thread!=game_thread)return release_failed(*value,"Original celebration LevelUp is outside the bound game thread");
+    if(release_.failed)return release_failed(*value,release_.cause);
+    if(release_.inflight)return release_failed(*value,"Release LevelUp delegate re-entered an in-flight release callback");
+    if(!next_release_invocation_)return release_failed(*value,"Release invocation counter exhausted");
+    auto call=input;call.invocation=next_release_invocation_++;call.registration=release_.token;
+    release_.last_invocation=call.invocation;auto callback=release_.callback;auto user=release_.user;++value->inflight;++release_.inflight;
+    // Keep retirement blocked even if constructing an error message throws.
+    auto finish=[this](Owner* active){std::lock_guard guard(gate_);--active->inflight;--release_.inflight;};
+    std::unique_ptr<Owner,decltype(finish)> lease(value,finish);
+    lock.unlock();
+    MT2FW_MT2_ReleaseDecision decision{sizeof(decision),MT2FW_MT2_RELEASE_FAILED,{}};
+    auto result=MT2FW_MT2_FAILED;std::string cause;
+    try{result=callback(user,&call,&decision);}
+    catch(const std::exception& problem){cause=std::string("Delegate exception: ")+problem.what();}
+    catch(...){cause="Delegate exception: unknown native exception";}
+    lock.lock();
+    auto end=std::find(std::begin(decision.cause),std::end(decision.cause),'\0');
+    if(cause.empty()&&end==std::end(decision.cause))cause="Delegate cause is not terminated";
+    if(cause.empty()&&decision.size<sizeof(decision))cause="Delegate decision size is invalid";
+    if(cause.empty()&&(result!=MT2FW_MT2_OK||decision.disposition==MT2FW_MT2_RELEASE_FAILED)){
+        cause.assign(decision.cause,end);
+        if(cause.empty())cause="Delegate returned failure without a cause; result="+std::to_string(result);
+    }
+    if(cause.empty()&&decision.disposition!=MT2FW_MT2_RELEASE_FORWARD&&decision.disposition!=MT2FW_MT2_RELEASE_SUPPRESS)cause="Delegate disposition is invalid";
+    if(!cause.empty())return release_failed(*value,cause);
+    // A recursive call can fail the registration while the outer delegate runs.
+    if(release_.failed)return release_failed(*value,release_.cause);
+    release_.last_disposition=decision.disposition;return decision.disposition;
 }
 void NativeOwnership::receipt(MT2FW_MT2_FreeReceipt& output){
     output={};output.size=sizeof(output);output.state=state_;output.generation=generation_;output.slot=proof_.slot;output.current=live_confirmed_?proof_.current:0;
@@ -106,9 +195,11 @@ bool NativeOwnership::retire(Plugin& plugin){
     std::lock_guard lock(gate_);auto found=owners_.find(&plugin);if(found==owners_.end())return true;auto& value=*found->second;value.active=false;
     for(auto& command:commands_)if(command.owner==&value)command.active=false;
     for(auto& input:inputs_)if(input.owner==&value)input.active=false;
+    if(release_.owner==&value)release_.active=false;
     if(value.inflight){report(value,"Mode command observer retirement waits for in-flight callback");return false;}
     std::erase_if(commands_,[&](auto& command){return command.owner==&value;});
     std::erase_if(inputs_,[&](auto& input){return input.owner==&value;});
+    if(release_.owner==&value)release_={};
     if(free_owner_!=&value)return true;MT2FW_MT2_FreeReceipt output{sizeof(output)};
     if(disable_free(value,&output)!=MT2FW_MT2_OK)return false;
     if(retained_){plugin.native_retained=true;return true;}free_owner_=nullptr;state_=MT2FW_MT2_ROUTE_REMOVED;return true;

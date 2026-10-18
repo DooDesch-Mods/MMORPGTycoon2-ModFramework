@@ -44,7 +44,9 @@ private:
     struct Owner {NativeRoutes* service=nullptr;Plugin* plugin=nullptr;std::atomic<bool> active{true};size_t inflight=0;std::string last_error;uint64_t suppressed_errors=0;};
     struct CreatePair {uint64_t token;Owner* owner;MT2FW_MT2_CreateBefore before;MT2FW_MT2_CreateAfter after;void* user;bool active=true;};
     struct Authority {uint64_t token=0;Owner* owner=nullptr;MT2FW_MT2_RemoveAuthority callback=nullptr;void* user=nullptr;bool active=false;};
-    struct Target {uint64_t rva;bool shared;uint32_t state=MT2FW_MT2_ROUTE_PRISTINE;uint64_t generation=0;Owner* owner=nullptr;void* detour=nullptr;void* trampoline=nullptr;Bytes pristine{},current{};std::string cause;bool created=false,retained=false;};
+    // current retains only this entry's patch. Receipts compose acknowledged
+    // neighbours without changing this owner's generation or pristine bytes.
+    struct Target {uint64_t rva;bool shared;uint32_t state=MT2FW_MT2_ROUTE_PRISTINE;uint64_t generation=0;Owner* owner=nullptr;void* detour=nullptr;void* trampoline=nullptr;Bytes pristine{},current{};std::string cause;bool created=false,retained=false;uint32_t patch_size=0;uint64_t patch_generation=0;};
     struct Continuation {void* manager;void* array;RemoveOriginal original;bool attempted=false,returned=false,duplicate=false;std::exception_ptr exception;};
     std::function<Plugin*(const MT2FW_Host*)> lookup_;
     Backend backend_;
@@ -80,6 +82,9 @@ private:
         catch(...){boundary_error(context,"Unknown native route exception");return failure;}
     }
     bool validate(Target&,std::string&);
+    bool compose(const Target&,Bytes&,std::string&,const Target* omitted=nullptr,const Target* retiring=nullptr) const;
+    bool accept_enabled(Target&,const Bytes&,std::string&);
+    bool accept_restored(Target&,std::string&);
     void receipt(const Target&,MT2FW_MT2_RouteReceipt&);
     static uint64_t MT2FW_CALL create_subscribe(void*,MT2FW_MT2_CreateBefore,MT2FW_MT2_CreateAfter,void*);
     static MT2FW_MT2_Result MT2FW_CALL create_unsubscribe(void*,uint64_t);

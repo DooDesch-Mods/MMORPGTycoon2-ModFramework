@@ -3,7 +3,7 @@
 <desc id="description">available: 7 of 10; partial: 1 of 10; experimental: 1 of 10; planned: 1 of 10. Each tile is one tracked feature area. Percentages describe the listed areas, not overall project completion or stability.</desc>
 <path fill="#0b1723" d="M0 0h1200v560H0z"/>
 <text x="28" y="44" font-family="Arial" font-size="30" fill="#f2f7fb" font-weight="700">Framework feature coverage</text>
-<text x="28" y="78" font-family="Arial" font-size="22" fill="#b8cad8" font-weight="400">Framework 0.2.1 - Development preview</text>
+<text x="28" y="78" font-family="Arial" font-size="22" fill="#b8cad8" font-weight="400">Framework 0.2.2 - Development preview</text>
 <text x="28.0" y="126" font-family="Arial" font-size="37" fill="#64e4d5" font-weight="700">70.0%</text>
 <text x="28.0" y="155" font-family="Arial" font-size="23" fill="#64e4d5" font-weight="700">Available</text>
 <text x="28.0" y="184" font-family="Arial" font-size="20" fill="#b8cad8" font-weight="400">7 of 10 tracked areas</text>

@@ -8,6 +8,7 @@ namespace {
 constexpr const char* game_sha="bbab2dc68babcc644d0a1679548bf1e334b6c52aea669c3f61f6cb9d45c1aaf6";
 template<size_t N>void copy(char(&output)[N],const std::string& value){auto length=std::min(value.size(),N-1);std::memcpy(output,value.data(),length);output[length]=0;}
 bool output_ok(MT2FW_MT2_RouteReceipt* out){return out&&out->size>=sizeof(*out);}
+bool overlaps(uint64_t a,size_t an,uint64_t b,size_t bn){return a<=b?b-a<an:a-b<bn;}
 void patch_error(Runtime& runtime,const std::string& cause) noexcept {
     try{runtime.queue_patch_error("framework",cause);}
     catch(const std::exception& error){std::fprintf(stderr,"Native Create patch: %s; logging failed: %s\n",cause.c_str(),error.what());}
@@ -23,6 +24,10 @@ void NativeRoutes::catalog(const std::string& name,uint64_t rva,bool shared){
     for(auto& [key,value]:targets_)if(value.rva==rva)throw std::runtime_error("Native route catalog RVA aliases: "+key);
     Target value{rva,shared};value.retained=!shared&&rva==0x1264b60;
     std::string cause;if(!backend_.pristine||!backend_.pristine(rva,0,value.pristine.data(),value.pristine.size(),cause))throw std::runtime_error("Native route pristine admission failed: "+name+": "+cause);
+    for(const auto& [other,peer]:targets_)if(overlaps(rva,32,peer.rva,32)){
+        for(size_t i=0;i<32;++i)if(rva+i>=peer.rva&&rva+i-peer.rva<32&&value.pristine[i]!=peer.pristine[rva+i-peer.rva])
+            throw std::runtime_error("Overlapping pristine native route differs: "+name+" and "+other);
+    }
     value.current=value.pristine;targets_.emplace(name,std::move(value));
 }
 NativeRoutes::Owner* NativeRoutes::owner(void* context){auto result=static_cast<Owner*>(context);return result&&result->active?result:nullptr;}
@@ -120,24 +125,76 @@ void NativeRoutes::remove(const MT2FW_MT2_RemoveCall& input,RemoveOriginal origi
     {std::lock_guard lock(gate_);--authority.owner->inflight;}
     if(continuation.exception)std::rethrow_exception(continuation.exception);
 }
-bool NativeRoutes::validate(Target& target,std::string& cause){
-    Bytes actual{};if(!backend_.read(image_+target.rva,actual.data(),actual.size(),cause))return false;
-    if(actual!=target.current){cause="Current native route differs from acknowledged adapter route";return false;}
-    if(target.detour&&target.current!=target.pristine&&(!backend_.prove||!backend_.prove(reinterpret_cast<void*>(image_+target.rva),target.detour,cause)))return false;
+bool NativeRoutes::compose(const Target& target,Bytes& expected,std::string& cause,const Target* omitted,const Target* retiring)const{
+    expected=target.pristine;std::array<bool,32> written{};
+    for(const auto& [name,peer]:targets_){
+        if(&peer==omitted||!peer.patch_size||!overlaps(target.rva,32,peer.rva,peer.patch_size))continue;
+        bool state=peer.state==MT2FW_MT2_ROUTE_ENABLED||(&peer==retiring&&peer.state==MT2FW_MT2_ROUTE_UNKNOWN);
+        if(!state||peer.patch_size>32||!peer.generation||peer.patch_generation!=peer.generation||!peer.detour||!peer.trampoline||
+           (!peer.shared&&(!peer.created||!peer.owner||peer.owner->service!=this||!peer.owner->plugin))){
+            cause="Adjacent native route has no acknowledged owned generation: "+name;return false;
+        }
+        for(uint32_t i=0;i<peer.patch_size;++i){auto address=peer.rva+i;if(address<target.rva||address-target.rva>=32)continue;
+            auto position=size_t(address-target.rva);
+            if(peer.pristine[i]!=target.pristine[position]){cause="Overlapping pristine native route differs: "+name;return false;}
+            if(written[position]){cause="Owned native patch spans overlap: "+name;return false;}
+            written[position]=true;expected[position]=peer.current[i];
+        }
+    }
     return true;
+}
+bool NativeRoutes::validate(Target& target,std::string& cause){
+    // Validate the full receipt window of every patch owner that contributes
+    // bytes, including transitive neighbours, before trusting its projection.
+    std::vector<Target*> pending{&target};
+    for(size_t i=0;i<pending.size();++i)for(auto& [name,peer]:targets_)
+        if(peer.patch_size&&overlaps(pending[i]->rva,32,peer.rva,32)&&std::find(pending.begin(),pending.end(),&peer)==pending.end())pending.push_back(&peer);
+    for(auto* value:pending){
+        Bytes expected{},actual{};if(!compose(*value,expected,cause,nullptr,&target)||!backend_.read(image_+value->rva,actual.data(),32,cause))return false;
+        if(actual!=expected){size_t i=0;while(i<32&&actual[i]==expected[i])++i;cause="Current native route differs from acknowledged adapter route: rva="+std::to_string(value->rva)+" byte="+std::to_string(i);return false;}
+        if(value->patch_size&&(!backend_.prove||!backend_.prove(reinterpret_cast<void*>(image_+value->rva),value->detour,cause))){cause="Owned native detour proof failed at rva="+std::to_string(value->rva)+": "+cause;return false;}
+    }
+    return true;
+}
+bool NativeRoutes::accept_enabled(Target& target,const Bytes& actual,std::string& cause){
+    Bytes before{};if(!compose(target,before,cause,&target))return false;
+    uint32_t length=0;
+    if(actual[0]==0xe9)length=5;
+    else if(actual[0]==0xeb)length=2;
+    else if(actual[0]==0xff&&actual[1]==0x25){int32_t displacement=0;std::memcpy(&displacement,actual.data()+2,4);length=displacement==0?14:6;}
+    if(!length){cause="Native enable has no supported owned jump prefix";return false;}
+    for(const auto& [name,peer]:targets_)if(&peer!=&target&&peer.patch_size&&overlaps(target.rva,length,peer.rva,peer.patch_size)){
+        cause="Owned native patch spans overlap: "+name;return false;
+    }
+    bool changed=false;for(uint32_t i=0;i<length;++i)changed|=actual[i]!=before[i];
+    if(!changed){cause="Native enable did not change its own entry bytes";return false;}
+    for(size_t i=length;i<32;++i)if(actual[i]!=before[i]){cause="Native enable changed bytes outside its owned jump: rva="+std::to_string(target.rva)+" byte="+std::to_string(i);return false;}
+    if(!backend_.prove||!backend_.prove(reinterpret_cast<void*>(image_+target.rva),target.detour,cause))return false;
+    target.current=target.pristine;std::copy_n(actual.begin(),length,target.current.begin());
+    target.patch_size=length;target.patch_generation=target.generation;target.state=MT2FW_MT2_ROUTE_ENABLED;
+    return validate(target,cause);
+}
+bool NativeRoutes::accept_restored(Target& target,std::string& cause){
+    Bytes expected{},actual{};if(!compose(target,expected,cause,&target)||!backend_.read(image_+target.rva,actual.data(),32,cause))return false;
+    if(actual!=expected){cause="Native restore differs from pristine and remaining owned adjacent routes: rva="+std::to_string(target.rva);return false;}
+    target.current=target.pristine;target.patch_size=0;target.patch_generation=0;
+    return validate(target,cause);
 }
 void NativeRoutes::receipt(const Target& target,MT2FW_MT2_RouteReceipt& output){
     output={sizeof(output),target.state,target.generation,target.rva,image_+target.rva,reinterpret_cast<uintptr_t>(target.trampoline),reinterpret_cast<uintptr_t>(target.detour)};
-    std::memcpy(output.pristine,target.pristine.data(),32);std::memcpy(output.current,target.current.data(),32);
-    copy(output.owner,target.owner?target.owner->plugin->manifest.id:target.shared?"framework":"");copy(output.game_sha256,game_sha);copy(output.cause,target.cause);
+    Bytes current{};std::string cause;bool composed=compose(target,current,cause,nullptr,&target);
+    if(!composed){output.state=MT2FW_MT2_ROUTE_UNKNOWN;current=target.current;}
+    std::memcpy(output.pristine,target.pristine.data(),32);std::memcpy(output.current,current.data(),32);
+    copy(output.owner,target.owner?target.owner->plugin->manifest.id:target.shared?"framework":"");copy(output.game_sha256,game_sha);copy(output.cause,target.cause.empty()?cause:target.cause);
 }
 bool NativeRoutes::publish_shared(const std::string& name,void* detour,void* trampoline,std::string& cause){
     std::lock_guard lock(gate_);auto found=targets_.find(name);
     if(found==targets_.end()||!found->second.shared||!detour||!trampoline){cause="Shared native route publication requires catalog and actual trampoline";return false;}
     auto& target=found->second;Bytes current{};
     if(!backend_.prove||!backend_.prove(reinterpret_cast<void*>(image_+target.rva),detour,cause)||!backend_.read(image_+target.rva,current.data(),32,cause))return false;
-    if(current==target.pristine){cause="Shared native route is not enabled";return false;}
-    target.detour=detour;target.trampoline=trampoline;target.current=current;target.state=MT2FW_MT2_ROUTE_ENABLED;++target.generation;return true;
+    target.detour=detour;target.trampoline=trampoline;++target.generation;
+    if(accept_enabled(target,current,cause))return true;
+    target.state=MT2FW_MT2_ROUTE_UNKNOWN;target.cause="Shared native route acknowledgement failed: "+cause;return false;
 }
 bool NativeRoutes::publish_framework_hook(void* target,void* detour,void* trampoline,std::string& cause){
     std::lock_guard lock(gate_);for(auto& [name,value]:targets_)if(image_+value.rva==reinterpret_cast<uintptr_t>(target)){
@@ -166,7 +223,7 @@ MT2FW_MT2_Result MT2FW_CALL NativeRoutes::hook_enable(void* context,const char* 
     std::string cause;bool okay=false;
     if(service.validate(target,cause)){try{okay=service.backend_.enable(reinterpret_cast<void*>(service.image_+target.rva),target.detour,cause);}catch(const std::exception& problem){cause=problem.what();}catch(...){cause="unknown native exception";}}
     Bytes actual{};
-    if(okay&&service.backend_.read(service.image_+target.rva,actual.data(),32,cause)&&actual!=target.pristine){target.current=actual;target.state=MT2FW_MT2_ROUTE_ENABLED;target.cause.clear();service.receipt(target,*output);return MT2FW_MT2_OK;}
+    if(okay&&service.backend_.read(service.image_+target.rva,actual.data(),32,cause)&&service.accept_enabled(target,actual,cause)){target.cause.clear();service.receipt(target,*output);return MT2FW_MT2_OK;}
     target.state=MT2FW_MT2_ROUTE_UNKNOWN;target.cause="Native enable outcome unknown: "+cause;service.report(*value,target.cause);service.receipt(target,*output);return MT2FW_MT2_FAILED;
 }
 MT2FW_MT2_Result MT2FW_CALL NativeRoutes::hook_remove(void* context,const char* name,MT2FW_MT2_RouteReceipt* output){
@@ -177,8 +234,7 @@ MT2FW_MT2_Result MT2FW_CALL NativeRoutes::hook_remove(void* context,const char* 
     std::string admission;
     if(!target.created||!service.validate(target,admission)){target.state=MT2FW_MT2_ROUTE_UNKNOWN;target.cause="Native removal has no authenticated current owned route: "+admission;service.receipt(target,*output);return MT2FW_MT2_FAILED;}
     std::string cause;bool okay=false;try{okay=service.backend_.remove(reinterpret_cast<void*>(service.image_+target.rva),cause);}catch(const std::exception& problem){cause=problem.what();}catch(...){cause="unknown native exception";}
-    Bytes actual{};
-    if(okay&&service.backend_.read(service.image_+target.rva,actual.data(),32,cause)&&actual==target.pristine){target.current=actual;target.state=MT2FW_MT2_ROUTE_REMOVED;target.cause.clear();target.owner=nullptr;target.detour=nullptr;target.trampoline=nullptr;target.created=false;service.receipt(target,*output);return MT2FW_MT2_OK;}
+    if(okay&&service.accept_restored(target,cause)){target.state=MT2FW_MT2_ROUTE_REMOVED;target.cause.clear();target.owner=nullptr;target.detour=nullptr;target.trampoline=nullptr;target.created=false;service.receipt(target,*output);return MT2FW_MT2_OK;}
     target.state=MT2FW_MT2_ROUTE_UNKNOWN;target.cause="Native remove outcome unknown: "+cause;service.report(*value,target.cause);service.receipt(target,*output);return MT2FW_MT2_FAILED;
 }
 MT2FW_MT2_Result MT2FW_CALL NativeRoutes::route_read(void* context,const char* name,MT2FW_MT2_RouteReceipt* output){
@@ -193,7 +249,8 @@ MT2FW_MT2_Result MT2FW_CALL NativeRoutes::code_verify(void* context,const char* 
     std::array<unsigned char,4096> pristine{},actual{};std::string cause;
     if(!service.backend_.pristine(target.rva,offset,pristine.data(),length,cause)||std::memcmp(pristine.data(),expected,length)||!service.backend_.read(service.image_+target.rva+offset,actual.data(),length,cause)){
         target.cause="Pristine native code guard differs: "+cause;service.receipt(target,*output);return MT2FW_MT2_FAILED;}
-    for(uint32_t i=0;i<length;++i){auto position=offset+i;auto current=position<32?target.current[position]:pristine[i];if(actual[i]!=current){target.cause="Native body or owned route guard differs";service.receipt(target,*output);return MT2FW_MT2_FAILED;}}
+    Bytes route{};if(!service.compose(target,route,cause)){target.cause=cause;service.receipt(target,*output);return MT2FW_MT2_FAILED;}
+    for(uint32_t i=0;i<length;++i){auto position=offset+i;auto current=position<32?route[position]:pristine[i];if(actual[i]!=current){target.cause="Native body or owned route guard differs";service.receipt(target,*output);return MT2FW_MT2_FAILED;}}
     target.cause.clear();service.receipt(target,*output);return MT2FW_MT2_OK;
 }
 bool NativeRoutes::retire(Plugin& plugin){
@@ -221,8 +278,7 @@ MT2FW_MT2_Result NativeRoutes::disable(Plugin& plugin,const char* name,MT2FW_MT2
     std::string cause;if(!target.created||!validate(target,cause)){target.state=MT2FW_MT2_ROUTE_UNKNOWN;target.cause="Native disable has no authenticated owned route: "+cause;receipt(target,*output);return MT2FW_MT2_FAILED;}
     if(target.current==target.pristine){target.state=MT2FW_MT2_ROUTE_DISABLED_RETAINED;target.cause.clear();receipt(target,*output);return MT2FW_MT2_OK;}
     bool okay=false;try{okay=backend_.disable&&backend_.disable(reinterpret_cast<void*>(image_+target.rva),cause);}catch(const std::exception& problem){cause=problem.what();}catch(...){cause="unknown native exception";}
-    Bytes actual{};
-    if(okay&&backend_.read(image_+target.rva,actual.data(),32,cause)&&actual==target.pristine){target.current=actual;target.state=MT2FW_MT2_ROUTE_DISABLED_RETAINED;target.cause.clear();receipt(target,*output);return MT2FW_MT2_OK;}
+    if(okay&&accept_restored(target,cause)){target.state=MT2FW_MT2_ROUTE_DISABLED_RETAINED;target.cause.clear();receipt(target,*output);return MT2FW_MT2_OK;}
     target.state=MT2FW_MT2_ROUTE_UNKNOWN;target.cause="Native disable outcome unknown: "+cause;report(*owned->second,target.cause);receipt(target,*output);return MT2FW_MT2_FAILED;
 }
 MT2FW_MT2_Result NativeRoutes::resume(Plugin& plugin,const char* name,MT2FW_MT2_RouteReceipt* output){
