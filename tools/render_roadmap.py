@@ -138,7 +138,7 @@ def coverage_graphic(data, mobile=False):
             out.append('</g>')
         offset += size
     out.extend([text(28, height - 44, 'Each tile is one tracked feature area.', 20),
-                text(28, height - 16, 'Partial scope is shown in the table below.', 20), '</svg>'])
+                text(28, height - 16, 'See feature details for scope and limits.', 20), '</svg>'])
     return '\n'.join(out) + '\n'
 
 
