@@ -1,5 +1,17 @@
 # Changelog
 
+## 0.1.6
+
+### Added
+
+- Native mod apps can add their own icon to the game desktop, with a separate launch request for each app.
+- Native mod apps can open the original New Game wizard and observe its state. An already open wizard keeps the player's name, map seed and current page.
+- Experimental app integration guide and machine contract for native mod authors.
+
+### Compatibility
+
+- Multiplayer uses the new app operations and requires this Runtime or newer. Lua API 1.0.0 and native C ABI 1 remain unchanged.
+
 ## 0.1.5
 
 ### Added

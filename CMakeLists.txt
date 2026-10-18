@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.24)
-project(MT2Framework VERSION 0.1.5 LANGUAGES C CXX)
+project(MT2Framework VERSION 0.1.6 LANGUAGES C CXX)
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_POLICY_VERSION_MINIMUM 3.5)
@@ -53,6 +53,15 @@ add_executable(mt2fw_core_tests tests/core_tests.cpp)
 target_link_libraries(mt2fw_core_tests PRIVATE mt2fw_core)
 add_test(NAME framework_core COMMAND mt2fw_core_tests)
 set_tests_properties(framework_core PROPERTIES TIMEOUT 15)
+add_executable(mt2fw_native_app_state_tests tests/native_app_state_tests.cpp)
+target_include_directories(mt2fw_native_app_state_tests PRIVATE adapters/mt2)
+target_compile_definitions(mt2fw_native_app_state_tests PRIVATE
+  MT2FW_TEST_ENTRY="${CMAKE_CURRENT_SOURCE_DIR}/adapters/mt2/ui/entry.win")
+if(MSVC)
+  target_compile_options(mt2fw_native_app_state_tests PRIVATE /utf-8)
+endif()
+add_test(NAME framework_native_app_state COMMAND mt2fw_native_app_state_tests)
+set_tests_properties(framework_native_app_state PROPERTIES TIMEOUT 10)
 add_executable(mt2fw_docs_probe tests/docs_probe.cpp)
 target_link_libraries(mt2fw_docs_probe PRIVATE mt2fw_core)
 add_library(mt2fw_example_native SHARED templates/native/plugin.cpp)
@@ -71,6 +80,18 @@ if(MT2FW_GAME)
   target_include_directories(mt2fw_titlebar_visibility_tests PRIVATE "${MT2FW_VENDOR}" adapters/mt2)
   add_test(NAME framework_titlebar_visibility COMMAND mt2fw_titlebar_visibility_tests)
   find_package(Python3 REQUIRED COMPONENTS Interpreter)
+  set(WIZARD_STATE_BODY "${CMAKE_CURRENT_BINARY_DIR}/wizard-state/wizard_state.inc")
+  add_custom_command(OUTPUT "${WIZARD_STATE_BODY}"
+    COMMAND "${Python3_EXECUTABLE}" -X utf8 "${CMAKE_CURRENT_SOURCE_DIR}/tests/wizard-state/extract_state.py"
+      "${CMAKE_CURRENT_SOURCE_DIR}/adapters/mt2/native_app_probe.inc" "${WIZARD_STATE_BODY}"
+    DEPENDS tests/wizard-state/extract_state.py adapters/mt2/native_app_probe.inc VERBATIM)
+  add_executable(mt2fw_wizard_state_tests tests/wizard-state/state_tests.cpp "${WIZARD_STATE_BODY}")
+  target_include_directories(mt2fw_wizard_state_tests PRIVATE "${MT2FW_VENDOR}" "${CMAKE_CURRENT_BINARY_DIR}/wizard-state")
+  if(MSVC)
+    target_compile_options(mt2fw_wizard_state_tests PRIVATE /W4 /WX /utf-8)
+  endif()
+  add_test(NAME framework_wizard_state COMMAND mt2fw_wizard_state_tests)
+  set_tests_properties(framework_wizard_state PROPERTIES TIMEOUT 10)
   add_custom_command(OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/actual_native_window_block.inc"
     COMMAND "${Python3_EXECUTABLE}" -B -X utf8 "${CMAKE_CURRENT_SOURCE_DIR}/tests/native-window-reopen/extract_native_window.py"
       --source "${CMAKE_CURRENT_SOURCE_DIR}/adapters/mt2/desktop_ui.cpp"

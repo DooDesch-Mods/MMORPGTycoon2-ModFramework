@@ -1,0 +1,85 @@
+{
+  "contract": "mt2-native-app-integration",
+  "version": 1,
+  "stability": "experimental",
+  "capability": "ui",
+  "callback": "render on the bound game thread",
+  "owner": "injected by the native host",
+  "operations": {
+    "ui.app": {
+      "arguments": {
+        "id": {
+          "type": "string",
+          "min_bytes": 1,
+          "max_bytes": 64,
+          "pattern": "^[a-zA-Z0-9_.-]+$"
+        },
+        "title": {
+          "type": "string",
+          "min_utf8_bytes": 1,
+          "max_utf8_bytes": 80
+        },
+        "desktop": {
+          "type": "boolean",
+          "default": false
+        },
+        "icon": {
+          "type": "string",
+          "optional": true,
+          "forms": [
+            "assets/<relative>.png",
+            "cache/<sha256>.png"
+          ],
+          "max_bytes": 256,
+          "requires_desktop": true,
+          "owner_confined": true
+        }
+      },
+      "desktop_limit": 64,
+      "open_requested": "per-owner, coalesced, consumed once",
+      "desktop_response": [
+        "requested",
+        "registered",
+        "visible",
+        "visibility_known",
+        "error"
+      ],
+      "retirement": "clear pending requests, hide icon, retain native ownership until destruction"
+    },
+    "ui.new_world": {
+      "arguments": {
+        "observe": {
+          "type": "boolean",
+          "default": false
+        }
+      },
+      "requires_registered_app": true,
+      "required_mode": 2,
+      "success": [
+        "already_open",
+        "opened"
+      ],
+      "failure": [
+        "rejected",
+        "unknown"
+      ],
+      "read_only_success": "observed",
+      "observe_calls_launcher": false,
+      "caller_may_hide_app_only_if": "confirmed == true and status in [opened, already_open]",
+      "already_open_calls_launcher": false,
+      "world_creation_confirmed": false,
+      "automatic_retry": false,
+      "receipt_fields": [
+        "status",
+        "confirmed",
+        "attempted",
+        "visible",
+        "mode",
+        "window",
+        "route",
+        "cause"
+      ]
+    }
+  },
+  "minimum_framework_version": "0.1.6"
+}

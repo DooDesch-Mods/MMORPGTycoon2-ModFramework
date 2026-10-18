@@ -3,6 +3,7 @@
 #include <nlohmann/json.hpp>
 namespace mt2mp::game::native {
 bool read_initial_save_world(void* receiver,std::string& folder,std::string& error);
+bool show_new_game_window(void* expected_title,void* expected_window,bool& attempted,std::string& error);
 struct ObservationHook {void* target;void* replacement;void** original;};
 struct ObjectChange {std::string operation;PropState prop;bool removed=false;};
 std::vector<ObservationHook> observation_hooks();

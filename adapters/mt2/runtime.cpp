@@ -314,6 +314,7 @@ void menu_state(bool visible) {
 }
 Json ui_request(const std::string& op,const Json& args) {
     if(op=="ui.app")return mt2::desktop::app(args);
+    if(op=="ui.new_world")return mt2::desktop::new_world(args);
     if(op=="ui.native")return mt2::desktop::native_window(args);
     if(!ui_ready||!ImGui::GetCurrentContext())throw std::runtime_error("UI context unavailable");
     if(op=="ui.document"||op=="ui.image.load")return mt2fw::document_ui::request(op,args,root);

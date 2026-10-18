@@ -2397,6 +2397,30 @@ bool request_exit_game(std::string& error) {
     return true;
 }
 
+bool show_new_game_window(void* expected_title, void* expected_window, bool& attempted, std::string& error) {
+    attempted = false;
+    if (!check_thread(error)) return false;
+    const auto* game = singleton(game_slot);
+    void* active = nullptr;
+    void* title = nullptr;
+    void* window = nullptr;
+    unsigned char pending = 1, visible = 1;
+    int32_t requested = -1;
+    if (!has_vtable(game, 0x1743730) || !read_at(game, 0x28, active) ||
+        !read_at(game, 0x350, title) || title != expected_title || active != title ||
+        !has_vtable(title, 0x16dfba0) || !read_at(game, 0x434, requested) || requested != 2)
+        return fail(error, "New Game launch rejected: idle current Title owner required");
+    if (!read_at(title, 0xd0, pending) || pending || !read_at(title, 0x20, window) ||
+        window != expected_window || !has_vtable(window, 0x1707fa0) ||
+        !read_at(window, 0x45f, visible) || visible)
+        return fail(error, "New Game launch rejected: hidden owned wizard required, with no pending transition");
+    attempted = true;
+    const auto exception = call_void(0x4b8770, title);
+    if (exception) return fail(error, "New Game ShowCreateWindow failed: native exception=" + std::to_string(exception));
+    error.clear();
+    return true;
+}
+
 bool prepare_test_world(const std::string& name, std::string& error) {
     void* title = nullptr;
     void* window = nullptr;

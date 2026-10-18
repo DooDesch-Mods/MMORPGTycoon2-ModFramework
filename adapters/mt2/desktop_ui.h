@@ -13,5 +13,6 @@ bool visible();
 Json status();
 Json activate(const Json& args);
 Json app(const Json& args);
+Json new_world(const Json& args);
 Json native_window(const Json& args);
 }

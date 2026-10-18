@@ -2,10 +2,12 @@
 #include "native_extensions.h"
 #include "crypto.h"
 #include "native_input.h"
+#include "native_app_state.h"
 #include <windows.h>
 #include <array>
 #include <chrono>
 #include <cstring>
+#include <cmath>
 #include <fstream>
 #include <sstream>
 
@@ -13,6 +15,7 @@ namespace mt2fw::mt2::desktop {
 namespace {
 namespace native = mt2mp::game::native;
 Runtime* runtime = nullptr;
+constexpr int desktop_entry_resource = 202;
 uintptr_t image = 0;
 DWORD thread = 0;
 fs::path profile;
@@ -29,8 +32,24 @@ std::string selected, fault, notice, last_command, pending_reload;
 uint64_t commands = 0, command_errors = 0;
 std::chrono::steady_clock::time_point refreshed{};
 std::map<std::string, std::string> labels;
-struct App { const Plugin* owner = nullptr; std::string id, title; bool requested = false; };
+struct App {
+    const Plugin* owner = nullptr;
+    std::string id, title, image_path, icon_material, icon_error;
+    native_app::OpenRequest request;
+    bool desktop = false, position_valid = false, presentation_dirty = true;
+    bool icon_confirmed = false;
+    std::optional<bool> icon_visible;
+    void* icon = nullptr;
+    void* attempted_desktop = nullptr;
+    uint64_t launches = 0;
+    std::array<float, 2> position{};
+};
 std::map<std::string, App> apps;
+native_app::WizardLatch wizard;
+void native_file(const fs::path& path, const std::string& bytes);
+void native_mount();
+std::string native_image(const std::string& owner, const std::string& relative);
+std::string app_icon_image(const std::string& owner, const std::string& relative);
 struct NativeWindow {
     const Plugin* owner = nullptr;
     void* mode = nullptr;
@@ -48,7 +67,7 @@ MenuElements original_elements = nullptr;
 MenuSelect original_select = nullptr;
 bool start_entry_registered = false;
 uint64_t start_entry_launches = 0;
-struct Binding { void* desktop; void* record; };
+struct Binding { void* desktop; void* record; std::string app_owner; const Plugin* plugin = nullptr; };
 std::map<void*, Binding> icons;
 using IconMethod = void(*)(void*);
 IconMethod original_launch = nullptr, original_destroy = nullptr;
@@ -263,7 +282,8 @@ void invoke(const std::string& value) {
         } else if (value == "MT2FWApp") {
             auto app = apps.find(selected);
             require(plugin->active && app != apps.end() && app->second.owner == plugin, "Selected mod has no active app");
-            app->second.requested = true; set_open(false);
+            app->second.request.active = true;
+            app->second.request.launch(); set_open(false);
         } else if (value == "MT2FWSettings") details(selected, false);
         else throw std::runtime_error("Unknown Mods command: " + value);
     }
@@ -280,7 +300,7 @@ void mount_assets() {
     HMODULE module = nullptr;
     require(GetModuleHandleExW(GET_MODULE_HANDLE_EX_FLAG_FROM_ADDRESS | GET_MODULE_HANDLE_EX_FLAG_UNCHANGED_REFCOUNT,
         reinterpret_cast<LPCWSTR>(&mount_assets), &module) != 0, "Framework module identity unavailable");
-    std::map<std::string, std::string> files{{"mods.png", resource(module, 201)}, {"entry.win", resource(module, 202)},
+    std::map<std::string, std::string> files{{"mods.png", resource(module, 201)}, {"entry.win", resource(module, desktop_entry_resource)},
         {"mods.win", resource(module, 203)}, {"materials/mt2fw_desktop_mods.mat", resource(module, 204)}};
     const char* materials[]{"base", "library", "details", "rule", "selected"};
     for (int index = 0; index < 5; ++index) files[std::string("materials/mt2fw_ui_") + materials[index] + ".mat"] = resource(module, 205 + index);
@@ -306,7 +326,8 @@ DWORD delete_record(void* record) {
     __try { reinterpret_cast<void(*)(void*)>(image + 0xbfb4b0)(record); }
     __except (EXCEPTION_EXECUTE_HANDLER) { return GetExceptionCode(); } return 0;
 }
-DWORD make_icon(void* desktop, void** output, void** record, bool* handed_off) {
+DWORD make_icon(void* desktop, void** output, void** record, bool* handed_off,
+                const char* entry_path = "mt2fw_ui/entry.win", const float* initial_position = nullptr) {
     String filename{}; RecordStorage file{}, source{};
     bool named = false, opened = false, parsed = false; DWORD error = 0;
     __try {
@@ -315,9 +336,10 @@ DWORD make_icon(void* desktop, void** output, void** record, bool* handed_off) {
         int shell = 6; std::memcpy(static_cast<unsigned char*>(*record) + 0x38, &shell, sizeof(shell));
         float width = 0; std::memcpy(&width, static_cast<unsigned char*>(desktop) + 0x138, sizeof(width));
         float position[2] = {width > 120 ? width - 120 : 20, 180};
-        if (position_valid && position_owner == desktop) std::memcpy(position, retained_position.data(), sizeof(position));
+        if (initial_position) std::memcpy(position, initial_position, sizeof(position));
+        else if (position_valid && position_owner == desktop) std::memcpy(position, retained_position.data(), sizeof(position));
         std::memcpy(static_cast<unsigned char*>(*record) + 0x3c, position, sizeof(position));
-        reinterpret_cast<void(*)(void*, const char*)>(image + 0x49e090)(&filename, "mt2fw_ui/entry.win"); named = true;
+        reinterpret_cast<void(*)(void*, const char*)>(image + 0x49e090)(&filename, entry_path); named = true;
         reinterpret_cast<void(*)(void*, const void*, int)>(image + 0x95ec00)(&file, &filename, 0); opened = true;
         reinterpret_cast<void(*)(void*)>(image + 0x9667c0)(&source); parsed = true;
         if (!reinterpret_cast<bool(*)(void*, void*)>(image + 0x95ddb0)(&file, &source)) error = ERROR_INVALID_DATA;
@@ -346,7 +368,7 @@ bool icon_identity(void* icon, const Binding& binding) {
 void* entry(bool title) {
     void* icon = nullptr;
     check(string_call(0x816150, current_desktop, "mt2fw_mods_entry", &icon), "Desktop entry lookup");
-    if (!icon) for (const auto& [candidate, binding] : icons) if (binding.desktop == current_desktop) {
+    if (!icon) for (const auto& [candidate, binding] : icons) if (binding.desktop == current_desktop && binding.app_owner.empty()) {
         require(icon == nullptr, "Multiple Mods icons in the current Desktop"); icon = candidate;
     }
     if (!icon && title) {
@@ -385,20 +407,118 @@ void launch(void* icon) {
     if (found == icons.end()) { original_launch(icon); return; }
     try {
         require(GetCurrentThreadId() == thread && icon_identity(icon, found->second) && found->second.desktop == current_desktop && entry_visible(icon, mode_index == 2), "Mods icon launch requires the current visible Desktop");
-        invoke("MT2FWOpen");
+        if (found->second.app_owner.empty()) invoke("MT2FWOpen");
+        else {
+            auto app = apps.find(found->second.app_owner);
+            require(app != apps.end() && app->second.owner == found->second.plugin &&
+                app->second.icon == icon && app->second.desktop && app->second.icon_error.empty(),
+                "Desktop app registration is no longer active");
+            bool active = false;
+            for (const auto& plugin : runtime->plugins()) if (plugin.get() == app->second.owner && plugin->active) active = true;
+            require(active, "Desktop app mod is inactive");
+            if (panel_open) set_open(false);
+            app->second.request.active = true;
+            app->second.request.launch();
+            ++app->second.launches;
+        }
     } catch (const std::exception& error) { log_error(error.what()); }
 }
 void destroy(void* icon) {
     void* record = nullptr;
     if (auto found = icons.find(icon); found != icons.end()) {
         record = found->second.record;
-        if (read(record, 0x3c, retained_position)) { position_owner = found->second.desktop; position_valid = true; }
-        else log_error("Desktop icon position could not be retained");
-        if (found->second.desktop == current_desktop) icon_attempted = false;
+        if (found->second.app_owner.empty()) {
+            if (read(record, 0x3c, retained_position)) { position_owner = found->second.desktop; position_valid = true; }
+            else log_error("Desktop icon position could not be retained");
+            if (found->second.desktop == current_desktop) icon_attempted = false;
+        } else if (auto app = apps.find(found->second.app_owner); app != apps.end() && app->second.icon == icon) {
+            app->second.position_valid = read(record, 0x3c, app->second.position);
+            if (!app->second.position_valid) log_error("Desktop app position could not be retained: " + found->second.app_owner);
+            app->second.icon = nullptr; app->second.attempted_desktop = nullptr;
+            app->second.icon_confirmed = false; app->second.icon_visible = false;
+        }
         icons.erase(found);
     }
     original_destroy(icon);
     if (record) { auto error = delete_record(record); if (error) log_error("Desktop icon record cleanup failed: " + std::to_string(error)); }
+}
+void sync_app_icons(bool title) {
+    size_t slot = 0;
+    for (auto& [owner, app] : apps) {
+        app.icon_visible.reset();
+        bool active = false;
+        for (const auto& plugin : runtime->plugins()) if (plugin.get() == app.owner && plugin->active) active = true;
+        if (!active) app.request.retire();
+        else app.request.active = true;
+        if (!app.icon_error.empty()) continue;
+        try {
+            uint8_t desktop_shown = 0;
+            require(read(current_desktop, 0x45f, desktop_shown), "Desktop app visibility unreadable");
+            const bool shown = active && app.desktop && title && desktop_shown;
+            auto binding = icons.find(app.icon);
+            bool current = binding != icons.end() && binding->second.desktop == current_desktop;
+            if (!shown) {
+                if (current) { require(icon_identity(app.icon, binding->second), "Desktop app retirement identity differs"); native_shown(app.icon, false); }
+                app.icon_visible = false;
+                continue;
+            }
+            if (!current) {
+                require(app.attempted_desktop != current_desktop, "Desktop app creation already attempted; no replay");
+                native_mount();
+                auto module = GetModuleHandleW(L"MT2Framework.dll");
+                auto bytes = native_app::icon_template(resource(module, desktop_entry_resource), digest(owner));
+                auto filename = "app-" + digest(bytes) + ".win";
+                native_file(profile / "cache/framework-native" / filename, bytes);
+                const auto path = "mt2fw_native/" + filename;
+                std::array<float, 2> position = app.position;
+                if (!app.position_valid) {
+                    float width = 0;
+                    require(read(current_desktop, 0x138, width), "Desktop app placement width unreadable");
+                    position = {(std::max)(20.0f, width - 240.0f - 120.0f * float(slot % 4)), 180.0f + 100.0f * float(slot / 4)};
+                }
+                app.attempted_desktop = current_desktop;
+                void* icon = nullptr; void* record = nullptr; bool handed_off = false;
+                const auto error = make_icon(current_desktop, &icon, &record, &handed_off, path.c_str(), position.data());
+                if (icon) { app.icon = icon; icons.emplace(icon, Binding{current_desktop, record, owner, app.owner}); }
+                if (error || !icon) {
+                    if (record && !handed_off) { auto cleanup = delete_record(record); if (cleanup) log_error("Unbound app icon record cleanup failed: " + std::to_string(cleanup)); }
+                    if (record && handed_off && !icon) log_error("App icon failed after record handoff; ownership unknown, record retained; no replay");
+                    check(error, "Desktop app icon creation");
+                    throw std::runtime_error("Native Desktop returned no app icon; no replay");
+                }
+                binding = icons.find(icon);
+                app.presentation_dirty = true;
+            }
+            require(binding != icons.end() && icon_identity(app.icon, binding->second), "Desktop app icon identity differs");
+            app.icon_confirmed = true;
+            binding->second.plugin = app.owner;
+            if (app.presentation_dirty) {
+                void* picture = nullptr; void* label = nullptr;
+                require(read(app.icon, 0x3c0, picture) && picture && read(app.icon, 0x3c8, label) && label,
+                    "Desktop app presentation links differ");
+                check(string_call(0x11bfce0, static_cast<unsigned char*>(app.icon) + 0x360, app.title.c_str()), "Desktop app name");
+                check(string_call(0x11bfce0, static_cast<unsigned char*>(app.icon) + 0x380, app.title.c_str()), "Desktop app display name");
+                check(icon_text_key(label, static_cast<unsigned char*>(app.icon) + 0x380), "Desktop app text key");
+                auto material = app.image_path.empty() ? "mt2fw_desktop_mods" : app_icon_image(owner, app.image_path);
+                check(string_call(0x771f90, picture, material.c_str()), "Desktop app icon material");
+                check(icon_layout(current_desktop, app.icon), "Native app icon placement");
+                app.icon_material = material; app.presentation_dirty = false;
+            }
+            native_shown(app.icon, true);
+            app.icon_visible = true;
+            ++slot;
+        } catch (const std::exception& error) {
+            app.icon_error = error.what();
+            auto binding = icons.find(app.icon);
+            if (binding != icons.end() && binding->second.desktop == current_desktop) {
+                try {
+                    require(icon_identity(app.icon, binding->second), "Failed app icon retirement identity differs");
+                    native_shown(app.icon, false); app.icon_visible = false;
+                } catch (const std::exception& hide_error) { app.icon_error += "; hide failed: " + std::string(hide_error.what()); }
+            }
+            runtime->log(owner, "error", "Desktop app: " + app.icon_error);
+        }
+    }
 }
 DWORD activate_native(void* target, bool icon) {
     __try {
@@ -407,6 +527,7 @@ DWORD activate_native(void* target, bool icon) {
     } __except (EXCEPTION_EXECUTE_HANDLER) { return GetExceptionCode(); } return 0;
 }
 #include "native_app_close.inc"
+#include "native_app_probe.inc"
 struct alignas(8) MenuElement { String key; Literal label; };
 static_assert(sizeof(MenuElement) == 0x58);
 struct MenuArray { void* vtable; void* data; int count, capacity; };
@@ -497,12 +618,13 @@ void frame(bool use_german) {
         require(native::read_world_status(world, error), error);
         bool title = world.active_mode_index == 2 && !world.title_transition_pending;
         bool active = title || world.active_mode_index == 3 && native::in_game();
-        if (!active) { mode = nullptr; panel = nullptr; mode_index = -1; panel_open = false; labels.clear(); return; }
+        if (!active) { wizard.reset_epoch(); mode = nullptr; panel = nullptr; mode_index = -1; panel_open = false; labels.clear(); return; }
         if (!assets_ready) mount_assets();
         void* game = nullptr; void* next_mode = nullptr; void* active_mode = nullptr; void* desktop = nullptr; uintptr_t vtable = 0;
         require(read(reinterpret_cast<void*>(image), 0x13df8f0, game) && read(game, title ? 0x350 : 0x358, next_mode) &&
             read(game, 0x28, active_mode) && next_mode && next_mode == active_mode, "Mods active mode owner differs");
         if (mode != next_mode || mode_index != world.active_mode_index) {
+            wizard.reset_epoch();
             mode = next_mode; mode_index = world.active_mode_index; panel = nullptr; append_attempted = false; panel_open = false; labels.clear(); dirty = true;
         }
         require(read(game, 0x1e8, desktop) && read(desktop, 0, vtable) && vtable == image + 0x16c02d0, "Native Desktop owner/class differs");
@@ -515,6 +637,7 @@ void frame(bool use_german) {
             set_open(false); labels.clear(); dirty = true;
         }
         void* icon = entry(title);
+        sync_app_icons(title);
         for (auto& [owner, app] : native_windows) {
             bool active = false;
             for (const auto& plugin : runtime->plugins()) if (plugin.get() == app.owner && plugin->active) active = true;
@@ -575,6 +698,8 @@ Json activate(const Json& args) {
     require(fault.empty(), fault);
     require(thread == GetCurrentThreadId() && mode && panel, "Diagnostic requires current game-thread Mods window");
     const auto id = args.at("target").get<std::string>(); bool icon = id == "icon";
+    if (id.starts_with("app-icon:")) return probe_app_icon(id.substr(9), args);
+    if (id.starts_with("wizard:")) return probe_wizard(id.substr(7), args);
     if (id.starts_with("app-close:")) return close_native_app(id.substr(10), args);
     if (id.starts_with("app:")) {
         auto split = id.find(':',4); require(split != std::string::npos,"Native app diagnostic target requires its owner and widget");
@@ -623,10 +748,75 @@ Json app(const Json& args) {
     const Plugin* plugin = nullptr;
     for (const auto& candidate : runtime->plugins()) if (candidate->manifest.id == owner && candidate->active) plugin = candidate.get();
     require(plugin, "App registration requires its active mod");
+    const bool desktop = args.value("desktop", false);
+    auto icon = args.value("icon", std::string());
+    require(icon.empty() || desktop, "Desktop icon requires desktop exposure");
+    native_app::icon_kind(icon);
     auto& value = apps[owner];
-    if (value.owner != plugin || value.id != id || value.title != title) { value = {plugin, id, title, false}; dirty = true; }
-    bool requested = value.requested; value.requested = false;
-    return {{"open_requested", requested}};
+    if (desktop && !value.desktop) {
+        size_t count = 0; for (const auto& [key, item] : apps) if (item.desktop) ++count;
+        require(count < 64, "Native Desktop supports at most 64 registered mod apps");
+    }
+    if (value.owner != plugin || value.id != id) value.request.retire();
+    if (value.owner != plugin || value.id != id || value.title != title || value.image_path != icon || value.desktop != desktop) {
+        value.owner = plugin; value.id = id; value.title = title; value.image_path = icon; value.desktop = desktop;
+        value.presentation_dirty = true; dirty = true;
+    }
+    value.request.active = true;
+    auto binding = icons.find(value.icon);
+    const bool registered = value.icon_confirmed && binding != icons.end() && binding->second.desktop == current_desktop;
+    const bool may_show = registered && desktop && mode_index == 2;
+    const Json visible = !may_show ? Json(false) : value.icon_visible ? Json(*value.icon_visible) : Json(nullptr);
+    return {{"open_requested", value.request.consume()}, {"desktop", {{"requested", desktop},
+        {"registered", registered}, {"visible", visible}, {"visibility_known", !may_show || value.icon_visible.has_value()},
+        {"error", value.icon_error}}}};
+}
+Json new_world(const Json& args) {
+    bool attempted = false;
+    try {
+        const auto owner = args.at("mod_id").get<std::string>();
+        auto app = apps.find(owner);
+        require(app != apps.end(), "Register the app before opening New Game");
+        bool active = false;
+        for (const auto& plugin : runtime->plugins()) if (plugin.get() == app->second.owner && plugin->active) active = true;
+        require(active && thread && thread == GetCurrentThreadId(), "New Game requires an active app on the bound game thread");
+        auto observe = [&]() {
+            native::WorldStatus status; std::string error;
+            require(native::read_world_status(status, error), error);
+            require(status.active_mode_index == 2 && status.requested_mode_index == 2 && !status.title_transition_pending,
+                "New Game requires idle Title with no pending mode transition");
+            void* game = nullptr; void* title = nullptr; void* active_mode = nullptr; void* window = nullptr; void* registered = nullptr;
+            uintptr_t title_class = 0, window_class = 0; uint8_t visible = 0, pending = 1;
+            require(read(reinterpret_cast<void*>(image), 0x13df8f0, game) && read(game, 0x350, title) &&
+                read(game, 0x28, active_mode) && title == mode && title == active_mode && read(title, 0, title_class) &&
+                title_class == image + 0x16dfbb0 && read(title, 0xd0, pending) && !pending &&
+                read(title, 0x20, window) && window && read(window, 0, window_class) && window_class == image + 0x1707fb0,
+                "New Game Title/window ownership differs");
+            check(window_lookup(&registered, "NewGame"), "New Game window registry");
+            require(registered == window && read(window, 0x45f, visible) && visible <= 1,
+                "New Game registry or visibility differs");
+            return native_app::WizardSnapshot{reinterpret_cast<uintptr_t>(title), reinterpret_cast<uintptr_t>(window), visible != 0};
+        };
+        if (args.value("observe", false)) {
+            const auto state = wizard.inspect(observe);
+            return {{"status", "observed"}, {"confirmed", true}, {"attempted", false}, {"visible", state.visible},
+                {"mode", 2}, {"window", "NewGame"}, {"route", "mmoNewGameWindow::visibility"}};
+        }
+        const auto result = wizard.open(observe, [&](bool& called) {
+            const auto state = observe(); std::string error;
+            const bool ok = native::show_new_game_window(reinterpret_cast<void*>(state.title), reinterpret_cast<void*>(state.window), called, error);
+            attempted = called; require(ok, error);
+        });
+        return {{"status", result == native_app::WizardResult::already_open ? "already_open" : "opened"},
+            {"confirmed", true}, {"attempted", attempted}, {"visible", true}, {"mode", 2},
+            {"window", "NewGame"}, {"route", "mmoModeTitle::ShowCreateWindow"}};
+    } catch (const native_app::WizardFailure& error) {
+        runtime->log(args.value("mod_id", std::string("framework")), error.unknown ? "error" : "warn", error.what());
+        return {{"status", error.unknown ? "unknown" : "rejected"}, {"confirmed", false}, {"attempted", error.attempted}, {"cause", error.what()}};
+    } catch (const std::exception& error) {
+        runtime->log(args.value("mod_id", std::string("framework")), "warn", error.what());
+        return {{"status", "rejected"}, {"confirmed", false}, {"attempted", false}, {"cause", error.what()}};
+    }
 }
 namespace {
 bool native_mounted = false;
@@ -643,14 +833,10 @@ void native_mount() {
     require(mount && mount(path_text(root).c_str(), "mt2fw_native", 1) && mount(path_text(root / "materials").c_str(), "materials", 1),
         "Native app resource mount failed"); native_mounted = true;
 }
-std::string native_image(const std::string& owner, const std::string& relative) {
-    require(relative.starts_with("cache/") && relative.size() == 74 && relative.ends_with(".png") &&
-        relative.substr(6, 64).find_first_not_of("0123456789abcdef") == std::string::npos,
-        "Native preview requires an immutable cache/<sha256>.png file");
+std::string cached_png(const std::string& owner, const std::string& relative, const fs::path& path, const std::string& expected_hash) {
     auto key = owner + ":" + relative;
     if (auto found = native_images.find(key); found != native_images.end()) return found->second;
     require(native_images.size() < 128, "Native preview session limit reached");
-    auto path = confined(confined(profile, fs::path("data") / owner), fs::u8path(relative));
     auto length = fs::file_size(path); require(length > 32 && length <= 1024 * 1024, "Native preview size exceeds 1 MiB");
     std::ifstream stream(path, std::ios::binary); std::string bytes(size_t(length), '\0');
     stream.read(bytes.data(), std::streamsize(bytes.size())); require(bool(stream), "Native preview read failed");
@@ -658,12 +844,25 @@ std::string native_image(const std::string& owner, const std::string& relative) 
     require(!std::memcmp(bytes.data(), magic, 8), "Native preview is not PNG");
     auto number = [&](int offset) { auto* p = reinterpret_cast<const unsigned char*>(bytes.data()) + offset; return uint32_t(p[0]) << 24 | uint32_t(p[1]) << 16 | uint32_t(p[2]) << 8 | p[3]; };
     require(number(16) && number(16) <= 2048 && number(20) && number(20) <= 2048, "Native preview dimensions exceed 2048 pixels");
-    auto sha = digest(bytes); require(relative.substr(6,64) == sha, "Native preview hash differs");
+    auto sha = digest(bytes); require(expected_hash.empty() || expected_hash == sha, "Native preview hash differs");
     auto name = "mt2fw_preview_" + sha;
     auto root = profile / "cache/framework-native";
     native_file(root / (sha + ".png"), bytes);
     native_file(root / "materials" / (name + ".mat"), "Material\n{\nmode normal\ncolor 1 1 1 1\nculling none\nzread false\nzwrite false\nglow false\ntexture \"mt2fw_native/" + sha + ".png\" clampUV\nshader \"default_v.glsl\" \"icon_f.glsl\"\n}\n");
     native_images.emplace(key, name); return name;
+}
+std::string native_image(const std::string& owner, const std::string& relative) {
+    require(relative.starts_with("cache/") && relative.size() == 74 && relative.ends_with(".png") &&
+        relative.substr(6, 64).find_first_not_of("0123456789abcdef") == std::string::npos,
+        "Native preview requires an immutable cache/<sha256>.png file");
+    return cached_png(owner, relative, confined(confined(profile, fs::path("data") / owner), fs::u8path(relative)), relative.substr(6,64));
+}
+std::string app_icon_image(const std::string& owner, const std::string& relative) {
+    if (native_app::icon_kind(relative) == native_app::IconKind::cache) return native_image(owner, relative);
+    const Plugin* plugin = nullptr;
+    for (const auto& candidate : runtime->plugins()) if (candidate->manifest.id == owner && candidate->active) plugin = candidate.get();
+    require(plugin, "Desktop icon requires its active mod package");
+    return cached_png(owner, relative, confined(plugin->directory, fs::u8path(relative)), "");
 }
 }
 Json native_window(const Json& args) {
@@ -710,11 +909,11 @@ Json native_window(const Json& args) {
             const char* kind = type == "button" ? "mmoButtonPane" : type == "input" ? "mmoTextEditPane" : type == "text" ? "mmoTextPane" : "mmoPane";
             source << kind << " { id \"" << name << "\"; anchorType TopLeft; anchorPos " << x << ' ' << y << "; dims " << w << ' ' << h << "; border false; ";
             if(type == "button") source << "text \"\"; clickable true; border true; edges All; corners \"TopLeft BottomRight\"; cornerSize 5; command \"MessageTo Mode MT2FWNative " << window.name << ' ' << name << "\";";
-            else if(type == "input") source << "text \"\"; size " << size << "; clickable true; editable true; maxLength " << item.at("max_bytes").get<size_t>() << "; margin 8; material \"AltPanelBacking\"; border true; edges All; justify left;";
+            else if(type == "input") source << "text \"\"; size " << size << "; clickable true; editable true; maxLength " << item.at("max_bytes").get<size_t>() << "; margin 8; material \"DarkPanelBacking\"; border true; edges All; justify left;";
             else if(type == "text") source << "text \"\"; size " << size << "; clickable false; justify topleft; textColor " << (item.at("tone") == "muted" ? "0.7 0.8 0.88 1" : item.at("tone") == "error" ? "1 0.65 0.4 1" : "0.95 0.97 1 1") << ';';
             else source << "clickable false; material \"" << (type == "panel" ? (item.at("tone") == "subtle" ? "DarkPanelBacking" : "PanelBacking") : "") << "\";";
             source << " }\n";
-            if(type == "button") source << "mmoTextPane { id \"" << name << "_label\"; anchorType TopLeft; anchorPos " << x+10 << ' ' << y+6 << "; dims " << w-20 << ' ' << h-6 << "; text \"\"; size " << size << "; justify topleft; clickable false; border false; }\n";
+            if(type == "button") source << "mmoTextPane { id \"" << name << "_label\"; anchorType TopLeft; anchorPos " << x+10 << ' ' << y << "; dims " << w-20 << ' ' << h << "; text \"\"; size " << size << "; justify left; clickable false; border false; }\n";
         }
         source << "} }\n";
         std::string formatted; bool quoted = false, escaped = false;
