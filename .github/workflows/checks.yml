@@ -23,6 +23,7 @@ jobs:
       - run: python -m pip install -r requirements-dev.txt
       - run: npm ci --ignore-scripts
       - run: python tools/license_inventory.py
+      - run: python tools/render_roadmap.py --check
       - run: python tools/build.py
       - run: python -m unittest discover -s tests -p "test_*.py"
       - run: python tools/generate_docs.py --check

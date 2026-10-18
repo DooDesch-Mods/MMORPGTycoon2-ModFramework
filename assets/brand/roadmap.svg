@@ -1,0 +1,40 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 475" role="img" aria-labelledby="title description">
+<title id="title">MT2 Mod Framework roadmap</title>
+<desc id="description">Available now: Start creating. Lua mods and C++ plugins; Lua reload and mod apps; Static GLB scenery. Next priorities: Reach more of MT2. More game operations; Native UI and diagnostics; Better content workflows. Longer term: More ways to create. Animated models; C# mod support; Broader multiplayer APIs</desc>
+<path fill="#0b1723" d="M0 0h1200v475H0z"/>
+<g font-family="Arial">
+<text x="28" y="46" font-family="Arial" font-size="30" fill="#f2f7fb" font-weight="700">More room for your ideas.</text>
+<text x="28" y="80" font-family="Arial" font-size="22" fill="#b8cad8" font-weight="400">Framework 0.2.1 - Development preview</text>
+<path d="M44 118h392" stroke="#64e4d5" stroke-width="2" stroke-dasharray="0" opacity=".5"/>
+<circle cx="44" cy="118" r="14" fill="#0b1723" stroke="#64e4d5" stroke-width="3"/>
+<path d="m38 118 4 4 8-8" fill="none" stroke="#64e4d5" stroke-width="3"/>
+<text x="28" y="172" font-family="Arial" font-size="23" fill="#64e4d5" font-weight="700">Available now</text>
+<text x="28" y="212" font-family="Arial" font-size="27" fill="#f2f7fb" font-weight="700">Start creating</text>
+<circle cx="33" cy="246" r="3" fill="#64e4d5"/>
+<text x="48" y="254" font-family="Arial" font-size="22" fill="#b8cad8" font-weight="400">Lua mods and C++ plugins</text>
+<circle cx="33" cy="285" r="3" fill="#64e4d5"/>
+<text x="48" y="293" font-family="Arial" font-size="22" fill="#b8cad8" font-weight="400">Lua reload and mod apps</text>
+<circle cx="33" cy="324" r="3" fill="#64e4d5"/>
+<text x="48" y="332" font-family="Arial" font-size="22" fill="#b8cad8" font-weight="400">Static GLB scenery</text>
+<path d="M436 118h392" stroke="#ffca67" stroke-width="2" stroke-dasharray="6" opacity=".5"/>
+<circle cx="436" cy="118" r="14" fill="#0b1723" stroke="#ffca67" stroke-width="3"/>
+<circle cx="436" cy="118" r="5" fill="#ffca67"/>
+<text x="420" y="172" font-family="Arial" font-size="23" fill="#ffca67" font-weight="700">Next priorities</text>
+<text x="420" y="212" font-family="Arial" font-size="27" fill="#f2f7fb" font-weight="700">Reach more of MT2</text>
+<circle cx="425" cy="246" r="3" fill="#ffca67"/>
+<text x="440" y="254" font-family="Arial" font-size="22" fill="#b8cad8" font-weight="400">More game operations</text>
+<circle cx="425" cy="285" r="3" fill="#ffca67"/>
+<text x="440" y="293" font-family="Arial" font-size="22" fill="#b8cad8" font-weight="400">Native UI and diagnostics</text>
+<circle cx="425" cy="324" r="3" fill="#ffca67"/>
+<text x="440" y="332" font-family="Arial" font-size="22" fill="#b8cad8" font-weight="400">Better content workflows</text>
+<circle cx="828" cy="118" r="14" fill="#0b1723" stroke="#a8c1d5" stroke-width="3"/>
+<text x="812" y="172" font-family="Arial" font-size="23" fill="#a8c1d5" font-weight="700">Longer term</text>
+<text x="812" y="212" font-family="Arial" font-size="27" fill="#f2f7fb" font-weight="700">More ways to create</text>
+<circle cx="817" cy="246" r="3" fill="#a8c1d5"/>
+<text x="832" y="254" font-family="Arial" font-size="22" fill="#b8cad8" font-weight="400">Animated models</text>
+<circle cx="817" cy="285" r="3" fill="#a8c1d5"/>
+<text x="832" y="293" font-family="Arial" font-size="22" fill="#b8cad8" font-weight="400">C# mod support</text>
+<circle cx="817" cy="324" r="3" fill="#a8c1d5"/>
+<text x="832" y="332" font-family="Arial" font-size="22" fill="#b8cad8" font-weight="400">Broader multiplayer APIs</text>
+<text x="28" y="455" font-family="Arial" font-size="19" fill="#b8cad8" font-weight="400">Priorities can change. No release dates promised.</text>
+</g></svg>

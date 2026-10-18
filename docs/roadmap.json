@@ -1,0 +1,28 @@
+{
+  "product": "MT2 Mod Framework",
+  "support_slug": "modframework",
+  "repository_url": "https://github.com/DooDesch-Mods/MMORPGTycoon2-ModFramework",
+  "version_label": "0.2.1",
+  "release_label": "Framework 0.2.1 - Development preview",
+  "graphic_title": "More room for your ideas.",
+  "asset_directory": "assets/brand",
+  "overview_heading": "What can I build today?",
+  "overview_intro": "Included in [Framework 0.2.1](https://github.com/DooDesch-Mods/MMORPGTycoon2-ModFramework/releases/tag/v0.2.1). Experimental features can change between releases.",
+  "stages": [
+    {"label": "Available now", "title": "Start creating", "items": ["Lua mods and C++ plugins", "Lua reload and mod apps", "Static GLB scenery"]},
+    {"label": "Next priorities", "title": "Reach more of MT2", "items": ["More game operations", "Native UI and diagnostics", "Better content workflows"]},
+    {"label": "Longer term", "title": "More ways to create", "items": ["Animated models", "C# mod support", "Broader multiplayer APIs"]}
+  ],
+  "features": [
+    {"name": "Lua mods and reload", "status": "available", "scope": "Use a text editor; reload scripts without restarting. A rejected replacement keeps the previous mod running. [Start here](docs/quickstart.md)."},
+    {"name": "Native C++ plugins", "status": "available", "scope": "Build with the native SDK. Plugin updates require a game restart. [SDK guide](docs/reference/native.md)."},
+    {"name": "In-game mod apps", "status": "available", "scope": "Open mods through the central Mods window; native apps can add their own game-desktop icon. [App integration](docs/experimental/native-app-integration.md)."},
+    {"name": "Static GLB scenery", "status": "available", "scope": "Import static models and textures into the scenery catalog. Keep required packs installed for your saves. [Scenery guide](docs/guides/scenery.md)."},
+    {"name": "Camera, objects and world actions", "status": "available", "scope": "Use the documented camera, time, object and checked world-operation APIs. [API reference](docs/reference/index.md)."},
+    {"name": "Native patches", "status": "experimental", "scope": "Observe named game calls with ordered callbacks and conflict diagnostics. [Patch guide](docs/experimental/patches.md)."},
+    {"name": "Vortex installation", "status": "available", "scope": "Manage the player Runtime and mod ZIPs using the separate Vortex Extension. [Install guide](integrations/vortex/README.md)."},
+    {"name": "Editor types and agent docs", "status": "available", "scope": "Generated Lua types, complete examples and a versioned machine contract. [Agent entry point](docs/agents/start.md)."},
+    {"name": "Multiplayer mods", "status": "partial", "scope": "Runtime for Multiplayer Early Beta 15. Other mods need explicit multiplayer integration; installing the Framework alone does not synchronize them."},
+    {"name": "Animated models and C#", "status": "planned", "scope": "Future extensions. The current release uses static scenery, Lua and native C++."}
+  ]
+}
