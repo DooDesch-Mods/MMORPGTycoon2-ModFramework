@@ -90,7 +90,7 @@ This target does not authorize general PostResolve suppression.
 
 ## Private Multiplayer route catalog
 
-The [machine-readable catalog](../../adapters/mt2/multiplayer-catalog.json)
+The [machine-readable catalog](https://github.com/DooDesch-Mods/MMORPGTycoon2-ModFramework/blob/v0.2.2/adapters/mt2/multiplayer-catalog.json)
 contains 252 named targets: 241 private Multiplayer routes and 11 shared routes.
 The compiled catalog uses the same names, addresses and sharing policy. Existing
 routes retain their identities. The separate Framework marker route is outside
