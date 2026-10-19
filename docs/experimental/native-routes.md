@@ -87,3 +87,22 @@ its original repair behavior. The consumer must validate complete Host values,
 external references, current owners and record readback, and confirm old owning
 cleanup. Unexpected or duplicate private callbacks retain their first cause.
 This target does not authorize general PostResolve suppression.
+
+## Private Multiplayer route catalog
+
+The [machine-readable catalog](../../adapters/mt2/multiplayer-catalog.json)
+contains 252 named targets: 241 private Multiplayer routes and 11 shared routes.
+The compiled catalog uses the same names, addresses and sharing policy. Existing
+routes retain their identities. The separate Framework marker route is outside
+this count.
+
+The private routes cover native UI commands, world editing, character and party
+identity, dungeon operations, management and control input. Each target records
+its owning feature and installation phase. These names belong to the private
+game adapter contract; they are not additions to the stable Lua or native plugin
+API, and a catalog entry does not establish synchronized gameplay support.
+
+Use the existing prepare/enable and code-verification flow for each route. An
+entry does not remove the consumer's responsibility to validate the supported
+executable, native calling convention, current thread, object ownership and
+original continuation. Do not register a second hook for the same native target.

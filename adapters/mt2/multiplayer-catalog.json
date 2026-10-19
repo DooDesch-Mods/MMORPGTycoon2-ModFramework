@@ -206,6 +206,174 @@
       ]
     },
     {
+      "name": "mp.dungeon-destroy-instance.a28f0",
+      "rva": 665840,
+      "shared": false,
+      "groups": [
+        {
+          "feature": "Private original Dungeon Instance lifecycle admission",
+          "phase": "typed_action_runtime::start, bound Mainthread, once per process",
+          "site": "Exact original Dungeon Instance lifecycle/queue replay with current owners and complete ordered lifetime; mixed update/transition must preserve client camera/UI. Consumer owns structural Frame25 integration and native acceptance."
+        }
+      ]
+    },
+    {
+      "name": "mp.dungeon-kick-party-queue.a2fd0",
+      "rva": 667600,
+      "shared": false,
+      "groups": [
+        {
+          "feature": "Private original Dungeon Instance lifecycle admission",
+          "phase": "typed_action_runtime::start, bound Mainthread, once per process",
+          "site": "Exact original Dungeon Instance lifecycle/queue replay with current owners and complete ordered lifetime; mixed update/transition must preserve client camera/UI. Consumer owns structural Frame25 integration and native acceptance."
+        }
+      ]
+    },
+    {
+      "name": "mp.dungeon-make-instance.a7670",
+      "rva": 685680,
+      "shared": false,
+      "groups": [
+        {
+          "feature": "Private original Dungeon Instance lifecycle admission",
+          "phase": "typed_action_runtime::start, bound Mainthread, once per process",
+          "site": "Exact original Dungeon Instance lifecycle/queue replay with current owners and complete ordered lifetime; mixed update/transition must preserve client camera/UI. Consumer owns structural Frame25 integration and native acceptance."
+        }
+      ]
+    },
+    {
+      "name": "mp.dungeon-desired-instances.a7a00",
+      "rva": 686592,
+      "shared": false,
+      "groups": [
+        {
+          "feature": "Private original Dungeon Instance lifecycle admission",
+          "phase": "typed_action_runtime::start, bound Mainthread, once per process",
+          "site": "Exact original Dungeon Instance lifecycle/queue replay with current owners and complete ordered lifetime; mixed update/transition must preserve client camera/UI. Consumer owns structural Frame25 integration and native acceptance."
+        }
+      ]
+    },
+    {
+      "name": "mp.dungeon-process-party-queue.a91e0",
+      "rva": 692704,
+      "shared": false,
+      "groups": [
+        {
+          "feature": "Private original Dungeon Instance lifecycle admission",
+          "phase": "typed_action_runtime::start, bound Mainthread, once per process",
+          "site": "Exact original Dungeon Instance lifecycle/queue replay with current owners and complete ordered lifetime; mixed update/transition must preserve client camera/UI. Consumer owns structural Frame25 integration and native acceptance."
+        }
+      ]
+    },
+    {
+      "name": "mp.dungeon-instance-force-players-out.b66e0",
+      "rva": 747232,
+      "shared": false,
+      "groups": [
+        {
+          "feature": "Private original Dungeon Instance lifecycle admission",
+          "phase": "typed_action_runtime::start, bound Mainthread, once per process",
+          "site": "Exact original Dungeon Instance lifecycle/queue replay with current owners and complete ordered lifetime; mixed update/transition must preserve client camera/UI. Consumer owns structural Frame25 integration and native acceptance."
+        }
+      ]
+    },
+    {
+      "name": "mp.dungeon-instance-reset.b6b40",
+      "rva": 748352,
+      "shared": false,
+      "groups": [
+        {
+          "feature": "Private original Dungeon Instance lifecycle admission",
+          "phase": "typed_action_runtime::start, bound Mainthread, once per process",
+          "site": "Exact original Dungeon Instance lifecycle/queue replay with current owners and complete ordered lifetime; mixed update/transition must preserve client camera/UI. Consumer owns structural Frame25 integration and native acceptance."
+        }
+      ]
+    },
+    {
+      "name": "mp.dungeon-instance-update.b7670",
+      "rva": 751216,
+      "shared": false,
+      "groups": [
+        {
+          "feature": "Private original Dungeon Instance lifecycle admission",
+          "phase": "typed_action_runtime::start, bound Mainthread, once per process",
+          "site": "Exact original Dungeon Instance lifecycle/queue replay with current owners and complete ordered lifetime; mixed update/transition must preserve client camera/UI. Consumer owns structural Frame25 integration and native acceptance."
+        }
+      ]
+    },
+    {
+      "name": "mp.control.player-release-control.d3390",
+      "rva": 865168,
+      "shared": false,
+      "groups": [
+        {
+          "feature": "Private caller-scoped Control input admission",
+          "phase": "typed_action_runtime::start, bound Mainthread, once per process",
+          "site": "Actual caller-scoped Control input with current real Player/actor/item lease, remote target isolation and original argument lifetime. Existing non-Control clock/UI/ability callers forward unchanged; consumer owns all runtime filters."
+        }
+      ]
+    },
+    {
+      "name": "mp.control.player-update.d4600",
+      "rva": 869888,
+      "shared": false,
+      "groups": [
+        {
+          "feature": "Private caller-scoped Control input admission",
+          "phase": "typed_action_runtime::start, bound Mainthread, once per process",
+          "site": "Actual caller-scoped Control input with current real Player/actor/item lease, remote target isolation and original argument lifetime. Existing non-Control clock/UI/ability callers forward unchanged; consumer owns all runtime filters."
+        }
+      ]
+    },
+    {
+      "name": "mp.control.player-take-control.d4cc0",
+      "rva": 871616,
+      "shared": false,
+      "groups": [
+        {
+          "feature": "Private caller-scoped Control input admission",
+          "phase": "typed_action_runtime::start, bound Mainthread, once per process",
+          "site": "Actual caller-scoped Control input with current real Player/actor/item lease, remote target isolation and original argument lifetime. Existing non-Control clock/UI/ability callers forward unchanged; consumer owns all runtime filters."
+        }
+      ]
+    },
+    {
+      "name": "mp.dungeon-gizmo-create.153920",
+      "rva": 1390880,
+      "shared": false,
+      "groups": [
+        {
+          "feature": "Private Dungeon Gizmo history admission",
+          "phase": "typed_action_runtime::start, bound Mainthread, once per process",
+          "site": "Original return observation only inside the exact pending original Dungeon cell Undo/Redo graph; require validated MakeGizmo/MakeGizmoDoor node plus0x108 as R9. Preserve fresh native UID and all unrelated original callers."
+        }
+      ]
+    },
+    {
+      "name": "mp.control.item-activate.207820",
+      "rva": 2127904,
+      "shared": false,
+      "groups": [
+        {
+          "feature": "Private caller-scoped Control input admission",
+          "phase": "typed_action_runtime::start, bound Mainthread, once per process",
+          "site": "Actual caller-scoped Control input with current real Player/actor/item lease, remote target isolation and original argument lifetime. Existing non-Control clock/UI/ability callers forward unchanged; consumer owns all runtime filters."
+        }
+      ]
+    },
+    {
+      "name": "mp.control.item-deactivate.2078a0",
+      "rva": 2128032,
+      "shared": false,
+      "groups": [
+        {
+          "feature": "Private caller-scoped Control input admission",
+          "phase": "typed_action_runtime::start, bound Mainthread, once per process",
+          "site": "Actual caller-scoped Control input with current real Player/actor/item lease, remote target isolation and original argument lifetime. Existing non-Control clock/UI/ability callers forward unchanged; consumer owns all runtime filters."
+        }
+      ]
+    },
+    {
       "name": "mp.time-activate-update.20e6d0",
       "rva": 2156240,
       "shared": false,
@@ -226,6 +394,18 @@
           "feature": "Time Activate/Update",
           "phase": "after engine-bound GameUpdate, local_test or connected session",
           "site": "src/core/dll_main.cpp:339"
+        }
+      ]
+    },
+    {
+      "name": "mp.interventions.boss-manager-update.239ba0",
+      "rva": 2333600,
+      "shared": false,
+      "groups": [
+        {
+          "feature": "Private NPC and Boss actor admission",
+          "phase": "typed_action_runtime::start, bound Mainthread, once per process",
+          "site": "Host/unowned forward original. Bound Client NPC/Boss EntityUpdate/Tick suppress free-running gameplay, with original renderer leaves only. BossManager post-original presentation also runs when actual Clock0 returns before native member loop. Ordered138 original replay remains explicit. Existing Monster3c0750 owner dispatches natural Zone actors; no second physical hook."
         }
       ]
     },
@@ -268,6 +448,18 @@
           "feature": "ClockUpdate",
           "phase": "initialize, after native exact-image binding, before global enable",
           "site": "src/core/dll_main.cpp:2292"
+        }
+      ]
+    },
+    {
+      "name": "mp.control.clock-time-scale.259d70",
+      "rva": 2465136,
+      "shared": false,
+      "groups": [
+        {
+          "feature": "Private caller-scoped Control input admission",
+          "phase": "typed_action_runtime::start, bound Mainthread, once per process",
+          "site": "Actual caller-scoped Control input with current real Player/actor/item lease, remote target isolation and original argument lifetime. Existing non-Control clock/UI/ability callers forward unchanged; consumer owns all runtime filters."
         }
       ]
     },
@@ -590,6 +782,102 @@
       ]
     },
     {
+      "name": "mp.interventions.boss-entity-update.397a50",
+      "rva": 3766864,
+      "shared": false,
+      "groups": [
+        {
+          "feature": "Private NPC and Boss actor admission",
+          "phase": "typed_action_runtime::start, bound Mainthread, once per process",
+          "site": "Host/unowned forward original. Bound Client NPC/Boss EntityUpdate/Tick suppress free-running gameplay, with original renderer leaves only. BossManager post-original presentation also runs when actual Clock0 returns before native member loop. Ordered138 original replay remains explicit. Existing Monster3c0750 owner dispatches natural Zone actors; no second physical hook."
+        }
+      ]
+    },
+    {
+      "name": "mp.interventions.boss-tick.399660",
+      "rva": 3774048,
+      "shared": false,
+      "groups": [
+        {
+          "feature": "Private NPC and Boss actor admission",
+          "phase": "typed_action_runtime::start, bound Mainthread, once per process",
+          "site": "Host/unowned forward original. Bound Client NPC/Boss EntityUpdate/Tick suppress free-running gameplay, with original renderer leaves only. BossManager post-original presentation also runs when actual Clock0 returns before native member loop. Ordered138 original replay remains explicit. Existing Monster3c0750 owner dispatches natural Zone actors; no second physical hook."
+        }
+      ]
+    },
+    {
+      "name": "mp.control.character-player-controlled.39aa40",
+      "rva": 3779136,
+      "shared": false,
+      "groups": [
+        {
+          "feature": "Private caller-scoped Control input admission",
+          "phase": "typed_action_runtime::start, bound Mainthread, once per process",
+          "site": "Actual caller-scoped Control input with current real Player/actor/item lease, remote target isolation and original argument lifetime. Existing non-Control clock/UI/ability callers forward unchanged; consumer owns all runtime filters."
+        }
+      ]
+    },
+    {
+      "name": "mp.interventions.character-clear-live-pointers.39d560",
+      "rva": 3790176,
+      "shared": false,
+      "groups": [
+        {
+          "feature": "Private original Character lifecycle admission",
+          "phase": "typed_action_runtime::start, bound Mainthread, once per process",
+          "site": "Observe actual original Host/ordered-Action lifecycle invocations with current bound Actor/fullUID and exact original-return proof. Preserve native OnSpawn and ClearLivePointers semantics; ordered Action receipts deduplicate Frame24 adoption. No dead/end-state inference and no whole Actor update replay. OnSpawn Boss wait and respawn call returns397afa/3996cd remain distinct. Original body includes map/threat/AbilitySet effects; these are replayed only from an actual invocation witness."
+        }
+      ]
+    },
+    {
+      "name": "mp.interventions.character-die.39e760",
+      "rva": 3794784,
+      "shared": false,
+      "groups": [
+        {
+          "feature": "Private actual base Character death admission",
+          "phase": "typed_action_runtime::start, bound Mainthread, once per process",
+          "site": "Observe actual original base Character::Die invocation on already-bound Boss/NPC/natural Zone Monster, fullUID and original-return proof. Native ThreatTable/AbilitySet/status reset belongs to this actual lifecycle transaction before the later OnSpawn. Ordered Action original calls deduplicate Frame24 replay. Derived Monster::Die with loot/RNG is never replayed from a state flag. No Actor AI or whole Tick replay."
+        }
+      ]
+    },
+    {
+      "name": "mp.control.character-set-target.39e950",
+      "rva": 3795280,
+      "shared": false,
+      "groups": [
+        {
+          "feature": "Private caller-scoped Control input admission",
+          "phase": "typed_action_runtime::start, bound Mainthread, once per process",
+          "site": "Actual caller-scoped Control input with current real Player/actor/item lease, remote target isolation and original argument lifetime. Existing non-Control clock/UI/ability callers forward unchanged; consumer owns all runtime filters."
+        }
+      ]
+    },
+    {
+      "name": "mp.interventions.character-on-spawn.39f920",
+      "rva": 3799328,
+      "shared": false,
+      "groups": [
+        {
+          "feature": "Private original Character lifecycle admission",
+          "phase": "typed_action_runtime::start, bound Mainthread, once per process",
+          "site": "Observe actual original Host/ordered-Action lifecycle invocations with current bound Actor/fullUID and exact original-return proof. Preserve native OnSpawn and ClearLivePointers semantics; ordered Action receipts deduplicate Frame24 adoption. No dead/end-state inference and no whole Actor update replay. OnSpawn Boss wait and respawn call returns397afa/3996cd remain distinct. Original body includes map/threat/AbilitySet effects; these are replayed only from an actual invocation witness."
+        }
+      ]
+    },
+    {
+      "name": "mp.interventions.character-command.39f9f0",
+      "rva": 3799536,
+      "shared": false,
+      "groups": [
+        {
+          "feature": "Private interventions and Boss stream admission",
+          "phase": "typed_action_runtime::start, bound Mainthread, once per process",
+          "site": "Existing Character/Toon command dispatch and Boss stream observation; exact native ownership, command scope, borrowed arguments and ordered replay remain consumer-owned."
+        }
+      ]
+    },
+    {
       "name": "mp.character-adjust-attribute.39fb80",
       "rva": 3799936,
       "shared": false,
@@ -610,6 +898,30 @@
           "feature": "Toon visual equip",
           "phase": "typed_action_runtime::start, bound Mainthread, once per process",
           "site": "src/game/toon_weapon_visual/native.cpp:184"
+        }
+      ]
+    },
+    {
+      "name": "mp.management-gm-entity-update.3ad520",
+      "rva": 3855648,
+      "shared": false,
+      "groups": [
+        {
+          "feature": "Co-op source-first Host-owned GameMaster policy",
+          "phase": "typed_action_runtime::start, bound Mainthread, once per process",
+          "site": "Forward original when Controller inactive or Host; active Client preserves only original FlyingArrow presentation tail after exact current fixed slot/native arrow class/vtable proof, suppressing gameplay and policy branches"
+        }
+      ]
+    },
+    {
+      "name": "mp.management-gm-tick.3adae0",
+      "rva": 3857120,
+      "shared": false,
+      "groups": [
+        {
+          "feature": "Co-op source-first Host-owned GameMaster policy",
+          "phase": "typed_action_runtime::start, bound Mainthread, once per process",
+          "site": "Forward original when Controller inactive or Host; active Client validates current fixed Lounge slot/full UID/FindUID/current world and suppresses original ticket/travel decisions"
         }
       ]
     },
@@ -650,6 +962,42 @@
       ]
     },
     {
+      "name": "mp.interventions.npc-entity-update.3c8d50",
+      "rva": 3968336,
+      "shared": false,
+      "groups": [
+        {
+          "feature": "Private NPC and Boss actor admission",
+          "phase": "typed_action_runtime::start, bound Mainthread, once per process",
+          "site": "Host/unowned forward original. Bound Client NPC/Boss EntityUpdate/Tick suppress free-running gameplay, with original renderer leaves only. BossManager post-original presentation also runs when actual Clock0 returns before native member loop. Ordered138 original replay remains explicit. Existing Monster3c0750 owner dispatches natural Zone actors; no second physical hook."
+        }
+      ]
+    },
+    {
+      "name": "mp.interventions.npc-tick.3c95c0",
+      "rva": 3970496,
+      "shared": false,
+      "groups": [
+        {
+          "feature": "Private NPC and Boss actor admission",
+          "phase": "typed_action_runtime::start, bound Mainthread, once per process",
+          "site": "Host/unowned forward original. Bound Client NPC/Boss EntityUpdate/Tick suppress free-running gameplay, with original renderer leaves only. BossManager post-original presentation also runs when actual Clock0 returns before native member loop. Ordered138 original replay remains explicit. Existing Monster3c0750 owner dispatches natural Zone actors; no second physical hook."
+        }
+      ]
+    },
+    {
+      "name": "mp.control.toon-player-controlled.3e4d30",
+      "rva": 4082992,
+      "shared": false,
+      "groups": [
+        {
+          "feature": "Private caller-scoped Control input admission",
+          "phase": "typed_action_runtime::start, bound Mainthread, once per process",
+          "site": "Actual caller-scoped Control input with current real Player/actor/item lease, remote target isolation and original argument lifetime. Existing non-Control clock/UI/ability callers forward unchanged; consumer owns all runtime filters."
+        }
+      ]
+    },
+    {
       "name": "mp.toon-time-normalization.3ea3a0",
       "rva": 4105120,
       "shared": false,
@@ -658,6 +1006,18 @@
           "feature": "Toon time normalization",
           "phase": "typed_action_runtime::start, bound Mainthread, once per process",
           "site": "src/game/toon_time_fence/native.cpp:118"
+        }
+      ]
+    },
+    {
+      "name": "mp.interventions.toon-command.3eb9f0",
+      "rva": 4110832,
+      "shared": false,
+      "groups": [
+        {
+          "feature": "Private interventions and Boss stream admission",
+          "phase": "typed_action_runtime::start, bound Mainthread, once per process",
+          "site": "Existing Character/Toon command dispatch and Boss stream observation; exact native ownership, command scope, borrowed arguments and ordered replay remain consumer-owned."
         }
       ]
     },
@@ -1094,6 +1454,18 @@
       ]
     },
     {
+      "name": "mp.shard-dip-transition.50a870",
+      "rva": 5286000,
+      "shared": false,
+      "groups": [
+        {
+          "feature": "Private original Dungeon Instance lifecycle admission",
+          "phase": "typed_action_runtime::start, bound Mainthread, once per process",
+          "site": "Exact original Dungeon Instance lifecycle/queue replay with current owners and complete ordered lifetime; mixed update/transition must preserve client camera/UI. Consumer owns structural Frame25 integration and native acceptance."
+        }
+      ]
+    },
+    {
       "name": "mp.campaign-expiry-isactive-observer.518290",
       "rva": 5341840,
       "shared": false,
@@ -1172,6 +1544,30 @@
       "groups": []
     },
     {
+      "name": "mp.ability-membership-remove.565400",
+      "rva": 5657600,
+      "shared": false,
+      "groups": [
+        {
+          "feature": "Private Character Ability membership admission",
+          "phase": "typed_action_runtime::start, bound Mainthread, once per process",
+          "site": "Capture original Character-owned ability destruction. Personal prefab-library destruction passes through without peer file writes."
+        }
+      ]
+    },
+    {
+      "name": "mp.ability-membership-dock.567d70",
+      "rva": 5668208,
+      "shared": false,
+      "groups": [
+        {
+          "feature": "Private Character Ability membership admission",
+          "phase": "typed_action_runtime::start, bound Mainthread, once per process",
+          "site": "Capture a real Character-owned destination when original dock changes authored level/order or copies a prefab into the world. Local empty/personal-library layout passes through."
+        }
+      ]
+    },
+    {
       "name": "mp.ability-edit-ui.5714c0",
       "rva": 5706944,
       "shared": false,
@@ -1180,6 +1576,18 @@
           "feature": "Co-op source-first Character-owned Ability Apply UI transaction",
           "phase": "typed_action_runtime::start, bound Mainthread, once per process",
           "site": "plugin captures normal Apply before native mutation; local draft controls and unrelated records forward original"
+        }
+      ]
+    },
+    {
+      "name": "mp.boss-cursor-release.58b020",
+      "rva": 5812256,
+      "shared": false,
+      "groups": [
+        {
+          "feature": "Private authored Boss cursor release admission",
+          "phase": "typed_action_runtime::start, bound Mainthread, once per process",
+          "site": "Whole native authored Boss source release before mutation; exact source preview cleanup and authoritative Action53 Purchase/RegionAt/AddBoss replay exactly once remain consumer-owned."
         }
       ]
     },
@@ -1216,6 +1624,30 @@
           "feature": "Co-op source-first Dungeon palette command capture",
           "phase": "typed_action_runtime::start, bound Mainthread, once per process",
           "site": "Dungeon palette pre-effect command capture; execution uses ordered explicit-owner leaves rather than current-Shard outer replay"
+        }
+      ]
+    },
+    {
+      "name": "mp.dungeon-tile-drag.59eb00",
+      "rva": 5892864,
+      "shared": false,
+      "groups": [
+        {
+          "feature": "Co-op source-first original Dungeon Tile stroke",
+          "phase": "typed_action_runtime::start, bound Mainthread, once per process",
+          "site": "Existing normal Dungeon Tile stroke capture; original DoGraph transaction and FinishedEditing boundary remain consumer-owned."
+        }
+      ]
+    },
+    {
+      "name": "mp.dungeon-tile-release.5a0db0",
+      "rva": 5901744,
+      "shared": false,
+      "groups": [
+        {
+          "feature": "Co-op source-first original Dungeon Tile stroke",
+          "phase": "typed_action_runtime::start, bound Mainthread, once per process",
+          "site": "Existing normal Dungeon Tile stroke capture; original DoGraph transaction and FinishedEditing boundary remain consumer-owned."
         }
       ]
     },
@@ -1292,6 +1724,18 @@
       ]
     },
     {
+      "name": "mp.world-path-capture.5c97e0",
+      "rva": 6068192,
+      "shared": false,
+      "groups": [
+        {
+          "feature": "Wall/Pass path capture",
+          "phase": "world-ready action capture enable, on bound Mainthread",
+          "site": "src/game/world_path_capture.inc:144; exact Wall/Pass native source Press capture through existing path action ownership, ordered replay and original cleanup."
+        }
+      ]
+    },
+    {
       "name": "mp.path-actions.5cc2b0",
       "rva": 6079152,
       "shared": false,
@@ -1312,6 +1756,18 @@
           "feature": "Building and Scenery capture",
           "phase": "world-ready action capture enable, on bound Mainthread",
           "site": "src/game/ui_build_runtime.cpp:387"
+        }
+      ]
+    },
+    {
+      "name": "mp.scenery-brush-finish.5cfdd0",
+      "rva": 6094288,
+      "shared": false,
+      "groups": [
+        {
+          "feature": "Co-op source-first original Scenery brush and eraser stroke",
+          "phase": "typed_action_runtime::start, bound Mainthread, once per process",
+          "site": "Existing Actions49/50 normal native Scenery brush/eraser stroke; original AddPaint and _FinishPaintUndo lifetimes remain consumer-owned."
         }
       ]
     },
@@ -1340,6 +1796,18 @@
       ]
     },
     {
+      "name": "mp.scenery-brush-add-paint.5d5070",
+      "rva": 6115440,
+      "shared": false,
+      "groups": [
+        {
+          "feature": "Co-op source-first original Scenery brush and eraser stroke",
+          "phase": "typed_action_runtime::start, bound Mainthread, once per process",
+          "site": "Existing Actions49/50 normal native Scenery brush/eraser stroke; original AddPaint and _FinishPaintUndo lifetimes remain consumer-owned."
+        }
+      ]
+    },
+    {
       "name": "mp.building-and-scenery-capture.5d64e0",
       "rva": 6120672,
       "shared": false,
@@ -1348,6 +1816,30 @@
           "feature": "Building and Scenery capture",
           "phase": "world-ready action capture enable, on bound Mainthread",
           "site": "src/game/ui_build_runtime.cpp:387"
+        }
+      ]
+    },
+    {
+      "name": "mp.scenery-eraser-finish.5d68f0",
+      "rva": 6121712,
+      "shared": false,
+      "groups": [
+        {
+          "feature": "Co-op source-first original Scenery brush and eraser stroke",
+          "phase": "typed_action_runtime::start, bound Mainthread, once per process",
+          "site": "Existing Actions49/50 normal native Scenery brush/eraser stroke; original AddPaint and _FinishPaintUndo lifetimes remain consumer-owned."
+        }
+      ]
+    },
+    {
+      "name": "mp.scenery-eraser-add-paint.5d7550",
+      "rva": 6124880,
+      "shared": false,
+      "groups": [
+        {
+          "feature": "Co-op source-first original Scenery brush and eraser stroke",
+          "phase": "typed_action_runtime::start, bound Mainthread, once per process",
+          "site": "Existing Actions49/50 normal native Scenery brush/eraser stroke; original AddPaint and _FinishPaintUndo lifetimes remain consumer-owned."
         }
       ]
     },
@@ -1448,6 +1940,18 @@
       ]
     },
     {
+      "name": "mp.world-path-capture.5ec320",
+      "rva": 6210336,
+      "shared": false,
+      "groups": [
+        {
+          "feature": "Wall/Pass path capture",
+          "phase": "world-ready action capture enable, on bound Mainthread",
+          "site": "src/game/world_path_capture.inc:144; exact Wall/Pass native source Press capture through existing path action ownership, ordered replay and original cleanup."
+        }
+      ]
+    },
+    {
       "name": "mp.monster-zone-action-capture.5ef6a0",
       "rva": 6223520,
       "shared": false,
@@ -1508,6 +2012,18 @@
       ]
     },
     {
+      "name": "mp.ability-membership-new.651990",
+      "rva": 6625680,
+      "shared": false,
+      "groups": [
+        {
+          "feature": "Private Character Ability membership admission",
+          "phase": "typed_action_runtime::start, bound Mainthread, once per process",
+          "site": "Capture only NewAbility Level <integer> for an actual bound Character owner; all other commands pass through."
+        }
+      ]
+    },
+    {
       "name": "mp.building-service-menu.66a790",
       "rva": 6727568,
       "shared": false,
@@ -1528,6 +2044,18 @@
           "feature": "Monster Zone action capture",
           "phase": "typed_action_runtime::start, bound Mainthread, once per process",
           "site": "src/game/monster_zone_action_runtime.inc:271"
+        }
+      ]
+    },
+    {
+      "name": "mp.character-membership-confirm.684250",
+      "rva": 6832720,
+      "shared": false,
+      "groups": [
+        {
+          "feature": "Private Character membership confirmation admission",
+          "phase": "typed_action_runtime::start, bound Mainthread, once per process",
+          "site": "Capture the actual confirmed native delete click on the bound Character View; queue Action87 without gameplay mutation. Native ordered replay calls original Collection::DestroyType9bb90 exactly once. Other connected UI actions and singleplayer pass through."
         }
       ]
     },
@@ -1604,6 +2132,18 @@
       ]
     },
     {
+      "name": "mp.management-gm-policy.6a1780",
+      "rva": 6952832,
+      "shared": false,
+      "groups": [
+        {
+          "feature": "Private GM Policy UI admission",
+          "phase": "typed_action_runtime::start, bound Mainthread, once per process",
+          "site": "Exact pre-write GM Policy controls only, proven AP and actual vsValue binding to current Queue Policy. Unrelated callers forward unchanged; preserve original Notify/ApplyPolicy ticket cascade."
+        }
+      ]
+    },
+    {
       "name": "mp.dungeon-instance-config-ui.6aea60",
       "rva": 7006816,
       "shared": false,
@@ -1676,6 +2216,30 @@
       ]
     },
     {
+      "name": "mp.design-rules.6d61a0",
+      "rva": 7168416,
+      "shared": false,
+      "groups": [
+        {
+          "feature": "Private global Design Rules command admission",
+          "phase": "typed_action_runtime::start, bound Mainthread, once per process",
+          "site": "Original global Design Rules intent capture and guarded replay; exact view, bound policy, current world and event lifetime remain consumer-owned."
+        }
+      ]
+    },
+    {
+      "name": "mp.gizmo-ui-command.6f4930",
+      "rva": 7293232,
+      "shared": false,
+      "groups": [
+        {
+          "feature": "Co-op source-first original Dungeon Gizmo UI command capture",
+          "phase": "typed_action_runtime::start, bound Mainthread, once per process",
+          "site": "Normal SetGold/SetLoot/SetVendorTrash/SetKeys/SetBossKeys before original inline int32 mutation; actual info_gizmo window, weak owner/full UID, container feature, original five-row grid and canonical scene census."
+        }
+      ]
+    },
+    {
       "name": "mp.management-logo-editor-command.735800",
       "rva": 7559168,
       "shared": false,
@@ -1720,6 +2284,18 @@
           "feature": "Co-op source-first management batch",
           "phase": "typed_action_runtime::start, bound Mainthread, once per process",
           "site": "plugin owns capture, ordered replay and original result; admission does not install hooks"
+        }
+      ]
+    },
+    {
+      "name": "mp.design-rules.783530",
+      "rva": 7877936,
+      "shared": false,
+      "groups": [
+        {
+          "feature": "Private global Design Rules command admission",
+          "phase": "typed_action_runtime::start, bound Mainthread, once per process",
+          "site": "Original global Design Rules intent capture and guarded replay; exact view, bound policy, current world and event lifetime remain consumer-owned."
         }
       ]
     },
@@ -1784,6 +2360,66 @@
       ]
     },
     {
+      "name": "mp.management-gm-policy.7c9510",
+      "rva": 8164624,
+      "shared": false,
+      "groups": [
+        {
+          "feature": "Private GM Policy UI admission",
+          "phase": "typed_action_runtime::start, bound Mainthread, once per process",
+          "site": "Exact pre-write GM Policy controls only, proven AP and actual vsValue binding to current Queue Policy. Unrelated callers forward unchanged; preserve original Notify/ApplyPolicy ticket cascade."
+        }
+      ]
+    },
+    {
+      "name": "mp.management-gm-policy.7c9e70",
+      "rva": 8167024,
+      "shared": false,
+      "groups": [
+        {
+          "feature": "Private GM Policy UI admission",
+          "phase": "typed_action_runtime::start, bound Mainthread, once per process",
+          "site": "Exact pre-write GM Policy controls only, proven AP and actual vsValue binding to current Queue Policy. Unrelated callers forward unchanged; preserve original Notify/ApplyPolicy ticket cascade."
+        }
+      ]
+    },
+    {
+      "name": "mp.management-gm-policy.7c9ff0",
+      "rva": 8167408,
+      "shared": false,
+      "groups": [
+        {
+          "feature": "Private GM Policy UI admission",
+          "phase": "typed_action_runtime::start, bound Mainthread, once per process",
+          "site": "Exact pre-write GM Policy controls only, proven AP and actual vsValue binding to current Queue Policy. Unrelated callers forward unchanged; preserve original Notify/ApplyPolicy ticket cascade."
+        }
+      ]
+    },
+    {
+      "name": "mp.management-gm-policy.7ca170",
+      "rva": 8167792,
+      "shared": false,
+      "groups": [
+        {
+          "feature": "Private GM Policy UI admission",
+          "phase": "typed_action_runtime::start, bound Mainthread, once per process",
+          "site": "Exact pre-write GM Policy controls only, proven AP and actual vsValue binding to current Queue Policy. Unrelated callers forward unchanged; preserve original Notify/ApplyPolicy ticket cascade."
+        }
+      ]
+    },
+    {
+      "name": "mp.management-gm-policy.7ca230",
+      "rva": 8167984,
+      "shared": false,
+      "groups": [
+        {
+          "feature": "Private GM Policy UI admission",
+          "phase": "typed_action_runtime::start, bound Mainthread, once per process",
+          "site": "Exact pre-write GM Policy controls only, proven AP and actual vsValue binding to current Queue Policy. Unrelated callers forward unchanged; preserve original Notify/ApplyPolicy ticket cascade."
+        }
+      ]
+    },
+    {
       "name": "mp.management-statistics-apply.7d2a40",
       "rva": 8202816,
       "shared": false,
@@ -1804,6 +2440,18 @@
           "feature": "HUD native Time and Calendar",
           "phase": "after engine-bound GameUpdate, local_test or connected session",
           "site": "src/game/hud_time_runtime.cpp:87"
+        }
+      ]
+    },
+    {
+      "name": "mp.design-rules.8286c0",
+      "rva": 8554176,
+      "shared": false,
+      "groups": [
+        {
+          "feature": "Private global Design Rules command admission",
+          "phase": "typed_action_runtime::start, bound Mainthread, once per process",
+          "site": "Original global Design Rules intent capture and guarded replay; exact view, bound policy, current world and event lifetime remain consumer-owned."
         }
       ]
     },
@@ -2036,6 +2684,30 @@
       ]
     },
     {
+      "name": "mp.management-gm-policy.b1e010",
+      "rva": 11657232,
+      "shared": false,
+      "groups": [
+        {
+          "feature": "Private GM Policy UI admission",
+          "phase": "typed_action_runtime::start, bound Mainthread, once per process",
+          "site": "Exact pre-write GM Policy controls only, proven AP and actual vsValue binding to current Queue Policy. Unrelated callers forward unchanged; preserve original Notify/ApplyPolicy ticket cascade."
+        }
+      ]
+    },
+    {
+      "name": "mp.management-gm-policy.b1e0b0",
+      "rva": 11657392,
+      "shared": false,
+      "groups": [
+        {
+          "feature": "Private GM Policy UI admission",
+          "phase": "typed_action_runtime::start, bound Mainthread, once per process",
+          "site": "Exact pre-write GM Policy controls only, proven AP and actual vsValue binding to current Queue Policy. Unrelated callers forward unchanged; preserve original Notify/ApplyPolicy ticket cascade."
+        }
+      ]
+    },
+    {
       "name": "mp.bug-lifecycle-and-saved-identity.baded0",
       "rva": 12246736,
       "shared": false,
@@ -2132,6 +2804,30 @@
       ]
     },
     {
+      "name": "mp.saved-party.load-stream.dc8400",
+      "rva": 14451712,
+      "shared": false,
+      "groups": [
+        {
+          "feature": "Private Party snapshot observer admission",
+          "phase": "typed_action_runtime::start, bound Mainthread, once per process",
+          "site": "Original Party property stream observation; exact property/manager, bounded snapshot lifetime and existing shared reader/object callbacks remain consumer-owned."
+        }
+      ]
+    },
+    {
+      "name": "mp.saved-party.save-stream.dc8430",
+      "rva": 14451760,
+      "shared": false,
+      "groups": [
+        {
+          "feature": "Private Party snapshot observer admission",
+          "phase": "typed_action_runtime::start, bound Mainthread, once per process",
+          "site": "Original Party property stream observation; exact property/manager, bounded snapshot lifetime and existing shared reader/object callbacks remain consumer-owned."
+        }
+      ]
+    },
+    {
       "name": "mp.district-property-load.ddc9c0",
       "rva": 14535104,
       "shared": false,
@@ -2164,6 +2860,30 @@
           "feature": "Network node capture",
           "phase": "initialize, after native exact-image binding, before global enable",
           "site": "src/core/dll_main.cpp:2319"
+        }
+      ]
+    },
+    {
+      "name": "mp.saved-boss.load-stream.dde0b0",
+      "rva": 14540976,
+      "shared": false,
+      "groups": [
+        {
+          "feature": "Private interventions and Boss stream admission",
+          "phase": "typed_action_runtime::start, bound Mainthread, once per process",
+          "site": "Existing Character/Toon command dispatch and Boss stream observation; exact native ownership, command scope, borrowed arguments and ordered replay remain consumer-owned."
+        }
+      ]
+    },
+    {
+      "name": "mp.saved-boss.save-stream.dde0e0",
+      "rva": 14541024,
+      "shared": false,
+      "groups": [
+        {
+          "feature": "Private interventions and Boss stream admission",
+          "phase": "typed_action_runtime::start, bound Mainthread, once per process",
+          "site": "Existing Character/Toon command dispatch and Boss stream observation; exact native ownership, command scope, borrowed arguments and ordered replay remain consumer-owned."
         }
       ]
     },
