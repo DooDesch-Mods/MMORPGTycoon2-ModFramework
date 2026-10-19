@@ -173,7 +173,7 @@ class ReleaseDeliveryTests(unittest.TestCase):
 
     def test_update_accepts_exact_legacy_title_but_rejects_other_release_url(self):
         self.plan.update(product='multiplayer', version='0.1.0-beta.15', tag='v0.1.0-beta.15',
-            release_url='https://github.com/DooDesch/MMORPGTycoon2-Multiplayer/releases/tag/v0.1.0-beta.15')
+            release_url='https://github.com/DooDesch-Mods/MMORPGTycoon2-Multiplayer/releases/tag/v0.1.0-beta.15')
         previous = {**{key: self.plan[key] for key in ('product', 'version', 'tag', 'sha256')}, 'status': 'confirmed', 'message_id': '123'}
         message = {'id': '123', 'channel_id': '456', 'embeds': [{
             'title': 'MMORPG Tycoon 2 Multiplayer - Early Beta 0.1.0-beta.15', 'url': self.plan['release_url']}]}

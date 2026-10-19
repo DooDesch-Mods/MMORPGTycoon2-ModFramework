@@ -21,10 +21,10 @@
     "file_variable": "NEXUS_MULTIPLAYER_FILE_ID",
     "mod_variable": "NEXUS_MULTIPLAYER_MOD_ID",
     "asset_pattern": "MMORPGTycoon2-Multiplayer-v*-windows-x64.zip",
-    "source_repository": "DooDesch/MMORPGTycoon2-Multiplayer",
+    "source_repository": "DooDesch-Mods/MMORPGTycoon2-Multiplayer",
     "receipt_tag": "v0.2.0",
     "manual_only": true,
-    "icon_url": "https://raw.githubusercontent.com/DooDesch/MMORPGTycoon2-Multiplayer/main/assets/ui/desktop_multiplayer/multiplayer.png",
+    "icon_url": "https://raw.githubusercontent.com/DooDesch-Mods/MMORPGTycoon2-Multiplayer/main/assets/ui/desktop_multiplayer/multiplayer.png",
     "footer": "MMORPG Tycoon 2 - MMORPGTycoon2-Multiplayer"
   },
   "vortex": {

@@ -57,12 +57,12 @@ class MultiplayerReleaseTests(unittest.TestCase):
     def test_explicit_target_uses_source_repo_and_exact_checksum(self):
         output = self.root / 'download'
         metadata = {'tagName': 'v' + self.version, 'isDraft': False, 'targetCommitish': self.commit,
-            'url': 'https://github.com/DooDesch/MMORPGTycoon2-Multiplayer/releases/tag/v' + self.version,
+            'url': 'https://github.com/DooDesch-Mods/MMORPGTycoon2-Multiplayer/releases/tag/v' + self.version,
             'assets': [{'name': self.archive.name, 'size': self.archive.stat().st_size},
                        {'name': self.archive.name + '.sha256'}]}
 
         def source(repository, *args):
-            self.assertEqual(repository, 'DooDesch/MMORPGTycoon2-Multiplayer')
+            self.assertEqual(repository, 'DooDesch-Mods/MMORPGTycoon2-Multiplayer')
             if args[:2] == ('release', 'view'):
                 return json.dumps(metadata)
             self.assertEqual(args[:2], ('release', 'download'))
@@ -76,7 +76,7 @@ class MultiplayerReleaseTests(unittest.TestCase):
              patch.object(nexus.urllib.request, 'urlopen', return_value=io.BytesIO(b'# Changelog\n\n## 0.1.0-beta.14\n\n- Native apps.\n')):
             plan = nexus.fetch_release('v' + self.version, 'multiplayer', output)
             self.assertEqual(plan['receipt_tag'], 'v0.2.0')
-            self.assertEqual(plan['source_repository'], 'DooDesch/MMORPGTycoon2-Multiplayer')
+            self.assertEqual(plan['source_repository'], 'DooDesch-Mods/MMORPGTycoon2-Multiplayer')
             metadata['targetCommitish'] = 'b' * 40
             with self.assertRaisesRegex(ValueError, 'source commit differs'):
                 nexus.fetch_release('v' + self.version, 'multiplayer', output)
@@ -88,7 +88,7 @@ class MultiplayerReleaseTests(unittest.TestCase):
 
     def test_receipt_is_read_from_cohort_but_announcement_points_to_mod(self):
         plan = {'product': 'multiplayer', 'version': self.version, 'tag': 'v' + self.version,
-                'receipt_tag': 'v0.2.0', 'release_url': 'https://github.com/DooDesch/MMORPGTycoon2-Multiplayer/releases/tag/v' + self.version,
+                'receipt_tag': 'v0.2.0', 'release_url': 'https://github.com/DooDesch-Mods/MMORPGTycoon2-Multiplayer/releases/tag/v' + self.version,
                 'nexus_url': 'https://www.nexusmods.com/mmorpgtycoon2/mods/28', 'notes': '- Native apps.'}
         with patch.object(delivery, 'gh', return_value=json.dumps({'assets': []})) as call:
             self.assertIsNone(delivery.remote_receipt(plan, 'receipt.json', self.root))

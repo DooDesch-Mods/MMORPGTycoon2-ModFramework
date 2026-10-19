@@ -106,7 +106,7 @@ def gh(*args):
 
 
 def gh_repository(repository, *args):
-    if repository not in (REPOSITORY, 'DooDesch/MMORPGTycoon2-Multiplayer'):
+    if repository not in (REPOSITORY, 'DooDesch-Mods/MMORPGTycoon2-Multiplayer'):
         raise ValueError('Release source repository is not allowlisted')
     result = subprocess.run(['gh', *args, '--repo', repository], capture_output=True, text=True, timeout=600)
     if result.returncode:
