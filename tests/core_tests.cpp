@@ -23,7 +23,12 @@ int main(){
         mod(root,"test.first","local count=0; mt2.events.on('update',function() count=count+1; mt2.log.info('first:'..count) end)");
         auto second=manifest("test.second");second["dependencies"]={{"test.first","^1.0.0"}};
         mod(root,"test.second","mt2.events.on('update',function() mt2.log.info('second') end)",second);
-        Runtime runtime(root);runtime.load();runtime.emit("update");CHECK(runtime.plugins().size()==2);CHECK(runtime.plugins()[0]->active&&runtime.plugins()[1]->active);checks+=2;
+        Runtime runtime(root);
+        std::vector<std::string> notices;
+        runtime.mod_notice=[&](const Manifest& value,const char* state){notices.push_back(std::string(state)+" "+value.id+" "+value.version);};
+        runtime.load();
+        CHECK((notices==std::vector<std::string>{"Loading test.first 1.0.0","Active test.first 1.0.0","Loading test.second 1.0.0","Active test.second 1.0.0"}));++checks;
+        runtime.emit("update");CHECK(runtime.plugins().size()==2);CHECK(runtime.plugins()[0]->active&&runtime.plugins()[1]->active);checks+=2;
         write(root/"mods/test.first/main.lua","this is invalid Lua!");CHECK(!runtime.reload("test.first"));runtime.emit("update");CHECK(runtime.plugins()[0]->active);checks+=2;
         write(root/"mods/test.first/main.lua","mt2.events.on('update',function() mt2.log.info('replacement') end)");CHECK(runtime.reload("test.first"));runtime.emit("update");CHECK(runtime.plugins()[1]->active);checks+=2;
         runtime.world_ready("reload-world");

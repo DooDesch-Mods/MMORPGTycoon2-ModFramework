@@ -147,6 +147,7 @@ void Runtime::log(const std::string& mod,const std::string& level,const std::str
     if(!stream)throw std::runtime_error("Cannot append framework log: "+path_text(path));
 }
 std::unique_ptr<Plugin> Runtime::prepare(const Manifest& manifest,const fs::path& directory) {
+    if(mod_notice)mod_notice(manifest,"Loading");
     auto p=std::make_unique<Plugin>(this); p->manifest=manifest; p->directory=directory;
     auto data=confined(root_,"data/"+manifest.id);
     if(fs::exists(data/"config.json"))p->config=read_json(data/"config.json");
@@ -223,6 +224,7 @@ void Runtime::activate(Plugin& plugin) {
     if(!plugin.profile_data.empty())atomic_json(confined(root_,"data/"+plugin.manifest.id+"/profile.json"),plugin.profile_data);
     if(plugin.active&&!world_.empty())dispatch(plugin,"world_ready",{{"epoch",epoch},{"name",world_}});
     log(plugin.manifest.id,"info",plugin.active?"Mod started":"Mod start failed");
+    if(mod_notice)mod_notice(plugin.manifest,plugin.active?"Active":"Failed");
     if(plugin.active){patches.replace(&plugin,plugin.manifest.id,plugin.patch_registrations);plugin.patch_staging=false;}
 }
 void Runtime::deactivate(Plugin& plugin) {

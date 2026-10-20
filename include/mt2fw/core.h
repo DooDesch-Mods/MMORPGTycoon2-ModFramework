@@ -104,6 +104,7 @@ public:
     void release_native(Plugin& plugin);
     void stop_plugins();
     std::function<bool(Plugin&)> native_retire;
+    std::function<void(const Manifest&,const char*)> mod_notice;
     const fs::path& root() const { return root_; }
     const std::vector<std::unique_ptr<Plugin>>& plugins() const { return plugins_; }
     const std::deque<LogEntry>& logs() const { return logs_; }

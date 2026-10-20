@@ -1,4 +1,5 @@
 #include "bootstrap.h"
+#include "game_log.h"
 #include "adapter.h"
 #include "desktop_ui.h"
 #include "world_markers.h"
@@ -660,6 +661,17 @@ extern "C" __declspec(dllexport) bool MT2FW_InitInstalled(const MT2FW_Bootstrap*
         FILETIME created{},exited{},kernel{},user{};if(!GetProcessTimes(GetCurrentProcess(),&created,&exited,&kernel,&user))throw std::runtime_error("Process creation time unavailable");
         process_started=std::to_string((uint64_t(created.dwHighDateTime)<<32)|created.dwLowDateTime);
         runtime=std::make_unique<Runtime>(root,[](const std::string& op,const Json& args){if(op.starts_with("ui."))return ui_request(op,args);return mt2::request(op,args);});
+        auto notice=[](const std::string& message){
+            std::string error;
+            if(!mt2::game_log("[MT2 Mod Framework] "+message,error)){
+                OutputDebugStringA(("warn: "+error+"\n").c_str());
+                runtime->log("framework","warn",error);
+            }
+        };
+        notice("MT2 Mod Framework "+runtime->status().at("version").get<std::string>()+" loaded. External mod code is enabled; this session is modded.");
+        runtime->mod_notice=[notice](const Manifest& mod,const char* state){
+            notice(std::string(state)+" mod "+mod.id+" "+mod.version+" ("+mod.type+")");
+        };
         native_services=std::make_unique<mt2::NativeServices>(receipt->game,root,[](const MT2FW_Host* host){return runtime?runtime->native_plugin(host):nullptr;});
         native_routes=std::make_shared<mt2::NativeRoutes>([](const MT2FW_Host* host){return runtime?runtime->native_plugin(host):nullptr;});
         native_routes->set_patch_runtime(runtime.get());

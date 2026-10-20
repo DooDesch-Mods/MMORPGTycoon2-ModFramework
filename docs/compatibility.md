@@ -4,7 +4,7 @@ title: Compatibility and status
 
 # Compatibility and status
 
-This is a public development preview: framework **0.2.0**, Lua API **1.0.0**, native ABI **1**. It supports only Windows x64 with Steam and the exact verified MT2 executable:
+This is a public development preview: framework **0.2.3**, Lua API **1.0.0**, native ABI **1**. It supports only Windows x64 with Steam and the exact verified MT2 executable:
 
 ```text
 bbab2dc68babcc644d0a1679548bf1e334b6c52aea669c3f61f6cb9d45c1aaf6
@@ -43,3 +43,7 @@ An isolated game run confirmed real Update pairs, a shared Lua/native create obs
 Lua script reload stages a replacement and commits registrations at frame end. Failed replacements keep the old instance. Already executed world actions remain. Content and native plugin updates require restart.
 
 Stable API changes stay compatible within the documented API major version. Check [generated changes](reference/changes.md), the versioned contract and migration notes before updating. A function signature check cannot establish unchanged behavior by itself.
+
+## Modded-session identification
+
+From 0.2.3, the Framework identifies itself and its version in the original game log before loading mods. Each loading mod is listed by ID, version and type, followed by its activation status. These startup messages help identify external code in bug and crash reports. They do not upload data or log player input, save contents or account identifiers. The exact supported game-build check remains in place.

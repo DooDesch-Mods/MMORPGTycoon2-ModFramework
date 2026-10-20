@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.2.3
+
+### Added
+
+- Identify modded sessions in the game's own log, helping VectorStorm and mod authors investigate bug and crash reports.
+- List each mod's ID, version and type before it runs, followed by its activation status.
+
 ## 0.2.2
 
 ### Changed
