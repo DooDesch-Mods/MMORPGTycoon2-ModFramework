@@ -81,10 +81,16 @@ mt2.storage = {
     get=function(key,default,scope) return call('storage.get',{key=key,default=default,scope=scope or 'profile'}) end,
     set=function(key,value,scope) return call('storage.set',{key=key,value=value,scope=scope or 'profile'}) end
 }
-mt2.world = {status=function() return call('world.status') end}
+mt2.world = {
+    status=function() return call('world.status') end,
+    region=function(x,z) return call('world.region',{x=x,z=z}) end,
+    simulation=function() return call('world.simulation') end,
+    software=function() return call('world.software') end
+}
 mt2.objects = {
     list=function(limit) return call('objects.list',{limit=limit or 100}) end,
     get=function(handle) return call('objects.get',{handle=handle}) end,
+    building=function(handle) return call('objects.building',{handle=handle}) end,
     selected=function() return call('objects.selected') end
     ,persist=function(handle) return call('objects.persist',{handle=handle}) end
     ,resolve=function(id) return call('objects.resolve',{id=id}) end
@@ -110,6 +116,9 @@ mt2.input = {
     end
 }
 mt2.ui = {
+    app=function(options) return call('ui.app',options) end,
+    native=function(options) return call('ui.native',options) end,
+    document=function(document) return call('ui.document',{document=document}) end,
     text=function(text) return call('ui.text',{text=tostring(text)}) end,
     button=function(label) return call('ui.button',{label=label}) end,
     checkbox=function(label,value) return call('ui.checkbox',{label=label,value=value}) end,

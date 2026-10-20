@@ -1,0 +1,42 @@
+-- SPDX-License-Identifier: MIT
+local open, summary, detail, elapsed = false, "Load a world to inspect it.", "", 1
+
+mt2.events.on("update", function(event)
+    if not open then return end
+    elapsed = elapsed + event.dt
+    if elapsed < 1 then return end
+    elapsed = 0
+    if not mt2.world.status().loaded then
+        summary, detail = "Load a world to inspect it.", ""
+        return
+    end
+    local simulation, software = mt2.world.simulation(), mt2.world.software()
+    summary = ("Cash: %d | Online: %d | Rating: %.2f | Fun: %.2f"):format(
+        simulation.cash, simulation.logged_in_subscribers, software.rating, software.fun)
+    if simulation.ledger then
+        summary = summary .. ("\nToday: income %d, expenses %d"):format(
+            simulation.ledger.income, simulation.ledger.expense)
+    end
+    local selected = mt2.objects.selected()
+    if not selected then detail = "Select a building in the game."; return end
+    local readable, building = pcall(mt2.objects.building, selected.handle)
+    if not readable then
+        detail = "Selection unavailable: " .. tostring(building)
+        return
+    end
+    local region = mt2.world.region(building.x, building.z)
+    detail = ("%s / %s\nScale: %.2f, %.2f, %.2f\nRegion owned: %s | Purchase price: %d"):format(
+        building.type, building.variant, building.scale[1], building.scale[2], building.scale[3],
+        tostring(region.owned), region.purchase_price)
+end)
+
+mt2.events.on("render", function()
+    local app = mt2.ui.app({id="main", title="World dashboard"})
+    if app.open_requested then open = true; elapsed = 1 end
+    if not open then return end
+    local result = mt2.ui.native({id="main", open=open, width=700, height=360, widgets={
+        {id="summary", type="text", x=20, y=20, width=660, height=100, text=summary},
+        {id="detail", type="text", x=20, y=140, width=660, height=160, text=detail}
+    }})
+    if result.ready then open = result.open end
+end)

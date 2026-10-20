@@ -51,4 +51,3 @@ mt2.events.on("world_ready", function()
     mt2.storage.set("visits", visits + 1, "world")
 end)
 ```
-

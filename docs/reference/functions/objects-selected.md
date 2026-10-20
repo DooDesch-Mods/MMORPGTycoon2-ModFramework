@@ -57,4 +57,3 @@ mt2.events.on("world_ready", function()
     end
 end)
 ```
-

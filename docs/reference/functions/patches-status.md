@@ -84,4 +84,3 @@ mt2.ui.window("API time policy", function()
     mt2.ui.text(message)
 end)
 ```
-

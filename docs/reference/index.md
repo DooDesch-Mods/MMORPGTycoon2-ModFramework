@@ -6,7 +6,7 @@ title: "API reference"
 
 # API reference
 
-Public Lua API **1.0.0**, native ABI **1**, framework **0.2.3**.
+Public Lua API **1.1.0**, native ABI **1**, framework **0.2.4**.
 
 [Events](events.md) | [Types](types.md) | [Capabilities](capabilities.md) | [Native ABI](native.md) | [Manifests](manifests.md)
 
@@ -55,6 +55,7 @@ Public Lua API **1.0.0**, native ABI **1**, framework **0.2.3**.
 - [`mt2.objects.selected`](functions/objects-selected.md): Read the first supported selected object, or nil.
 - [`mt2.objects.persist`](functions/objects-persist.md): Create a mod-owned persistent building reference.
 - [`mt2.objects.resolve`](functions/objects-resolve.md): Resolve a saved reference to a fresh session handle.
+- [`mt2.objects.building`](functions/objects-building.md): Read building type, variant, quaternion rotation and scale.
 
 ## patches
 
@@ -80,9 +81,13 @@ Public Lua API **1.0.0**, native ABI **1**, framework **0.2.3**.
 - [`mt2.ui.button`](functions/ui-button.md): Draw a button; true on the frame it is pressed.
 - [`mt2.ui.checkbox`](functions/ui-checkbox.md): Draw a checkbox and return its current value.
 - [`mt2.ui.number`](functions/ui-number.md): Draw a numeric slider and return its value.
+- [`mt2.ui.app`](functions/ui-app.md): Register your mod in the central Mods launcher and consume its open request.
+- [`mt2.ui.native`](functions/ui-native.md): Display a native MT2 window with buttons, tabs, inputs, panels and PNG images.
+- [`mt2.ui.document`](functions/ui-document.md): Draw a resizable document with lists, columns, text inputs and buttons.
 
 ## world
 
 - [`mt2.world.status`](functions/world-status.md): Read the loaded world name and current epoch.
-
-
+- [`mt2.world.region`](functions/world-region.md): Read region ownership, native type and the current region purchase price.
+- [`mt2.world.simulation`](functions/world-simulation.md): Read cash, logged-in subscribers, game clock and the current financial ledger.
+- [`mt2.world.software`](functions/world-software.md): Read the current game rating and fun values.

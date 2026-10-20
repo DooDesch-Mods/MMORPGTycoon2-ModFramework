@@ -17,6 +17,10 @@ int main(int argc,char** argv) {
             if(op=="objects.list")return Json::array({object});
             if(op=="objects.get"||op=="objects.selected"||op=="objects.resolve")return object;
             if(op=="objects.persist")return "fixture-reference";
+            if(op=="objects.building") { auto result=object;result.update({{"type","Scenery"},{"variant","Oak"},{"rotation",{0,0,0,1}},{"scale",{1,1,1}},{"in_dungeon",false},{"in_dungeon_instance",false}});return result; }
+            if(op=="world.region")return {{"epoch",1},{"x",args.at("x")},{"z",args.at("z")},{"type",0},{"owned",true},{"purchase_price",1000},{"cash",5000}};
+            if(op=="world.simulation")return {{"epoch",1},{"cash",5000},{"logged_in_subscribers",42},{"clock",{{"paused",true},{"speed",1},{"day",1},{"seconds",0}}},{"ledger",{{"day",1},{"cash",5000},{"income",200},{"expense",50},{"lines",Json::array()}}}};
+            if(op=="world.software")return {{"epoch",1},{"rating",75.5},{"fun",80.5}};
             if(op=="camera.get")return {{"x",1},{"y",2},{"z",3},{"focus_x",1},{"focus_y",2},{"focus_z",3},{"distance",30},{"min",10},{"max",1000},{"editable",true},{"script_weight",1}};
             if(op=="camera.focus")return {{"accepted",true}};
             if(op=="time.get"||op=="time.set")return {{"paused",true},{"speed",1},{"day",1},{"seconds",0}};
@@ -26,11 +30,16 @@ int main(int argc,char** argv) {
             if(op=="ui.begin"||op=="ui.end"||op=="ui.text")return true;
             if(op=="ui.button")return false;
             if(op=="ui.number"||op=="ui.checkbox")return args.at("value");
+            if(op=="ui.app")return {{"open_requested",true},{"desktop",{{"requested",false},{"registered",false},{"visible",nullptr},{"visibility_known",false},{"error",""}}}};
+            if(op=="ui.native")return {{"ready",true},{"open",args.at("open")},{"visible",true},{"visibility_known",true},{"suspended",false},{"clicked",Json::array()},{"values",Json::object()}};
+            if(op=="ui.document")return {{"open",true},{"clicked",Json::array()},{"values",Json::object()}};
             throw std::runtime_error("Fixture has no operation: "+op);
         });
         runtime.set_patch_authority([](const std::string&, std::string&) { return true; });
         runtime.load();runtime.world_ready("Documentation fixture");runtime.emit("update",{{"dt",0.016},{"epoch",1}});
         runtime.rendering=true;runtime.emit("render");runtime.rendering=false;
+        // App examples open through their launcher before taking a bounded update snapshot.
+        if(manifest.source.at("api_version")=="1.1.0")runtime.emit("update",{{"dt",1.0},{"epoch",1}});
         runtime.emit("input",{{"owner",manifest.id},{"name","show_message"},{"scancode",66}});
         Json exports=Json::array();
         for(auto& log:runtime.logs())if(log.message.starts_with("@export "))exports.push_back(log.message.substr(8));

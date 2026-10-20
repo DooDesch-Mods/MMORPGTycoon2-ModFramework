@@ -52,4 +52,3 @@ mt2.ui.window("My mod", function()
     if mt2.ui.button("Say hello") then mt2.log.info("Hello from my mod") end
 end)
 ```
-

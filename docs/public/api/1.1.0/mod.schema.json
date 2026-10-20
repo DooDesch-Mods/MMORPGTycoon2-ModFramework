@@ -1,0 +1,108 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:mt2fw:mod:1.1.0",
+  "title": "MT2 mod manifest",
+  "type": "object",
+  "required": [
+    "id",
+    "name",
+    "version",
+    "api_version",
+    "type",
+    "entry",
+    "capabilities"
+  ],
+  "properties": {
+    "id": {
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9]*(?:\\.[a-z0-9][a-z0-9_-]*)+$"
+    },
+    "name": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 256
+    },
+    "version": {
+      "type": "string",
+      "format": "semver"
+    },
+    "api_version": {
+      "type": "string",
+      "format": "supported-mt2-api"
+    },
+    "type": {
+      "enum": [
+        "lua",
+        "native",
+        "content"
+      ]
+    },
+    "entry": {
+      "type": "string",
+      "minLength": 1,
+      "format": "mt2-relative-path"
+    },
+    "capabilities": {
+      "type": "array",
+      "items": {
+        "enum": [
+          "ui",
+          "input",
+          "world.read",
+          "objects.read",
+          "objects.write",
+          "camera",
+          "time.write",
+          "content"
+        ]
+      }
+    },
+    "multiplayer": {
+      "enum": [
+        "local",
+        "shared",
+        "singleplayer"
+      ],
+      "default": "singleplayer"
+    },
+    "dependencies": {
+      "type": "object",
+      "propertyNames": {
+        "pattern": "^[a-z][a-z0-9]*(?:\\.[a-z0-9][a-z0-9_-]*)+$"
+      },
+      "additionalProperties": {
+        "type": "string"
+      }
+    }
+  },
+  "additionalProperties": true,
+  "allOf": [
+    {
+      "if": {
+        "required": [
+          "multiplayer"
+        ],
+        "properties": {
+          "multiplayer": {
+            "const": "local"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "capabilities": {
+            "items": {
+              "not": {
+                "enum": [
+                  "objects.write",
+                  "time.write",
+                  "content"
+                ]
+              }
+            }
+          }
+        }
+      }
+    }
+  ]
+}

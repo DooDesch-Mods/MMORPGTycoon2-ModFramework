@@ -40,12 +40,12 @@ class DocumentationContractTests(unittest.TestCase):
         @checker.checks('semver',raises=(ValueError,TypeError))
         def semver(value):packages.version(value);return True
         @checker.checks('supported-mt2-api',raises=(ValueError,TypeError))
-        def supported(value):return packages.version(value)[0]==1 and packages.version(value)<=packages.version('1.0.0')
+        def supported(value):return packages.version(value)[0]==1 and packages.version(value)<=packages.version(contract['api_version'])
         @checker.checks('mt2-relative-path',raises=(ValueError,TypeError))
         def relative(value):packages.relative(value);return True
         validator=jsonschema.Draft202012Validator(schema,format_checker=checker)
         valid=packages.read_json(ROOT/'templates/hello/mod.json')
-        cases=[valid,{**valid,'version':'1.2.0-beta.1+build'},
+        cases=[valid,{**valid,'api_version':'1.1.0'},{**valid,'api_version':'1.2.0'},{**valid,'version':'1.2.0-beta.1+build'},
                {**valid,'entry':'../escape.lua'},{**valid,'api_version':'2.0.0'},
                {**valid,'version':'1.0.0-01'},{**valid,'capabilities':['objects.write']},
                {key:value for key,value in valid.items() if key!='capabilities'}]

@@ -10,6 +10,11 @@ from mt2fw import packages
 
 
 class PackageTests(unittest.TestCase):
+    def test_api_minor_version_boundary(self):
+        value={'id':'test.api','name':'API test','version':'1.0.0','api_version':'1.1.0','type':'lua','entry':'main.lua','capabilities':[]}
+        self.assertEqual(packages.validate_manifest(value)['api_version'],'1.1.0')
+        value['api_version']='1.2.0'
+        with self.assertRaises(packages.PackageError):packages.validate_manifest(value)
     def test_new_project_includes_current_agent_contract_and_license(self):
         mod=self.root/'agent-project';packages.new_mod(mod,'test.agent')
         self.assertEqual(packages.read_json(mod/'.mt2fw/api.json'),packages.read_json(packages.FRAMEWORK/'api/contract.json'))

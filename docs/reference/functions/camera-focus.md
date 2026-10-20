@@ -52,4 +52,3 @@ mt2.ui.window("Camera", function()
     end
 end)
 ```
-

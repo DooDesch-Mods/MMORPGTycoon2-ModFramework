@@ -46,4 +46,3 @@ mt2.ui.window("Settings", function()
     if mt2.ui.button("Use a new greeting") then mt2.config.set("greeting", "I made this.") end
 end)
 ```
-

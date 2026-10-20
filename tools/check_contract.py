@@ -33,6 +33,14 @@ def main():
         log.write_text(result.stdout+result.stderr,encoding='utf-8')
         if result.returncode:raise RuntimeError('Real Lua fixture failed: '+str(log))
         value=packages.read_json(output)
+        required_examples={
+            'native-app':{'ui.app','ui.native'},
+            'document-app':{'ui.app','ui.document'},
+            'world-dashboard':{'ui.app','ui.native','objects.building','world.region','world.simulation','world.software'}
+        }
+        observed={row['operation'] for row in value['host_calls']}
+        missing=required_examples.get(directory.name,set())-observed
+        if missing:raise RuntimeError('Complete example did not exercise its API: '+directory.name+': '+str(missing))
         if directory==probe:
             expected={f['name'][4:] for f in contract['functions']}
             if set(value['exports'])!=expected:raise RuntimeError('Actual loaded Lua exports differ: '+str(set(value['exports'])^expected))

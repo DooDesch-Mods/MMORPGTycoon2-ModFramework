@@ -59,4 +59,3 @@ mt2.events.on("action_completed", function(value)
     end
 end)
 ```
-

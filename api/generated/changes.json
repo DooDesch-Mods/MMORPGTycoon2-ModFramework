@@ -1,10 +1,17 @@
 {
-  "api_version": "1.0.0",
+  "api_version": "1.1.0",
   "added": [
+    "mt2.objects.building",
     "mt2.patches.add",
     "mt2.patches.remove",
     "mt2.patches.status",
-    "mt2.patches.targets"
+    "mt2.patches.targets",
+    "mt2.ui.app",
+    "mt2.ui.document",
+    "mt2.ui.native",
+    "mt2.world.region",
+    "mt2.world.simulation",
+    "mt2.world.software"
   ],
   "removed": [],
   "changed_signatures": []

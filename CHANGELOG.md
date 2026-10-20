@@ -1,5 +1,23 @@
 # Changelog
 
+## 0.2.4
+
+### Added
+
+- Open Lua mod apps from Mods, with an optional game-desktop icon and no extra function key.
+- Create native Lua windows with text fields, buttons, tabs, panels and PNG images.
+- Build searchable lists and flexible layouts with the document renderer.
+- Read building types and transforms, region ownership, finances, rating and fun from Lua.
+- Three complete Lua examples, with updated editor types and API documentation.
+
+### Fixed
+
+- Reloading a Lua app with a desktop icon no longer triggers a duplicate-icon game assertion.
+
+### Compatibility
+
+- New functions require Lua API 1.1.0. Existing API 1.0 mods remain supported. Native ABI 1 is unchanged; UI operations remain experimental.
+
 ## 0.2.3
 
 ### Added

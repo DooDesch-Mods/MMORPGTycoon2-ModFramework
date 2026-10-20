@@ -3,6 +3,7 @@
 #include "mt2mp/core/logger.h"
 #include "crypto.h"
 #include "native_extensions.h"
+#include "public_reads.h"
 #include <windows.h>
 #include <cmath>
 #include <deque>
@@ -111,6 +112,20 @@ void frame(Runtime& runtime,float dt) {
 Json request(const std::string& op,const Json& args) {
     std::string error;
     if(op=="world.status")return {{"loaded",world},{"name",current_world},{"epoch",current_runtime?current_runtime->epoch:0}};
+    if(op=="world.region"||op=="world.simulation"||op=="world.software") {
+        if(!current_runtime||!world)throw std::runtime_error("World query requires a loaded world");
+        if(op=="world.region") {
+            auto x=public_reads::coordinate(args,"x"),z=public_reads::coordinate(args,"z");
+            native::RegionState state;require(native::read_region_state(x,z,state,error),error);
+            return public_reads::region(state,x,z,current_runtime->epoch);
+        }
+        if(op=="world.simulation") {
+            native::SimulationState state;require(native::read_simulation_state(state,error),error);
+            return public_reads::simulation(state,current_runtime->epoch);
+        }
+        native::SoftwareState state;require(native::read_software_state(state,error),error);
+        return public_reads::software(state,current_runtime->epoch);
+    }
     if(op=="time.get") {native::ClockState state;require(native::read_clock(state,error),error);return {{"paused",state.paused},{"speed",state.time_scale},{"day",state.flat_day},{"seconds",state.seconds}};}
     if(op=="time.set") {require(native::set_clock(args.at("paused").get<bool>(),args.at("speed").get<float>(),error),error);return request("time.get",Json::object());}
     if(op=="objects.list") {
@@ -118,6 +133,7 @@ Json request(const std::string& op,const Json& args) {
         std::vector<native::PropState> rows;require(native::list_props(count,rows,error),error);Json result=Json::array();for(auto& row:rows)result.push_back(prop(row));return result;
     }
     if(op=="objects.get") {auto uid=checked_handle(args.at("handle"));native::PropState state;require(native::read_prop(uid,state,error),error);return prop(state);}
+    if(op=="objects.building") {auto uid=checked_handle(args.at("handle"));native::BuildingState state;require(native::read_building(uid,state,error),error);return public_reads::building(state,current_runtime->epoch);}
     if(op=="objects.persist") {
         auto uid=checked_handle(args.at("handle"));Json location;require(native::saved_location(uid,location,error),error);
         if(current_runtime->object_bindings.size()>=1024)throw std::runtime_error("Persistent object budget exceeded (1024)");

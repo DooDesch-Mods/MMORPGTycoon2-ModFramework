@@ -350,8 +350,11 @@ DWORD make_icon(void* desktop, void** output, void** record, bool* handed_off,
     if (named) { __try { reinterpret_cast<void(*)(void*)>(image + 0x11bd1e0)(&filename); } __except (EXCEPTION_EXECUTE_HANDLER) { if (!error) error = GetExceptionCode(); } }
     return error;
 }
-DWORD icon_layout(void* desktop, void* icon) {
-    __try { reinterpret_cast<void(*)(void*, void*)>(image + 0x5fe5f0)(desktop, icon); reinterpret_cast<void(*)(void*)>(image + 0x81a330)(desktop); }
+DWORD icon_layout(void* desktop, void* icon, bool place = true) {
+    __try {
+        if (place) reinterpret_cast<void(*)(void*, void*)>(image + 0x5fe5f0)(desktop, icon);
+        reinterpret_cast<void(*)(void*)>(image + 0x81a330)(desktop);
+    }
     __except (EXCEPTION_EXECUTE_HANDLER) { return GetExceptionCode(); } return 0;
 }
 DWORD icon_text_key(void* pane, const void* key) {
@@ -457,6 +460,7 @@ void sync_app_icons(bool title) {
             const bool shown = active && app.desktop && title && desktop_shown;
             auto binding = icons.find(app.icon);
             bool current = binding != icons.end() && binding->second.desktop == current_desktop;
+            const bool created = shown && !current;
             if (!shown) {
                 if (current) { require(icon_identity(app.icon, binding->second), "Desktop app retirement identity differs"); native_shown(app.icon, false); }
                 app.icon_visible = false;
@@ -501,7 +505,7 @@ void sync_app_icons(bool title) {
                 check(icon_text_key(label, static_cast<unsigned char*>(app.icon) + 0x380), "Desktop app text key");
                 auto material = app.image_path.empty() ? "mt2fw_desktop_mods" : app_icon_image(owner, app.image_path);
                 check(string_call(0x771f90, picture, material.c_str()), "Desktop app icon material");
-                check(icon_layout(current_desktop, app.icon), "Native app icon placement");
+                check(icon_layout(current_desktop, app.icon, created), "Native app icon placement");
                 app.icon_material = material; app.presentation_dirty = false;
             }
             native_shown(app.icon, true);
@@ -978,7 +982,7 @@ Json native_window(const Json& args) {
             if(actual != value) { events["values"][name] = actual; window.values[name] = actual; }
         } else if(type == "image") {
             auto value = item.value("path",std::string());
-            if(!value.empty() && (!window.values.contains(name) || window.values[name] != value)) { check(string_call(0x771f90,target,native_image(owner,value).c_str()),"Native app image material"); window.values[name] = value; }
+            if(!value.empty() && (!window.values.contains(name) || window.values[name] != value)) { check(string_call(0x771f90,target,app_icon_image(owner,value).c_str()),"Native app image material"); window.values[name] = value; }
         }
     }
     events["clicked"] = std::move(window.clicked); window.clicked = Json::array(); return events;

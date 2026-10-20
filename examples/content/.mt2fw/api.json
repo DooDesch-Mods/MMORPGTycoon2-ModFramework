@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
-  "framework_version": "0.2.3",
-  "api_version": "1.0.0",
+  "framework_version": "0.2.4",
+  "api_version": "1.1.0",
   "abi_version": 1,
   "capabilities": [
     "ui",
@@ -162,6 +162,131 @@
       "targets": "MT2PatchTarget[]",
       "patches": "MT2PatchRecord[]",
       "authority": "table<string, MT2PatchAuthority>"
+    },
+    "MT2Building": {
+      "handle": "MT2Handle",
+      "x": "number",
+      "y": "number",
+      "z": "number",
+      "type": "string",
+      "variant": "string",
+      "rotation": "number[]",
+      "scale": "number[]",
+      "in_dungeon": "boolean",
+      "in_dungeon_instance": "boolean",
+      "exterior?": "MT2Handle"
+    },
+    "MT2Region": {
+      "epoch": "integer",
+      "x": "number",
+      "z": "number",
+      "type": "integer",
+      "owned": "boolean",
+      "purchase_price": "integer",
+      "cash": "integer"
+    },
+    "MT2LedgerLine": {
+      "category": "integer",
+      "count": "integer",
+      "income": "integer"
+    },
+    "MT2Ledger": {
+      "day": "integer",
+      "cash": "integer",
+      "income": "integer",
+      "expense": "integer",
+      "lines": "MT2LedgerLine[]"
+    },
+    "MT2Simulation": {
+      "epoch": "integer",
+      "cash": "integer",
+      "logged_in_subscribers": "integer",
+      "clock": "MT2Clock",
+      "ledger?": "MT2Ledger"
+    },
+    "MT2Software": {
+      "epoch": "integer",
+      "rating": "number",
+      "fun": "number"
+    },
+    "MT2AppOptions": {
+      "id": "string",
+      "title": "string",
+      "desktop?": "boolean",
+      "icon?": "string"
+    },
+    "MT2AppDesktop": {
+      "requested": "boolean",
+      "registered": "boolean",
+      "visible?": "boolean",
+      "visibility_known": "boolean",
+      "error": "string"
+    },
+    "MT2AppResult": {
+      "open_requested": "boolean",
+      "desktop": "MT2AppDesktop"
+    },
+    "MT2NativeWidget": {
+      "id": "string",
+      "type": "'text'|'button'|'input'|'image'|'panel'",
+      "x": "integer",
+      "y": "integer",
+      "width": "integer",
+      "height": "integer",
+      "size?": "integer",
+      "tone?": "'muted'|'error'|'subtle'|'preview'",
+      "style?": "'button'|'tab'|'row'|'quiet'",
+      "text?": "string",
+      "value?": "string",
+      "max_bytes?": "integer",
+      "path?": "string",
+      "visible?": "boolean",
+      "disabled?": "boolean",
+      "selected?": "boolean"
+    },
+    "MT2NativeWindow": {
+      "id": "string",
+      "open": "boolean",
+      "width": "integer",
+      "height": "integer",
+      "widgets": "MT2NativeWidget[]"
+    },
+    "MT2NativeResult": {
+      "ready": "boolean",
+      "open": "boolean",
+      "visible?": "boolean",
+      "visibility_known": "boolean",
+      "suspended?": "boolean",
+      "clicked": "string[]",
+      "values": "table<string, string>"
+    },
+    "MT2DocumentWidget": {
+      "type": "'text'|'button'|'input'|'selectable'|'separator'|'space'|'panel'|'columns'",
+      "id?": "string",
+      "text?": "string",
+      "title?": "string",
+      "subtitle?": "string",
+      "value?": "string",
+      "hint?": "string",
+      "tone?": "'heading'|'muted'|'success'|'error'",
+      "width?": "number",
+      "height?": "number",
+      "disabled?": "boolean",
+      "selected?": "boolean",
+      "primary?": "boolean",
+      "children?": "MT2DocumentWidget[]"
+    },
+    "MT2Document": {
+      "id": "string",
+      "title": "string",
+      "width?": "number",
+      "height?": "number",
+      "content": "MT2DocumentWidget"
+    },
+    "MT2DocumentResult": {
+      "open": "boolean",
+      "clicked": "string[]",
+      "values": "table<string, string>"
     }
   },
   "events": [
@@ -1398,6 +1523,221 @@
         "patches.status"
       ],
       "example": "examples/time-policy/main.lua"
+    },
+    {
+      "name": "mt2.ui.app",
+      "group": "ui",
+      "parameters": [
+        {
+          "name": "options",
+          "type": "MT2AppOptions",
+          "description": "Stable app ID and title; optional desktop icon under assets/*.png."
+        }
+      ],
+      "returns": "MT2AppResult",
+      "summary": "Register your mod in the central Mods launcher and consume its open request.",
+      "capabilities": [
+        "ui"
+      ],
+      "since": "1.1.0",
+      "stability": "experimental",
+      "thread": "Render callback.",
+      "lifecycle": "Active render callback. Do not nest inside mt2.ui.window.",
+      "side_effects": "One app per mod. Call every render, including while closed. desktop defaults to false.",
+      "reload": "Owned UI registrations are replaced when the new Lua instance first renders; failed preparation retains the old instance.",
+      "persistence": "Session-local. Store input values and open state in Lua.",
+      "errors": [
+        "Missing capability or inactive/staging owner raises a Lua error.",
+        "Invalid IDs, title or icon paths are rejected."
+      ],
+      "host_operations": [
+        "ui.app"
+      ],
+      "example": "examples/native-app/main.lua"
+    },
+    {
+      "name": "mt2.ui.native",
+      "group": "ui",
+      "parameters": [
+        {
+          "name": "options",
+          "type": "MT2NativeWindow",
+          "description": "Registered app ID, open state, dimensions and 1-80 native widgets."
+        }
+      ],
+      "returns": "MT2NativeResult",
+      "summary": "Display a native MT2 window with buttons, tabs, inputs, panels and PNG images.",
+      "capabilities": [
+        "ui"
+      ],
+      "since": "1.1.0",
+      "stability": "experimental",
+      "thread": "Render callback.",
+      "lifecycle": "Active render callback. Do not nest inside mt2.ui.window.",
+      "side_effects": "Creates a game-owned window. Layout is fixed for this Lua instance; text and state may change. Send open=false to hide it.",
+      "reload": "Owned UI registrations are replaced when the new Lua instance first renders; failed preparation retains the old instance.",
+      "persistence": "Session-local. Store input values and open state in Lua.",
+      "errors": [
+        "Missing capability or inactive/staging owner raises a Lua error.",
+        "Register ui.app first. Native dimensions must be 400-1100 by 300-640.",
+        "Layout changes require a Lua reload; native plugins still require a restart.",
+        "PNG paths must be package assets/*.png or owned `cache/<sha256>.png`; 1 MiB, 2048 pixels per dimension, 128 images per session.",
+        "ready=false during a mode transition is a wait state, not a confirmed visible window."
+      ],
+      "host_operations": [
+        "ui.native"
+      ],
+      "example": "examples/native-app/main.lua"
+    },
+    {
+      "name": "mt2.ui.document",
+      "group": "ui",
+      "parameters": [
+        {
+          "name": "document",
+          "type": "MT2Document",
+          "description": "Owned document tree with stable widget IDs, at most 200 widgets, depth 8 and four columns."
+        }
+      ],
+      "returns": "MT2DocumentResult",
+      "summary": "Draw a resizable document with lists, columns, text inputs and buttons.",
+      "capabilities": [
+        "ui"
+      ],
+      "since": "1.1.0",
+      "stability": "experimental",
+      "thread": "Render callback.",
+      "lifecycle": "Active render callback. Do not nest inside mt2.ui.window.",
+      "side_effects": "Draws the complete document this frame. Stop submitting after open becomes false. Store changes from values and process clicked once.",
+      "reload": "Owned UI registrations are replaced when the new Lua instance first renders; failed preparation retains the old instance.",
+      "persistence": "Session-local. Store input values and open state in Lua.",
+      "errors": [
+        "Missing capability or inactive/staging owner raises a Lua error.",
+        "Invalid widgets, dimensions or budgets are rejected before drawing.",
+        "Use globally unique widget IDs within a document for unambiguous clicked and values results.",
+        "Lua document images are not available; use a native image widget for packaged PNGs."
+      ],
+      "host_operations": [
+        "ui.document"
+      ],
+      "example": "examples/document-app/main.lua"
+    },
+    {
+      "name": "mt2.objects.building",
+      "group": "objects",
+      "parameters": [
+        {
+          "name": "handle",
+          "type": "MT2Handle",
+          "description": "Current-world handle returned by objects.get/list/selected."
+        }
+      ],
+      "returns": "MT2Building",
+      "summary": "Read building type, variant, quaternion rotation and scale.",
+      "capabilities": [
+        "objects.read"
+      ],
+      "since": "1.1.0",
+      "stability": "stable-within-api-1",
+      "thread": "Game-thread update or world_ready callback; native readers reject another thread.",
+      "lifecycle": "Active callback with a loaded world; unavailable during staged replacement.",
+      "side_effects": "Read-only. rotation is [x,y,z,w]; scale is [x,y,z]. Names are native identifiers, not localized display names.",
+      "reload": "No registrations. Handles and snapshots retain their original world epoch.",
+      "persistence": "Returns a snapshot, not a live object. Re-read after world or simulation changes.",
+      "errors": [
+        "Missing capability or inactive/staging owner raises a Lua error.",
+        "Deleted, stale, wrong-type or unavailable objects are rejected."
+      ],
+      "host_operations": [
+        "objects.building"
+      ],
+      "example": "examples/world-dashboard/main.lua"
+    },
+    {
+      "name": "mt2.world.region",
+      "group": "world",
+      "parameters": [
+        {
+          "name": "x",
+          "type": "number",
+          "description": "Finite world X coordinate."
+        },
+        {
+          "name": "z",
+          "type": "number",
+          "description": "Finite world Z coordinate."
+        }
+      ],
+      "returns": "MT2Region",
+      "summary": "Read region ownership, native type and the current region purchase price.",
+      "capabilities": [
+        "world.read"
+      ],
+      "since": "1.1.0",
+      "stability": "stable-within-api-1",
+      "thread": "Game-thread update or world_ready callback; native readers reject another thread.",
+      "lifecycle": "Active callback with a loaded world; unavailable during staged replacement.",
+      "side_effects": "Read-only single-position query. x/z echo the query, not region bounds. purchase_price is the current business configuration price, including for an owned region.",
+      "reload": "No registrations. Handles and snapshots retain their original world epoch.",
+      "persistence": "Returns a snapshot, not a live object. Re-read after world or simulation changes.",
+      "errors": [
+        "Missing capability or inactive/staging owner raises a Lua error.",
+        "No active world, missing region, out-of-range coordinates or failed native guards are rejected."
+      ],
+      "host_operations": [
+        "world.region"
+      ],
+      "example": "examples/world-dashboard/main.lua"
+    },
+    {
+      "name": "mt2.world.simulation",
+      "group": "world",
+      "parameters": [],
+      "returns": "MT2Simulation",
+      "summary": "Read cash, logged-in subscribers, game clock and the current financial ledger.",
+      "capabilities": [
+        "world.read"
+      ],
+      "since": "1.1.0",
+      "stability": "stable-within-api-1",
+      "thread": "Game-thread update or world_ready callback; native readers reject another thread.",
+      "lifecycle": "Active callback with a loaded world; unavailable during staged replacement.",
+      "side_effects": "Read-only bounded snapshot. ledger is nil when no current record exists. A present ledger has exactly 20 lines with native category IDs 0-19; no history or world scan.",
+      "reload": "No registrations. Handles and snapshots retain their original world epoch.",
+      "persistence": "Returns a snapshot, not a live object. Re-read after world or simulation changes.",
+      "errors": [
+        "Missing capability or inactive/staging owner raises a Lua error.",
+        "No active world or failed native identity/ledger guards are rejected."
+      ],
+      "host_operations": [
+        "world.simulation"
+      ],
+      "example": "examples/world-dashboard/main.lua"
+    },
+    {
+      "name": "mt2.world.software",
+      "group": "world",
+      "parameters": [],
+      "returns": "MT2Software",
+      "summary": "Read the current game rating and fun values.",
+      "capabilities": [
+        "world.read"
+      ],
+      "since": "1.1.0",
+      "stability": "stable-within-api-1",
+      "thread": "Game-thread update or world_ready callback; native readers reject another thread.",
+      "lifecycle": "Active callback with a loaded world; unavailable during staged replacement.",
+      "side_effects": "Read-only public snapshot of the native software metrics; no normalization or invented percentages.",
+      "reload": "No registrations. Handles and snapshots retain their original world epoch.",
+      "persistence": "Returns a snapshot, not a live object. Re-read after world or simulation changes.",
+      "errors": [
+        "Missing capability or inactive/staging owner raises a Lua error.",
+        "No active world or failed native software guards are rejected."
+      ],
+      "host_operations": [
+        "world.software"
+      ],
+      "example": "examples/world-dashboard/main.lua"
     }
   ],
   "limits": {

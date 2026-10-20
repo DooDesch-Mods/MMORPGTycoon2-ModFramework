@@ -67,5 +67,3 @@ Payload: `MT2ObjectChangedEvent`. Since 1.0.0.
 A queued world action has a terminal status; unknown is not success.
 
 Payload: `MT2Action`. Since 1.0.0.
-
-

@@ -51,4 +51,3 @@ mt2.ui.window("Time", function()
     if mt2.ui.button("Resume") then mt2.time.set(false, 1) end
 end)
 ```
-

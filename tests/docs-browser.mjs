@@ -22,7 +22,7 @@ const reportPath = resolve(argument('--report', resolve(repository, 'artifacts/d
 const captureArgument = argument('--captures', undefined)
 const captureDirectory = captureArgument ? resolve(captureArgument) : undefined
 const executablePath = process.env.CHROMIUM_EXECUTABLE || chromium.executablePath()
-const pages = ['index.html', 'quickstart.html', 'reference/index.html', 'reference/functions/ui-window.html', 'reference/native.html', 'guides/scenery.html', 'agents/start.html', 'experimental/patches.html', 'reference/functions/patches-add.html']
+const pages = ['index.html', 'quickstart.html', 'reference/index.html', 'reference/functions/ui-window.html', 'reference/native.html', 'guides/scenery.html', 'agents/start.html', 'experimental/patches.html', 'reference/functions/patches-add.html', 'recipes/lua-apps.html', 'reference/functions/ui-native.html', 'reference/functions/ui-document.html', 'reference/functions/world-simulation.html']
 const mimeTypes = { '.html': 'text/html; charset=utf-8', '.js': 'text/javascript; charset=utf-8', '.css': 'text/css; charset=utf-8', '.json': 'application/json', '.svg': 'image/svg+xml', '.png': 'image/png', '.jpg': 'image/jpeg', '.woff2': 'font/woff2' }
 const started = performance.now()
 const report = { status: 'running', checks: [], errors: [], blockedRequests: [], navigationWait: 'Idle callback, animation frame and network idle before leaving a document.' }

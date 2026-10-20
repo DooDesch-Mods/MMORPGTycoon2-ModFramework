@@ -47,4 +47,3 @@ mt2.events.on("world_leave", function(event)
     mt2.log.info("Leaving: " .. event.name)
 end)
 ```
-

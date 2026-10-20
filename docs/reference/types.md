@@ -226,4 +226,172 @@ Handles carry a world epoch and an exact string UID. Never convert the UID to a 
 | `patches` | `MT2PatchRecord[]` |
 | `authority` | `table<string, MT2PatchAuthority>` |
 
+## MT2Building
 
+| Field | Type |
+| --- | --- |
+| `handle` | `MT2Handle` |
+| `x` | `number` |
+| `y` | `number` |
+| `z` | `number` |
+| `type` | `string` |
+| `variant` | `string` |
+| `rotation` | `number[]` |
+| `scale` | `number[]` |
+| `in_dungeon` | `boolean` |
+| `in_dungeon_instance` | `boolean` |
+| `exterior?` | `MT2Handle` |
+
+## MT2Region
+
+| Field | Type |
+| --- | --- |
+| `epoch` | `integer` |
+| `x` | `number` |
+| `z` | `number` |
+| `type` | `integer` |
+| `owned` | `boolean` |
+| `purchase_price` | `integer` |
+| `cash` | `integer` |
+
+## MT2LedgerLine
+
+| Field | Type |
+| --- | --- |
+| `category` | `integer` |
+| `count` | `integer` |
+| `income` | `integer` |
+
+## MT2Ledger
+
+| Field | Type |
+| --- | --- |
+| `day` | `integer` |
+| `cash` | `integer` |
+| `income` | `integer` |
+| `expense` | `integer` |
+| `lines` | `MT2LedgerLine[]` |
+
+## MT2Simulation
+
+| Field | Type |
+| --- | --- |
+| `epoch` | `integer` |
+| `cash` | `integer` |
+| `logged_in_subscribers` | `integer` |
+| `clock` | `MT2Clock` |
+| `ledger?` | `MT2Ledger` |
+
+## MT2Software
+
+| Field | Type |
+| --- | --- |
+| `epoch` | `integer` |
+| `rating` | `number` |
+| `fun` | `number` |
+
+## MT2AppOptions
+
+| Field | Type |
+| --- | --- |
+| `id` | `string` |
+| `title` | `string` |
+| `desktop?` | `boolean` |
+| `icon?` | `string` |
+
+## MT2AppDesktop
+
+| Field | Type |
+| --- | --- |
+| `requested` | `boolean` |
+| `registered` | `boolean` |
+| `visible?` | `boolean` |
+| `visibility_known` | `boolean` |
+| `error` | `string` |
+
+## MT2AppResult
+
+| Field | Type |
+| --- | --- |
+| `open_requested` | `boolean` |
+| `desktop` | `MT2AppDesktop` |
+
+## MT2NativeWidget
+
+| Field | Type |
+| --- | --- |
+| `id` | `string` |
+| `type` | `'text'\|'button'\|'input'\|'image'\|'panel'` |
+| `x` | `integer` |
+| `y` | `integer` |
+| `width` | `integer` |
+| `height` | `integer` |
+| `size?` | `integer` |
+| `tone?` | `'muted'\|'error'\|'subtle'\|'preview'` |
+| `style?` | `'button'\|'tab'\|'row'\|'quiet'` |
+| `text?` | `string` |
+| `value?` | `string` |
+| `max_bytes?` | `integer` |
+| `path?` | `string` |
+| `visible?` | `boolean` |
+| `disabled?` | `boolean` |
+| `selected?` | `boolean` |
+
+## MT2NativeWindow
+
+| Field | Type |
+| --- | --- |
+| `id` | `string` |
+| `open` | `boolean` |
+| `width` | `integer` |
+| `height` | `integer` |
+| `widgets` | `MT2NativeWidget[]` |
+
+## MT2NativeResult
+
+| Field | Type |
+| --- | --- |
+| `ready` | `boolean` |
+| `open` | `boolean` |
+| `visible?` | `boolean` |
+| `visibility_known` | `boolean` |
+| `suspended?` | `boolean` |
+| `clicked` | `string[]` |
+| `values` | `table<string, string>` |
+
+## MT2DocumentWidget
+
+| Field | Type |
+| --- | --- |
+| `type` | `'text'\|'button'\|'input'\|'selectable'\|'separator'\|'space'\|'panel'\|'columns'` |
+| `id?` | `string` |
+| `text?` | `string` |
+| `title?` | `string` |
+| `subtitle?` | `string` |
+| `value?` | `string` |
+| `hint?` | `string` |
+| `tone?` | `'heading'\|'muted'\|'success'\|'error'` |
+| `width?` | `number` |
+| `height?` | `number` |
+| `disabled?` | `boolean` |
+| `selected?` | `boolean` |
+| `primary?` | `boolean` |
+| `children?` | `MT2DocumentWidget[]` |
+
+## MT2Document
+
+| Field | Type |
+| --- | --- |
+| `id` | `string` |
+| `title` | `string` |
+| `width?` | `number` |
+| `height?` | `number` |
+| `content` | `MT2DocumentWidget` |
+
+## MT2DocumentResult
+
+| Field | Type |
+| --- | --- |
+| `open` | `boolean` |
+| `clicked` | `string[]` |
+| `values` | `table<string, string>` |

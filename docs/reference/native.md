@@ -75,6 +75,7 @@ Lua wrappers use the following operations. `ui.begin` and `ui.end` are native ho
 - `content.register`
 - `input.bind`
 - `log`
+- `objects.building`
 - `objects.get`
 - `objects.list`
 - `objects.persist`
@@ -86,11 +87,16 @@ Lua wrappers use the following operations. `ui.begin` and `ui.end` are native ho
 - `storage.set`
 - `time.get`
 - `time.set`
+- `ui.app`
 - `ui.begin`
 - `ui.button`
 - `ui.checkbox`
+- `ui.document`
 - `ui.end`
+- `ui.native`
 - `ui.number`
 - `ui.text`
+- `world.region`
+- `world.simulation`
+- `world.software`
 - `world.status`
-

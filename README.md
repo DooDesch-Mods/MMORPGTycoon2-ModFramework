@@ -13,7 +13,7 @@ Build mods for **MMORPG Tycoon 2**. Start with Lua and a text editor, extend wit
 <!-- roadmap:start -->
 ## What can I build today?
 
-Included in [Framework 0.2.3](https://github.com/DooDesch-Mods/MMORPGTycoon2-ModFramework/releases/tag/v0.2.3). Experimental features can change between releases.
+Included in [Framework 0.2.4](https://github.com/DooDesch-Mods/MMORPGTycoon2-ModFramework/releases/tag/v0.2.4). Experimental features can change between releases.
 
 <picture>
   <source media="(max-width: 600px)" srcset="https://raw.githubusercontent.com/DooDesch-Mods/MMORPGTycoon2-ModFramework/main/assets/brand/coverage-mobile.svg">
@@ -25,11 +25,11 @@ Percentages count the listed areas equally. They describe feature coverage, not 
 <details>
 <summary>Feature details - what is included</summary>
 
-| Feature | 0.2.3 | What is covered |
+| Feature | 0.2.4 | What is covered |
 | --- | --- | --- |
 | Lua mods and reload | ✅ Available | Use a text editor; reload scripts without restarting. A rejected replacement keeps the previous mod running. [Start here](docs/quickstart.md). |
 | Native C++ plugins | ✅ Available | Build with the native SDK. Plugin updates require a game restart. [SDK guide](docs/reference/native.md). |
-| In-game mod apps | ✅ Available | Open mods through the central Mods window; native apps can add their own game-desktop icon. [App integration](docs/experimental/native-app-integration.md). |
+| In-game mod apps | ✅ Available | Open Lua and native mods through the central Mods window, with optional game-desktop icons. Lua apps can use native windows, PNGs and document layouts. [Lua app guide](docs/recipes/lua-apps.md). |
 | Static GLB scenery | ✅ Available | Import static models and textures into the scenery catalog. Keep required packs installed for your saves. [Scenery guide](docs/guides/scenery.md). |
 | Camera, objects and world actions | ✅ Available | Use the documented camera, time, object and checked world-operation APIs. [API reference](docs/reference/index.md). |
 | Native patches | ◇ Experimental | Observe named game calls with ordered callbacks and conflict diagnostics. [Patch guide](docs/experimental/patches.md). |
@@ -56,7 +56,7 @@ The portable helper installs the framework, creates projects and installs mod ZI
 
 ![The native Mods app with mod selection and reload controls](docs/public/media/mods-menu.png)
 
-Native plugin authors can also register a central app and use [native game windows and previews](docs/experimental/native-document-ui.md). These operations are experimental and are separate from the stable Lua API.
+Lua API **1.1.0** adds central mod apps, native game windows, searchable document layouts and richer read-only world dashboards. See the [complete Lua app examples](docs/recipes/lua-apps.md). Native plugin authors can use the same [native windows and previews](docs/experimental/native-document-ui.md). The UI protocol remains experimental.
 
 ## For contributors
 

@@ -15,6 +15,9 @@ Capabilities belong in `mod.json`. Local mods cannot declare `objects.write`, `t
 - [`mt2.ui.button`](functions/ui-button.md)
 - [`mt2.ui.checkbox`](functions/ui-checkbox.md)
 - [`mt2.ui.number`](functions/ui-number.md)
+- [`mt2.ui.app`](functions/ui-app.md)
+- [`mt2.ui.native`](functions/ui-native.md)
+- [`mt2.ui.document`](functions/ui-document.md)
 
 ## input
 
@@ -24,6 +27,9 @@ Capabilities belong in `mod.json`. Local mods cannot declare `objects.write`, `t
 
 - [`mt2.world.status`](functions/world-status.md)
 - [`mt2.time.get`](functions/time-get.md)
+- [`mt2.world.region`](functions/world-region.md)
+- [`mt2.world.simulation`](functions/world-simulation.md)
+- [`mt2.world.software`](functions/world-software.md)
 
 ## objects.read
 
@@ -32,6 +38,7 @@ Capabilities belong in `mod.json`. Local mods cannot declare `objects.write`, `t
 - [`mt2.objects.selected`](functions/objects-selected.md)
 - [`mt2.objects.persist`](functions/objects-persist.md)
 - [`mt2.objects.resolve`](functions/objects-resolve.md)
+- [`mt2.objects.building`](functions/objects-building.md)
 
 ## objects.write
 
@@ -52,5 +59,3 @@ Capabilities belong in `mod.json`. Local mods cannot declare `objects.write`, `t
 ## content
 
 - [`mt2.content.register`](functions/content-register.md)
-
-

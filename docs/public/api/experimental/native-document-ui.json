@@ -36,7 +36,7 @@
         "values": "Record<input ID,string>"
       },
       "layout": "immutable per app instance; native window and controls owned by the active game mode",
-      "images": "immutable mod-owned cache/<sha256>.png, <=1MiB and 2048px per dimension; session budget 128 unique previews",
+      "images": "immutable package assets/*.png or mod-owned cache/<sha256>.png, <=1MiB and 2048px per dimension; session budget 128 unique previews",
       "appearance": "Native MT2 PanelBacking canvas; widget style button/tab/row/quiet and tone muted/error/subtle/preview. Style, tone and layout remain fixed for an instance."
     },
     "ui.document": {
@@ -72,14 +72,15 @@
       "width": "positive integer; inside window",
       "height": "positive integer; inside window",
       "size?": "integer 10..30, default 16",
-      "tone?": "muted|error",
+      "tone?": "muted|error|subtle|preview",
       "text?": "string <=1024 bytes",
       "value?": "UTF-8 string within max_bytes for input; other text <=1024 bytes",
       "max_bytes?": "input UTF-8 byte limit, integer 1..1024, default 128; part of immutable layout",
       "path?": "immutable preview PNG path",
       "visible?": "boolean, default true",
       "disabled?": "boolean, buttons only",
-      "selected?": "boolean, buttons only"
+      "selected?": "boolean, buttons only",
+      "style?": "button|tab|row|quiet"
     },
     "Document": {
       "id": "string <=128 bytes",

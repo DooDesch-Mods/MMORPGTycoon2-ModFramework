@@ -41,4 +41,3 @@ mt2.events.on("world_ready", function()
     mt2.log.info(world.name .. " - epoch " .. world.epoch)
 end)
 ```
-

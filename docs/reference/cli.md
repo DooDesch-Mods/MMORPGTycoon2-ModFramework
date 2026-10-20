@@ -109,4 +109,3 @@ options:
 ```
 
 `new` creates a complete project. `check` validates it without executing scripts. `pack` writes an archive outside its source. `doctor` reads game/profile diagnostics. Installation commands preserve original game data and require the target game to be closed.
-

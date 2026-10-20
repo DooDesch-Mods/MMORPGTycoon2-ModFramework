@@ -70,4 +70,3 @@ mt2.ui.window("Native create observer", function()
     mt2.ui.text("Includes non-scenery creates.")
 end)
 ```
-

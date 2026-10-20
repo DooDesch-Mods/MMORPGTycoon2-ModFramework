@@ -1,11 +1,11 @@
-# Native patch observer authoring
+# MT2 mod authoring
 
-Requires MT2 Mod Framework 0.2.0 or later with experimental patch protocol 1 and native plugin ABI 1. Use the matching headers bundled under `.mt2fw`; the SDK's `api/experimental/patches.json` describes targets and ordering. The guide includes the actual `plugin.cpp` source from this project.
+Use the bundled `.mt2fw/mt2.lua` types and `.mt2fw/api.json` contract. Set `api_version` to `1.1.0` when using the new app or world-query functions. API 1.0 mods remain supported. Create Lua mods with a text editor; no compiler is required. Read the installed documentation's Agents section for complete examples.
 
-- Preserve manifest identity, entry DLL and exported metadata together. Declare `world.read` for observations.
-- Load is preparation. Query the extension from an active Framework callback on the bound game thread with the exact borrowed Host pointer from Load.
-- Read copied scalar fields only during the callback. Never retain the borrowed event pointer. Create callbacks can run on worker threads; keep shared state thread safe.
-- No exception or STL object may cross the C ABI. Inspect every query, registration and retirement result and preserve its receipt cause.
-- `BUSY` prevents future selection but retains current callback leases. Keep callback code and user data until confirmed `OK`. Failed retirement stops automatic retries and also preserves state. The example's state lasts for the process lifetime.
-- Native plugins require restart. Source compilation and package validation do not prove native game callbacks or multiplayer compatibility.
-- Preserve the included MIT license for redistributed template code.
+- Declare every required capability in `mod.json`. Use a namespaced lowercase ID. Local mods cannot change world state.
+- Register basic windows once with `mt2.ui.window`, or call `mt2.ui.app` and `mt2.ui.native`/`mt2.ui.document` directly from `render`. Keep app registration active while its window is closed. Read game state from game-thread `world_ready` or `update` callbacks. The `start` event still belongs to preparation.
+- Keep handles intact. Their string UID is exact; their epoch expires on world change. Use persisted references and world storage for confirmed saves.
+- An accepted action is queued, not successful. Wait for confirmed. Preserve and investigate unknown outcomes; never repeat them automatically.
+- Lua code can reload. Content registrations and native plugins need restart. Do not use raw addresses, process launches or native Lua modules.
+- Run `mt2fw check <mod-directory>`, then `mt2fw pack <mod-directory> <zip-outside-source>`. Report source checks separately from real game acceptance.
+- This framework template is MIT licensed. Preserve the included notice for redistributed template code; choose a license for your own original additions.

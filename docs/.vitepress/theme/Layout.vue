@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import { Content, onContentUpdated, useData, withBase } from 'vitepress'
+import contract from '../../../api/contract.json'
 
 const { frontmatter, page } = useData()
 const home = computed(() => frontmatter.value.layout === 'home')
@@ -24,6 +25,7 @@ const guideLinks = [
   { text: 'Install with Vortex', href: '/guides/vortex.html' },
   { text: 'Settings and storage', href: '/guides/config-storage.html' },
   { text: 'Events and input', href: '/guides/events-input.html' },
+  { text: 'Lua apps and dashboards', href: '/recipes/lua-apps.html' },
   { text: 'World actions', href: '/guides/world-actions.html' },
   { text: 'Import GLB scenery', href: '/guides/scenery.html' },
   { text: 'Patch callbacks', href: '/experimental/patches.html' },
@@ -82,7 +84,7 @@ onContentUpdated(() => {
         <nav aria-label="Main navigation">
           <a v-for="link in primaryLinks" :key="link.href" :href="withBase(link.href)" :aria-current="primaryState(link)">{{ link.text }}</a>
         </nav>
-        <span class="site-version">v0.1.1</span>
+        <span class="site-version">Lua {{ contract.api_version }}</span>
       </div>
     </div>
   </header>
@@ -121,8 +123,8 @@ onContentUpdated(() => {
         </nav>
       </div>
       <div class="sidebar-note">
-        <strong>Framework 0.1.1</strong>
-        <p>Lua API 1.0.0 - native ABI 1</p>
+        <strong>Framework {{ contract.framework_version }}</strong>
+        <p>Lua API {{ contract.api_version }} - native ABI {{ contract.abi_version }}</p>
         <a :href="withBase('/contributing/build.html')">Build from source <span aria-hidden="true">↗</span></a>
       </div>
     </aside>
