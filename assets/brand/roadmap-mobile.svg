@@ -4,7 +4,7 @@
 <path fill="#0b1723" d="M0 0h600v1030H0z"/>
 <g font-family="Arial">
 <text x="28" y="46" font-family="Arial" font-size="30" fill="#f2f7fb" font-weight="700">More room for your ideas.</text>
-<text x="28" y="80" font-family="Arial" font-size="22" fill="#b8cad8" font-weight="400">Framework 0.2.5 - Development preview</text>
+<text x="28" y="80" font-family="Arial" font-size="22" fill="#b8cad8" font-weight="400">Framework 0.2.6 - Development preview</text>
 <path d="M32 152v286" stroke="#64e4d5" stroke-width="2" stroke-dasharray="0" opacity=".5"/>
 <circle cx="32" cy="152" r="14" fill="#0b1723" stroke="#64e4d5" stroke-width="3"/>
 <path d="m26 152 4 4 8-8" fill="none" stroke="#64e4d5" stroke-width="3"/>

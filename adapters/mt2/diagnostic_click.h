@@ -10,6 +10,13 @@ namespace mt2fw::mt2 {
 struct DiagnosticClick {
     enum class Phase { idle, down_queued, down_forwarded, up_queued, up_forwarded, restore_pending, restore_forwarded, complete, failed };
     enum class Edge { motion, down, up, enter };
+    enum class Button : uint8_t { left=1, right=3 };
+    Button button=Button::left;
+    static Button parse_button(const std::string& value){
+        if(value=="left")return Button::left;if(value=="right")return Button::right;
+        throw std::runtime_error("Diagnostic click button must be left or right");
+    }
+    const char* button_name() const {return button==Button::right?"right":"left";}
     Phase phase=Phase::idle;
     std::string id,cause;
     uintptr_t owner=0;
@@ -79,11 +86,12 @@ struct DiagnosticClick {
     }
     template<class Push>
     void begin(const std::string& request,uintptr_t owned_window,uint32_t owned_id,uint32_t owned_thread,
-               float px,float py,uint64_t timestamp,uint64_t now,Push&& push,bool mouse_outside=false){
+               float px,float py,uint64_t timestamp,uint64_t now,Push&& push,bool mouse_outside=false,Button selected_button=Button::left){
         if(unresolved())throw std::runtime_error("Previous diagnostic click is unresolved; no replay");
         if(request.empty()||!owned_window||!owned_id||!owned_thread||!timestamp||
            !std::isfinite(px)||!std::isfinite(py))throw std::runtime_error("Diagnostic click identity or coordinates invalid");
-        *this={};id=request;owner=owned_window;window_id=owned_id;thread=owned_thread;
+        if(selected_button!=Button::left&&selected_button!=Button::right)throw std::runtime_error("Diagnostic click button must be left or right");
+        *this={};button=selected_button;id=request;owner=owned_window;window_id=owned_id;thread=owned_thread;
         x=px;y=py;stamp=timestamp;started=now;phase=Phase::down_queued;
         borrowed_mouse=mouse_outside;
         try{
@@ -105,6 +113,13 @@ struct DiagnosticClick {
             forwarded|=2;down_frame=frame;phase=Phase::down_forwarded;
         }
         else if(edge==Edge::up&&phase==Phase::up_queued){forwarded|=4;up_frame=frame;phase=Phase::up_forwarded;}
+    }
+    void observe_button(Edge edge,uint8_t event_button,uint32_t event_window,uint64_t timestamp,
+                        float px,float py,bool delivered,uint64_t frame){
+        if(!pending()||event_button!=uint8_t(button))return;
+        if(event_window==window_id&&timestamp!=stamp)
+            fail(std::string("Diagnostic click interrupted by a real ")+button_name()+"-button event; no replay");
+        observe(edge,event_window,timestamp,px,py,delivered,frame);
     }
     template<class Push>
     void present(uintptr_t current_owner,uint32_t current_window,uint32_t current_thread,

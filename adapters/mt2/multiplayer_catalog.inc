@@ -157,6 +157,7 @@ catalog.catalog("mp.world.district-finish.5ae530",0x5ae530,false);
 catalog.catalog("mp.world.district-paint.5aee80",0x5aee80,false);
 catalog.catalog("mp.world.district-add.5af370",0x5af370,false);
 catalog.catalog("mp.region-properties.5b9610",0x5b9610,false);
+catalog.catalog("mp.modular-b07.5ba2c0",0x5ba2c0,false);
 catalog.catalog("mp.modular-b07.5bad60",0x5bad60,false);
 catalog.catalog("mp.modular-b07.5bc0c0",0x5bc0c0,false);
 catalog.catalog("mp.monster-release-capture.5bf3c0",0x5bf3c0,false);

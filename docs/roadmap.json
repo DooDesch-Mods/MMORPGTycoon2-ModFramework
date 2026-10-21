@@ -2,13 +2,13 @@
   "product": "MT2 Mod Framework",
   "support_slug": "modframework",
   "repository_url": "https://github.com/DooDesch-Mods/MMORPGTycoon2-ModFramework",
-  "version_label": "0.2.5",
-  "release_label": "Framework 0.2.5 - Development preview",
+  "version_label": "0.2.6",
+  "release_label": "Framework 0.2.6 - Development preview",
   "graphic_title": "More room for your ideas.",
   "coverage_title": "Framework feature coverage",
   "asset_directory": "assets/brand",
   "overview_heading": "What can I build today?",
-  "overview_intro": "Included in [Framework 0.2.5](https://github.com/DooDesch-Mods/MMORPGTycoon2-ModFramework/releases/tag/v0.2.5). Experimental features can change between releases.",
+  "overview_intro": "Included in [Framework 0.2.6](https://github.com/DooDesch-Mods/MMORPGTycoon2-ModFramework/releases/tag/v0.2.6). Experimental features can change between releases.",
   "stages": [
     {
       "label": "Available now",
@@ -85,7 +85,7 @@
       "name": "Multiplayer mods",
       "short_name": "Co-op mods",
       "status": "partial",
-      "scope": "Runtime for Multiplayer Early Beta 15. Other mods need explicit multiplayer integration; installing the Framework alone does not synchronize them."
+      "scope": "Runtime for Multiplayer Early Beta 18, including the native right-click route. Other mods need explicit multiplayer integration; installing the Framework alone does not synchronize them."
     },
     {
       "name": "Animated models and C#",

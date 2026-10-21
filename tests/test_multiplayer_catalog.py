@@ -33,7 +33,7 @@ class MultiplayerCatalogTests(unittest.TestCase):
         prior = json.loads((ROOT / 'tests/fixtures/multiplayer-catalog-v0.2.1.json').read_text(encoding='utf-8'))['targets']
         previous = {row['name'] for row in prior}
         self.assertEqual([row for row in self.targets if row['name'] in previous], prior)
-        self.assertEqual(len(self.targets), 282)
+        self.assertEqual(len(self.targets), 283)
         self.assertEqual(sum(row['shared'] for row in self.targets), 11)
 
 

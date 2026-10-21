@@ -1856,6 +1856,18 @@
       ]
     },
     {
+      "name": "mp.modular-b07.5ba2c0",
+      "rva": 6005440,
+      "shared": false,
+      "groups": [
+        {
+          "feature": "Modular building input capture",
+          "phase": "after ui_move Runtime publication, bound Mainthread",
+          "site": "src/game/modular_runtime.h"
+        }
+      ]
+    },
+    {
       "name": "mp.modular-b07.5bad60",
       "rva": 6008160,
       "shared": false,

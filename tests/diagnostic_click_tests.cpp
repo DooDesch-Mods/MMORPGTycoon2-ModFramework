@@ -49,6 +49,46 @@ int main(){
     try{
         int checks=0;
         {
+            require(Click::parse_button("left")==Click::Button::left&&Click::parse_button("right")==Click::Button::right,"Named click button differs");++checks;
+            for(const auto& name:{"", "middle", "RIGHT"}){rejected([&]{Click::parse_button(name);},"button must be left or right");++checks;}
+            Fixture f;f.begin();require(f.click.button==Click::Button::left&&std::string(f.click.button_name())=="left","Default click changed from left");++checks;
+        }
+        {
+            Fixture f;std::vector<uint8_t> buttons;
+            const auto push=[&](auto edge){f.push(edge);if(edge==Click::Edge::down||edge==Click::Edge::up)buttons.push_back(uint8_t(f.click.button));};
+            f.click.begin("right-request",1,2,3,640,360,101,1000,push,false,Click::Button::right);
+            require(f.click.button==Click::Button::right&&std::string(f.click.button_name())=="right"&&buttons==std::vector<uint8_t>{3},"Right DOWN lost selected button");++checks;
+            f.click.observe_button(Click::Edge::down,1,2,101,640,360,true,9);
+            f.click.present(1,2,3,10,1100,push);require(buttons.size()==1&&f.click.phase==Click::Phase::down_queued,"Wrong button armed right release");++checks;
+            f.click.observe_button(Click::Edge::down,3,2,101,640,360,true,9);
+            f.click.present(1,2,3,9,1100,push);require(buttons.size()==1,"Right UP entered the same frame as DOWN");++checks;
+            f.click.present(1,2,3,10,1100,push);f.click.present(1,2,3,10,1100,push);
+            require(buttons==std::vector<uint8_t>{3,3}&&f.click.phase==Click::Phase::up_queued,"Right UP was absent, duplicated or changed to left");++checks;
+            f.click.observe_button(Click::Edge::up,1,2,101,640,360,true,10);require(f.click.phase==Click::Phase::up_queued,"Left UP completed a right click");++checks;
+            f.click.observe_button(Click::Edge::up,3,2,101,640,360,true,10);f.click.present(1,2,3,11,1200,push);
+            require(!f.click.unresolved()&&f.click.forwarded==6&&buttons.size()==2,"Right click did not complete through both original edges");++checks;
+        }
+        for(auto button:{Click::Button::left,Click::Button::right}){
+            Fixture f;const auto push=[&](auto edge){f.push(edge);};
+            f.click.begin("owned-request",1,2,3,640,360,101,1000,push,false,button);
+            f.click.observe_button(Click::Edge::down,uint8_t(button),2,102,640,360,true,9);
+            require(f.click.phase==Click::Phase::failed&&f.click.cause==std::string("Diagnostic click interrupted by a real ")+f.click.button_name()+"-button event; no replay","Physical selected-button interference lost failure cause");++checks;
+            rejected([&]{f.click.begin("retry",1,2,3,640,360,103,1200,push,false,button);},"Previous diagnostic click");require(f.events.size()==2,"Failed button input replayed");++checks;
+        }
+        for(int boundary=0;boundary<4;++boundary){
+            Fixture f;f.click.begin("right-request",1,2,3,640,360,101,1000,[&](auto edge){f.push(edge);},false,Click::Button::right);
+            if(boundary==0)f.click.check(9,2,3,1100);
+            if(boundary==1)f.click.check(1,9,3,1100);
+            if(boundary==2)f.click.check(1,2,9,1100);
+            if(boundary==3)f.click.check(1,2,3,181000);
+            require(f.click.phase==Click::Phase::failed&&!f.click.cause.empty()&&f.events.size()==2,"Right click bypassed identity/window/thread/timeout guard");++checks;
+        }
+        {
+            Fixture f;rejected([&]{f.click.begin("bad-button",1,2,3,640,360,101,1000,[&](auto edge){f.push(edge);},false,static_cast<Click::Button>(2));},"button must be left or right");
+            require(f.events.empty()&&f.click.phase==Click::Phase::idle,"Invalid button queued partial native input");++checks;
+        }
+
+        {
             Fixture f;f.begin();
             require(f.events==std::vector<Click::Edge>{Click::Edge::motion,Click::Edge::down},"Release entered original poll batch");
             f.present();require(f.events.size()==2,"Unobserved DOWN released");

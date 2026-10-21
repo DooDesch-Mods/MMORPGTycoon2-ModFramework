@@ -1,5 +1,16 @@
 # Changelog
 
+## 0.2.6
+
+### Added
+
+- Support the shared right-click block tool used by Multiplayer Early Beta 18.
+
+### Changed
+
+- Extend native input diagnostics to handle the right mouse button.
+
+
 ## 0.2.5
 
 ### Updated

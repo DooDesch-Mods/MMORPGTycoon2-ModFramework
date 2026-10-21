@@ -360,6 +360,7 @@ void sample_click_native(const char* boundary) {
     click_native_samples.push_back(std::move(row));
 }
 void push_click(mt2::DiagnosticClick::Edge edge) {
+    static_assert(uint8_t(mt2::DiagnosticClick::Button::left)==SDL_BUTTON_LEFT&&uint8_t(mt2::DiagnosticClick::Button::right)==SDL_BUTTON_RIGHT);
     SDL_Event event{};
     if(edge==mt2::DiagnosticClick::Edge::enter){
         event.type=SDL_EVENT_WINDOW_MOUSE_ENTER;event.window.timestamp=diagnostic_click.stamp;
@@ -370,7 +371,7 @@ void push_click(mt2::DiagnosticClick::Edge edge) {
     }else{
         event.type=edge==mt2::DiagnosticClick::Edge::down?SDL_EVENT_MOUSE_BUTTON_DOWN:SDL_EVENT_MOUSE_BUTTON_UP;
         event.button.timestamp=diagnostic_click.stamp;event.button.windowID=diagnostic_click.window_id;
-        event.button.button=SDL_BUTTON_LEFT;event.button.down=edge==mt2::DiagnosticClick::Edge::down;
+        event.button.button=uint8_t(diagnostic_click.button);event.button.down=edge==mt2::DiagnosticClick::Edge::down;
         event.button.clicks=1;event.button.x=diagnostic_click.x;event.button.y=diagnostic_click.y;
     }
     if(!SDL_PushEvent(&event))throw std::runtime_error(std::string("SDL click event enqueue failed: ")+SDL_GetError());
@@ -386,11 +387,9 @@ void observe_click(const SDL_Event& event,bool forwarded) {
     }
     if(event.type==SDL_EVENT_WINDOW_FOCUS_LOST&&event.window.windowID==diagnostic_click.window_id)
         diagnostic_click.fail("Diagnostic click lost owned window focus; no replay");
-    if((event.type==SDL_EVENT_MOUSE_BUTTON_DOWN||event.type==SDL_EVENT_MOUSE_BUTTON_UP)&&event.button.button==SDL_BUTTON_LEFT){
-        if(event.button.windowID==diagnostic_click.window_id&&event.button.timestamp!=diagnostic_click.stamp)
-            diagnostic_click.fail("Diagnostic click interrupted by a real left-button event; no replay");
-        diagnostic_click.observe(event.type==SDL_EVENT_MOUSE_BUTTON_DOWN?mt2::DiagnosticClick::Edge::down:mt2::DiagnosticClick::Edge::up,
-            event.button.windowID,event.button.timestamp,event.button.x,event.button.y,forwarded,frames);
+    if((event.type==SDL_EVENT_MOUSE_BUTTON_DOWN||event.type==SDL_EVENT_MOUSE_BUTTON_UP)&&event.button.button==uint8_t(diagnostic_click.button)){
+        diagnostic_click.observe_button(event.type==SDL_EVENT_MOUSE_BUTTON_DOWN?mt2::DiagnosticClick::Edge::down:mt2::DiagnosticClick::Edge::up,
+            event.button.button,event.button.windowID,event.button.timestamp,event.button.x,event.button.y,forwarded,frames);
         if(forwarded&&diagnostic_click.matches(event.button.windowID,event.button.timestamp,event.button.x,event.button.y))
             sample_click_native(event.type==SDL_EVENT_MOUSE_BUTTON_DOWN?"down_forwarded_before_consume":"up_forwarded_before_consume");
     }else if(event.type==SDL_EVENT_MOUSE_MOTION){
@@ -408,7 +407,7 @@ Json status() {
     value["diagnostic_click_native_readback"]={{"samples",click_native_samples},{"dropped",click_native_samples_dropped},
         {"motion_x_offset",offsetof(SDL_MouseMotionEvent,x)},{"motion_y_offset",offsetof(SDL_MouseMotionEvent,y)},
         {"motion_which_offset",offsetof(SDL_MouseMotionEvent,which)},{"sdl_version",SDL_VERSION}};
-    value["diagnostic_click"]={{"id",diagnostic_click.id},{"phase",diagnostic_click.name()},
+    value["diagnostic_click"]={{"id",diagnostic_click.id},{"phase",diagnostic_click.name()},{"button",diagnostic_click.button_name()},
         {"pending",diagnostic_click.pending()},{"unresolved",diagnostic_click.unresolved()},
         {"input_complete",diagnostic_click.phase==mt2::DiagnosticClick::Phase::complete},
         {"window_id",diagnostic_click.window_id},{"attempted_mask",diagnostic_click.attempted},
@@ -573,11 +572,12 @@ void diagnostics() {
             if(!SDL_PushEvent(&down)||!SDL_PushEvent(&up))throw std::runtime_error(std::string("SDL key event enqueue failed: ")+SDL_GetError());result={{"accepted",true}};
         }
         else if(op=="click") {
+            const auto button=mt2::DiagnosticClick::parse_button(args.value("button",std::string("left")));
             float x=args.at("x"),y=args.at("y");int width=0,height=0;if(!window||!SDL_GetWindowSize(window,&width,&height)||x<0||y<0||x>=width||y>=height)throw std::runtime_error("Diagnostic click is outside the owned game client");
             const auto initial_mouse=mt2::read_click_native(reinterpret_cast<uintptr_t>(GetModuleHandleW(nullptr)),copy_click_native,true);
             if(!initial_mouse.input_read)throw std::runtime_error(initial_mouse.cause);
             diagnostic_click.begin(id,reinterpret_cast<uintptr_t>(window),SDL_GetWindowID(window),GetCurrentThreadId(),
-                x,y,SDL_GetTicksNS(),GetTickCount64(),push_click,initial_mouse.mouse_on_screen==0);
+                x,y,SDL_GetTicksNS(),GetTickCount64(),push_click,initial_mouse.mouse_on_screen==0,button);
             reported_click_cause.clear();click_native_samples=Json::array();click_native_samples_dropped=0;click_native_read_cause.clear();
             diagnostic_mouse_x=x;diagnostic_mouse_y=y;diagnostic_mouse_frames=3;result={{"accepted",true}};
         }

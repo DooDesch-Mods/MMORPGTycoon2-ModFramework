@@ -2,7 +2,7 @@
 
 > 🛟 **Need help or found a bug?** Get support at [support.doodesch.de/modframework](https://support.doodesch.de/modframework).
 
-Included in [Framework 0.2.5](https://github.com/DooDesch-Mods/MMORPGTycoon2-ModFramework/releases/tag/v0.2.5). Experimental features can change between releases.
+Included in [Framework 0.2.6](https://github.com/DooDesch-Mods/MMORPGTycoon2-ModFramework/releases/tag/v0.2.6). Experimental features can change between releases.
 
 ## Available now: Start creating
 
@@ -26,7 +26,7 @@ Priorities can change. No release dates are promised.
 
 ## Feature coverage
 
-| Feature | 0.2.5 | What is covered |
+| Feature | 0.2.6 | What is covered |
 | --- | --- | --- |
 | Lua mods and reload | ✅ Available | Use a text editor; reload scripts without restarting. A rejected replacement keeps the previous mod running. [Start here](quickstart.md). |
 | Native C++ plugins | ✅ Available | Build with the native SDK. Plugin updates require a game restart. [SDK guide](reference/native.md). |
@@ -36,7 +36,7 @@ Priorities can change. No release dates are promised.
 | Native patches | ◇ Experimental | Observe named game calls with ordered callbacks and conflict diagnostics. [Patch guide](experimental/patches.md). |
 | Vortex installation | ✅ Available | Manage the player Runtime and mod ZIPs using the separate Vortex Extension. [Install guide](https://github.com/DooDesch-Mods/MMORPGTycoon2-ModFramework/blob/main/integrations/vortex/README.md). |
 | Editor types and agent docs | ✅ Available | Generated Lua types, complete examples and a versioned machine contract. [Agent entry point](agents/start.md). |
-| Multiplayer mods | ◐ Partial | Runtime for Multiplayer Early Beta 15. Other mods need explicit multiplayer integration; installing the Framework alone does not synchronize them. |
+| Multiplayer mods | ◐ Partial | Runtime for Multiplayer Early Beta 18, including the native right-click route. Other mods need explicit multiplayer integration; installing the Framework alone does not synchronize them. |
 | Animated models and C# | ○ Planned | Future extensions. The current release uses static scenery, Lua and native C++. |
 
 ## How coverage is counted
