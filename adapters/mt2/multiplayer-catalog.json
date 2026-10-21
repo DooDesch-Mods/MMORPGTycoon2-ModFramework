@@ -338,6 +338,18 @@
       ]
     },
     {
+      "name": "mp.dungeon-input-purchase.147a20",
+      "rva": 1341984,
+      "shared": false,
+      "groups": [
+        {
+          "feature": "Dungeon original placement and paint input capture",
+          "phase": "after ui_move Runtime publication, bound Mainthread",
+          "site": "src/game/dungeon_input_action_codes.h"
+        }
+      ]
+    },
+    {
       "name": "mp.dungeon-gizmo-create.153920",
       "rva": 1390880,
       "shared": false,
@@ -1022,6 +1034,18 @@
       ]
     },
     {
+      "name": "mp.thought-d1-lifetime.3f0fc0",
+      "rva": 4132800,
+      "shared": false,
+      "groups": [
+        {
+          "feature": "Thought D1 lifetime and Zone ownership cleanup",
+          "phase": "management_runtime::start, bound Mainthread, once per process",
+          "site": "src/game/toon_thought_lifetime.inc:61"
+        }
+      ]
+    },
+    {
       "name": "mp.building-rename.402bf0",
       "rva": 4205552,
       "shared": false,
@@ -1106,6 +1130,30 @@
       ]
     },
     {
+      "name": "mp.world.district-cancel.417bf0",
+      "rva": 4291568,
+      "shared": false,
+      "groups": [
+        {
+          "feature": "District property input capture",
+          "phase": "ui_move_runtime::enable, after publication on the bound Mainthread",
+          "site": "src/game/district_edit_routes.inc::district_edit::enable"
+        }
+      ]
+    },
+    {
+      "name": "mp.world.district-begin.417e20",
+      "rva": 4292128,
+      "shared": false,
+      "groups": [
+        {
+          "feature": "District property input capture",
+          "phase": "ui_move_runtime::enable, after publication on the bound Mainthread",
+          "site": "src/game/district_edit_routes.inc::district_edit::enable"
+        }
+      ]
+    },
+    {
       "name": "mp.district-name.418360",
       "rva": 4293472,
       "shared": false,
@@ -1114,6 +1162,18 @@
           "feature": "Co-op source-first District name and description setters",
           "phase": "typed_action_runtime::start, bound Mainthread, once per process",
           "site": "plugin owns matching intent capture, guarded ordered replay and original result; admission does not install hooks"
+        }
+      ]
+    },
+    {
+      "name": "mp.world.district-end.418a80",
+      "rva": 4295296,
+      "shared": false,
+      "groups": [
+        {
+          "feature": "District property input capture",
+          "phase": "ui_move_runtime::enable, after publication on the bound Mainthread",
+          "site": "src/game/district_edit_routes.inc::district_edit::enable"
         }
       ]
     },
@@ -1358,6 +1418,30 @@
       ]
     },
     {
+      "name": "mp.tutorial-intro.4f1940",
+      "rva": 5183808,
+      "shared": false,
+      "groups": [
+        {
+          "feature": "Intro scenario Update and Event startup routes",
+          "phase": "tutorial_replication initialization on the bound Mainthread",
+          "site": "src/game/tutorial_replication.cpp"
+        }
+      ]
+    },
+    {
+      "name": "mp.tutorial-intro.4f2330",
+      "rva": 5186352,
+      "shared": false,
+      "groups": [
+        {
+          "feature": "Intro scenario Update and Event startup routes",
+          "phase": "tutorial_replication initialization on the bound Mainthread",
+          "site": "src/game/tutorial_replication.cpp"
+        }
+      ]
+    },
+    {
       "name": "mp.tutorial-research-staff-starting-point-authority.4f3b00",
       "rva": 5192448,
       "shared": false,
@@ -1580,6 +1664,30 @@
       ]
     },
     {
+      "name": "mp.dungeon.build-cursor-selection.585270",
+      "rva": 5788272,
+      "shared": false,
+      "groups": [
+        {
+          "feature": "Original Dungeon build cursor boundaries",
+          "phase": "Build runtime enable on the bound Mainthread before readiness",
+          "site": "src/game/ui_build_runtime.cpp"
+        }
+      ]
+    },
+    {
+      "name": "mp.dungeon.build-cursor-behaviour.5854e0",
+      "rva": 5788896,
+      "shared": false,
+      "groups": [
+        {
+          "feature": "Original Dungeon build cursor boundaries",
+          "phase": "Build runtime enable on the bound Mainthread before readiness",
+          "site": "src/game/ui_build_runtime.cpp"
+        }
+      ]
+    },
+    {
       "name": "mp.boss-cursor-release.58b020",
       "rva": 5812256,
       "shared": false,
@@ -1652,6 +1760,90 @@
       ]
     },
     {
+      "name": "mp.dungeon-input-monster-release.5a82e0",
+      "rva": 5931744,
+      "shared": false,
+      "groups": [
+        {
+          "feature": "Dungeon original placement and paint input capture",
+          "phase": "after ui_move Runtime publication, bound Mainthread",
+          "site": "src/game/dungeon_input_action_codes.h"
+        }
+      ]
+    },
+    {
+      "name": "mp.dungeon-input-paint-finish.5a9950",
+      "rva": 5937488,
+      "shared": false,
+      "groups": [
+        {
+          "feature": "Dungeon original placement and paint input capture",
+          "phase": "after ui_move Runtime publication, bound Mainthread",
+          "site": "src/game/dungeon_input_action_codes.h"
+        }
+      ]
+    },
+    {
+      "name": "mp.dungeon-input-paint-stamp.5aa570",
+      "rva": 5940592,
+      "shared": false,
+      "groups": [
+        {
+          "feature": "Dungeon original placement and paint input capture",
+          "phase": "after ui_move Runtime publication, bound Mainthread",
+          "site": "src/game/dungeon_input_action_codes.h"
+        }
+      ]
+    },
+    {
+      "name": "mp.world.district-erase.5ac460",
+      "rva": 5948512,
+      "shared": false,
+      "groups": [
+        {
+          "feature": "District paint, erase and finish capture",
+          "phase": "after ui_move Runtime publication, bound Mainthread",
+          "site": "src/game/district_stroke_routes.inc"
+        }
+      ]
+    },
+    {
+      "name": "mp.world.district-finish.5ae530",
+      "rva": 5956912,
+      "shared": false,
+      "groups": [
+        {
+          "feature": "District paint, erase and finish capture",
+          "phase": "after ui_move Runtime publication, bound Mainthread",
+          "site": "src/game/district_stroke_routes.inc"
+        }
+      ]
+    },
+    {
+      "name": "mp.world.district-paint.5aee80",
+      "rva": 5959296,
+      "shared": false,
+      "groups": [
+        {
+          "feature": "District paint, erase and finish capture",
+          "phase": "after ui_move Runtime publication, bound Mainthread",
+          "site": "src/game/district_stroke_routes.inc"
+        }
+      ]
+    },
+    {
+      "name": "mp.world.district-add.5af370",
+      "rva": 5960560,
+      "shared": false,
+      "groups": [
+        {
+          "feature": "District paint, erase and finish capture",
+          "phase": "after ui_move Runtime publication, bound Mainthread",
+          "site": "src/game/district_stroke_routes.inc"
+        }
+      ]
+    },
+    {
       "name": "mp.region-properties.5b9610",
       "rva": 6002192,
       "shared": false,
@@ -1660,6 +1852,30 @@
           "feature": "Region properties",
           "phase": "world-ready action capture enable, on bound Mainthread",
           "site": "src/game/region_properties_runtime.inc:165"
+        }
+      ]
+    },
+    {
+      "name": "mp.modular-b07.5bad60",
+      "rva": 6008160,
+      "shared": false,
+      "groups": [
+        {
+          "feature": "Modular building input capture",
+          "phase": "after ui_move Runtime publication, bound Mainthread",
+          "site": "src/game/modular_runtime.h"
+        }
+      ]
+    },
+    {
+      "name": "mp.modular-b07.5bc0c0",
+      "rva": 6013120,
+      "shared": false,
+      "groups": [
+        {
+          "feature": "Modular building input capture",
+          "phase": "after ui_move Runtime publication, bound Mainthread",
+          "site": "src/game/modular_runtime.h"
         }
       ]
     },
@@ -1964,6 +2180,18 @@
       ]
     },
     {
+      "name": "mp.world.zone-press-right.5ef790",
+      "rva": 6223760,
+      "shared": false,
+      "groups": [
+        {
+          "feature": "Zone original right-click erase capture",
+          "phase": "npc_probe after existing Zone23 installation on bound Mainthread",
+          "site": "src/game/zone_edit_routes.inc"
+        }
+      ]
+    },
+    {
       "name": "mp.monster-zone-action-capture.5f0990",
       "rva": 6228368,
       "shared": false,
@@ -2056,6 +2284,30 @@
           "feature": "Private Character membership confirmation admission",
           "phase": "typed_action_runtime::start, bound Mainthread, once per process",
           "site": "Capture the actual confirmed native delete click on the bound Character View; queue Action87 without gameplay mutation. Native ordered replay calls original Collection::DestroyType9bb90 exactly once. Other connected UI actions and singleplayer pass through."
+        }
+      ]
+    },
+    {
+      "name": "mp.character.view-select.689100",
+      "rva": 6852864,
+      "shared": false,
+      "groups": [
+        {
+          "feature": "Character adjustment local presentation tail",
+          "phase": "Character ability initialization on the bound Mainthread",
+          "site": "src/game/ability_edit_runtime.inc"
+        }
+      ]
+    },
+    {
+      "name": "mp.character.import-image.689510",
+      "rva": 6853904,
+      "shared": false,
+      "groups": [
+        {
+          "feature": "Original Character image import boundary",
+          "phase": "Character membership initialization on the bound Mainthread",
+          "site": "src/game/character_membership_runtime.inc"
         }
       ]
     },
@@ -2360,6 +2612,78 @@
       ]
     },
     {
+      "name": "mp.world.spinner-value.7c2c60",
+      "rva": 8137824,
+      "shared": false,
+      "groups": [
+        {
+          "feature": "District property input capture",
+          "phase": "ui_move_runtime::enable, after publication on the bound Mainthread",
+          "site": "src/game/district_edit_routes.inc::district_edit::enable"
+        }
+      ]
+    },
+    {
+      "name": "mp.world.spinner-float.7c3840",
+      "rva": 8140864,
+      "shared": false,
+      "groups": [
+        {
+          "feature": "District property input capture",
+          "phase": "ui_move_runtime::enable, after publication on the bound Mainthread",
+          "site": "src/game/district_edit_routes.inc::district_edit::enable"
+        }
+      ]
+    },
+    {
+      "name": "mp.world.spinner-drag-adjusted.7c3a00",
+      "rva": 8141312,
+      "shared": false,
+      "groups": [
+        {
+          "feature": "District property input capture",
+          "phase": "ui_move_runtime::enable, after publication on the bound Mainthread",
+          "site": "src/game/district_edit_routes.inc::district_edit::enable"
+        }
+      ]
+    },
+    {
+      "name": "mp.world.spinner-click-adjusted.7c3b90",
+      "rva": 8141712,
+      "shared": false,
+      "groups": [
+        {
+          "feature": "District property input capture",
+          "phase": "ui_move_runtime::enable, after publication on the bound Mainthread",
+          "site": "src/game/district_edit_routes.inc::district_edit::enable"
+        }
+      ]
+    },
+    {
+      "name": "mp.world.spinner-click.7c3d20",
+      "rva": 8142112,
+      "shared": false,
+      "groups": [
+        {
+          "feature": "District property input capture",
+          "phase": "ui_move_runtime::enable, after publication on the bound Mainthread",
+          "site": "src/game/district_edit_routes.inc::district_edit::enable"
+        }
+      ]
+    },
+    {
+      "name": "mp.world.spinner-drag.7c3eb0",
+      "rva": 8142512,
+      "shared": false,
+      "groups": [
+        {
+          "feature": "District property input capture",
+          "phase": "ui_move_runtime::enable, after publication on the bound Mainthread",
+          "site": "src/game/district_edit_routes.inc::district_edit::enable"
+        }
+      ]
+    },
+    {
       "name": "mp.management-gm-policy.7c9510",
       "rva": 8164624,
       "shared": false,
@@ -2452,6 +2776,30 @@
           "feature": "Private global Design Rules command admission",
           "phase": "typed_action_runtime::start, bound Mainthread, once per process",
           "site": "Original global Design Rules intent capture and guarded replay; exact view, bound policy, current world and event lifetime remain consumer-owned."
+        }
+      ]
+    },
+    {
+      "name": "mp.world.zone-command.82b740",
+      "rva": 8566592,
+      "shared": false,
+      "groups": [
+        {
+          "feature": "Zone original window command capture",
+          "phase": "npc_probe after existing Zone23 installation on bound Mainthread",
+          "site": "src/game/zone_edit_routes.inc"
+        }
+      ]
+    },
+    {
+      "name": "mp.world.color-value.839d30",
+      "rva": 8625456,
+      "shared": false,
+      "groups": [
+        {
+          "feature": "District property input capture",
+          "phase": "ui_move_runtime::enable, after publication on the bound Mainthread",
+          "site": "src/game/district_edit_routes.inc::district_edit::enable"
         }
       ]
     },
@@ -2956,6 +3304,18 @@
           "feature": "Native Free ownership",
           "phase": "world-ready action capture enable, on bound Mainthread",
           "site": "src/game/object_identity/native_free_runtime/native_free_runtime.cpp:196"
+        }
+      ]
+    },
+    {
+      "name": "mp.building-uptime-add.859e30",
+      "rva": 8756784,
+      "shared": false,
+      "groups": [
+        {
+          "feature": "Building uptime authority",
+          "phase": "typed_action_runtime::start, bound Mainthread, once per process",
+          "site": "src/game/building_uptime_native.inc::enable"
         }
       ]
     }

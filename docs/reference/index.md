@@ -6,7 +6,7 @@ title: "API reference"
 
 # API reference
 
-Public Lua API **1.1.0**, native ABI **1**, framework **0.2.4**.
+Public Lua API **1.1.0**, native ABI **1**, framework **0.2.5**.
 
 [Events](events.md) | [Types](types.md) | [Capabilities](capabilities.md) | [Native ABI](native.md) | [Manifests](manifests.md)
 

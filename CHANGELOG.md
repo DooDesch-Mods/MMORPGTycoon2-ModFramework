@@ -1,5 +1,21 @@
 # Changelog
 
+## 0.2.5
+
+### Updated
+
+- Add the matching native support for Multiplayer Early Beta 17, including shared scenery, groups and building history.
+- Keep existing Lua mods and native plugins compatible.
+
+### Fixed
+
+- Deliver diagnostic mouse presses and releases in separate game updates so native game buttons can receive a complete click.
+- Keep diagnostic clicks tied to the intended game window and cursor entry state.
+
+### Install
+
+Close the game and update the Framework Runtime. Players only need the Runtime ZIP; the separate SDK on GitHub is for creating mods.
+
 ## 0.2.4
 
 ### Added

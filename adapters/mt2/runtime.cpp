@@ -11,6 +11,8 @@
 #include "shared_operations.h"
 #include "native_extensions.h"
 #include "initial_save_path.h"
+#include "diagnostic_click.h"
+#include "diagnostic_click_readback.h"
 #include "mt2fw/save_metadata.h"
 #include <intrin.h>
 #include "crypto.h"
@@ -82,6 +84,11 @@ struct WindowFramebuffer {
 DWORD engine_thread=0;
 std::string process_started;
 uint64_t frames=0;
+mt2::DiagnosticClick diagnostic_click;
+std::string reported_click_cause;
+Json click_native_samples=Json::array();
+uint64_t click_native_samples_dropped=0;
+std::string click_native_read_cause;
 std::string pending_capture,last_request,last_error,log_filter;
 std::string details_mod;
 char filter[128]{};
@@ -305,12 +312,114 @@ void drain_saves() {
         }else {runtime->save_acknowledged(result.metadata,result.hash);++confirmed_saves;last_save=result.hash;}
     }
 }
+void click_failure() {
+    if(!diagnostic_click.cause.empty()&&diagnostic_click.cause!=reported_click_cause){
+        reported_click_cause=diagnostic_click.cause;report(diagnostic_click.cause);
+    }
+}
+bool copy_click_native(uintptr_t address,void* output,size_t bytes,std::string& error){
+    SIZE_T copied=0;const bool ok=ReadProcessMemory(GetCurrentProcess(),reinterpret_cast<const void*>(address),output,bytes,&copied)!=0;
+    const auto code=ok?0:GetLastError();
+    if(!ok||copied!=bytes){error="ReadProcessMemory code="+std::to_string(code)+" copied="+std::to_string(copied)+" required="+std::to_string(bytes);return false;}
+    return true;
+}
+void sample_click_native(const char* boundary) {
+    if(!diagnostic_click.pending())return;
+    if(click_native_samples.size()>=24){++click_native_samples_dropped;return;}
+    Json row={{"boundary",boundary},{"frame",frames},{"phase",diagnostic_click.name()},
+        {"elapsed_ms",GetTickCount64()-diagnostic_click.started},{"cause",""}};
+    if(diagnostic_click.owner!=reinterpret_cast<uintptr_t>(window)||!window||
+       diagnostic_click.window_id!=SDL_GetWindowID(window)||diagnostic_click.thread!=GetCurrentThreadId()){
+        row["cause"]="Click native sample owned window/thread differs";
+    }else{
+        const auto value=mt2::read_click_native(reinterpret_cast<uintptr_t>(GetModuleHandleW(nullptr)),
+            copy_click_native);
+        row["cause"]=value.cause;
+        row["input_read"]=value.input_read;row["cursor_read"]=value.cursor_read;row["screen_read"]=value.screen_read;
+        row["input_normalized_xy"]=value.input_read?Json(value.input_xy):Json(nullptr);
+        row["mouse_on_screen_124"]=value.input_read?Json(value.mouse_on_screen):Json(nullptr);
+        row["left_pressed_released"]=value.input_read?Json(value.input_edges):Json(nullptr);
+        row["native_screen_size"]=value.screen_read?Json(value.screen_size):Json(nullptr);
+        if(value.cursor_read){
+            row["cursor_ui_xy"]=value.cursor_ui;row["cursor_world_screen_xy"]=value.cursor_world_screen;
+            row["cursor_world_pick"]=value.cursor_world_pick;row["cursor_ui_restrictions"]=value.restrictions;
+            row["cursor_down_drag"]=value.cursor_down_drag;row["cursor_enabled_257"]=value.cursor_enabled;
+            row["cursor_input_gate_256"]=value.input_gate;row["cursor_trap_gate_1e0"]=value.trap_gate;
+            row["cursor_trap_present"]=value.trap;row["pressed_window_present"]=value.pressed_window;
+            row["focus_window_present"]=value.focus_window;row["capture_window_present"]=value.capture_window;
+            row["pressed_window_class_rva"]=value.pressed_window_class;row["focus_window_class_rva"]=value.focus_window_class;
+            row["capture_window_class_rva"]=value.capture_window_class;
+        }
+        int width=0,height=0,pixel_width=0,pixel_height=0;
+        if(SDL_GetWindowSize(window,&width,&height)&&SDL_GetWindowSizeInPixels(window,&pixel_width,&pixel_height)){
+            row["sdl_window_size"]={width,height};row["sdl_pixel_size"]={pixel_width,pixel_height};
+        }else row["sdl_dimensions_cause"]=SDL_GetError();
+    }
+    const auto cause=row.at("cause").get<std::string>();
+    if(!cause.empty()&&cause!=click_native_read_cause){click_native_read_cause=cause;runtime->log("diagnostics","error",cause);}
+    click_native_samples.push_back(std::move(row));
+}
+void push_click(mt2::DiagnosticClick::Edge edge) {
+    SDL_Event event{};
+    if(edge==mt2::DiagnosticClick::Edge::enter){
+        event.type=SDL_EVENT_WINDOW_MOUSE_ENTER;event.window.timestamp=diagnostic_click.stamp;
+        event.window.windowID=diagnostic_click.window_id;
+    }else if(edge==mt2::DiagnosticClick::Edge::motion){
+        event.type=SDL_EVENT_MOUSE_MOTION;event.motion.timestamp=diagnostic_click.stamp;
+        event.motion.windowID=diagnostic_click.window_id;event.motion.x=diagnostic_click.x;event.motion.y=diagnostic_click.y;
+    }else{
+        event.type=edge==mt2::DiagnosticClick::Edge::down?SDL_EVENT_MOUSE_BUTTON_DOWN:SDL_EVENT_MOUSE_BUTTON_UP;
+        event.button.timestamp=diagnostic_click.stamp;event.button.windowID=diagnostic_click.window_id;
+        event.button.button=SDL_BUTTON_LEFT;event.button.down=edge==mt2::DiagnosticClick::Edge::down;
+        event.button.clicks=1;event.button.x=diagnostic_click.x;event.button.y=diagnostic_click.y;
+    }
+    if(!SDL_PushEvent(&event))throw std::runtime_error(std::string("SDL click event enqueue failed: ")+SDL_GetError());
+    // Preserve the timestamp actually retained by SDL, including filter updates.
+    diagnostic_click.stamp=event.common.timestamp;
+}
+void observe_click(const SDL_Event& event,bool forwarded) {
+    if(!diagnostic_click.pending())return;
+    if(event.type==SDL_EVENT_WINDOW_MOUSE_ENTER||event.type==SDL_EVENT_WINDOW_MOUSE_LEAVE){
+        diagnostic_click.presence(event.type==SDL_EVENT_WINDOW_MOUSE_ENTER,event.window.windowID,event.window.timestamp,forwarded,frames);
+        if(forwarded&&event.window.windowID==diagnostic_click.window_id&&event.window.timestamp==diagnostic_click.stamp)
+            sample_click_native(event.type==SDL_EVENT_WINDOW_MOUSE_ENTER?"mouse_enter_forwarded_before_consume":"mouse_leave_forwarded_before_consume");
+    }
+    if(event.type==SDL_EVENT_WINDOW_FOCUS_LOST&&event.window.windowID==diagnostic_click.window_id)
+        diagnostic_click.fail("Diagnostic click lost owned window focus; no replay");
+    if((event.type==SDL_EVENT_MOUSE_BUTTON_DOWN||event.type==SDL_EVENT_MOUSE_BUTTON_UP)&&event.button.button==SDL_BUTTON_LEFT){
+        if(event.button.windowID==diagnostic_click.window_id&&event.button.timestamp!=diagnostic_click.stamp)
+            diagnostic_click.fail("Diagnostic click interrupted by a real left-button event; no replay");
+        diagnostic_click.observe(event.type==SDL_EVENT_MOUSE_BUTTON_DOWN?mt2::DiagnosticClick::Edge::down:mt2::DiagnosticClick::Edge::up,
+            event.button.windowID,event.button.timestamp,event.button.x,event.button.y,forwarded,frames);
+        if(forwarded&&diagnostic_click.matches(event.button.windowID,event.button.timestamp,event.button.x,event.button.y))
+            sample_click_native(event.type==SDL_EVENT_MOUSE_BUTTON_DOWN?"down_forwarded_before_consume":"up_forwarded_before_consume");
+    }else if(event.type==SDL_EVENT_MOUSE_MOTION){
+        diagnostic_click.observe(mt2::DiagnosticClick::Edge::motion,event.motion.windowID,event.motion.timestamp,
+            event.motion.x,event.motion.y,forwarded,frames);
+    }
+    click_failure();
+}
 Json status() {
     auto value=runtime->status();value["pid"]=GetCurrentProcessId();value["frames"]=frames;value["running"]=running;value["ui_ready"]=ui_ready;value["menu_open"]=show_menu||mt2::desktop::visible();
     value["patches"]=runtime->patch_status();if(native_patches)value["patches"]["session_authority"]=native_patches->status();
     value["desktop_app"]=mt2::desktop::status();
     value["error"]=last_error;value["process_start_time"]=process_started;value["confirmed_saves"]=confirmed_saves;value["last_save"]=last_save;value["confirmed_initial_saves"]=confirmed_initial_saves;value["last_initial_save"]=last_initial_save;
     value["menu_input_active"]=menu_input_active;
+    value["diagnostic_click_native_readback"]={{"samples",click_native_samples},{"dropped",click_native_samples_dropped},
+        {"motion_x_offset",offsetof(SDL_MouseMotionEvent,x)},{"motion_y_offset",offsetof(SDL_MouseMotionEvent,y)},
+        {"motion_which_offset",offsetof(SDL_MouseMotionEvent,which)},{"sdl_version",SDL_VERSION}};
+    value["diagnostic_click"]={{"id",diagnostic_click.id},{"phase",diagnostic_click.name()},
+        {"pending",diagnostic_click.pending()},{"unresolved",diagnostic_click.unresolved()},
+        {"input_complete",diagnostic_click.phase==mt2::DiagnosticClick::Phase::complete},
+        {"window_id",diagnostic_click.window_id},{"attempted_mask",diagnostic_click.attempted},
+        {"borrowed_mouse_presence",diagnostic_click.borrowed_mouse},{"mouse_enter_attempted",diagnostic_click.enter_attempted},
+        {"mouse_enter_queued",diagnostic_click.enter_queued},{"mouse_enter_forwarded",diagnostic_click.enter_forwarded},
+        {"mouse_leave_attempted",diagnostic_click.leave_attempted},{"mouse_leave_forwarded",diagnostic_click.leave_forwarded},
+        {"restore_skipped_physical_mouse_focus",diagnostic_click.restore_skipped_physical_focus},
+        {"position_attempted",diagnostic_click.position_attempted},{"position_forwarded",diagnostic_click.position_forwarded},
+        {"last_logical_x",diagnostic_click.last_position_x},{"last_logical_y",diagnostic_click.last_position_y},
+        {"queued_mask",diagnostic_click.queued},{"forwarded_mask",diagnostic_click.forwarded},
+        {"cause",diagnostic_click.cause}};
     if(window){value["relative_mouse"]=SDL_GetWindowRelativeMouseMode(window);value["text_input_active"]=SDL_TextInputActive(window);value["cursor_visible"]=SDL_CursorVisible();}
     if(!timings.empty()){std::vector<double> sorted(timings.begin(),timings.end());std::sort(sorted.begin(),sorted.end());value["core_ms_p95"]=sorted[size_t((sorted.size()-1)*0.95)];value["core_ms_samples"]=sorted.size();}
     value["measurement_mode"]=benchmark_mode;
@@ -465,10 +574,11 @@ void diagnostics() {
         }
         else if(op=="click") {
             float x=args.at("x"),y=args.at("y");int width=0,height=0;if(!window||!SDL_GetWindowSize(window,&width,&height)||x<0||y<0||x>=width||y>=height)throw std::runtime_error("Diagnostic click is outside the owned game client");
-            SDL_Event motion{};motion.type=SDL_EVENT_MOUSE_MOTION;motion.motion.windowID=SDL_GetWindowID(window);motion.motion.x=x;motion.motion.y=y;
-            SDL_Event down{};down.type=SDL_EVENT_MOUSE_BUTTON_DOWN;down.button.windowID=SDL_GetWindowID(window);down.button.button=SDL_BUTTON_LEFT;down.button.down=true;down.button.x=x;down.button.y=y;
-            SDL_Event up=down;up.type=SDL_EVENT_MOUSE_BUTTON_UP;up.button.down=false;
-            if(!SDL_PushEvent(&motion)||!SDL_PushEvent(&down)||!SDL_PushEvent(&up))throw std::runtime_error(std::string("SDL click enqueue failed: ")+SDL_GetError());
+            const auto initial_mouse=mt2::read_click_native(reinterpret_cast<uintptr_t>(GetModuleHandleW(nullptr)),copy_click_native,true);
+            if(!initial_mouse.input_read)throw std::runtime_error(initial_mouse.cause);
+            diagnostic_click.begin(id,reinterpret_cast<uintptr_t>(window),SDL_GetWindowID(window),GetCurrentThreadId(),
+                x,y,SDL_GetTicksNS(),GetTickCount64(),push_click,initial_mouse.mouse_on_screen==0);
+            reported_click_cause.clear();click_native_samples=Json::array();click_native_samples_dropped=0;click_native_read_cause.clear();
             diagnostic_mouse_x=x;diagnostic_mouse_y=y;diagnostic_mouse_frames=3;result={{"accepted",true}};
         }
         else if(op=="text"){
@@ -487,6 +597,7 @@ void diagnostics() {
     atomic_json(root/"diagnostics"/"response.json",response);
 }
 void update(void* game,float dt) {
+    {std::lock_guard lock(gate);sample_click_native("game_update_entry_after_input");}
     auto native_begin=std::chrono::steady_clock::now();double auxiliary=auxiliary_ms;auxiliary_ms=0;
     bool paired=false;
     {std::lock_guard lock(gate);if(running&&native_services){
@@ -506,11 +617,17 @@ void update(void* game,float dt) {
         catch(const std::exception& error){report(std::string("Native Update patch end failed: ")+error.what());}
         catch(...){report("Native Update patch end failed: unknown native exception");}
     };
+    {
+        std::lock_guard lock(gate);
+        diagnostic_click.check(reinterpret_cast<uintptr_t>(window),window?SDL_GetWindowID(window):0,GetCurrentThreadId(),GetTickCount64());
+        click_failure();
+    }
     auto original_begin=std::chrono::steady_clock::now();
     try{original_update(game,dt);}
-    catch(...){std::lock_guard lock(gate);end_patches(false);if(paired)native_services->end_frame(false);if(shutdown_requested&&!native_services->in_frame())finish_shutdown();throw;}
+    catch(...){std::lock_guard lock(gate);diagnostic_click.fail("Diagnostic click original GameUpdate raised; no replay");click_failure();end_patches(false);if(paired)native_services->end_frame(false);if(shutdown_requested&&!native_services->in_frame())finish_shutdown();throw;}
     auto original_end=std::chrono::steady_clock::now();
     std::lock_guard lock(gate);
+    sample_click_native("original_game_update_return");
     end_patches(true);
     if(paired)native_services->end_frame(true);
     if(native_routes)for(auto& [owner,cause]:native_routes->drain_errors())runtime->log(owner->manifest.id,"error",cause);
@@ -539,10 +656,23 @@ void update(void* game,float dt) {
         timings.push_back(core_ms);original_timings.push_back(original_ms);total_timings.push_back(original_ms+core_ms);
         if(timings.size()>2048){timings.pop_front();original_timings.pop_front();total_timings.pop_front();}
     }catch(const std::exception& error){report(std::string("Game update failed: ")+error.what());}
+    sample_click_native("framework_update_exit_before_screen");
 }
 bool swap(SDL_Window* target) {
     auto begin=std::chrono::steady_clock::now();
     std::lock_guard lock(gate);
+    if(runtime&&running&&target==window){
+        sample_click_native("present_entry_after_screen");
+        try{
+            // CoreGo presents after Mode/Screen updates, later than GameUpdate's return.
+            diagnostic_click.present(reinterpret_cast<uintptr_t>(target),SDL_GetWindowID(target),GetCurrentThreadId(),
+                frames,GetTickCount64(),push_click,SDL_GetMouseFocus()==window);
+        }catch(const std::exception&){
+            // The helper retains the enqueue cause; report it without aborting presentation.
+            click_failure();
+        }
+        click_failure();
+    }
     if(runtime&&running&&!show_menu&&runtime->plugins().empty()&&pending_capture.empty())return original_swap(target);
     try {
         if(runtime&&running) {
@@ -572,11 +702,41 @@ bool swap(SDL_Window* target) {
     auxiliary_ms+=std::chrono::duration<double,std::milli>(std::chrono::steady_clock::now()-begin).count();return original_swap(target);
 }
 bool poll(SDL_Event* event) {
-    while(original_poll(event)) {
-        HookCost cost;
-        if(!event)return true;
+    {
         std::lock_guard lock(gate);
-        if(!runtime||!running)return true;
+        if(diagnostic_click.finish_position_poll(GetCurrentThreadId())){
+            sample_click_native("poll_drain_end_after_final_motion");return false;
+        }
+    }
+    for(;;) {
+        bool restoring_mouse=false;
+        {
+            std::lock_guard lock(gate);
+            if(event&&runtime&&running&&diagnostic_click.restore_mouse(reinterpret_cast<uintptr_t>(window),
+                    window?SDL_GetWindowID(window):0,GetCurrentThreadId(),GetTickCount64())){
+                // Restore before pumping genuine events, so a new physical enter wins normally.
+                *event={};event->type=SDL_EVENT_WINDOW_MOUSE_LEAVE;
+                event->window.windowID=diagnostic_click.window_id;event->window.timestamp=diagnostic_click.stamp;
+                restoring_mouse=true;
+            }
+            click_failure();
+        }
+        const bool received=restoring_mouse||original_poll(event);
+        HookCost cost;
+        if(!event)return received;
+        std::lock_guard lock(gate);
+        if(!runtime||!running)return received;
+        bool final_position=false;
+        if(!received){
+            final_position=diagnostic_click.drain_position(reinterpret_cast<uintptr_t>(window),
+                window?SDL_GetWindowID(window):0,GetCurrentThreadId(),frames,GetTickCount64());
+            click_failure();
+            if(!final_position)return false;
+            // Native vsInput retains the last motion of this drain, not button x/y.
+            *event={};event->type=SDL_EVENT_MOUSE_MOTION;event->motion.timestamp=diagnostic_click.stamp;
+            event->motion.windowID=diagnostic_click.window_id;
+            event->motion.x=diagnostic_click.x;event->motion.y=diagnostic_click.y;
+        }
         if(event->type==SDL_EVENT_KEY_DOWN&&event->key.scancode==SDL_SCANCODE_F10&&!event->key.repeat){
             if(show_menu)menu_state(false);else mt2::desktop::request_toggle();continue;
         }
@@ -595,12 +755,16 @@ bool poll(SDL_Event* event) {
         if(ui_ready&&overlay_visible) {
             const auto& io=ImGui::GetIO();bool mouse=event->type>=SDL_EVENT_MOUSE_MOTION&&event->type<=SDL_EVENT_MOUSE_WHEEL;
             bool keyboard=event->type==SDL_EVENT_KEY_DOWN||event->type==SDL_EVENT_KEY_UP||event->type==SDL_EVENT_TEXT_INPUT||event->type==SDL_EVENT_TEXT_EDITING;
-            if((mouse&&io.WantCaptureMouse)||(keyboard&&io.WantCaptureKeyboard))continue;
+            if((mouse&&io.WantCaptureMouse)||(keyboard&&io.WantCaptureKeyboard)){
+                if(final_position){diagnostic_click.position_delivered(false);click_failure();diagnostic_click.finish_position_poll(GetCurrentThreadId());return false;}
+                observe_click(*event,false);continue;
+            }
         }
+        if(final_position)diagnostic_click.position_delivered(true);
+        observe_click(*event,true);
         if(native_ownership){static_assert(sizeof(SDL_Event)<=MT2FW_MT2_EVENT_COPY_BYTES);MT2FW_MT2_PolledEvent observed{sizeof(observed),sizeof(SDL_Event),SDL_VERSION,0,0,GetCurrentThreadId(),event};native_ownership->observe_input(observed);}
         return true;
     }
-    return false;
 }
 bool hide_cursor(){if(show_menu)return SDL_ShowCursor();return original_hide();}
 bool relative_mouse(SDL_Window* target,bool active){if(show_menu){restore_relative=active;return original_relative(target,false);}return original_relative(target,active);}
@@ -610,6 +774,7 @@ void hook(void* target,void* replacement,void** original) {
 }
 void finish_shutdown(){
     if(retained_storage){shutdown_requested=false;return;}
+    diagnostic_click.fail("Diagnostic click interrupted by Framework shutdown; no replay");click_failure();
     running=false;shutdown_requested=false;
     if(save_worker.joinable()){save_worker.request_stop();save_wake.notify_all();save_worker.join();}
     try{if(runtime){runtime->world_leave();runtime->stop_plugins();
