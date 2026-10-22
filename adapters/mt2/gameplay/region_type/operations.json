@@ -1,0 +1,25 @@
+[
+  {
+    "name": "regions.set_type",
+    "kind": "action",
+    "parameters": [
+      {"name": "handle", "type": "MT2RegionHandle", "description": "Exact Region handle from this world epoch."},
+      {"name": "type", "type": "integer", "description": "Original native type: 0 lowers to Ocean; 1 raises to land."},
+      {"name": "position", "type": "number[]", "description": "Three world coordinates whose original native hit resolves to this Region."}
+    ],
+    "returns": "MT2RegionTypeResult",
+    "summary": "Apply the original private Lift/Land transaction to an unowned Region, clear its native contents and retain the original Undo graph.",
+    "errors": [
+      "World, handle, root view, original hit or unowned/type precondition differs.",
+      "Native code, complete saved Region roster, manager serialization or reciprocal content identity differs.",
+      "Native Press/Release, member retirement, surviving graph, ledger, edit scope or original inverse payload readback differs; attempted actions are never replayed."
+    ],
+    "native_evidence": [
+      "multiplayer-source/src/game/region_properties_runtime.inc",
+      "multiplayer-source/src/game/mixed_path_reader.h",
+      "multiplayer-source/src/game/connected_network_reader.h",
+      "adapters/mt2/gameplay/region_type/native_evidence.json",
+      "adapters/mt2/gameplay/region_type/provenance.md"
+    ]
+  }
+]

@@ -58,6 +58,7 @@ struct Plugin {
     std::map<std::string,int> hotkeys;
     std::string error;
     bool active = false, staging = true;
+    uint64_t instance = 0;
     bool patch_staging = true;
     bool provisional = false;
     uint64_t calls = 0;

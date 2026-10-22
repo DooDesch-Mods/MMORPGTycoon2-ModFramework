@@ -94,7 +94,8 @@ def coverage_graphic(data, mobile=False):
     counts = coverage_counts(data)
     total = sum(counts.values())
     statuses = [status for status in STATES if counts[status]]
-    width, height = (600, 1040 + 38 * (len(statuses) - 3)) if mobile else (1200, 560)
+    mobile_tile_height = max(680, total * 68)
+    width, height = (600, 1040 + 38 * (len(statuses) - 3) + mobile_tile_height - 680) if mobile else (1200, 560)
     description = '; '.join(f'{status}: {counts[status]} of {total}' for status in statuses)
     out = [f'<svg xmlns="http://www.w3.org/2000/svg" width="{width}" height="{height}" viewBox="0 0 {width} {height}" '
            'role="img" aria-labelledby="title description">',
@@ -115,7 +116,7 @@ def coverage_graphic(data, mobile=False):
             out.extend([text(x, 126, f'{percent:.1f}%', 37, color, 700),
                         text(x, 155, label, 23, color, 700),
                         text(x, 184, f'{counts[status]} of {total} tracked areas', 20)])
-    gx, gy, gw, gh = (28, 240 + 38 * (len(statuses) - 3), 544, 680) if mobile else (28, 210, 1144, 264)
+    gx, gy, gw, gh = (28, 240 + 38 * (len(statuses) - 3), 544, mobile_tile_height) if mobile else (28, 210, 1144, 264)
     offset = 0
     for status in statuses:
         rows = [row for row in data['features'] if row['status'] == status]

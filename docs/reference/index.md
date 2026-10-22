@@ -6,7 +6,7 @@ title: "API reference"
 
 # API reference
 
-Public Lua API **1.1.0**, native ABI **1**, framework **0.2.6**.
+Public Lua API **1.2.0**, native ABI **1**, framework **0.3.0**.
 
 [Events](events.md) | [Types](types.md) | [Capabilities](capabilities.md) | [Native ABI](native.md) | [Manifests](manifests.md)
 
@@ -17,10 +17,48 @@ Public Lua API **1.1.0**, native ABI **1**, framework **0.2.6**.
 - [`mt2.actions.remove`](functions/actions-remove.md): Queue a checked native removal.
 - [`mt2.actions.status`](functions/actions-status.md): Read accepted, confirmed, rejected or unknown status.
 
+## actors
+
+- [`mt2.actors.regions`](functions/actors-regions.md): List saved root Region IDs and native level bounds.
+- [`mt2.actors.list`](functions/actors-list.md): List current root-world NPCs, Monsters and Bosses with exact handles and native manager membership.
+- [`mt2.actors.get`](functions/actors-get.md): Read a current root-world actor's identity, transform, character and level; NPCs include online/tint/command state.
+- [`mt2.actors.boss_phases`](functions/actors-boss_phases.md): Read native phase order, health, VFX/color and owner ability-slot membership.
+- [`mt2.actors.place_boss`](functions/actors-place_boss.md): Purchase a Boss for the original 1000 cash and create it through native AddBoss; verify exact accounting, actor membership/pose/type/level, original tag progression and unchanged native Undo.
+- [`mt2.actors.move`](functions/actors-move.md): Move through native BeginEdit, Undo Open, DoMove, Close and EndEdit. Restore prior selection and verify the complete native inverse, pose, visual lifetime and surviving state. Native Boss movement preserves its existing respawn anchor; NPC/Monster movement updates its spawn point.
+- [`mt2.actors.remove`](functions/actors-remove.md): Remove an NPC or a Monster outside a generating Zone through original SelectionManager DestroyProp. Confirm UID/manager/spatial/selection absence, full quest and visitor cascade, native actor/quest inverse records, and unchanged zero-cost ledger.
+- [`mt2.actors.remove_boss`](functions/actors-remove_boss.md): Destroy a Boss through the original SelectionManager command and confirm its native 1000 cash refund and refund Undo. The native game does not retain a Boss recreation inverse; the result states this explicitly.
+- [`mt2.actors.create_boss_phase`](functions/actors-create_boss_phase.md): Construct and attach a phase through original native allocation/ownership functions.
+- [`mt2.actors.remove_boss_phase`](functions/actors-remove_boss_phase.md): Remove an owned phase through native RemoveBossPhase and verify all remaining phase records.
+- [`mt2.actors.reorder_boss_phase`](functions/actors-reorder_boss_phase.md): Reorder through native phase ownership and verify the complete final order.
+- [`mt2.actors.set_boss_phase`](functions/actors-set_boss_phase.md): Edit phase fields between native pre/post change events and verify every phase record.
+- [`mt2.actors.add_phase_ability`](functions/actors-add_phase_ability.md): Construct and attach an owned phase element for a current owner ability.
+- [`mt2.actors.remove_phase_ability`](functions/actors-remove_phase_ability.md): Remove an element through native phase ownership between original change events.
+
 ## camera
 
 - [`mt2.camera.get`](functions/camera-get.md): Read camera position, focus and edit state.
 - [`mt2.camera.focus`](functions/camera-focus.md): Request the native edit camera to focus a position.
+
+## characters
+
+- [`mt2.characters.list`](functions/characters-list.md): List current native character type definitions and exact lifetime handles.
+- [`mt2.characters.get`](functions/characters-get.md): Read a current character definition, names, flags and stats.
+- [`mt2.characters.stats`](functions/characters-stats.md): Read the two native attribute sets, speed and boss phase health.
+- [`mt2.characters.appearance`](functions/characters-appearance.md): Read the complete owned costume record and weapon categories.
+- [`mt2.characters.abilities`](functions/characters-abilities.md): Read native ability slots, complete records and exact ability handles.
+- [`mt2.characters.create`](functions/characters-create.md): Create a native base character slot in the supplied base's owning collection. Omit kind to use the base kind.
+- [`mt2.characters.create_variant`](functions/characters-create_variant.md): Copy a base's complete native definition into a new variant using MakeVariant.
+- [`mt2.characters.remove`](functions/characters-remove.md): Remove the selected character through its original owning collection and confirm definition UID retirement; native actor cleanup follows the game's lifecycle.
+- [`mt2.characters.rename`](functions/characters-rename.md): Set both authored names through native SetName, including its native edited/day and user notifications.
+- [`mt2.characters.set_stat`](functions/characters-set_stat.md): Set native level-one attributes or speed, then synchronize variants. Health sets the second attribute set to twice the first; boss health targets the first phase.
+- [`mt2.characters.set_appearance`](functions/characters-set_appearance.md): Deep-assign a complete costume with native transform construction and owner edit/costume notifications.
+- [`mt2.characters.set_weapon_category`](functions/characters-set_weapon_category.md): Update the native ordered weapon category set and verify its exact result.
+- [`mt2.characters.create_ability`](functions/characters-create_ability.md): Create an ability using the game's original NewAbility command and a private native receiver.
+- [`mt2.characters.copy_ability`](functions/characters-copy_ability.md): Copy a complete source ability, including across character owners, through the original native dock transaction. New copies use display slot -1; dock them separately when needed.
+- [`mt2.characters.remove_ability`](functions/characters-remove_ability.md): Remove an ability using its original native Icon transaction and ownership-aware private cleanup.
+- [`mt2.characters.dock_ability`](functions/characters-dock_ability.md): Set native ability level and display slot through the original dock transaction.
+- [`mt2.characters.set_ability`](functions/characters-set_ability.md): Edit native prototype strings, effects, costs, selectors, colors, timings, flags and level; simplify and notify its owner. Native normalization differences remain unknown.
+- [`mt2.characters.import`](functions/characters-import.md): Validate an embedded prefab, round-trip its private original image, invoke native import once and confirm its original success notification through a private native pane. Preserve an existing design selection/notice; initialize a previously unbound hidden component. Reject unsaved native authoring input.
 
 ## config
 
@@ -32,10 +70,61 @@ Public Lua API **1.1.0**, native ABI **1**, framework **0.2.6**.
 
 - [`mt2.content.register`](functions/content-register.md): Register static scenery resources at startup.
 
+## development
+
+- [`mt2.development.staff`](functions/development-staff.md): Read all fifty native developer slots, employment and job/membership state
+- [`mt2.development.research`](functions/development-research.md): Read current development progress and all shared project sources
+- [`mt2.development.hire`](functions/development-hire.md): Pay the original 500 hiring charge and employ one native developer
+- [`mt2.development.fire`](functions/development-fire.md): Fire the last employed developer when it has no job or carried object
+- [`mt2.development.set_state`](functions/development-set_state.md): Set a jobless developer state through the verified native property loader
+- [`mt2.development.set_active`](functions/development-set_active.md): Set a jobless developer active property through the native property loader
+- [`mt2.development.assign_research_workers`](functions/development-assign_research_workers.md): Allocate workers to the current native project
+
+## dungeons
+
+- [`mt2.dungeons.list`](functions/dungeons-list.md): List current root DungeonExterior handles and exact Dungeon UID strings.
+- [`mt2.dungeons.get`](functions/dungeons-get.md): Read native desired instance count, atmosphere, authored light and pool count.
+- [`mt2.dungeons.layout`](functions/dungeons-layout.md): Read authored layout cells, open flags, Theme keys, packed cell colors and palette.
+- [`mt2.dungeons.erase_paint`](functions/dungeons-erase_paint.md): Erase existing Dungeon Canvas paint inside supplied native clipping paths through the original Canvas erase and retained DungeonPaint Undo graph.
+- [`mt2.dungeons.paint`](functions/dungeons-paint.md): Load a detached native Fill from portable Records, confirm its exact native save readback, then paint supplied clipping paths through original Stroke/Canvas lifecycle and DungeonPaint Undo.
+- [`mt2.dungeons.instances`](functions/dungeons-instances.md): List current saved Instance indices and started flags with reciprocal scene validation.
+- [`mt2.dungeons.gizmos`](functions/dungeons-gizmos.md): List Gizmo handles, identity, transforms, trigger/state, contents and door edges in one scene.
+- [`mt2.dungeons.monsters`](functions/dungeons-monsters.md): List scene Monster handles, rank, CharacterTypeID, level, tag, status and authored pose.
+- [`mt2.dungeons.spawn_monster`](functions/dungeons-spawn_monster.md): Spawn one Dungeon Monster from a live Monster Character definition through native creation, Destroy inverse and Undo; apply the selected level, achievement and placement sound.
+- [`mt2.dungeons.set_gizmo_runtime`](functions/dungeons-set_gizmo_runtime.md): Set exact live triggered/state/immediate fields by compare-and-exchange and on_map through native SetOnMap; scalar adoption does not dispatch trigger callbacks.
+- [`mt2.dungeons.set_gizmo_contents`](functions/dungeons-set_gizmo_contents.md): Adopt one or more native container content counts by guarded compare-and-exchange and exact authored readback; existing native editor limits 0..5 apply.
+- [`mt2.dungeons.rename_gizmo`](functions/dungeons-rename_gizmo.md): Rename a scene-owned Gizmo through its original native Rename method and confirm the exact resulting name.
+- [`mt2.dungeons.move_gizmo`](functions/dungeons-move_gizmo.md): Move one offline template Gizmo through the original Move/Undo transaction and preserve local selection.
+- [`mt2.dungeons.destroy_gizmo`](functions/dungeons-destroy_gizmo.md): Destroy one offline template Gizmo through native DestroyProps, confirm original Undo and preserve surviving local selection.
+- [`mt2.dungeons.duplicate_gizmo`](functions/dungeons-duplicate_gizmo.md): Duplicate one offline template Gizmo through native payment, Duplicate, inverse graph and Undo, preserving local selection.
+- [`mt2.dungeons.place_gizmo`](functions/dungeons-place_gizmo.md): Place a Door, Key or Treasure in the offline template through original purchase, creation, inverse graph and Undo; native cost and sound apply.
+- [`mt2.dungeons.buildings`](functions/dungeons-buildings.md): List Building handles, types, variants and positions in one Dungeon scene.
+- [`mt2.dungeons.place_building`](functions/dungeons-place_building.md): Place a native Building or DungeonPortal through an isolated original Build receiver and maker/Undo. Requires the requested offline template to already be the native active scene; normal native tool and selection changes apply.
+- [`mt2.dungeons.configure_instances`](functions/dungeons-configure_instances.md): Run the original native config transaction and confirm desired count; normal native costs apply.
+- [`mt2.dungeons.set_atmosphere`](functions/dungeons-set_atmosphere.md): Run the native Dungeon sound command and confirm the selected atmosphere.
+- [`mt2.dungeons.set_lighting`](functions/dungeons-set_lighting.md): Apply native lighting inputs and confirm the exact 23 authored light values from native conversion.
+- [`mt2.dungeons.set_palette`](functions/dungeons-set_palette.md): Set the four packed palette colors and defaults flag through native explicit-owner leaves; existing cells retain their colors.
+- [`mt2.dungeons.open_cell`](functions/dungeons-open_cell.md): Open one eligible cell through an isolated native edit and Undo transaction; existing open cells return changed=false.
+- [`mt2.dungeons.close_cell`](functions/dungeons-close_cell.md): Close one unobstructed open cell through the native edit and Undo transaction; closed cells return changed=false.
+- [`mt2.dungeons.set_cell_theme`](functions/dungeons-set_cell_theme.md): Apply a native Theme to one open cell through the native edit and Undo transaction.
+- [`mt2.dungeons.apply_cell_palette`](functions/dungeons-apply_cell_palette.md): Apply the current Dungeon palette to one open cell through native SetCellData and Undo.
+- [`mt2.dungeons.make_instance`](functions/dungeons-make_instance.md): Run native MakeInstance and confirm one appended pool member; native camera effects apply.
+- [`mt2.dungeons.destroy_instance`](functions/dungeons-destroy_instance.md): Run native DestroyInstance and confirm removal from its Dungeon pool.
+- [`mt2.dungeons.reset_instance`](functions/dungeons-reset_instance.md): Run native Instance Reset and confirm the same pool member is retained unstarted.
+- [`mt2.dungeons.force_reset_instance`](functions/dungeons-force_reset_instance.md): Run native Instance ForceReset and confirm the same pool member is retained unstarted.
+- [`mt2.dungeons.set_gizmo_state`](functions/dungeons-set_gizmo_state.md): Run original native Gizmo SetState including trigger, Door unlock, animation and gameplay callbacks, then confirm state/trigger/scene unlocked bits. Requires the requested native active scene; the original info_gizmo Window is rebound to this target without human input.
+- [`mt2.dungeons.move_building`](functions/dungeons-move_building.md): Move one native Building or DungeonPortal through the original Move/Undo transaction. Requires the requested offline template to already be the native active scene; normal native tool and selection changes apply.
+- [`mt2.dungeons.destroy_building`](functions/dungeons-destroy_building.md): Remove one native Building or DungeonPortal through original DestroyProps and confirm retained native Undo. Requires the requested offline template to already be the native active scene; normal native tool and selection changes apply.
+- [`mt2.dungeons.duplicate_building`](functions/dungeons-duplicate_building.md): Duplicate one native Building or DungeonPortal through original payment, Duplicate, native release edit, selection and Undo transaction. Requires the requested offline template to already be the native active scene; normal native tool and selection changes apply.
+
 ## events
 
 - [`mt2.events.on`](functions/events-on.md): Subscribe to an event.
 - [`mt2.events.off`](functions/events-off.md): Remove your subscription.
+
+## experimental
+
+- [`mt2.experimental.operations`](functions/experimental-operations.md): Discover the experimental Lua gameplay operations in this runtime.
 
 ## input
 
@@ -47,6 +136,93 @@ Public Lua API **1.1.0**, native ABI **1**, framework **0.2.6**.
 - [`mt2.log.info`](functions/log-info.md): Write a mod-labelled info log entry.
 - [`mt2.log.warn`](functions/log-warn.md): Write a mod-labelled warn log entry.
 - [`mt2.log.error`](functions/log-error.md): Write a mod-labelled error log entry.
+
+## management
+
+- [`mt2.management.fees`](functions/management-fees.md): Read game purchase and subscription fees
+- [`mt2.management.loans`](functions/management-loans.md): Read current loans and eligible loan offers
+- [`mt2.management.staff`](functions/management-staff.md): Read Game Master employment and exact UID handles
+- [`mt2.management.statistics`](functions/management-statistics.md): Read software statistics and development point balances
+- [`mt2.management.release`](functions/management-release.md): Read software version and the current release
+- [`mt2.management.policies`](functions/management-policies.md): Read chat and cheat Game Master policies
+- [`mt2.management.rules`](functions/management-rules.md): Read experience, respawn, and feature rules
+- [`mt2.management.campaigns`](functions/management-campaigns.md): Read active advertising campaigns and native daily costs
+- [`mt2.management.services`](functions/management-services.md): Read services owned by the exact current building
+- [`mt2.management.release_cycle`](functions/management-release_cycle.md): Read current native release phase, history count, and free points
+- [`mt2.management.set_purchase_fee`](functions/management-set_purchase_fee.md): Set the game purchase fee
+- [`mt2.management.set_subscription_fee`](functions/management-set_subscription_fee.md): Set the monthly subscription fee
+- [`mt2.management.allocate_release_funds`](functions/management-allocate_release_funds.md): Set allocated release funds using the original charge or refund
+- [`mt2.management.set_respawn_seconds`](functions/management-set_respawn_seconds.md): Set subscriber respawn wait in seconds
+- [`mt2.management.hire_gm`](functions/management-hire_gm.md): Hire one Game Master
+- [`mt2.management.fire_gm`](functions/management-fire_gm.md): Fire one Game Master
+- [`mt2.management.take_loan`](functions/management-take_loan.md): Take an eligible loan offer by exact key
+- [`mt2.management.repay_loan`](functions/management-repay_loan.md): Repay the current loan by exact key
+- [`mt2.management.purchase_statistic`](functions/management-purchase_statistic.md): Purchase the next native statistic project
+- [`mt2.management.spend_statistics`](functions/management-spend_statistics.md): Spend development points through each original statistic function
+- [`mt2.management.set_policy`](functions/management-set_policy.md): Set one native GM policy property and notify its owner
+- [`mt2.management.set_respawn_delay`](functions/management-set_respawn_delay.md): Set whether respawn waits for subscribers
+- [`mt2.management.set_xp`](functions/management-set_xp.md): Apply the complete editable experience rule block
+- [`mt2.management.set_feature`](functions/management-set_feature.md): Set an unlocked gameplay feature through the original native setter
+- [`mt2.management.set_release_type`](functions/management-set_release_type.md): Set release kind and calculate the next native version
+- [`mt2.management.set_release_title`](functions/management-set_release_title.md): Set the release planner title
+- [`mt2.management.set_release_announcement`](functions/management-set_release_announcement.md): Set the release announcement; empty text restores its native default
+- [`mt2.management.set_release_changelog`](functions/management-set_release_changelog.md): Set and enable a custom changelog; empty text restores its native default
+- [`mt2.management.reset_release_text`](functions/management-reset_release_text.md): Restore native default announcement and changelog and disable custom text
+- [`mt2.management.enable_release_custom`](functions/management-enable_release_custom.md): Enable the current native custom release text
+- [`mt2.management.show_release`](functions/management-show_release.md): Check native release eligibility and show its announcement; launch releases publish immediately
+- [`mt2.management.begin_release`](functions/management-begin_release.md): Begin the current release celebration; hotfixes publish immediately
+- [`mt2.management.abort_release`](functions/management-abort_release.md): Abort the current release celebration
+- [`mt2.management.skip_release`](functions/management-skip_release.md): Skip the current release celebration and publish through the native path
+- [`mt2.management.publish_release`](functions/management-publish_release.md): Publish the current announced release by skipping its active celebration
+- [`mt2.management.set_service_price`](functions/management-set_service_price.md): Set the exact owned service price and update its shared configuration if synchronized
+- [`mt2.management.set_service_sync`](functions/management-set_service_sync.md): Set service price synchronization when allowed by its prototype
+- [`mt2.management.start_campaign`](functions/management-start_campaign.md): Pay for and start a seven-day native advertising campaign
+- [`mt2.management.abort_campaign`](functions/management-abort_campaign.md): Abort the current native advertising campaign
+- [`mt2.management.set_buzz`](functions/management-set_buzz.md): Set both native marketing buzz accumulators with guarded stores
+- [`mt2.management.purge_expired_awards`](functions/management-purge_expired_awards.md): Purge native awards older than the current six-day retention interval
+- [`mt2.management.add_award`](functions/management-add_award.md): Construct and add a native marketing award for the current game day
+
+## modular
+
+- [`mt2.modular.get_layout`](functions/modular-get_layout.md): Capture the complete native Layout and Plan records for an existing modular Scenery/base Building.
+- [`mt2.modular.history`](functions/modular-history.md): List retained modular edit receipts and exact Undo/Redo top readiness.
+- [`mt2.modular.add_block`](functions/modular-add_block.md): Add one native modular block at the adjusted world position. Commit a complete original Layout/Plan/pose inverse to native Undo.
+- [`mt2.modular.remove_block`](functions/modular-remove_block.md): Remove a native modular block at the world position. Commit a complete original Layout/Plan/pose inverse to native Undo.
+- [`mt2.modular.add_entrance`](functions/modular-add_entrance.md): Add a native modular entrance at the world position. Commit a complete original Layout/Plan/pose inverse to native Undo.
+- [`mt2.modular.remove_entrance`](functions/modular-remove_entrance.md): Remove a native modular entrance at the world position. Commit a complete original Layout/Plan/pose inverse to native Undo.
+- [`mt2.modular.undo`](functions/modular-undo.md): Undo one confirmed modular edit or prefab placement when its exact graph is the current native stack top. Prefab history includes cleared Scenery and reciprocal Service/Quest closure.
+- [`mt2.modular.redo`](functions/modular-redo.md): Redo one confirmed modular edit or prefab placement when its exact graph is the current native stack top. Prefab history includes cleared Scenery and reciprocal Service/Quest closure.
+- [`mt2.modular.place_prefab`](functions/modular-place_prefab.md): Load authored Layout/Plan records, purchase and place a modular Scenery/base Building through the complete native transaction, with receipt-based Undo/Redo.
+
+## monsters
+
+- [`mt2.monsters.list`](functions/monsters-list.md): List current root-world Monsters with exact handles and native manager membership.
+- [`mt2.monsters.place`](functions/monsters-place.md): Spawn through original MonsterManager methods, sound and LevelChanged; confirm native destroy Undo, release edit, global/manager counters, full actor and quest/visitor survivors, and unchanged ledger.
+- [`mt2.monsters.zones`](functions/monsters-zones.md): Read current Monster Zones, native fixed-point polygons, authored properties and reciprocally owned generated Monster handles.
+- [`mt2.monsters.get_zone`](functions/monsters-get_zone.md): Read a current Monster Zone only while its full UID and root manager membership match.
+- [`mt2.monsters.create_zone`](functions/monsters-create_zone.md): Construct a private native Zone brush, paint and finish it with a private current-selection receiver. Native island/Region clipping applies. Verify final clipped geometry, generated Monsters and counters, complete native Undo, release points, unchanged survivors/quests/visitors/ledger, and owned receiver cleanup.
+- [`mt2.monsters.set_zone`](functions/monsters-set_zone.md): Apply original Zone properties and rebuild generated Monsters through the native Undo transaction. Confirm old UID retirement, complete make/destroy/edit inverses, replacement membership and all surviving state.
+- [`mt2.monsters.reset_zone`](functions/monsters-reset_zone.md): Destroy and rebuild this Zone's generated Monsters through original lifetime and native Undo methods; verify full ownership, retired UIDs, replacement members and untouched authored properties.
+- [`mt2.monsters.respawn_zone`](functions/monsters-respawn_zone.md): Run the original Zone respawn command for dead members and confirm preserved membership, original spawn positions, death/timer reset and unchanged native Undo and ledger.
+- [`mt2.monsters.remove_zone`](functions/monsters-remove_zone.md): Remove a Zone through original SelectionManager destruction, including generated Monsters and incoming quests. Confirm UID, manager, spatial and weak-reference retirement; complete native Zone/Monster/quest Undo records; exact counters and unchanged ledger.
+- [`mt2.monsters.paint_zone`](functions/monsters-paint_zone.md): Extend an existing Monster Zone through the original private brush transaction. Native island/Region clipping and culling of intersecting Zone families apply. Confirm every stamp's authored/walkable snapshots, emitted actor births/retirements, complete native inverse coverage, quest/visitor cascade, release points and selection cleanup.
+- [`mt2.monsters.erase_zones`](functions/monsters-erase_zones.md): Erase native Zone coverage through the original private brush across intersecting Zone families. Confirm complete authored/walkable changes, generated Monster and Zone retirement, native Undo and quest/visitor cleanup. Return confirmed no-op only when the original brush acknowledges no emitted mutation and no Undo.
+
+## network
+
+- [`mt2.network.snapshot`](functions/network-snapshot.md): Read committed server nodes, pipes, waypoints and reciprocal connections
+- [`mt2.network.catalogue`](functions/network-catalogue.md): Read node catalogue keys and current native definition costs
+- [`mt2.network.place_node`](functions/network-place_node.md): Buy and place a server node with its original native inverse history
+- [`mt2.network.place_pipe`](functions/network-place_pipe.md): Create the proved native Cable connection between nodes or to a new Junction, with payment and inverse history
+- [`mt2.network.remove`](functions/network-remove.md): Remove the network object through native destruction and verify UID retirement and inverse history
+
+## npcs
+
+- [`mt2.npcs.list`](functions/npcs-list.md): List current root-world NPCs with exact handles and native manager membership.
+- [`mt2.npcs.place`](functions/npcs-place.md): Create through original NPCManager AddNPC, including two generated quests for a QuestGiver. Verify native cash/destroy Undo, original TypeCost refund, release edit, tag progression, all quest/visitor and actor survivors, and unchanged ledger.
+- [`mt2.npcs.rename`](functions/npcs-rename.md): Rename through the original native actor command and confirm the complete property result.
+- [`mt2.npcs.set_online`](functions/npcs-set_online.md): Set the native online mode and verify its mode, forced-tint flag and color.
+- [`mt2.npcs.change_level`](functions/npcs-change_level.md): Execute the original Raise Level or Lower Level command and verify the current level and preserved properties.
 
 ## objects
 
@@ -64,10 +240,85 @@ Public Lua API **1.1.0**, native ABI **1**, framework **0.2.6**.
 - [`mt2.patches.targets`](functions/patches-targets.md): Discover supported experimental patch targets, phases and modes.
 - [`mt2.patches.status`](functions/patches-status.md): Read published patch order, diagnostics and current time-write authority.
 
+## paths
+
+- [`mt2.paths.place_route`](functions/paths-place_route.md): Execute the whole original native Road hover/pin/Press transaction, accepting native auto snapping, split targets and up to ten native preview splines. Returns all created Paths/nodes, changed Path before/after values, removed Paths, cost, native spline count and owned history receipt. Native geometry and mixed topology readback own the result; one final Press follows only an acknowledged no-effect pin phase.
+- [`mt2.paths.graph`](functions/paths-graph.md): Read the complete saved root-world mixed Path graph, including all eleven Path types, six Intersection types, reciprocal node edges and cross-Region membership. Fields contain native handles, Region IDs, names, waypoints and native distances.
+- [`mt2.paths.place`](functions/paths-place.md): Create one native Road segment through an isolated original Road cursor hover/press, native purchase and Undo. Native ground projection sets endpoint height; optional native node handles pin connections. Splitting existing Paths and multi-spline Road previews are rejected. Returns the created Path, cost and owned history receipt; normal native costs and tool effects apply.
+- [`mt2.paths.link`](functions/paths-link.md): Create a native cross-Region Pass through an isolated original Pass receiver and Finish transaction. Confirms both Regions, supplied two-point shape, endpoint identities, remote membership and native Undo. Returns the Pass and owned history receipt; normal native tool effects apply.
+- [`mt2.paths.remove`](functions/paths-remove.md): Remove any current mixed Path, including Wall or Pass, through original native Destroy command and edit transaction. Confirms Path removal, native orphan policy for endpoint types0/1, retained other Intersections, remote/selection retirement and exact Make/Cash inverse UID set. Returns refund, removed node count and owned history receipt.
+- [`mt2.paths.undo`](functions/paths-undo.md): Run original native undo for one owned Path/Wall receipt at the exact native stack top. Confirms the complete saved mixed topology and exact source/inverse stack transition. Up to twenty receipts are retained in the current World lifetime; an unresolved native history attempt quarantines its receipt.
+- [`mt2.paths.redo`](functions/paths-redo.md): Run original native redo for one owned Path/Wall receipt at the exact native stack top. Confirms the complete saved mixed topology and exact source/inverse stack transition. Up to twenty receipts are retained in the current World lifetime; an unresolved native history attempt quarantines its receipt.
+
+## projects
+
+- [`mt2.projects.catalogue`](functions/projects-catalogue.md): Read native project eligibility and technology purchase/deployment flags
+- [`mt2.projects.current`](functions/projects-current.md): Read current source, work, code lines, bugs and desired workers
+- [`mt2.projects.start`](functions/projects-start.md): Pay for and start the selected native research, art, statistic or shared project source
+- [`mt2.projects.cancel`](functions/projects-cancel.md): Cancel and retire the current native project
+- [`mt2.projects.commit`](functions/projects-commit.md): Deploy and retire the natively completed current project
+- [`mt2.projects.set_workers`](functions/projects-set_workers.md): Allocate workers to the current native project
+
+## quests
+
+- [`mt2.quests.list`](functions/quests-list.md): Read a QuestGiver NPC's owned quest slots, authored fields, destination handles and daily counters with reciprocal weak ownership checks.
+- [`mt2.quests.get`](functions/quests-get.md): Read a quest only while its exact current owner, slot and sequence still match.
+- [`mt2.quests.create`](functions/quests-create.md): Generate and append a native quest for a QuestGiver with fewer than five quests and an existing Building fallback destination. Preserve the original native Undo inverse, active visitor state and ledger with complete readback.
+- [`mt2.quests.remove`](functions/quests-remove.md): Remove a current quest through native NPC lifetime cleanup and verify its expired visitor references and reindexed survivors. Preserve the original native Undo inverse, active visitor state and ledger with complete readback.
+- [`mt2.quests.swap`](functions/quests-swap.md): Swap two quest slots through native ReorderQuest and confirm the complete owner/global records. Preserve the original native Undo inverse, active visitor state and ledger with complete readback.
+- [`mt2.quests.set_name`](functions/quests-set_name.md): Assign the quest title through the native String method. Preserve the original native Undo inverse, active visitor state and ledger with complete readback.
+- [`mt2.quests.set_kills`](functions/quests-set_kills.md): Set the authored kill count with the original selector's field semantics. Preserve the original native Undo inverse, active visitor state and ledger with complete readback.
+- [`mt2.quests.set_rewards`](functions/quests-set_rewards.md): Set custom or default awards through the original native reward setters. Preserve the original native Undo inverse, active visitor state and ledger with complete readback.
+- [`mt2.quests.set_destination`](functions/quests-set_destination.md): Run original SetDestination with the native default action, then verify all global quest records, reciprocal weak links, its single-operation native Undo inverse, recalculation task and unchanged ledger.
+
+## regions
+
+- [`mt2.regions.set_type`](functions/regions-set_type.md): Apply the original private Lift/Land transaction to an unowned Region, clear its native contents and retain the original Undo graph.
+- [`mt2.regions.list`](functions/regions-list.md): List saved root-world Region handles using bounded pages.
+- [`mt2.regions.get`](functions/regions-get.md): Read a Region name, type, levels, styles and complete environment settings.
+- [`mt2.regions.presets`](functions/regions-presets.md): Read the native Region preset names.
+- [`mt2.regions.rename`](functions/regions-rename.md): Rename a Region through its native widget notification.
+- [`mt2.regions.set_tint`](functions/regions-set_tint.md): Set the native Region tint.
+- [`mt2.regions.set_light`](functions/regions-set_light.md): Set native Region light.
+- [`mt2.regions.set_ambient`](functions/regions-set_ambient.md): Set native Region ambient light.
+- [`mt2.regions.set_sky`](functions/regions-set_sky.md): Set native Region sky spline coefficients.
+- [`mt2.regions.set_particles`](functions/regions-set_particles.md): Set the original Region particle type and enabled state.
+- [`mt2.regions.set_particle_color`](functions/regions-set_particle_color.md): Set the original Region particle color.
+- [`mt2.regions.styles`](functions/regions-styles.md): Read the nine canonical terrain style names.
+- [`mt2.regions.set_styles`](functions/regions-set_styles.md): Apply all four terrain styles through the original native EditManager transaction.
+- [`mt2.regions.set_levels`](functions/regions-set_levels.md): Set the Region level range with the original tool transaction, complete actor level clamp, restored input and native Undo inverse.
+- [`mt2.regions.set_preset`](functions/regions-set_preset.md): Apply an original Region preset, confirm its styles and refresh the visible native inspector.
+- [`mt2.regions.purchase`](functions/regions-purchase.md): Buy unowned land through the original native tool, with complete actor level clamp, payment and inverse readback.
+- [`mt2.regions.sell`](functions/regions-sell.md): Sell owned land through the original native tool, with complete actor level clamp, refund and inverse readback.
+
+## scenery
+
+- [`mt2.scenery.stroke`](functions/scenery-stroke.md): Run complete ordered native SceneryBrush or SceneryEraser AddPaint stamps and one original Finish through isolated private receivers. Returns created/removed Scenery rows, cumulative birth count, paid/refund amounts and before/after Building/Monster bug-anchor records. Confirms complete born/removed full-UID Make/Destroy/cash inverse coverage, saved Make records, unchanged surviving Scenery, Group member removals and native Release edits. Preserves normal native cost, replacement, variant RNG and brush bug effects; confirms general erase leaves RNG/bugs unchanged. Temporarily journals the original Cursor finish position and restores it plus surviving selection. Requires the root world to be the actual native active scene. Partial native owners are retained on uncertain failures; never replay such a result.
+- [`mt2.scenery.transform`](functions/scenery-transform.md): Move, rotate or scale multiple free Scenery in one original native Begin/Open/DoMove-per-target/Close/End transaction. Returns target results in input order. Confirms exact inverse UID/prior-pose order, destination Region, unchanged other Scenery and unchanged Groups. Requires the root world to be the actual active scene and owned destination Regions; normal native tool effects apply.
+- [`mt2.scenery.duplicate`](functions/scenery-duplicate.md): Duplicate free Scenery or a whole Group through original native capability/price/payment, virtual Duplicate, cash/destroy inverses and localized Undo. Confirms created pose, whole Group member ordering/relative poses and untouched sources, plus native release edit and selection readback. Returns a Scenery prop or Group table. Requires the root world to be the native active scene; normal native costs and selection changes apply.
+- [`mt2.scenery.list`](functions/scenery-list.md): Read current root-world Scenery handles, native poses and Region IDs from every actual Region/category roster. A pose contains quaternion x/y/z/w, position x/y/z and scale x/y/z, in that order.
+- [`mt2.scenery.move_group`](functions/scenery-move_group.md): Move, rotate or scale a whole native Group through original DoMove and Undo, preserving its ordered member identities and relative poses. Confirms native destination pose and unchanged other Groups/Scenery. Requires the root world to be the actual native active scene; normal native selection and tool effects apply.
+- [`mt2.scenery.destroy_group`](functions/scenery-destroy_group.md): Destroy a whole native Group through original SelectionManager DestroyProp, retaining normal native refund and Undo behavior. Confirms removal of the Group and every owned Scenery member, plus unchanged unrelated members. Returns destroyed=true and member count. Requires the root world to be the actual native active scene; normal native selection and tool effects apply.
+- [`mt2.scenery.groups`](functions/scenery-groups.md): Read root-world Groups with exact Group and member handles, native ten-float poses, Region IDs and relative member poses.
+- [`mt2.scenery.group`](functions/scenery-group.md): Group or merge root-world Scenery through explicitly rooted native Group creation and the whole original GroupSelection transaction. Confirms ordered membership, unchanged member poses, reciprocal parents and exact native Undo. Requires the root world to be the native active scene and the current native tool to permit selection; normal native selection changes apply.
+- [`mt2.scenery.ungroup`](functions/scenery-ungroup.md): Run the whole original UngroupSelection transaction and confirm removal, free surviving member handles and unchanged member poses, plus original per-Group saved inverse records. Returns ungrouped count and members. Requires the root world to be the native active scene and the current native tool to permit selection; normal native selection changes apply.
+
 ## storage
 
 - [`mt2.storage.get`](functions/storage-get.md): Read mod-owned profile or world data.
 - [`mt2.storage.set`](functions/storage-set.md): Store mod-owned profile or world data.
+
+## subscribers
+
+- [`mt2.subscribers.candidates`](functions/subscribers-candidates.md): Read the existing bounded native subscriber-candidate scan, preserving whether it completed.
+- [`mt2.subscribers.get`](functions/subscribers-get.md): Read a subscriber's satisfaction, addiction, login state and seven native needs.
+
+## terrain
+
+- [`mt2.terrain.heights`](functions/terrain-heights.md): Read a bounded page of the original Region height grid.
+- [`mt2.terrain.change_height`](functions/terrain-change_height.md): Use the original height brush once and confirm the complete grid, 100 cash payment, restored cursor and unchanged Undo history.
+- [`mt2.terrain.contours`](functions/terrain-contours.md): Read a bounded page of exact native integer terrain polygon coordinates.
+- [`mt2.terrain.paint`](functions/terrain-paint.md): Complete an original terrain paint stroke and confirm its contour inverse, native Undo, Region and ledger readback. The result states whether contours changed.
 
 ## time
 
@@ -85,9 +336,15 @@ Public Lua API **1.1.0**, native ABI **1**, framework **0.2.6**.
 - [`mt2.ui.native`](functions/ui-native.md): Display a native MT2 window with buttons, tabs, inputs, panels and PNG images.
 - [`mt2.ui.document`](functions/ui-document.md): Draw a resizable document with lists, columns, text inputs and buttons.
 
+## walls
+
+- [`mt2.walls.place_curve`](functions/walls-place_curve.md): Compute and place a native Wall curve from 2..11 ordered control points. Original AddPointAt calculates segment velocities and PlotSpline samples and validates terrain/collisions, supplying the native preview and spline-length price quote. The same isolated native receiver owns Purchase/Finish and model/ghost cleanup. Returns native spline records and sampled preview, created Path/node handles, changed and removed split Paths, cost and an owned history receipt. Requires one owned active-root Region; supplied endpoint handles pin native intersections/split Paths. Original validation causes are retained and uncertain actions must not be replayed.
+- [`mt2.walls.place`](functions/walls-place.md): Execute a bounded explicit native Wall plan through isolated original Wall/Path/model construction, native Purchase and Finish, then owned cleanup. Native ghost Length supplies the price quote. Supports explicit current node and split-Path handles, including preview split targets. Confirms reciprocal mixed topology, created Path family/scene, retained original Undo and unchanged unrelated Paths. Returns created Paths, native length, cost and owned history receipt.
+
 ## world
 
 - [`mt2.world.status`](functions/world-status.md): Read the loaded world name and current epoch.
 - [`mt2.world.region`](functions/world-region.md): Read region ownership, native type and the current region purchase price.
 - [`mt2.world.simulation`](functions/world-simulation.md): Read cash, logged-in subscribers, game clock and the current financial ledger.
 - [`mt2.world.software`](functions/world-software.md): Read the current game rating and fun values.
+- [`mt2.world.entities`](functions/world-entities.md): Read a bounded native world-object inventory with exact handles and building classification.

@@ -51,7 +51,7 @@ int main() {
         auto folder=root/"mods/test.expansion";fs::create_directories(folder);
         Json manifest{{"id","test.expansion"},{"name","Expansion"},{"version","1.0.0"},{"api_version","1.1.0"},{"type","lua"},{"entry","main.lua"},{"capabilities",{"ui","world.read","objects.read"}},{"multiplayer","local"}};
         atomic_json(folder/"mod.json",manifest);
-        auto future=manifest;future["api_version"]="1.2.0";
+        auto future=manifest;future["api_version"]="1.3.0";
         rejects([&] { Manifest::parse(future); }, "API");
         write(folder/"main.lua",R"lua(
 mt2.events.on('update',function()

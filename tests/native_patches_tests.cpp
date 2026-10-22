@@ -100,6 +100,7 @@ int main(){try{
     check(!routes.retirement_blocked()&&routes.detach_patch_runtime(),"Runtime detachment confirms only after Create invocation closes");
     routes.create(call,original);check(observer.before.size()==prior,"late shared route entry after detachment does not use Runtime");
     std::string reason;check(service.authorize("api.time.set",reason)&&reason.find("Standalone")!=std::string::npos,"positive world proof and absent bridge acknowledge standalone");
+    check(service.authorize("api.gameplay.action",reason),"Gameplay actions use the same positive standalone proof");
     world=false;check(!service.authorize("api.time.set",reason)&&reason.find("synthetic world absent")!=std::string::npos,"missing native world denies mutation");world=true;
     proof_throws=true;check(!service.authorize("api.time.set",reason)&&reason.find("synthetic-world-proof-failure")!=std::string::npos,"world proof exception becomes visible unknown authority");proof_throws=false;
     thread=102;check(!service.authorize("api.time.set",reason),"worker mutation denied");thread=101;
@@ -119,6 +120,7 @@ int main(){try{
     check(!service.authorize("api.time.set",reason)&&reason.find("unknown")!=std::string::npos,"unknown provider role denies mutation");
     provider.role=MT2FW_MT2_SESSION_CLIENT;check(!service.authorize("api.time.set",reason)&&reason.find("Client")!=std::string::npos,"client role denies mutation");
     provider.role=MT2FW_MT2_SESSION_HOST;check(!service.authorize("api.time.set",reason)&&reason.find("Host-action bridge is unavailable")!=std::string::npos,"trusted Host role does not imply an available shared action bridge");
+    check(!service.authorize("api.gameplay.action",reason),"Gameplay actions cannot bypass the trusted Host action bridge");
     check(service.status().at("role")=="host","denied mutation retains the observed Host role");
     check(!runtime.multiplayer,"production-default multiplayer flag remains false for Host denial check");
     denied_request=false;try{runtime.request(owner,"time.set",{{"paused",false},{"speed",1.f}});}catch(const std::runtime_error& error){denied_request=std::string(error.what()).find("Host-action bridge is unavailable")!=std::string::npos;}

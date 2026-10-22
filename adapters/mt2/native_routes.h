@@ -28,6 +28,7 @@ public:
     void set_patch_runtime(Runtime* runtime){std::lock_guard lock(gate_);patch_runtime_=runtime;}
     bool detach_patch_runtime(){std::lock_guard lock(gate_);patch_runtime_=nullptr;return patch_inflight_==0;}
     void catalog(const std::string& name,uint64_t rva,bool shared=false);
+    bool verify_body(uint64_t rva,size_t bytes,const std::string& sha256,std::string& cause);
     bool publish_shared(const std::string& name,void* detour,void* trampoline,std::string& cause);
     bool publish_framework_hook(void* target,void* detour,void* trampoline,std::string& cause);
     MT2FW_MT2_Result query(const MT2FW_Host*,uint32_t,MT2FW_MT2_RoutesV1*,uint32_t);

@@ -1,0 +1,83 @@
+{
+  "MT2CharacterHandle": {
+    "epoch": "integer",
+    "uid": "string",
+    "kind": "integer",
+    "index": "integer"
+  },
+  "MT2AbilityHandle": {
+    "owner": "MT2CharacterHandle",
+    "epoch": "integer",
+    "uid": "string",
+    "slot": "integer"
+  },
+  "MT2CharacterStats": {
+    "attributes": "number[][]",
+    "speed": "number",
+    "boss_phases": "integer",
+    "boss_health": "integer"
+  },
+  "MT2Character": {
+    "handle": "MT2CharacterHandle",
+    "name": "string",
+    "definition_name": "string",
+    "deleted": "boolean",
+    "edited": "boolean",
+    "released": "boolean",
+    "parent": "MT2CharacterHandle?",
+    "stats": "MT2CharacterStats?",
+    "variant_ordinal": "integer?"
+  },
+  "MT2CostumePose": {
+    "rotation": "number[]",
+    "position": "number[]",
+    "scale": "number[]"
+  },
+  "MT2CostumeAttachment": {
+    "name": "string",
+    "pose": "MT2CostumePose"
+  },
+  "MT2CostumePart": {
+    "bone": "string",
+    "model": "string",
+    "pose": "MT2CostumePose",
+    "model_scale": "number",
+    "attachments": "MT2CostumeAttachment[]",
+    "colors": "number[][]"
+  },
+  "MT2CostumeRecord": {
+    "name": "string",
+    "skeleton": "string",
+    "flag": "boolean",
+    "parts": "MT2CostumePart[]"
+  },
+  "MT2CharacterAppearance": {
+    "record": "MT2CostumeRecord",
+    "weapon_categories": "string[]"
+  },
+  "MT2AbilityEffect": {
+    "integers": "integer[]",
+    "values": "number[]",
+    "count": "integer"
+  },
+  "MT2AbilityRecord": {
+    "text": "string[]",
+    "item_value": "number",
+    "item_kind": "integer",
+    "item_flag": "boolean",
+    "selectors": "integer[]",
+    "color": "number[]",
+    "timing": "number[]",
+    "flags": "boolean[]",
+    "final_values": "number[]",
+    "level": "integer",
+    "final_flag": "boolean",
+    "costs": "MT2AbilityEffect[]",
+    "effects": "MT2AbilityEffect[]"
+  },
+  "MT2CharacterAbility": {
+    "handle": "MT2AbilityHandle",
+    "display_slot": "integer",
+    "record": "MT2AbilityRecord"
+  }
+}

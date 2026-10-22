@@ -1,0 +1,22 @@
+[
+  {
+    "name": "world.entities", "kind": "query", "returns": "MT2WorldEntity[]",
+    "parameters": [{"name":"limit","type":"integer","description":"Maximum returned native objects, 1..128.","optional":true,"default":100}],
+    "summary": "Read a bounded native world-object inventory with exact handles and building classification.",
+    "errors": ["The world, native object roster or game-thread identity is unavailable."],
+    "native_evidence": ["adapters/mt2/native_engine.cpp: list_world_props"]
+  },
+  {
+    "name": "subscribers.candidates", "kind": "query", "returns": "MT2SubscriberCandidates", "parameters": [],
+    "summary": "Read the existing bounded native subscriber-candidate scan, preserving whether it completed.",
+    "errors": ["The world or subscriber manager is unavailable, or its roster changes during the read."],
+    "native_evidence": ["adapters/mt2/native_engine.cpp: read_subscriber_candidates"]
+  },
+  {
+    "name": "subscribers.get", "kind": "query", "returns": "MT2SubscriberState",
+    "parameters": [{"name":"handle","type":"MT2SubscriberHandle","description":"Subscriber identity returned by candidates() in the current world epoch."}],
+    "summary": "Read a subscriber's satisfaction, addiction, login state and seven native needs.",
+    "errors": ["The handle expired or the subscriber identity, ownership or needs state differs."],
+    "native_evidence": ["adapters/mt2/native_engine.cpp: read_subscriber_needs"]
+  }
+]

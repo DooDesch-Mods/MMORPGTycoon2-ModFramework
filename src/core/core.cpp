@@ -107,7 +107,7 @@ Manifest Manifest::parse(const Json& value) {
     static const std::regex id(R"([a-z][a-z0-9]*(\.[a-z0-9][a-z0-9_-]*)+)");
     if (!std::regex_match(m.id,id)) throw std::runtime_error("Mod ID must be lowercase and namespaced, for example author.my_mod");
     parse_version(m.version);
-    if (!version_matches("1.1.0",">="+text(value,"api_version")) || parse_version(text(value,"api_version")).core[0]!="1")
+    if (!version_matches("1.2.0",">="+text(value,"api_version")) || parse_version(text(value,"api_version")).core[0]!="1")
         throw std::runtime_error("Mod requires an unsupported API version");
     if (m.type!="lua"&&m.type!="native"&&m.type!="content") throw std::runtime_error("Mod type must be lua, native or content");
     if (fs::path(m.entry).is_absolute() || m.entry.find(':')!=std::string::npos || m.entry.find("..")!=std::string::npos || m.entry.find('\\')!=std::string::npos)
@@ -130,7 +130,7 @@ Manifest Manifest::parse(const Json& value) {
     }
     return m;
 }
-Plugin::Plugin(Runtime* owner):runtime(owner) { host={sizeof(MT2FW_Host),MT2FW_ABI_VERSION,this,native_request,native_subscribe,native_unsubscribe}; }
+Plugin::Plugin(Runtime* owner):runtime(owner) { static std::atomic<uint64_t> next_instance{1};instance=next_instance.fetch_add(1); host={sizeof(MT2FW_Host),MT2FW_ABI_VERSION,this,native_request,native_subscribe,native_unsubscribe}; }
 Plugin::~Plugin(){if(native_loaded&&native_shutdown&&!native_retirement_failed&&!native_retained&&!native_pins)native_shutdown();}
 Runtime::Runtime(fs::path root,Adapter adapter):patches([this](const std::string& owner,const std::string& cause){queue_patch_error(owner,cause);}),root_(fs::absolute(root)),adapter_(std::move(adapter)) {
     fs::create_directories(root_/"mods");
@@ -337,9 +337,10 @@ Json Runtime::patch_status() const {
 }
 Json Runtime::request(Plugin& p,const std::string& op,const Json& args) {
     if(!args.is_object())throw std::runtime_error("API arguments must be an object");
+    if(rendering&&(op=="gameplay.query"||op=="gameplay.action"))throw std::runtime_error("Gameplay queries and actions belong in game-thread callbacks, not render callbacks");
     if(op=="patches.targets")return patches.targets();
     if(op=="patches.status")return patch_status();
-    if(patches.in_callback()&&((op.starts_with("actions.")&&op!="actions.status")||op=="time.set"||op=="content.register"))throw std::runtime_error("PATCH_READ_ONLY: patch callbacks cannot call shared-world write APIs; modifiers return writable values");
+    if(patches.in_callback()&&((op.starts_with("actions.")&&op!="actions.status")||op=="gameplay.action"||op=="time.set"||op=="content.register"))throw std::runtime_error("PATCH_READ_ONLY: patch callbacks cannot call shared-world write APIs; modifiers return writable values");
     if(op=="log") {auto level=args.value("level","info");if(level!="debug"&&level!="info"&&level!="warn"&&level!="error")throw std::runtime_error("Invalid log level");log(p.manifest.id,level,args.at("message").get<std::string>());return true;}
     if(op=="config.define") {
         auto key=text(args,"key");if(key.find('/')!=std::string::npos)throw std::runtime_error("Invalid setting key");
@@ -370,7 +371,8 @@ Json Runtime::request(Plugin& p,const std::string& op,const Json& args) {
         if(!p.manifest.capabilities.contains("world.read"))throw std::runtime_error("Missing capability: world.read");
     }
     else if(op.starts_with("ui.")) {cap="ui";if(!rendering)throw std::runtime_error("UI calls belong in ui.window/render callbacks");}
-    else if(op.starts_with("world."))cap="world.read";
+    else if(op.starts_with("world.")||op=="gameplay.query"||op=="gameplay.operations")cap="world.read";
+    else if(op=="gameplay.action")cap="objects.write";
     else if(op.starts_with("objects."))cap="objects.read";
     else if(op.starts_with("camera."))cap="camera";
     else if(op=="time.get")cap="world.read";
@@ -393,7 +395,10 @@ Json Runtime::request(Plugin& p,const std::string& op,const Json& args) {
     if(multiplayer&&p.manifest.multiplayer=="singleplayer")throw std::runtime_error("Singleplayer mod cannot run in multiplayer");
     if(multiplayer&&(cap=="objects.write"||cap=="time.write"||cap=="content"))throw std::runtime_error("Multiplayer bridge is not active; shared writes are unavailable");
     if(!adapter_)throw std::runtime_error("Game adapter unavailable: "+op);
-    auto forwarded=args;forwarded["mod_id"]=p.manifest.id;
+    auto forwarded=args;forwarded["mod_id"]=p.manifest.id;forwarded["mod_instance"]=p.instance;
+    if(op=="gameplay.action"){
+        std::string reason;if(!patch_authorized("api.gameplay.action",reason))throw std::runtime_error(reason);
+    }
     if(op=="content.register")forwarded["directory"]=path_text(p.directory);
     if(op=="time.set"){
         std::string reason;if(!patch_authorized("api.time.set",reason))throw std::runtime_error(reason);
@@ -484,6 +489,6 @@ std::vector<std::string> Runtime::multiplayer_conflicts(const Json& peer) const 
 }
 Json Runtime::status() const {
     Json mods=Json::array();for(auto& p:plugins_)mods.push_back({{"id",p->manifest.id},{"name",p->manifest.name},{"version",p->manifest.version},{"type",p->manifest.type},{"active",p->active},{"error",p->error},{"calls",p->calls},{"last_ms",p->last_ms},{"total_ms",p->total_ms},{"settings",p->config},{"schema",p->config_schema}});
-    return {{"version",MT2FW_VERSION},{"api_version","1.1.0"},{"epoch",epoch},{"world",world_},{"mods",mods},{"multiplayer_bridge",false}};
+    return {{"version",MT2FW_VERSION},{"api_version","1.2.0"},{"epoch",epoch},{"world",world_},{"mods",mods},{"multiplayer_bridge",false}};
 }
 }

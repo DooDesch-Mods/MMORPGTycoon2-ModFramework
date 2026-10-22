@@ -1,0 +1,120 @@
+{
+  "MT2ManagementFees": {
+    "purchase": "integer",
+    "subscription": "integer"
+  },
+  "MT2ManagementLoan": {
+    "key": "string",
+    "name": "string",
+    "description": "string",
+    "amount": "integer",
+    "days": "integer",
+    "daily_principal": "integer",
+    "daily_interest": "integer"
+  },
+  "MT2ManagementOffer": {
+    "key": "string",
+    "name": "string",
+    "description": "string",
+    "amount": "integer",
+    "repayment": "integer",
+    "days": "integer",
+    "eligibility": "integer",
+    "available": "boolean"
+  },
+  "MT2ManagementLoans": {
+    "loans": "MT2ManagementLoan[]",
+    "offers": "MT2ManagementOffer[]"
+  },
+  "MT2ManagementGm": {
+    "handle": "MT2Handle",
+    "slot": "integer",
+    "employed": "boolean",
+    "busy": "boolean"
+  },
+  "MT2ManagementStaff": {
+    "count": "integer",
+    "employed": "integer",
+    "staff": "MT2ManagementGm[]"
+  },
+  "MT2ManagementStatistics": {
+    "values": "integer[]",
+    "spent": "integer[]",
+    "purchased": "integer[]",
+    "free_points": "integer",
+    "purchased_points": "integer",
+    "character_slots": "integer[]"
+  },
+  "MT2ManagementRelease": {
+    "version": "integer[]",
+    "funds": "integer",
+    "present": "boolean",
+    "planned_version": "integer[]|nil",
+    "type": "integer|nil",
+    "state": "integer|nil",
+    "custom": "boolean|nil",
+    "text": "string[]|nil"
+  },
+  "MT2ManagementReleaseCycle": {
+    "release": "MT2ManagementRelease",
+    "phase": "integer",
+    "history_count": "integer",
+    "free_points": "integer"
+  },
+  "MT2ManagementPolicy": {
+    "enabled": "boolean",
+    "watchSeconds": "integer",
+    "checkLog": "boolean",
+    "isBannable": "boolean",
+    "banFavorites": "boolean",
+    "banInfluencers": "boolean",
+    "warnsBeforeBan": "integer"
+  },
+  "MT2ManagementRules": {
+    "xp": "integer[]",
+    "respawn_seconds": "integer",
+    "respawn_delay": "boolean",
+    "features": "integer[]"
+  },
+  "MT2ManagementCampaign": {
+    "name": "string",
+    "type": "integer",
+    "started_on": "integer",
+    "duration": "integer",
+    "impressions": "integer",
+    "conversions": "integer",
+    "hype": "integer",
+    "active": "boolean"
+  },
+  "MT2ManagementAward": {
+    "name": "string",
+    "source": "string",
+    "day": "integer",
+    "impressions": "integer",
+    "conversions": "integer",
+    "good": "boolean"
+  },
+  "MT2ManagementCampaigns": {
+    "campaigns": "MT2ManagementCampaign[]",
+    "awards": "MT2ManagementAward[]",
+    "daily_costs": "integer[]",
+    "positive_buzz": "integer",
+    "negative_buzz": "integer"
+  },
+  "MT2ManagementServiceConfig": {
+    "currency": "integer",
+    "price": "integer"
+  },
+  "MT2ManagementService": {
+    "handle": "MT2Handle",
+    "ordinal": "integer",
+    "type": "integer",
+    "config_key": "string",
+    "currency": "integer",
+    "price": "integer",
+    "synced": "boolean",
+    "allow_sync": "boolean",
+    "config_manager_present": "boolean",
+    "config": "MT2ManagementServiceConfig|nil"
+  }
+}

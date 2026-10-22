@@ -105,7 +105,7 @@ bool NativePatches::authority_result(uint32_t role,const std::string& reason,std
 }
 bool NativePatches::authorize(const std::string& operation,std::string& reason){
     std::lock_guard lock(gate_);
-    if(operation!="api.time.set")return authority_result(MT2FW_MT2_SESSION_UNKNOWN,"Patch mutation target is unsupported",reason);
+    if(operation!="api.time.set"&&operation!="api.gameplay.action")return authority_result(MT2FW_MT2_SESSION_UNKNOWN,"Patch mutation target is unsupported",reason);
     if(!on_thread())return authority_result(MT2FW_MT2_SESSION_UNKNOWN,"Patch authority rejected: caller is outside the bound game thread",reason);
     uint64_t epoch=0;std::string proof;
     bool proven=false;try{proven=world_proof_&&world_proof_(epoch,proof);}catch(const std::exception& error){proof=std::string("native world proof failed: ")+error.what();}catch(...){proof="native world proof failed: unknown native exception";}

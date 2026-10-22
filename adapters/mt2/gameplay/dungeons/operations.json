@@ -1,0 +1,1185 @@
+[
+  {
+    "name": "dungeons.list",
+    "kind": "query",
+    "summary": "List current root DungeonExterior handles and exact Dungeon UID strings.",
+    "parameters": [],
+    "returns": "table",
+    "errors": [
+      "World is unavailable or the call is off the current game thread.",
+      "Handle epoch, original UID registry, native class or reciprocal world ownership differs.",
+      "Native code or readback differs; attempted actions return unknown and must not be replayed."
+    ],
+    "native_evidence": [
+      "Multiplayer/src/game/dungeon_scene_roster.h"
+    ]
+  },
+  {
+    "name": "dungeons.get",
+    "kind": "query",
+    "summary": "Read native desired instance count, atmosphere, authored light and pool count.",
+    "parameters": [
+      {
+        "name": "handle",
+        "type": "MT2Handle",
+        "description": "Current root DungeonExterior handle with epoch and decimal UID string."
+      }
+    ],
+    "returns": "MT2DungeonState",
+    "errors": [
+      "World is unavailable or the call is off the current game thread.",
+      "Handle epoch, original UID registry, native class or reciprocal world ownership differs.",
+      "Native code or readback differs; attempted actions return unknown and must not be replayed."
+    ],
+    "native_evidence": [
+      "Multiplayer/src/game/dungeon_config_reader.h",
+      "Multiplayer/src/game/dungeon_light_runtime.inc",
+      "Multiplayer/src/game/dungeon_sound_runtime.inc"
+    ]
+  },
+  {
+    "name": "dungeons.layout",
+    "kind": "query",
+    "summary": "Read authored layout cells, open flags, Theme keys, packed cell colors and palette.",
+    "parameters": [
+      {
+        "name": "handle",
+        "type": "MT2Handle",
+        "description": "Current root DungeonExterior handle with epoch and decimal UID string."
+      }
+    ],
+    "returns": "MT2DungeonLayout",
+    "errors": [
+      "World is unavailable or the call is off the current game thread.",
+      "Handle epoch, original UID registry, native class or reciprocal world ownership differs.",
+      "Native code or readback differs; attempted actions return unknown and must not be replayed."
+    ],
+    "native_evidence": [
+      "Multiplayer/src/game/dungeon_layout_reader.h"
+    ]
+  },
+  {
+    "name": "dungeons.erase_paint",
+    "kind": "action",
+    "summary": "Erase existing Dungeon Canvas paint inside supplied native clipping paths through the original Canvas erase and retained DungeonPaint Undo graph.",
+    "parameters": [
+      {
+        "name": "handle",
+        "type": "MT2Handle",
+        "description": "Current root DungeonExterior handle with epoch and decimal UID string."
+      },
+      {
+        "name": "paths",
+        "type": "table",
+        "description": "Array of polygon paths; each path has at least three x/z integer pairs in native clipping coordinates. At most 100000 points total."
+      }
+    ],
+    "returns": "table",
+    "errors": [
+      "World is unavailable or the call is off the current game thread.",
+      "Handle epoch, original UID registry, native class or reciprocal world ownership differs.",
+      "Native code or readback differs; attempted actions return unknown and must not be replayed."
+    ],
+    "native_evidence": [
+      "Multiplayer/src/game/native_polyshape.h",
+      "Multiplayer/src/game/dungeon_input_calls.h",
+      "Multiplayer/src/game/dungeon_input_port.inc",
+      "Multiplayer/src/game/dungeon_input_native.h"
+    ]
+  },
+  {
+    "name": "dungeons.paint",
+    "kind": "action",
+    "summary": "Load a detached native Fill from portable Records, confirm its exact native save readback, then paint supplied clipping paths through original Stroke/Canvas lifecycle and DungeonPaint Undo.",
+    "parameters": [
+      {
+        "name": "handle",
+        "type": "MT2Handle",
+        "description": "Current root DungeonExterior handle with epoch and decimal UID string."
+      },
+      {
+        "name": "paths",
+        "type": "table",
+        "description": "Array of polygon paths with at least three x/z integer pairs each, in native clipping coordinates. At most 100000 points."
+      },
+      {
+        "name": "fill_records",
+        "type": "table",
+        "description": "Canonical breadth-first mmoFill rows: {parentIndex,childIndex,{type,bits,text},tokens}; root parent=-1, token types 0..4, float tokens carry uint32 bits. At most 2048 rows, 16384 tokens and 65536 text bytes."
+      }
+    ],
+    "returns": "table",
+    "errors": [
+      "World is unavailable or the call is off the current game thread.",
+      "Handle epoch, original UID registry, native class or reciprocal world ownership differs.",
+      "Native code or readback differs; attempted actions return unknown and must not be replayed."
+    ],
+    "native_evidence": [
+      "Multiplayer/src/game/dungeon_fill_record.h",
+      "Multiplayer/src/game/dungeon_fill_native.cpp",
+      "Multiplayer/src/game/subscriber_lifecycle/record_decode.cpp",
+      "Multiplayer/src/game/subscriber_lifecycle/record_graph.cpp",
+      "Multiplayer/src/game/dungeon_input_calls.h",
+      "Multiplayer/src/game/dungeon_input_port.inc",
+      "Multiplayer/src/game/dungeon_input_native.h"
+    ]
+  },
+  {
+    "name": "dungeons.instances",
+    "kind": "query",
+    "summary": "List current saved Instance indices and started flags with reciprocal scene validation.",
+    "parameters": [
+      {
+        "name": "handle",
+        "type": "MT2Handle",
+        "description": "Current root DungeonExterior handle with epoch and decimal UID string."
+      }
+    ],
+    "returns": "MT2DungeonInstance[]",
+    "errors": [
+      "World is unavailable or the call is off the current game thread.",
+      "Handle epoch, original UID registry, native class or reciprocal world ownership differs.",
+      "Native code or readback differs; attempted actions return unknown and must not be replayed."
+    ],
+    "native_evidence": [
+      "Multiplayer/src/game/dungeon_config_reader.h",
+      "Multiplayer/src/game/dungeon_scene_roster.h"
+    ]
+  },
+  {
+    "name": "dungeons.gizmos",
+    "kind": "query",
+    "summary": "List Gizmo handles, identity, transforms, trigger/state, contents and door edges in one scene.",
+    "parameters": [
+      {
+        "name": "handle",
+        "type": "MT2Handle",
+        "description": "Current root DungeonExterior handle with epoch and decimal UID string."
+      },
+      {
+        "name": "instance",
+        "type": "integer",
+        "description": "Saved Instance.index; omitted selects the authored template scene.",
+        "optional": true
+      }
+    ],
+    "returns": "MT2DungeonGizmo[]",
+    "errors": [
+      "World is unavailable or the call is off the current game thread.",
+      "Handle epoch, original UID registry, native class or reciprocal world ownership differs.",
+      "Native code or readback differs; attempted actions return unknown and must not be replayed."
+    ],
+    "native_evidence": [
+      "Multiplayer/src/game/dungeon_gizmo_reader.h"
+    ]
+  },
+  {
+    "name": "dungeons.monsters",
+    "kind": "query",
+    "summary": "List scene Monster handles, rank, CharacterTypeID, level, tag, status and authored pose.",
+    "parameters": [
+      {
+        "name": "handle",
+        "type": "MT2Handle",
+        "description": "Current root DungeonExterior handle with epoch and decimal UID string."
+      },
+      {
+        "name": "instance",
+        "type": "integer",
+        "description": "Saved Instance.index; omitted selects the authored template scene.",
+        "optional": true
+      }
+    ],
+    "returns": "table",
+    "errors": [
+      "World is unavailable or the call is off the current game thread.",
+      "Handle epoch, original UID registry, native class or reciprocal world ownership differs.",
+      "Native code or readback differs; attempted actions return unknown and must not be replayed."
+    ],
+    "native_evidence": [
+      "Multiplayer/src/game/monster_zone_read.h",
+      "Multiplayer/src/game/dungeon_authored_sample.inc"
+    ]
+  },
+  {
+    "name": "dungeons.spawn_monster",
+    "kind": "action",
+    "summary": "Spawn one Dungeon Monster from a live Monster Character definition through native creation, Destroy inverse and Undo; apply the selected level, achievement and placement sound.",
+    "parameters": [
+      {
+        "name": "handle",
+        "type": "MT2Handle",
+        "description": "Current root DungeonExterior handle with epoch and decimal UID string."
+      },
+      {
+        "name": "character",
+        "type": "MT2CharacterHandle",
+        "description": "Live Character definition with kind=1 from mt2.characters."
+      },
+      {
+        "name": "rank",
+        "type": "integer",
+        "description": "Native Monster rank, 0..2."
+      },
+      {
+        "name": "level",
+        "type": "integer",
+        "description": "Positive native Monster level."
+      },
+      {
+        "name": "position",
+        "type": "number[]",
+        "description": "Three finite coordinates within the selected scene Region."
+      },
+      {
+        "name": "rotation",
+        "type": "number[]",
+        "description": "Normalized quaternion x/y/z/w.",
+        "optional": true,
+        "default": [
+          0,
+          0,
+          0,
+          1
+        ]
+      },
+      {
+        "name": "instance",
+        "type": "integer",
+        "description": "Saved Instance.index; omitted selects the authored template scene.",
+        "optional": true
+      }
+    ],
+    "returns": "table",
+    "errors": [
+      "World is unavailable or the call is off the current game thread.",
+      "Handle epoch, original UID registry, native class or reciprocal world ownership differs.",
+      "Native code or readback differs; attempted actions return unknown and must not be replayed."
+    ],
+    "native_evidence": [
+      "Multiplayer/src/game/dungeon_input_calls.h",
+      "Multiplayer/src/game/dungeon_input_port.inc",
+      "Multiplayer/src/game/dungeon_input_action_calls.h",
+      "Multiplayer/src/game/monster_zone_read.h",
+      "Multiplayer/src/game/character_definition_identity.h"
+    ]
+  },
+  {
+    "name": "dungeons.set_gizmo_runtime",
+    "kind": "action",
+    "summary": "Set exact live triggered/state/immediate fields by compare-and-exchange and on_map through native SetOnMap; scalar adoption does not dispatch trigger callbacks.",
+    "parameters": [
+      {
+        "name": "handle",
+        "type": "MT2Handle",
+        "description": "Current root DungeonExterior handle with epoch and decimal UID string."
+      },
+      {
+        "name": "gizmo",
+        "type": "MT2Handle",
+        "description": "Current Gizmo handle in the selected Dungeon scene."
+      },
+      {
+        "name": "state",
+        "type": "MT2DungeonGizmoRuntime",
+        "description": "One or more live runtime fields to adopt."
+      },
+      {
+        "name": "instance",
+        "type": "integer",
+        "description": "Saved Instance.index; omitted selects the authored template scene.",
+        "optional": true
+      }
+    ],
+    "returns": "table",
+    "errors": [
+      "World is unavailable or the call is off the current game thread.",
+      "Handle epoch, original UID registry, native class or reciprocal world ownership differs.",
+      "Native code or readback differs; attempted actions return unknown and must not be replayed."
+    ],
+    "native_evidence": [
+      "Multiplayer/src/game/dungeon_gizmo_live_native.inc",
+      "Multiplayer/src/game/dungeon_gizmo_live_read.h",
+      "Multiplayer/src/game/dungeon_gizmo_live_state.h"
+    ]
+  },
+  {
+    "name": "dungeons.set_gizmo_contents",
+    "kind": "action",
+    "summary": "Adopt one or more native container content counts by guarded compare-and-exchange and exact authored readback; existing native editor limits 0..5 apply.",
+    "parameters": [
+      {
+        "name": "handle",
+        "type": "MT2Handle",
+        "description": "Current root DungeonExterior handle with epoch and decimal UID string."
+      },
+      {
+        "name": "gizmo",
+        "type": "MT2Handle",
+        "description": "Current container Gizmo in the selected Dungeon scene."
+      },
+      {
+        "name": "contents",
+        "type": "MT2DungeonGizmoContents",
+        "description": "One or more content counts, each 0..5."
+      },
+      {
+        "name": "instance",
+        "type": "integer",
+        "description": "Saved Instance.index; omitted selects the authored template scene.",
+        "optional": true
+      }
+    ],
+    "returns": "table",
+    "errors": [
+      "World is unavailable or the call is off the current game thread.",
+      "Handle epoch, original UID registry, native class or reciprocal world ownership differs.",
+      "Native code or readback differs; attempted actions return unknown and must not be replayed."
+    ],
+    "native_evidence": [
+      "Multiplayer/src/game/dungeon_gizmo_reader.h",
+      "Multiplayer/src/game/dungeon_gizmo_record.h",
+      "Multiplayer/src/game/typed_action/dungeon_gizmo_action.h",
+      "Multiplayer/src/game/dungeon_gizmo_live_native.inc"
+    ]
+  },
+  {
+    "name": "dungeons.rename_gizmo",
+    "kind": "action",
+    "summary": "Rename a scene-owned Gizmo through its original native Rename method and confirm the exact resulting name.",
+    "parameters": [
+      {
+        "name": "handle",
+        "type": "MT2Handle",
+        "description": "Current root DungeonExterior handle with epoch and decimal UID string."
+      },
+      {
+        "name": "gizmo",
+        "type": "MT2Handle",
+        "description": "Current Gizmo handle in the selected Dungeon scene."
+      },
+      {
+        "name": "name",
+        "type": "string",
+        "description": "Nonempty native name, at most 256 UTF-8 bytes without NUL."
+      },
+      {
+        "name": "instance",
+        "type": "integer",
+        "description": "Saved Instance.index; omitted selects the authored template scene.",
+        "optional": true
+      }
+    ],
+    "returns": "table",
+    "errors": [
+      "World is unavailable or the call is off the current game thread.",
+      "Handle epoch, original UID registry, native class or reciprocal world ownership differs.",
+      "Native code or readback differs; attempted actions return unknown and must not be replayed."
+    ],
+    "native_evidence": [
+      "Multiplayer/src/game/dungeon_gizmo_rename.inc"
+    ]
+  },
+  {
+    "name": "dungeons.move_gizmo",
+    "kind": "action",
+    "summary": "Move one offline template Gizmo through the original Move/Undo transaction and preserve local selection.",
+    "parameters": [
+      {
+        "name": "handle",
+        "type": "MT2Handle",
+        "description": "Current root DungeonExterior handle with epoch and decimal UID string."
+      },
+      {
+        "name": "gizmo",
+        "type": "MT2Handle",
+        "description": "Current Gizmo in this offline template."
+      },
+      {
+        "name": "position",
+        "type": "number[]",
+        "description": "Three finite destination coordinates within the current Region."
+      },
+      {
+        "name": "rotation",
+        "type": "number[]",
+        "description": "Normalized quaternion x/y/z/w; omitted preserves rotation.",
+        "optional": true
+      },
+      {
+        "name": "scale",
+        "type": "number[]",
+        "description": "Three positive finite scale coordinates; omitted preserves scale.",
+        "optional": true
+      }
+    ],
+    "returns": "table",
+    "errors": [
+      "World is unavailable or the call is off the current game thread.",
+      "Handle epoch, original UID registry, native class or reciprocal world ownership differs.",
+      "Native code or readback differs; attempted actions return unknown and must not be replayed."
+    ],
+    "native_evidence": [
+      "Multiplayer/src/game/dungeon_gizmo_control_port.inc",
+      "Multiplayer/src/game/move_kiss/native_calls.cpp",
+      "Multiplayer/src/game/dungeon_gizmo_live_codes.h"
+    ]
+  },
+  {
+    "name": "dungeons.destroy_gizmo",
+    "kind": "action",
+    "summary": "Destroy one offline template Gizmo through native DestroyProps, confirm original Undo and preserve surviving local selection.",
+    "parameters": [
+      {
+        "name": "handle",
+        "type": "MT2Handle",
+        "description": "Current root DungeonExterior handle with epoch and decimal UID string."
+      },
+      {
+        "name": "gizmo",
+        "type": "MT2Handle",
+        "description": "Current Gizmo in this offline template."
+      }
+    ],
+    "returns": "table",
+    "errors": [
+      "World is unavailable or the call is off the current game thread.",
+      "Handle epoch, original UID registry, native class or reciprocal world ownership differs.",
+      "Native code or readback differs; attempted actions return unknown and must not be replayed."
+    ],
+    "native_evidence": [
+      "Multiplayer/src/game/dungeon_gizmo_control_calls.h",
+      "Multiplayer/src/game/dungeon_gizmo_control_port.inc",
+      "Multiplayer/src/game/dungeon_gizmo_live_codes.h"
+    ]
+  },
+  {
+    "name": "dungeons.duplicate_gizmo",
+    "kind": "action",
+    "summary": "Duplicate one offline template Gizmo through native payment, Duplicate, inverse graph and Undo, preserving local selection.",
+    "parameters": [
+      {
+        "name": "handle",
+        "type": "MT2Handle",
+        "description": "Current root DungeonExterior handle with epoch and decimal UID string."
+      },
+      {
+        "name": "gizmo",
+        "type": "MT2Handle",
+        "description": "Current Gizmo in this offline template."
+      },
+      {
+        "name": "position",
+        "type": "number[]",
+        "description": "Three finite destination coordinates within the current Region."
+      },
+      {
+        "name": "rotation",
+        "type": "number[]",
+        "description": "Normalized quaternion x/y/z/w; omitted preserves rotation.",
+        "optional": true
+      },
+      {
+        "name": "scale",
+        "type": "number[]",
+        "description": "Three positive finite scale coordinates; omitted preserves scale.",
+        "optional": true
+      }
+    ],
+    "returns": "table",
+    "errors": [
+      "World is unavailable or the call is off the current game thread.",
+      "Handle epoch, original UID registry, native class or reciprocal world ownership differs.",
+      "Native code or readback differs; attempted actions return unknown and must not be replayed."
+    ],
+    "native_evidence": [
+      "Multiplayer/src/game/dungeon_gizmo_control_port.inc",
+      "Multiplayer/src/game/duplicate_calls.h",
+      "Multiplayer/src/game/dungeon_gizmo_live_codes.h"
+    ]
+  },
+  {
+    "name": "dungeons.place_gizmo",
+    "kind": "action",
+    "summary": "Place a Door, Key or Treasure in the offline template through original purchase, creation, inverse graph and Undo; native cost and sound apply.",
+    "parameters": [
+      {
+        "name": "handle",
+        "type": "MT2Handle",
+        "description": "Current root DungeonExterior handle with epoch and decimal UID string."
+      },
+      {
+        "name": "tool",
+        "type": "string",
+        "description": "Native placement family: door, key or treasure."
+      },
+      {
+        "name": "type",
+        "type": "string",
+        "description": "Native Gizmo type resource key."
+      },
+      {
+        "name": "position",
+        "type": "number[]",
+        "description": "Three finite world position coordinates."
+      },
+      {
+        "name": "variant",
+        "type": "string",
+        "description": "Native variant resource key.",
+        "optional": true,
+        "default": ""
+      },
+      {
+        "name": "rotation",
+        "type": "number[]",
+        "description": "Normalized quaternion x/y/z/w.",
+        "optional": true,
+        "default": [
+          0,
+          0,
+          0,
+          1
+        ]
+      },
+      {
+        "name": "scale",
+        "type": "number[]",
+        "description": "Three positive scale coordinates.",
+        "optional": true,
+        "default": [
+          1,
+          1,
+          1
+        ]
+      }
+    ],
+    "returns": "table",
+    "errors": [
+      "World is unavailable or the call is off the current game thread.",
+      "Handle epoch, original UID registry, native class or reciprocal world ownership differs.",
+      "Native code or readback differs; attempted actions return unknown and must not be replayed."
+    ],
+    "native_evidence": [
+      "Multiplayer/src/game/dungeon_input_calls.h",
+      "Multiplayer/src/game/dungeon_input_native.h",
+      "Multiplayer/src/game/dungeon_input_port.inc",
+      "Multiplayer/src/game/dungeon_input_action_calls.h",
+      "Multiplayer/src/game/duplicate_calls.h"
+    ]
+  },
+  {
+    "name": "dungeons.buildings",
+    "kind": "query",
+    "summary": "List Building handles, types, variants and positions in one Dungeon scene.",
+    "parameters": [
+      {
+        "name": "handle",
+        "type": "MT2Handle",
+        "description": "Current root DungeonExterior handle with epoch and decimal UID string."
+      },
+      {
+        "name": "instance",
+        "type": "integer",
+        "description": "Saved Instance.index; omitted selects the authored template scene.",
+        "optional": true
+      }
+    ],
+    "returns": "MT2DungeonBuilding[]",
+    "errors": [
+      "World is unavailable or the call is off the current game thread.",
+      "Handle epoch, original UID registry, native class or reciprocal world ownership differs.",
+      "Native code or readback differs; attempted actions return unknown and must not be replayed."
+    ],
+    "native_evidence": [
+      "Multiplayer/src/game/dungeon_scene_roster.h",
+      "Multiplayer/src/game/dungeon_building_children.h"
+    ]
+  },
+  {
+    "name": "dungeons.place_building",
+    "kind": "action",
+    "summary": "Place a native Building or DungeonPortal through an isolated original Build receiver and maker/Undo. Requires the requested offline template to already be the native active scene; normal native tool and selection changes apply.",
+    "parameters": [
+      {
+        "name": "handle",
+        "type": "MT2Handle",
+        "description": "Current root DungeonExterior handle with epoch and decimal UID string."
+      },
+      {
+        "name": "type",
+        "type": "string",
+        "description": "Existing native BuildingDefinition type; DungeonPortal is supported, DungeonExterior and Scenery are excluded."
+      },
+      {
+        "name": "variant",
+        "type": "string",
+        "description": "Existing native filtered Building variant key."
+      },
+      {
+        "name": "position",
+        "type": "number[]",
+        "description": "Three finite coordinates within the active template Region."
+      },
+      {
+        "name": "rotation",
+        "type": "number[]",
+        "description": "Normalized quaternion x/y/z/w.",
+        "optional": true,
+        "default": [
+          0,
+          0,
+          0,
+          1
+        ]
+      },
+      {
+        "name": "scale",
+        "type": "number[]",
+        "description": "Three positive finite scale coordinates.",
+        "optional": true,
+        "default": [
+          1,
+          1,
+          1
+        ]
+      }
+    ],
+    "returns": "table",
+    "errors": [
+      "World is unavailable or the call is off the current game thread.",
+      "Handle epoch, original UID registry, native class or reciprocal world ownership differs.",
+      "Native code or readback differs; attempted actions return unknown and must not be replayed."
+    ],
+    "native_evidence": [
+      "Multiplayer/src/game/placement_kiss/native_build.cpp",
+      "Multiplayer/src/game/placement_kiss/native_family.cpp",
+      "Multiplayer/src/game/placement_kiss/effect_cleanup.h",
+      "Multiplayer/src/game/dungeon_build_tasks.inc",
+      "Multiplayer/src/game/dungeon_building_identity.inc"
+    ]
+  },
+  {
+    "name": "dungeons.configure_instances",
+    "kind": "action",
+    "summary": "Run the original native config transaction and confirm desired count; normal native costs apply.",
+    "parameters": [
+      {
+        "name": "handle",
+        "type": "MT2Handle",
+        "description": "Current root DungeonExterior handle with epoch and decimal UID string."
+      },
+      {
+        "name": "count",
+        "type": "integer",
+        "description": "Desired number of instances, 1..10."
+      }
+    ],
+    "returns": "table",
+    "errors": [
+      "World is unavailable or the call is off the current game thread.",
+      "Handle epoch, original UID registry, native class or reciprocal world ownership differs.",
+      "Native code or readback differs; attempted actions return unknown and must not be replayed."
+    ],
+    "native_evidence": [
+      "Multiplayer/src/game/dungeon_config_runtime.inc",
+      "Multiplayer/src/game/dungeon_config_codes.h"
+    ]
+  },
+  {
+    "name": "dungeons.set_atmosphere",
+    "kind": "action",
+    "summary": "Run the native Dungeon sound command and confirm the selected atmosphere.",
+    "parameters": [
+      {
+        "name": "handle",
+        "type": "MT2Handle",
+        "description": "Current root DungeonExterior handle with epoch and decimal UID string."
+      },
+      {
+        "name": "atmosphere",
+        "type": "integer",
+        "description": "Native atmosphere row, 0..5."
+      }
+    ],
+    "returns": "table",
+    "errors": [
+      "World is unavailable or the call is off the current game thread.",
+      "Handle epoch, original UID registry, native class or reciprocal world ownership differs.",
+      "Native code or readback differs; attempted actions return unknown and must not be replayed."
+    ],
+    "native_evidence": [
+      "Multiplayer/src/game/dungeon_sound_runtime.inc",
+      "Multiplayer/src/game/dungeon_sound_codes.h"
+    ]
+  },
+  {
+    "name": "dungeons.set_lighting",
+    "kind": "action",
+    "summary": "Apply native lighting inputs and confirm the exact 23 authored light values from native conversion.",
+    "parameters": [
+      {
+        "name": "handle",
+        "type": "MT2Handle",
+        "description": "Current root DungeonExterior handle with epoch and decimal UID string."
+      },
+      {
+        "name": "spinners",
+        "type": "integer[]",
+        "description": "Four native raw integer Spinner inputs in native widget order."
+      },
+      {
+        "name": "sliders",
+        "type": "integer[]",
+        "description": "Three native raw integer Slider inputs in native widget order."
+      },
+      {
+        "name": "colors",
+        "type": "table",
+        "description": "Four RGBA color arrays, each with four finite channels in 0..1."
+      }
+    ],
+    "returns": "table",
+    "errors": [
+      "World is unavailable or the call is off the current game thread.",
+      "Handle epoch, original UID registry, native class or reciprocal world ownership differs.",
+      "Native code or readback differs; attempted actions return unknown and must not be replayed."
+    ],
+    "native_evidence": [
+      "Multiplayer/src/game/dungeon_light_input.h",
+      "Multiplayer/src/game/dungeon_light_runtime.inc",
+      "Multiplayer/src/game/dungeon_light_codes.h"
+    ]
+  },
+  {
+    "name": "dungeons.set_palette",
+    "kind": "action",
+    "summary": "Set the four packed palette colors and defaults flag through native explicit-owner leaves; existing cells retain their colors.",
+    "parameters": [
+      {
+        "name": "handle",
+        "type": "MT2Handle",
+        "description": "Current root DungeonExterior handle with epoch and decimal UID string."
+      },
+      {
+        "name": "colors",
+        "type": "table",
+        "description": "Four RGBA color arrays, each with four finite channels in 0..1."
+      },
+      {
+        "name": "defaults",
+        "type": "boolean",
+        "description": "Use Theme defaults for subsequent native tile edits.",
+        "optional": true,
+        "default": false
+      }
+    ],
+    "returns": "table",
+    "errors": [
+      "World is unavailable or the call is off the current game thread.",
+      "Handle epoch, original UID registry, native class or reciprocal world ownership differs.",
+      "Native code or readback differs; attempted actions return unknown and must not be replayed."
+    ],
+    "native_evidence": [
+      "Multiplayer/src/game/dungeon_palette_record.h",
+      "Multiplayer/src/game/dungeon_palette_runtime.inc",
+      "Multiplayer/src/game/dungeon_palette_codes.h"
+    ]
+  },
+  {
+    "name": "dungeons.open_cell",
+    "kind": "action",
+    "summary": "Open one eligible cell through an isolated native edit and Undo transaction; existing open cells return changed=false.",
+    "parameters": [
+      {
+        "name": "handle",
+        "type": "MT2Handle",
+        "description": "Current root DungeonExterior handle with epoch and decimal UID string."
+      },
+      {
+        "name": "cell",
+        "type": "integer",
+        "description": "Zero-based authored layout cell index."
+      },
+      {
+        "name": "theme",
+        "type": "string",
+        "description": "Existing native ThemeManager resource key."
+      }
+    ],
+    "returns": "table",
+    "errors": [
+      "World is unavailable or the call is off the current game thread.",
+      "Handle epoch, original UID registry, native class or reciprocal world ownership differs.",
+      "Native code or readback differs; attempted actions return unknown and must not be replayed."
+    ],
+    "native_evidence": [
+      "Multiplayer/src/game/dungeon_cells_calls.h",
+      "Multiplayer/src/game/dungeon_cells_native.h",
+      "Multiplayer/src/game/dungeon_cells_port.inc"
+    ]
+  },
+  {
+    "name": "dungeons.close_cell",
+    "kind": "action",
+    "summary": "Close one unobstructed open cell through the native edit and Undo transaction; closed cells return changed=false.",
+    "parameters": [
+      {
+        "name": "handle",
+        "type": "MT2Handle",
+        "description": "Current root DungeonExterior handle with epoch and decimal UID string."
+      },
+      {
+        "name": "cell",
+        "type": "integer",
+        "description": "Zero-based authored layout cell index."
+      }
+    ],
+    "returns": "table",
+    "errors": [
+      "World is unavailable or the call is off the current game thread.",
+      "Handle epoch, original UID registry, native class or reciprocal world ownership differs.",
+      "Native code or readback differs; attempted actions return unknown and must not be replayed."
+    ],
+    "native_evidence": [
+      "Multiplayer/src/game/dungeon_cells_calls.h",
+      "Multiplayer/src/game/dungeon_cells_native.h",
+      "Multiplayer/src/game/dungeon_cells_port.inc"
+    ]
+  },
+  {
+    "name": "dungeons.set_cell_theme",
+    "kind": "action",
+    "summary": "Apply a native Theme to one open cell through the native edit and Undo transaction.",
+    "parameters": [
+      {
+        "name": "handle",
+        "type": "MT2Handle",
+        "description": "Current root DungeonExterior handle with epoch and decimal UID string."
+      },
+      {
+        "name": "cell",
+        "type": "integer",
+        "description": "Zero-based authored layout cell index."
+      },
+      {
+        "name": "theme",
+        "type": "string",
+        "description": "Existing native ThemeManager resource key."
+      }
+    ],
+    "returns": "table",
+    "errors": [
+      "World is unavailable or the call is off the current game thread.",
+      "Handle epoch, original UID registry, native class or reciprocal world ownership differs.",
+      "Native code or readback differs; attempted actions return unknown and must not be replayed."
+    ],
+    "native_evidence": [
+      "Multiplayer/src/game/dungeon_cells_calls.h",
+      "Multiplayer/src/game/dungeon_cells_port.inc"
+    ]
+  },
+  {
+    "name": "dungeons.apply_cell_palette",
+    "kind": "action",
+    "summary": "Apply the current Dungeon palette to one open cell through native SetCellData and Undo.",
+    "parameters": [
+      {
+        "name": "handle",
+        "type": "MT2Handle",
+        "description": "Current root DungeonExterior handle with epoch and decimal UID string."
+      },
+      {
+        "name": "cell",
+        "type": "integer",
+        "description": "Zero-based authored layout cell index."
+      }
+    ],
+    "returns": "table",
+    "errors": [
+      "World is unavailable or the call is off the current game thread.",
+      "Handle epoch, original UID registry, native class or reciprocal world ownership differs.",
+      "Native code or readback differs; attempted actions return unknown and must not be replayed."
+    ],
+    "native_evidence": [
+      "Multiplayer/src/game/dungeon_cells_calls.h",
+      "Multiplayer/src/game/dungeon_cells_port.inc"
+    ]
+  },
+  {
+    "name": "dungeons.make_instance",
+    "kind": "action",
+    "summary": "Run native MakeInstance and confirm one appended pool member; native camera effects apply.",
+    "parameters": [
+      {
+        "name": "handle",
+        "type": "MT2Handle",
+        "description": "Current root DungeonExterior handle with epoch and decimal UID string."
+      }
+    ],
+    "returns": "table",
+    "errors": [
+      "World is unavailable or the call is off the current game thread.",
+      "Handle epoch, original UID registry, native class or reciprocal world ownership differs.",
+      "Native code or readback differs; attempted actions return unknown and must not be replayed."
+    ],
+    "native_evidence": [
+      "Multiplayer/src/game/dungeon_instance_native.cpp",
+      "Multiplayer/src/game/dungeon_instance_native_codes.h"
+    ]
+  },
+  {
+    "name": "dungeons.destroy_instance",
+    "kind": "action",
+    "summary": "Run native DestroyInstance and confirm removal from its Dungeon pool.",
+    "parameters": [
+      {
+        "name": "handle",
+        "type": "MT2Handle",
+        "description": "Current root DungeonExterior handle with epoch and decimal UID string."
+      },
+      {
+        "name": "instance",
+        "type": "integer",
+        "description": "Saved Instance.index within this Dungeon pool, not array position."
+      }
+    ],
+    "returns": "table",
+    "errors": [
+      "World is unavailable or the call is off the current game thread.",
+      "Handle epoch, original UID registry, native class or reciprocal world ownership differs.",
+      "Native code or readback differs; attempted actions return unknown and must not be replayed."
+    ],
+    "native_evidence": [
+      "Multiplayer/src/game/dungeon_instance_native.cpp",
+      "Multiplayer/src/game/dungeon_instance_native_guard.h"
+    ]
+  },
+  {
+    "name": "dungeons.reset_instance",
+    "kind": "action",
+    "summary": "Run native Instance Reset and confirm the same pool member is retained unstarted.",
+    "parameters": [
+      {
+        "name": "handle",
+        "type": "MT2Handle",
+        "description": "Current root DungeonExterior handle with epoch and decimal UID string."
+      },
+      {
+        "name": "instance",
+        "type": "integer",
+        "description": "Saved Instance.index within this Dungeon pool, not array position."
+      }
+    ],
+    "returns": "table",
+    "errors": [
+      "World is unavailable or the call is off the current game thread.",
+      "Handle epoch, original UID registry, native class or reciprocal world ownership differs.",
+      "Native code or readback differs; attempted actions return unknown and must not be replayed."
+    ],
+    "native_evidence": [
+      "Multiplayer/src/game/dungeon_instance_native.cpp",
+      "Multiplayer/src/game/dungeon_instance_native_codes.h"
+    ]
+  },
+  {
+    "name": "dungeons.force_reset_instance",
+    "kind": "action",
+    "summary": "Run native Instance ForceReset and confirm the same pool member is retained unstarted.",
+    "parameters": [
+      {
+        "name": "handle",
+        "type": "MT2Handle",
+        "description": "Current root DungeonExterior handle with epoch and decimal UID string."
+      },
+      {
+        "name": "instance",
+        "type": "integer",
+        "description": "Saved Instance.index within this Dungeon pool, not array position."
+      }
+    ],
+    "returns": "table",
+    "errors": [
+      "World is unavailable or the call is off the current game thread.",
+      "Handle epoch, original UID registry, native class or reciprocal world ownership differs.",
+      "Native code or readback differs; attempted actions return unknown and must not be replayed."
+    ],
+    "native_evidence": [
+      "Multiplayer/src/game/dungeon_instance_native.cpp",
+      "Multiplayer/src/game/dungeon_instance_native_codes.h"
+    ]
+  },
+  {
+    "name": "dungeons.set_gizmo_state",
+    "kind": "action",
+    "summary": "Run original native Gizmo SetState including trigger, Door unlock, animation and gameplay callbacks, then confirm state/trigger/scene unlocked bits. Requires the requested native active scene; the original info_gizmo Window is rebound to this target without human input.",
+    "parameters": [
+      {
+        "name": "handle",
+        "type": "MT2Handle",
+        "description": "Current root DungeonExterior handle with epoch and decimal UID string."
+      },
+      {
+        "name": "gizmo",
+        "type": "MT2Handle",
+        "description": "Current Gizmo in the selected active Dungeon scene."
+      },
+      {
+        "name": "state",
+        "type": "integer",
+        "description": "Original native State choice 1..3; non-Door Gizmos accept trigger=1 or reset=3."
+      },
+      {
+        "name": "instance",
+        "type": "integer",
+        "description": "Saved Instance.index; omitted selects the authored template scene.",
+        "optional": true
+      }
+    ],
+    "returns": "table",
+    "errors": [
+      "World is unavailable or the call is off the current game thread.",
+      "Handle epoch, original UID registry, native class or reciprocal world ownership differs.",
+      "Native code or readback differs; attempted actions return unknown and must not be replayed."
+    ],
+    "native_evidence": [
+      "Multiplayer/src/game/dungeon_gizmo_runtime.inc",
+      "Multiplayer/src/game/dungeon_gizmo_record.h",
+      "Multiplayer/src/game/dungeon_gizmo_live_codes.h",
+      "Multiplayer/src/game/typed_action/dungeon_gizmo_action.h"
+    ]
+  },
+  {
+    "name": "dungeons.move_building",
+    "kind": "action",
+    "summary": "Move one native Building or DungeonPortal through the original Move/Undo transaction. Requires the requested offline template to already be the native active scene; normal native tool and selection changes apply.",
+    "parameters": [
+      {
+        "name": "handle",
+        "type": "MT2Handle",
+        "description": "Current root DungeonExterior handle with epoch and decimal UID string."
+      },
+      {
+        "name": "building",
+        "type": "MT2Handle",
+        "description": "Current native Building in this offline template; DungeonExterior and Scenery are excluded."
+      },
+      {
+        "name": "position",
+        "type": "number[]",
+        "description": "Three finite destination coordinates within the active template Region."
+      },
+      {
+        "name": "rotation",
+        "type": "number[]",
+        "description": "Normalized quaternion x/y/z/w; omitted preserves rotation.",
+        "optional": true
+      },
+      {
+        "name": "scale",
+        "type": "number[]",
+        "description": "Three positive finite scale coordinates; omitted preserves scale.",
+        "optional": true
+      }
+    ],
+    "returns": "table",
+    "errors": [
+      "World is unavailable or the call is off the current game thread.",
+      "Handle epoch, original UID registry, native class or reciprocal world ownership differs.",
+      "Native code or readback differs; attempted actions return unknown and must not be replayed."
+    ],
+    "native_evidence": [
+      "Multiplayer/src/game/dungeon_building_engine.inc",
+      "Multiplayer/src/game/dungeon_building_identity.inc",
+      "Multiplayer/src/game/dungeon_building_graph.h",
+      "Multiplayer/src/game/move_kiss/native_calls.cpp",
+      "Multiplayer/src/game/ui_remove/diagnostic/ui_diagnostic.cpp",
+      "Multiplayer/src/game/duplicate_port.inc",
+      "Multiplayer/src/game/duplicate_calls.h",
+      "Multiplayer/src/game/duplicate_codeguards.h"
+    ]
+  },
+  {
+    "name": "dungeons.destroy_building",
+    "kind": "action",
+    "summary": "Remove one native Building or DungeonPortal through original DestroyProps and confirm retained native Undo. Requires the requested offline template to already be the native active scene; normal native tool and selection changes apply.",
+    "parameters": [
+      {
+        "name": "handle",
+        "type": "MT2Handle",
+        "description": "Current root DungeonExterior handle with epoch and decimal UID string."
+      },
+      {
+        "name": "building",
+        "type": "MT2Handle",
+        "description": "Current native Building in this offline template; DungeonExterior and Scenery are excluded."
+      }
+    ],
+    "returns": "table",
+    "errors": [
+      "World is unavailable or the call is off the current game thread.",
+      "Handle epoch, original UID registry, native class or reciprocal world ownership differs.",
+      "Native code or readback differs; attempted actions return unknown and must not be replayed."
+    ],
+    "native_evidence": [
+      "Multiplayer/src/game/dungeon_building_engine.inc",
+      "Multiplayer/src/game/dungeon_building_identity.inc",
+      "Multiplayer/src/game/dungeon_building_graph.h",
+      "Multiplayer/src/game/move_kiss/native_calls.cpp",
+      "Multiplayer/src/game/ui_remove/diagnostic/ui_diagnostic.cpp",
+      "Multiplayer/src/game/duplicate_port.inc",
+      "Multiplayer/src/game/duplicate_calls.h",
+      "Multiplayer/src/game/duplicate_codeguards.h"
+    ]
+  },
+  {
+    "name": "dungeons.duplicate_building",
+    "kind": "action",
+    "summary": "Duplicate one native Building or DungeonPortal through original payment, Duplicate, native release edit, selection and Undo transaction. Requires the requested offline template to already be the native active scene; normal native tool and selection changes apply.",
+    "parameters": [
+      {
+        "name": "handle",
+        "type": "MT2Handle",
+        "description": "Current root DungeonExterior handle with epoch and decimal UID string."
+      },
+      {
+        "name": "building",
+        "type": "MT2Handle",
+        "description": "Current native Building in this offline template; DungeonExterior and Scenery are excluded."
+      },
+      {
+        "name": "position",
+        "type": "number[]",
+        "description": "Three finite destination coordinates within the active template Region."
+      },
+      {
+        "name": "rotation",
+        "type": "number[]",
+        "description": "Normalized quaternion x/y/z/w; omitted preserves rotation.",
+        "optional": true
+      },
+      {
+        "name": "scale",
+        "type": "number[]",
+        "description": "Three positive finite scale coordinates; omitted preserves scale.",
+        "optional": true
+      }
+    ],
+    "returns": "table",
+    "errors": [
+      "World is unavailable or the call is off the current game thread.",
+      "Handle epoch, original UID registry, native class or reciprocal world ownership differs.",
+      "Native code or readback differs; attempted actions return unknown and must not be replayed."
+    ],
+    "native_evidence": [
+      "Multiplayer/src/game/dungeon_building_engine.inc",
+      "Multiplayer/src/game/dungeon_building_identity.inc",
+      "Multiplayer/src/game/dungeon_building_graph.h",
+      "Multiplayer/src/game/move_kiss/native_calls.cpp",
+      "Multiplayer/src/game/ui_remove/diagnostic/ui_diagnostic.cpp",
+      "Multiplayer/src/game/duplicate_port.inc",
+      "Multiplayer/src/game/duplicate_calls.h",
+      "Multiplayer/src/game/duplicate_codeguards.h"
+    ]
+  }
+]

@@ -1,0 +1,107 @@
+{
+  "MT2Developer": {
+    "handle": "MT2Handle",
+    "id": "integer",
+    "slot": "integer",
+    "state": "integer",
+    "employed": "boolean",
+    "active": "boolean",
+    "on_map": "boolean",
+    "job_present": "boolean",
+    "carried_present": "boolean",
+    "position": "number[]"
+  },
+  "MT2DeveloperPool": {
+    "count": "integer",
+    "employed": "integer",
+    "indoor_count": "integer",
+    "outdoor_count": "integer",
+    "developers": "MT2Developer[]"
+  },
+  "MT2ProjectSource": {
+    "epoch": "integer",
+    "kind": "integer",
+    "tech": "string",
+    "art": "string",
+    "statistic": "integer"
+  },
+  "MT2ProjectCatalogueRow": {
+    "source": "MT2ProjectSource",
+    "valid": "boolean",
+    "visible": "boolean",
+    "owned": "boolean",
+    "can_choose": "boolean",
+    "can_afford": "boolean",
+    "price": "integer|nil",
+    "maximum_workers": "integer|nil",
+    "purchased": "boolean|nil",
+    "deployed": "boolean|nil",
+    "custom": "boolean|nil"
+  },
+  "MT2ProjectProgress": {
+    "source": "MT2ProjectSource|nil",
+    "work": "number",
+    "lines": "integer",
+    "bugs_total": "integer",
+    "bugs_known": "integer",
+    "workers": "integer"
+  },
+  "MT2ProjectSnapshot": {
+    "progress": "MT2ProjectProgress",
+    "catalogue": "MT2ProjectCatalogueRow[]"
+  },
+  "MT2ServerRegion": {
+    "id": "integer",
+    "owned": "boolean"
+  },
+  "MT2ServerConnection": {
+    "region": "integer",
+    "waypoint": "integer",
+    "position": "number[]",
+    "source_position": "number[]",
+    "pending": "number",
+    "dynamic": "number[]"
+  },
+  "MT2ServerNode": {
+    "handle": "MT2Handle",
+    "region": "integer",
+    "type": "string",
+    "key": "string",
+    "cost": "integer",
+    "transform": "number[]",
+    "definition_values": "number[]",
+    "state": "number[]",
+    "flags": "integer[]",
+    "pipes": "MT2Handle[]",
+    "connections": "MT2ServerConnection[]"
+  },
+  "MT2ServerPipe": {
+    "handle": "MT2Handle",
+    "region": "integer",
+    "type": "string",
+    "key": "string",
+    "base_cost": "integer",
+    "definition_values": "number[]",
+    "cross_region": "boolean",
+    "start_position": "number[]",
+    "end_position": "number[]",
+    "points": "number[][]",
+    "distances": "number[]",
+    "current": "number[]",
+    "last_current": "number[]",
+    "start": "MT2Handle",
+    "end": "MT2Handle",
+    "connections": "MT2ServerConnection[]"
+  },
+  "MT2ServerNetwork": {
+    "regions": "MT2ServerRegion[]",
+    "nodes": "MT2ServerNode[]",
+    "pipes": "MT2ServerPipe[]"
+  },
+  "MT2ServerNodeDefinition": {
+    "key": "string",
+    "type": "string",
+    "cost": "integer",
+    "values": "number[]"
+  }
+}

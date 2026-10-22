@@ -1,0 +1,35 @@
+{
+  "MT2RegionTypeRetired": {
+    "handle": "MT2Handle",
+    "family": "string"
+  },
+  "MT2RegionTypeCounts": {
+    "npcs": "integer",
+    "parties": "integer",
+    "network": "integer",
+    "monsters": "integer",
+    "bosses": "integer",
+    "paths": "integer",
+    "gizmos": "integer",
+    "buildings": "integer",
+    "scenery": "integer",
+    "zones": "integer",
+    "districts": "integer",
+    "path_nodes": "integer",
+    "network_nodes": "integer",
+    "network_pipes": "integer"
+  },
+  "MT2RegionTypeMoney": {
+    "cash": "integer",
+    "record": "integer[]",
+    "categories": "integer[][]"
+  },
+  "MT2RegionTypeResult": {
+    "before": "MT2RegionDetails",
+    "after": "MT2RegionDetails",
+    "retired": "MT2RegionTypeRetired[]",
+    "retired_counts": "MT2RegionTypeCounts",
+    "native_undo_operations": "integer",
+    "money": "MT2RegionTypeMoney"
+  }
+}

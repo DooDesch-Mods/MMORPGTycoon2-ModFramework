@@ -1,0 +1,47 @@
+{
+  "MT2ModularLayout": {
+    "building": "MT2Handle",
+    "layout": "table",
+    "plan": "table"
+  },
+  "MT2ModularHistory": {
+    "history": "string",
+    "building": "MT2Handle",
+    "undo_ready": "boolean",
+    "redo_ready": "boolean"
+  },
+  "MT2ModularEditResult": {
+    "history": "string",
+    "before": "MT2ModularLayout",
+    "after": "MT2ModularLayout",
+    "position": "number[]?",
+    "direction": "string?"
+  },
+  "MT2ModularMoney": {
+    "cash": "integer",
+    "record": "integer[]",
+    "categories": "integer[][]"
+  },
+  "MT2ModularPrefabResult": {
+    "history": "string",
+    "building": "MT2Handle",
+    "authored": "MT2ModularLayout",
+    "cleared_scenery": "MT2Handle[]",
+    "cost": "integer",
+    "before_money": "MT2ModularMoney",
+    "after_money": "MT2ModularMoney"
+  },
+  "MT2ModularHistoryResult": {
+    "history": "string",
+    "direction": "string",
+    "before": "MT2ModularLayout?",
+    "after": "MT2ModularLayout?",
+    "building_uid": "string?",
+    "building": "MT2Handle?",
+    "cleared_scenery_count": "integer?",
+    "service_inverse_count": "integer?",
+    "quest_owner_inverse_count": "integer?",
+    "before_money": "MT2ModularMoney?",
+    "after_money": "MT2ModularMoney?"
+  }
+}

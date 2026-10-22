@@ -14,6 +14,8 @@ def main():
     if '#define MT2FW_MT2_PATCHES_VERSION '+str(patch_contract['version'])+'u' not in native_patch_header:
         raise RuntimeError('Native patch protocol version differs from its machine contract')
     bridge=(ROOT/'src/core/lua_mod.cpp').read_text(encoding='utf-8')
+    generated=(ROOT/'src/core/gameplay_lua.inc').read_text(encoding='utf-8')
+    bridge+=''.join(re.findall(r'R"MT2gameplay\((.*?)\)MT2gameplay"',generated,re.S))
     host_names=set(re.findall(r"call\('([^']+)'",bridge))
     described={op for f in contract['functions'] for op in f['host_operations']}
     if host_names!=described:raise RuntimeError('Lua bridge operations differ: '+str(host_names^described))

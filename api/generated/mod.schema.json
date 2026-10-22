@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "urn:mt2fw:mod:1.1.0",
+  "$id": "urn:mt2fw:mod:1.2.0",
   "title": "MT2 mod manifest",
   "type": "object",
   "required": [

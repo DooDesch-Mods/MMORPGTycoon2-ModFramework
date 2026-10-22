@@ -51,7 +51,7 @@ Json pull(lua_State* state,int index,int depth=0) {
     default:throw std::runtime_error("API values must be JSON-compatible");
     }
 }
-constexpr const char* library=R"lua(
+const std::string library=R"lua(
 local invoke = _mt2_call
 local patch_add = _mt2_patch_add
 local patch_remove = _mt2_patch_remove
@@ -148,6 +148,9 @@ mt2.patches = {
     targets = function() return call('patches.targets') end,
     status = function() return call('patches.status') end
 }
+)lua" +
+#include "gameplay_lua.inc"
++ R"lua(
 _mt2_call=nil; _mt2_on=nil; _mt2_off=nil; _mt2_patch_add=nil; _mt2_patch_remove=nil
 )lua";
 }
@@ -200,7 +203,7 @@ LuaMod::LuaMod(Plugin& plugin):plugin_(plugin) {
     lua_pushcfunction(state_,patch_remove);lua_setglobal(state_,"_mt2_patch_remove");
     lua_pushstring(state_,plugin.manifest.id.c_str());lua_setglobal(state_,"_mt2_owner");
     budget();
-    if(luaL_loadbufferx(state_,library,std::strlen(library),"@mt2fw/api.lua","t")!=LUA_OK||lua_pcall(state_,0,0,0)!=LUA_OK){auto error=std::string(lua_tostring(state_,-1));lua_close(state_);state_=nullptr;throw std::runtime_error(error);}
+    if(luaL_loadbufferx(state_,library.data(),library.size(),"@mt2fw/api.lua","t")!=LUA_OK||lua_pcall(state_,0,0,0)!=LUA_OK){auto error=std::string(lua_tostring(state_,-1));lua_close(state_);state_=nullptr;throw std::runtime_error(error);}
 }
 LuaMod::~LuaMod(){if(state_)lua_close(state_);}
 void LuaMod::budget(){

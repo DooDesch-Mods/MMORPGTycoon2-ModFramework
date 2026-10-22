@@ -14,6 +14,9 @@ int main(int argc,char** argv) {
         Runtime runtime(root,[&](const std::string& op,const Json& args)->Json {
             calls.push_back({{"operation",op},{"arguments",args}});
             if(op=="world.status")return {{"loaded",true},{"name","Documentation fixture"},{"epoch",1}};
+            if(op=="gameplay.operations")return Json::parse(
+#include "../adapters/mt2/gameplay/operations.inc"
+            );
             if(op=="objects.list")return Json::array({object});
             if(op=="objects.get"||op=="objects.selected"||op=="objects.resolve")return object;
             if(op=="objects.persist")return "fixture-reference";

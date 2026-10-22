@@ -1,10 +1,10 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="600" height="1030" viewBox="0 0 600 1030" role="img" aria-labelledby="title description">
 <title id="title">MT2 Mod Framework roadmap</title>
-<desc id="description">Available now: Start creating. Lua mods and C++ plugins; Lua reload and mod apps; Static GLB scenery. Next priorities: Reach more of MT2. More game operations; Native UI and diagnostics; Better content workflows. Longer term: More ways to create. Animated models; C# mod support; Broader multiplayer APIs</desc>
+<desc id="description">Available now: Start creating. Lua mods and C++ plugins; Lua reload and mod apps; Static GLB scenery. Next priorities: Connect more mods. Shared Lua world actions; Native UI improvements; Better content workflows. Longer term: More ways to create. Animated models; C# mod support; Broader multiplayer APIs</desc>
 <path fill="#0b1723" d="M0 0h600v1030H0z"/>
 <g font-family="Arial">
 <text x="28" y="46" font-family="Arial" font-size="30" fill="#f2f7fb" font-weight="700">More room for your ideas.</text>
-<text x="28" y="80" font-family="Arial" font-size="22" fill="#b8cad8" font-weight="400">Framework 0.2.6 - Development preview</text>
+<text x="28" y="80" font-family="Arial" font-size="22" fill="#b8cad8" font-weight="400">Framework 0.3.0 - Experimental gameplay tools</text>
 <path d="M32 152v286" stroke="#64e4d5" stroke-width="2" stroke-dasharray="0" opacity=".5"/>
 <circle cx="32" cy="152" r="14" fill="#0b1723" stroke="#64e4d5" stroke-width="3"/>
 <path d="m26 152 4 4 8-8" fill="none" stroke="#64e4d5" stroke-width="3"/>
@@ -20,11 +20,11 @@
 <circle cx="32" cy="438" r="14" fill="#0b1723" stroke="#ffca67" stroke-width="3"/>
 <circle cx="32" cy="438" r="5" fill="#ffca67"/>
 <text x="76" y="444" font-family="Arial" font-size="23" fill="#ffca67" font-weight="700">Next priorities</text>
-<text x="76" y="484" font-family="Arial" font-size="27" fill="#f2f7fb" font-weight="700">Reach more of MT2</text>
+<text x="76" y="484" font-family="Arial" font-size="27" fill="#f2f7fb" font-weight="700">Connect more mods</text>
 <circle cx="81" cy="518" r="3" fill="#ffca67"/>
-<text x="96" y="526" font-family="Arial" font-size="24" fill="#b8cad8" font-weight="400">More game operations</text>
+<text x="96" y="526" font-family="Arial" font-size="24" fill="#b8cad8" font-weight="400">Shared Lua world actions</text>
 <circle cx="81" cy="558" r="3" fill="#ffca67"/>
-<text x="96" y="566" font-family="Arial" font-size="24" fill="#b8cad8" font-weight="400">Native UI and diagnostics</text>
+<text x="96" y="566" font-family="Arial" font-size="24" fill="#b8cad8" font-weight="400">Native UI improvements</text>
 <circle cx="81" cy="598" r="3" fill="#ffca67"/>
 <text x="96" y="606" font-family="Arial" font-size="24" fill="#b8cad8" font-weight="400">Better content workflows</text>
 <circle cx="32" cy="724" r="14" fill="#0b1723" stroke="#a8c1d5" stroke-width="3"/>

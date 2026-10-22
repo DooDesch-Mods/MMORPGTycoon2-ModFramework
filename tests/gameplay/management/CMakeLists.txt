@@ -1,0 +1,8 @@
+cmake_minimum_required(VERSION 3.24)
+project(ManagementAdapterTests LANGUAGES CXX)
+set(CMAKE_CXX_STANDARD 20)
+get_filename_component(FRAMEWORK "${CMAKE_CURRENT_LIST_DIR}/../../.." ABSOLUTE)
+add_executable(management_tests test_management.cpp "${FRAMEWORK}/adapters/mt2/gameplay/management/management.cpp")
+target_include_directories(management_tests PRIVATE "${FRAMEWORK}/include" "${FRAMEWORK}/third_party/vendor" "${FRAMEWORK}/adapters/mt2/gameplay")
+enable_testing()
+add_test(NAME management_query_and_validation COMMAND management_tests)

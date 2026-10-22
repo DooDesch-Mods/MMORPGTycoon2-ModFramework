@@ -34,6 +34,23 @@ class DocumentationContractTests(unittest.TestCase):
         invalid=copy.deepcopy(contract);invalid['functions'][0]['capabilities']=['unknown']
         with self.assertRaises(ValueError):generate_docs.validate(invalid)
 
+    def test_gameplay_actions_expose_and_validate_confirmed_result_types(self):
+        contract=generate_docs.read(ROOT/'api/contract.json')
+        action=next(f for f in contract['functions'] if f.get('gameplay_kind')=='action')
+        for missing in (True,False):
+            invalid=copy.deepcopy(contract)
+            target=next(f for f in invalid['functions'] if f['name']==action['name'])
+            if missing:del target['native_result']
+            else:target['native_result']='MT2UndeclaredResult'
+            with self.subTest(missing=missing),self.assertRaises(ValueError):generate_docs.validate(invalid)
+        outputs=generate_docs.outputs(contract)
+        discovery=json.loads(outputs['api/experimental/gameplay.json'])
+        operation=next(row for row in discovery['operations'] if row['name']==action['name'][4:])
+        self.assertEqual(operation['native_result'],action['native_result'])
+        page=outputs['docs/reference/functions/'+action['name'][4:].replace('.','-')+'.md']
+        self.assertIn('**Confirmed action.result:**',page)
+        self.assertIn(action['native_result'],page)
+
     def test_manifest_schema_matches_semantic_validator_for_documented_cases(self):
         contract=generate_docs.read(ROOT/'api/contract.json');schema=generate_docs.schema(contract)
         checker=jsonschema.FormatChecker()

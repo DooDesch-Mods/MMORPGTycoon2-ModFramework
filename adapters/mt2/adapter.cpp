@@ -4,6 +4,7 @@
 #include "crypto.h"
 #include "native_extensions.h"
 #include "public_reads.h"
+#include "gameplay/dispatch.h"
 #include <windows.h>
 #include <cmath>
 #include <deque>
@@ -16,7 +17,7 @@ Runtime* current_runtime=nullptr;
 uint64_t current_epoch=0;
 std::string current_world;
 bool world=false;
-struct Action {std::string id,owner,operation;Json arguments,result;uint64_t epoch;};
+struct Action {std::string id,owner,operation;Json arguments,result;uint64_t epoch;uint64_t instance=0;};
 std::deque<Action> pending;
 std::map<std::string,Action> completed;
 std::deque<std::string> completed_order;
@@ -56,8 +57,16 @@ void perform_actions(Runtime& runtime) {
         bool attempted=false;std::string error;bool confirmed=false;Json object;
         try {
             if(!world||action.epoch!=runtime.epoch)throw std::runtime_error("Action belongs to a world that is no longer active");
+            if(action.instance&&!std::any_of(runtime.plugins().begin(),runtime.plugins().end(),[&](const auto& plugin){return plugin->active&&plugin->manifest.id==action.owner&&plugin->instance==action.instance;}))
+                throw std::runtime_error("Action owner was disabled or replaced before execution");
             auto& args=action.arguments;
-            if(action.operation=="actions.place") {
+            if(action.operation=="gameplay.action") {
+                std::string reason;if(!runtime.patch_authorized("api.gameplay.action",reason))throw std::runtime_error(reason);
+                auto context=gameplay::context(runtime.epoch);
+                confirmed=gameplay::action(context,args.at("operation"),args.at("arguments"),attempted,object,error);
+                if(confirmed&&!error.empty())throw std::runtime_error("Gameplay handler returned confirmation with an error: "+error);
+                if(!confirmed&&error.empty())error="Native gameplay action returned without confirmation or cause";
+            }else if(action.operation=="actions.place") {
                 std::string type,variant;auto definition=args.at("definition").get<std::string>();
                 if(definition.starts_with("mt2:")){auto parts=definition.substr(4);auto slash=parts.find('/');if(slash==std::string::npos)throw std::runtime_error("Built-in definition format: mt2:Type/Variant");type=parts.substr(0,slash);variant=parts.substr(slash+1);}
                 else {auto found=content.find(definition);if(found==content.end())throw std::runtime_error("Unknown content definition: "+definition);type="Scenery";variant=found->second.at("variant");}
@@ -67,7 +76,8 @@ void perform_actions(Runtime& runtime) {
             else throw std::runtime_error("Unsupported queued action");
         }catch(const std::exception& problem){error=problem.what();}
         action.result={{"id",action.id},{"status",confirmed?"confirmed":attempted?"unknown":"rejected"},{"native_attempted",attempted},{"cause",error}};
-        if(!object.is_null())action.result["object"]=object;
+        if(!object.is_null())action.result[action.operation=="gameplay.action"?"result":"object"]=object;
+        if(action.operation=="gameplay.action")action.result["operation"]=action.arguments.at("operation");
         if(!confirmed)runtime.log(action.owner,attempted?"error":"warn",action.operation+": "+error);
         runtime.emit("action_completed",action.result);
         completed[action.id]=action;completed_order.push_back(action.id);
@@ -112,6 +122,20 @@ void frame(Runtime& runtime,float dt) {
 Json request(const std::string& op,const Json& args) {
     std::string error;
     if(op=="world.status")return {{"loaded",world},{"name",current_world},{"epoch",current_runtime?current_runtime->epoch:0}};
+    if(op=="gameplay.operations")return gameplay::operations();
+    if(op=="gameplay.query") {
+        if(!current_runtime||!world)throw std::runtime_error("Gameplay query requires a loaded world");
+        auto context=gameplay::context(current_runtime->epoch);
+        return gameplay::query(context,args.at("operation"),args.at("arguments"));
+    }
+    if(op=="gameplay.action") {
+        if(!current_runtime||!world)throw std::runtime_error("Gameplay action requires a loaded world");
+        if(pending.size()>=64)throw std::runtime_error("Pending action budget exceeded (64)");
+        gameplay::validate_operation(args.at("operation"),"action",args.at("arguments"));
+        Action action{uuid(),args.at("mod_id").get<std::string>(),op,args,{},current_runtime->epoch,args.at("mod_instance").get<uint64_t>()};
+        action.result={{"id",action.id},{"status","accepted"},{"operation",args.at("operation")}};
+        pending.push_back(action);return action.result;
+    }
     if(op=="world.region"||op=="world.simulation"||op=="world.software") {
         if(!current_runtime||!world)throw std::runtime_error("World query requires a loaded world");
         if(op=="world.region") {
@@ -170,7 +194,7 @@ Json request(const std::string& op,const Json& args) {
         if(pending.size()>=64)throw std::runtime_error("Pending action budget exceeded (64)");
         for(const char* field:{"x","y","z"})if(op!="actions.remove"&&(!args.contains(field)||!args[field].is_number()||!std::isfinite(args[field].get<double>())))throw std::runtime_error("Action requires finite x, y and z");
         if(op!="actions.place")checked_handle(args.at("handle"));
-        Action action{uuid(),args.at("mod_id").get<std::string>(),op,args,{},current_runtime->epoch};action.result={{"id",action.id},{"status","accepted"}};
+        Action action{uuid(),args.at("mod_id").get<std::string>(),op,args,{},current_runtime->epoch,args.at("mod_instance").get<uint64_t>()};action.result={{"id",action.id},{"status","accepted"}};
         pending.push_back(action);return action.result;
     }
     if(op=="camera.get") {native::CameraState s;require(native::read_camera_state(s,error),error);return {{"x",s.x},{"y",s.y},{"z",s.z},{"focus_x",s.focus_x},{"focus_y",s.focus_y},{"focus_z",s.focus_z},{"distance",s.distance},{"min",s.minimum_distance},{"max",s.maximum_distance},{"editable",s.edit_weight>=0.999f},{"script_weight",s.edit_weight}};}

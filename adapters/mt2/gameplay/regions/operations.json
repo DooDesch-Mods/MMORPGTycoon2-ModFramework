@@ -1,0 +1,578 @@
+[
+  {
+    "name": "regions.list",
+    "kind": "query",
+    "returns": "MT2RegionPage",
+    "parameters": [
+      {
+        "name": "offset",
+        "type": "integer",
+        "description": "Zero-based page offset.",
+        "optional": true,
+        "default": 0
+      },
+      {
+        "name": "limit",
+        "type": "integer",
+        "description": "Maximum returned handles, 1..128.",
+        "optional": true,
+        "default": 100
+      }
+    ],
+    "summary": "List saved root-world Region handles using bounded pages.",
+    "errors": [
+      "The world or Region identity expired, the native operation is busy, or the input has the wrong shape.",
+      "Native code, owner or complete semantic readback differs. Unknown mutations must not be replayed."
+    ],
+    "native_evidence": [
+      "Multiplayer/src/game/region_saved_identity.h",
+      "Multiplayer/src/game/region_properties_runtime.inc",
+      "Multiplayer/src/game/region_appearance_runtime.inc"
+    ]
+  },
+  {
+    "name": "regions.get",
+    "kind": "query",
+    "returns": "MT2RegionDetails",
+    "parameters": [
+      {
+        "name": "handle",
+        "type": "MT2RegionHandle",
+        "description": "Current world epoch and saved Region ID."
+      }
+    ],
+    "summary": "Read a Region name, type, levels, styles and complete environment settings.",
+    "errors": [
+      "The world or Region identity expired, the native operation is busy, or the input has the wrong shape.",
+      "Native code, owner or complete semantic readback differs. Unknown mutations must not be replayed."
+    ],
+    "native_evidence": [
+      "Multiplayer/src/game/region_saved_identity.h",
+      "Multiplayer/src/game/region_properties_runtime.inc",
+      "Multiplayer/src/game/region_appearance_runtime.inc"
+    ]
+  },
+  {
+    "name": "regions.presets",
+    "kind": "query",
+    "returns": "string[]",
+    "parameters": [],
+    "summary": "Read the native Region preset names.",
+    "errors": [
+      "The world or Region identity expired, the native operation is busy, or the input has the wrong shape.",
+      "Native code, owner or complete semantic readback differs. Unknown mutations must not be replayed."
+    ],
+    "native_evidence": [
+      "Multiplayer/src/game/region_saved_identity.h",
+      "Multiplayer/src/game/region_properties_runtime.inc",
+      "Multiplayer/src/game/region_appearance_runtime.inc"
+    ]
+  },
+  {
+    "name": "regions.rename",
+    "kind": "action",
+    "returns": "MT2RegionDetails",
+    "parameters": [
+      {
+        "name": "handle",
+        "type": "MT2RegionHandle",
+        "description": "Current Region identity."
+      },
+      {
+        "name": "name",
+        "type": "string",
+        "description": "Region name, 1..256 UTF-8 bytes."
+      }
+    ],
+    "summary": "Rename a Region through its native widget notification.",
+    "errors": [
+      "The world or Region identity expired, the native operation is busy, or the input has the wrong shape.",
+      "Native code, owner or complete semantic readback differs. Unknown mutations must not be replayed."
+    ],
+    "native_evidence": [
+      "Multiplayer/src/game/region_saved_identity.h",
+      "Multiplayer/src/game/region_properties_runtime.inc",
+      "Multiplayer/src/game/region_appearance_runtime.inc"
+    ]
+  },
+  {
+    "name": "regions.set_tint",
+    "kind": "action",
+    "returns": "MT2RegionDetails",
+    "parameters": [
+      {
+        "name": "handle",
+        "type": "MT2RegionHandle",
+        "description": "Current Region identity."
+      },
+      {
+        "name": "values",
+        "type": "number[]",
+        "description": "Four finite native color channels."
+      }
+    ],
+    "summary": "Set the native Region tint.",
+    "errors": [
+      "The world or Region identity expired, the native operation is busy, or the input has the wrong shape.",
+      "Native code, owner or complete semantic readback differs. Unknown mutations must not be replayed."
+    ],
+    "native_evidence": [
+      "Multiplayer/src/game/region_saved_identity.h",
+      "Multiplayer/src/game/region_properties_runtime.inc",
+      "Multiplayer/src/game/region_appearance_runtime.inc"
+    ]
+  },
+  {
+    "name": "regions.set_light",
+    "kind": "action",
+    "returns": "MT2RegionDetails",
+    "parameters": [
+      {
+        "name": "handle",
+        "type": "MT2RegionHandle",
+        "description": "Current Region identity."
+      },
+      {
+        "name": "values",
+        "type": "number[]",
+        "description": "Four finite native color channels."
+      }
+    ],
+    "summary": "Set native Region light.",
+    "errors": [
+      "The world or Region identity expired, the native operation is busy, or the input has the wrong shape.",
+      "Native code, owner or complete semantic readback differs. Unknown mutations must not be replayed."
+    ],
+    "native_evidence": [
+      "Multiplayer/src/game/region_saved_identity.h",
+      "Multiplayer/src/game/region_properties_runtime.inc",
+      "Multiplayer/src/game/region_appearance_runtime.inc"
+    ]
+  },
+  {
+    "name": "regions.set_ambient",
+    "kind": "action",
+    "returns": "MT2RegionDetails",
+    "parameters": [
+      {
+        "name": "handle",
+        "type": "MT2RegionHandle",
+        "description": "Current Region identity."
+      },
+      {
+        "name": "values",
+        "type": "number[]",
+        "description": "Four finite native color channels."
+      }
+    ],
+    "summary": "Set native Region ambient light.",
+    "errors": [
+      "The world or Region identity expired, the native operation is busy, or the input has the wrong shape.",
+      "Native code, owner or complete semantic readback differs. Unknown mutations must not be replayed."
+    ],
+    "native_evidence": [
+      "Multiplayer/src/game/region_saved_identity.h",
+      "Multiplayer/src/game/region_properties_runtime.inc",
+      "Multiplayer/src/game/region_appearance_runtime.inc"
+    ]
+  },
+  {
+    "name": "regions.set_sky",
+    "kind": "action",
+    "returns": "MT2RegionDetails",
+    "parameters": [
+      {
+        "name": "handle",
+        "type": "MT2RegionHandle",
+        "description": "Current Region identity."
+      },
+      {
+        "name": "values",
+        "type": "number[]",
+        "description": "Sixteen finite native spline coefficients, as returned by get()."
+      }
+    ],
+    "summary": "Set native Region sky spline coefficients.",
+    "errors": [
+      "The world or Region identity expired, the native operation is busy, or the input has the wrong shape.",
+      "Native code, owner or complete semantic readback differs. Unknown mutations must not be replayed."
+    ],
+    "native_evidence": [
+      "Multiplayer/src/game/region_saved_identity.h",
+      "Multiplayer/src/game/region_properties_runtime.inc",
+      "Multiplayer/src/game/region_appearance_runtime.inc"
+    ]
+  },
+  {
+    "name": "regions.set_particles",
+    "kind": "action",
+    "returns": "MT2RegionDetails",
+    "parameters": [
+      {
+        "name": "handle",
+        "type": "MT2RegionHandle",
+        "description": "Current Region identity."
+      },
+      {
+        "name": "type",
+        "type": "integer",
+        "description": "Native particle kind 0..6; zero disables particles."
+      }
+    ],
+    "summary": "Set the original Region particle type and enabled state.",
+    "errors": [
+      "The world or Region identity expired, the native operation is busy, or the input has the wrong shape.",
+      "Native code, owner or complete semantic readback differs. Unknown mutations must not be replayed."
+    ],
+    "native_evidence": [
+      "Multiplayer/src/game/region_saved_identity.h",
+      "Multiplayer/src/game/region_properties_runtime.inc",
+      "Multiplayer/src/game/region_appearance_runtime.inc"
+    ]
+  },
+  {
+    "name": "regions.set_particle_color",
+    "kind": "action",
+    "returns": "MT2RegionDetails",
+    "parameters": [
+      {
+        "name": "handle",
+        "type": "MT2RegionHandle",
+        "description": "Current Region identity."
+      },
+      {
+        "name": "values",
+        "type": "number[]",
+        "description": "Four finite native color channels."
+      }
+    ],
+    "summary": "Set the original Region particle color.",
+    "errors": [
+      "The world or Region identity expired, the native operation is busy, or the input has the wrong shape.",
+      "Native code, owner or complete semantic readback differs. Unknown mutations must not be replayed."
+    ],
+    "native_evidence": [
+      "Multiplayer/src/game/region_saved_identity.h",
+      "Multiplayer/src/game/region_properties_runtime.inc",
+      "Multiplayer/src/game/region_appearance_runtime.inc"
+    ]
+  },
+  {
+    "name": "regions.styles",
+    "kind": "query",
+    "returns": "string[]",
+    "parameters": [],
+    "summary": "Read the nine canonical terrain style names.",
+    "errors": [
+      "The world or Region identity expired, the native operation is busy, or the input has the wrong shape.",
+      "Native code, owner or complete semantic readback differs. Unknown mutations must not be replayed."
+    ],
+    "native_evidence": [
+      "Multiplayer/src/game/region_saved_identity.h",
+      "Multiplayer/src/game/region_properties_runtime.inc",
+      "Multiplayer/src/game/region_appearance_runtime.inc"
+    ]
+  },
+  {
+    "name": "regions.set_styles",
+    "kind": "action",
+    "returns": "MT2RegionDetails",
+    "parameters": [
+      {
+        "name": "handle",
+        "type": "MT2RegionHandle",
+        "description": "Current Region identity."
+      },
+      {
+        "name": "styles",
+        "type": "string[]",
+        "description": "Four exact names returned by styles()."
+      }
+    ],
+    "summary": "Apply all four terrain styles through the original native EditManager transaction.",
+    "errors": [
+      "The world or Region identity expired, the native operation is busy, or the input has the wrong shape.",
+      "Native code, owner or complete semantic readback differs. Unknown mutations must not be replayed."
+    ],
+    "native_evidence": [
+      "Multiplayer/src/game/region_saved_identity.h",
+      "Multiplayer/src/game/region_properties_runtime.inc",
+      "Multiplayer/src/game/region_appearance_runtime.inc"
+    ]
+  },
+  {
+    "name": "terrain.heights",
+    "kind": "query",
+    "returns": "MT2TerrainHeightPage",
+    "parameters": [
+      {
+        "name": "handle",
+        "type": "MT2RegionHandle",
+        "description": "Current owned Region identity."
+      },
+      {
+        "name": "offset",
+        "type": "integer",
+        "description": "First cell index.",
+        "optional": true,
+        "default": 0
+      },
+      {
+        "name": "limit",
+        "type": "integer",
+        "description": "Number of returned heights, 1..4096.",
+        "optional": true,
+        "default": 256
+      }
+    ],
+    "summary": "Read a bounded page of the original Region height grid.",
+    "errors": [
+      "The world or Region identity expired, the native operation is busy, or the input has the wrong shape.",
+      "Native code, owner or complete semantic readback differs. Unknown mutations must not be replayed."
+    ],
+    "native_evidence": [
+      "Multiplayer/src/game/terrain_height_grid.h"
+    ]
+  },
+  {
+    "name": "terrain.change_height",
+    "kind": "action",
+    "returns": "MT2TerrainHeightResult",
+    "parameters": [
+      {
+        "name": "handle",
+        "type": "MT2RegionHandle",
+        "description": "Current owned Region identity."
+      },
+      {
+        "name": "position",
+        "type": "number[]",
+        "description": "Finite world position inside the supplied Region."
+      },
+      {
+        "name": "up",
+        "type": "boolean",
+        "description": "True raises the selected cell by 20; false lowers it by 20."
+      },
+      {
+        "name": "radius",
+        "type": "number",
+        "description": "Native brush radius, greater than zero and at most 10000.",
+        "optional": true,
+        "default": 1
+      }
+    ],
+    "summary": "Use the original height brush once and confirm the complete grid, 100 cash payment, restored cursor and unchanged Undo history.",
+    "errors": [
+      "The world or Region identity expired, the native operation is busy, or the input has the wrong shape.",
+      "Native code, owner or complete semantic readback differs. Unknown mutations must not be replayed."
+    ],
+    "native_evidence": [
+      "Multiplayer/src/game/ui_terrain_height.inc",
+      "Multiplayer/src/game/terrain_height_grid.h"
+    ]
+  },
+  {
+    "name": "regions.set_levels",
+    "kind": "action",
+    "returns": "MT2RegionDetails",
+    "parameters": [
+      {
+        "name": "handle",
+        "type": "MT2RegionHandle",
+        "description": "Current owned Region identity."
+      },
+      {
+        "name": "minimum",
+        "type": "integer",
+        "description": "Minimum level within the native widget domain."
+      },
+      {
+        "name": "maximum",
+        "type": "integer",
+        "description": "Maximum level within the native widget domain."
+      },
+      {
+        "name": "position",
+        "type": "number[]",
+        "description": "Finite XYZ point inside the Region; defaults to its center.",
+        "optional": true
+      }
+    ],
+    "summary": "Set the Region level range with the original tool transaction, complete actor level clamp, restored input and native Undo inverse.",
+    "errors": [
+      "The world or Region identity expired, the native operation is busy, or the input has the wrong shape.",
+      "Native code, owner or complete semantic readback differs. Unknown mutations must not be replayed."
+    ],
+    "native_evidence": [
+      "Multiplayer/src/game/region_level_runtime.inc",
+      "Multiplayer/src/game/region_level_reader.h"
+    ]
+  },
+  {
+    "name": "regions.set_preset",
+    "kind": "action",
+    "returns": "MT2RegionDetails",
+    "parameters": [
+      {
+        "name": "handle",
+        "type": "MT2RegionHandle",
+        "description": "Current Region identity."
+      },
+      {
+        "name": "name",
+        "type": "string",
+        "description": "Exact native preset name returned by presets()."
+      }
+    ],
+    "summary": "Apply an original Region preset, confirm its styles and refresh the visible native inspector.",
+    "errors": [
+      "The world or Region identity expired, the native operation is busy, or the input has the wrong shape.",
+      "Native code, owner or complete semantic readback differs. Unknown mutations must not be replayed."
+    ],
+    "native_evidence": [
+      "Multiplayer/src/game/ui_region_runtime.cpp"
+    ]
+  },
+  {
+    "name": "regions.purchase",
+    "kind": "action",
+    "returns": "MT2RegionDetails",
+    "parameters": [
+      {
+        "name": "handle",
+        "type": "MT2RegionHandle",
+        "description": "Current Region identity."
+      },
+      {
+        "name": "position",
+        "type": "number[]",
+        "description": "Finite XYZ point inside the Region; defaults to its center.",
+        "optional": true
+      }
+    ],
+    "summary": "Buy unowned land through the original native tool, with complete actor level clamp, payment and inverse readback.",
+    "errors": [
+      "The world or Region identity expired, the native operation is busy, or the input has the wrong shape.",
+      "Native code, owner or complete semantic readback differs. Unknown mutations must not be replayed."
+    ],
+    "native_evidence": [
+      "Multiplayer/src/game/region_properties_runtime.inc",
+      "Multiplayer/src/game/region_ownership_native.inc",
+      "Multiplayer/src/game/region_sale_runtime.inc"
+    ]
+  },
+  {
+    "name": "regions.sell",
+    "kind": "action",
+    "returns": "MT2RegionDetails",
+    "parameters": [
+      {
+        "name": "handle",
+        "type": "MT2RegionHandle",
+        "description": "Current Region identity."
+      },
+      {
+        "name": "position",
+        "type": "number[]",
+        "description": "Finite XYZ point inside the Region; defaults to its center.",
+        "optional": true
+      }
+    ],
+    "summary": "Sell owned land through the original native tool, with complete actor level clamp, refund and inverse readback.",
+    "errors": [
+      "The world or Region identity expired, the native operation is busy, or the input has the wrong shape.",
+      "Native code, owner or complete semantic readback differs. Unknown mutations must not be replayed."
+    ],
+    "native_evidence": [
+      "Multiplayer/src/game/region_properties_runtime.inc",
+      "Multiplayer/src/game/region_ownership_native.inc",
+      "Multiplayer/src/game/region_sale_runtime.inc"
+    ]
+  },
+  {
+    "name": "terrain.contours",
+    "kind": "query",
+    "returns": "MT2TerrainContourPage",
+    "parameters": [
+      {
+        "name": "handle",
+        "type": "MT2RegionHandle",
+        "description": "Current Region identity."
+      },
+      {
+        "name": "style",
+        "type": "integer",
+        "description": "Native terrain style index, 0..3."
+      },
+      {
+        "name": "path",
+        "type": "integer",
+        "description": "Zero-based polygon path index.",
+        "optional": true,
+        "default": 0
+      },
+      {
+        "name": "offset",
+        "type": "integer",
+        "description": "First vertex in that path.",
+        "optional": true,
+        "default": 0
+      },
+      {
+        "name": "limit",
+        "type": "integer",
+        "description": "Maximum returned vertices, 1..4096.",
+        "optional": true,
+        "default": 256
+      }
+    ],
+    "summary": "Read a bounded page of exact native integer terrain polygon coordinates.",
+    "errors": [
+      "The world or Region identity expired, the native operation is busy, or the input has the wrong shape.",
+      "Native code, owner or complete semantic readback differs. Unknown mutations must not be replayed."
+    ],
+    "native_evidence": [
+      "Multiplayer/src/game/native_polyshape.h",
+      "Multiplayer/src/game/ui_terrain_runtime.inc"
+    ]
+  },
+  {
+    "name": "terrain.paint",
+    "kind": "action",
+    "returns": "MT2TerrainPaintResult",
+    "parameters": [
+      {
+        "name": "handle",
+        "type": "MT2RegionHandle",
+        "description": "Current Region identity."
+      },
+      {
+        "name": "style",
+        "type": "integer",
+        "description": "Native terrain style index, 0..3."
+      },
+      {
+        "name": "stamps",
+        "type": "MT2TerrainStamp[]",
+        "description": "1..64 native paint stamps; shapes use the exact integer coordinate system returned by contours()."
+      },
+      {
+        "name": "label",
+        "type": "string",
+        "description": "Native edit description, 1..256 UTF-8 bytes.",
+        "optional": true,
+        "default": "Paint terrain"
+      }
+    ],
+    "summary": "Complete an original terrain paint stroke and confirm its contour inverse, native Undo, Region and ledger readback. The result states whether contours changed.",
+    "errors": [
+      "The world or Region identity expired, the native operation is busy, or the input has the wrong shape.",
+      "Native code, owner or complete semantic readback differs. Unknown mutations must not be replayed."
+    ],
+    "native_evidence": [
+      "Multiplayer/src/game/ui_terrain_runtime.inc",
+      "Multiplayer/src/game/terrain_history_runtime.inc"
+    ]
+  }
+]

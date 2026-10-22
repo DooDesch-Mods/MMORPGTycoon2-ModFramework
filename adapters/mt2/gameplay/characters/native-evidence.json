@@ -1,0 +1,72 @@
+{
+  "schema": 1,
+  "provenance": "Original framework implementation based on Multiplayer 8a13602 source and exact-build static ABI evidence.",
+  "game_sha256": "bbab2dc68babcc644d0a1679548bf1e334b6c52aea669c3f61f6cb9d45c1aaf6",
+  "source_evidence": [
+    "MMORPGTycoon2-Multiplayer@8a13602/src/game/character_definition_identity.h",
+    "MMORPGTycoon2-Multiplayer@8a13602/src/game/character_membership_runtime.inc",
+    "MMORPGTycoon2-Multiplayer@8a13602/src/game/character_rename_runtime.inc",
+    "MMORPGTycoon2-Multiplayer@8a13602/src/game/ability_edit_runtime.inc",
+    "MMORPGTycoon2-Multiplayer@8a13602/src/game/ability_membership_runtime.inc",
+    "MMORPGTycoon2-Multiplayer@8a13602/src/game/costume_edit_runtime.inc",
+    "MMORPGTycoon2-Multiplayer@8a13602/src/game/character_import_runtime.inc",
+    "MMORPGTycoon2-Multiplayer@8a13602/src/game/character_import_native.cpp"
+  ],
+  "additional_native_facts": [
+    {
+      "rva": "0x9b7a0",
+      "signature": "mmoCharacterTypeCollection::AddSlot(CharacterType)",
+      "bytes": 770,
+      "sha256": "ea6fe59e2880c0f105429dcbb30b8319d9cc5580a009e7ac694818f68602397e",
+      "fact": "Returns packed native CharacterTypeID with kind in the low 32 bits and global index in the high 32 bits; binds the new type to its collection and sends NewCharacterTypeCreated."
+    },
+    {
+      "rva": "0x4a9f0",
+      "signature": "mmoAttributeParameters::SetMaximumValueForLevelOne(float)",
+      "bytes": 531,
+      "sha256": "783f85ef829dc176527018608ba559ee11badb2b2916e3d5355ca7d95569aea2"
+    },
+    {
+      "rva": "0x97350",
+      "signature": "mmoCharacterType::SyncVariants()",
+      "bytes": 120,
+      "sha256": "6fe9d0db120218bd614ce720f9a7d2963f5dbd9a25e5b44b954f4c7f33fdd775"
+    },
+    {
+      "rva": "0xd8e690",
+      "signature": "vsRTTIFactory<mmoNotificationPane>::Create() const",
+      "bytes": 64,
+      "sha256": "b8c87e439b35d59b00b827db8154cd2db3225e1ecef22da0beb2285497e6e017",
+      "fact": "Does not read its receiver; allocates 0x360 bytes and invokes mmoNotificationPane's default constructor."
+    },
+    {
+      "rva": "0x75fa40",
+      "signature": "mmoNotificationPane::mmoNotificationPane()",
+      "bytes": 64,
+      "sha256": "583454048954ee8c3c57c88fa6cffa8fc45d2c851ae21b75bf610eeffa46eb42",
+      "fact": "Initializes the TextPane base and the notification address point at image+0x171f240."
+    },
+    {
+      "rva": "0x7f80a0",
+      "signature": "mmoTextPane::SetText(vsLocString const&)",
+      "bytes": 128,
+      "sha256": "71c4b1105268ad20e522a8a6e4e93aa0afede1a62423e25dc2b8986656c1b01c",
+      "fact": "Retains the raw localization string at +0x2c8; an unparented pane skips layout callbacks."
+    },
+    {
+      "rva": "0x689510",
+      "signature": "mmoCharacterTypeInfoView::LoadFromImage(vsImage const&)",
+      "fact": "The success branch emits {design_character_prefab_import_success} through CharacterPrefabsView::SetImportMessage after native definition adoption, user notifications and release effects."
+    },
+    {
+      "rva": "0x689100",
+      "signature": "mmoCharacterTypeInfoView::SetCharacterType(mmoCharacterType*)",
+      "fact": "Requires a non-null type. Rebuilds its current base/variant binding and child design panes; never use it to restore a previously null selection."
+    },
+    {
+      "rva": "0x683c50",
+      "signature": "mmoCharacterTypeInfoView::_Start_Rename()",
+      "fact": "Activates MultiView page general_edit_name before filling the native text editor. Hidden inactive editor text is not proof of unsaved input."
+    }
+  ]
+}

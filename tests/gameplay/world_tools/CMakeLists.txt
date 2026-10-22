@@ -1,0 +1,8 @@
+cmake_minimum_required(VERSION 3.24)
+project(WorldToolsTests LANGUAGES CXX)
+set(CMAKE_CXX_STANDARD 20)
+get_filename_component(FRAMEWORK "${CMAKE_CURRENT_LIST_DIR}/../../.." ABSOLUTE)
+add_executable(world_tools_tests test_world_tools.cpp "${FRAMEWORK}/adapters/mt2/gameplay/world_tools/world_tools.cpp")
+target_include_directories(world_tools_tests PRIVATE "${FRAMEWORK}/include" "${FRAMEWORK}/third_party/vendor" "${FRAMEWORK}/adapters/mt2/gameplay")
+enable_testing()
+add_test(NAME world_tools_query_and_guards COMMAND world_tools_tests)

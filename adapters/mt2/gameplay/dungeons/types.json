@@ -1,0 +1,65 @@
+{
+  "MT2DungeonGizmoRuntime": {
+    "triggered?": "boolean",
+    "state?": "integer",
+    "immediate?": "integer",
+    "on_map?": "boolean"
+  },
+  "MT2DungeonGizmoContents": {
+    "gold?": "integer",
+    "loot?": "integer",
+    "vendor_trash?": "integer",
+    "keys?": "integer",
+    "boss_keys?": "integer"
+  },
+  "MT2DungeonInstance": {
+    "index": "integer",
+    "started": "boolean"
+  },
+  "MT2DungeonCell": {
+    "index": "integer",
+    "open": "boolean",
+    "theme": "string",
+    "colors": "integer[]"
+  },
+  "MT2DungeonLayout": {
+    "cells": "MT2DungeonCell[]",
+    "palette": "integer[]"
+  },
+  "MT2DungeonState": {
+    "handle": "MT2Handle",
+    "dungeon_uid": "string",
+    "desired_instances": "integer",
+    "atmosphere": "integer",
+    "light": "number[]",
+    "palette_defaults": "boolean",
+    "instance_count": "integer"
+  },
+  "MT2DungeonGizmo": {
+    "handle": "MT2Handle",
+    "name": "string",
+    "type": "string",
+    "variant": "string",
+    "position": "number[]",
+    "rotation": "number[]",
+    "scale": "number[]",
+    "triggered": "boolean",
+    "state": "integer",
+    "immediate": "integer",
+    "on_map": "boolean",
+    "gold": "integer",
+    "loot": "integer",
+    "vendor_trash": "integer",
+    "keys": "integer",
+    "boss_keys": "integer",
+    "lock_id": "integer",
+    "edge_a": "integer",
+    "edge_b": "integer"
+  },
+  "MT2DungeonBuilding": {
+    "handle": "MT2Handle",
+    "type": "string",
+    "variant": "string",
+    "position": "number[]"
+  }
+}

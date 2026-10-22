@@ -1,0 +1,305 @@
+[
+  {
+    "name": "walls.place_curve",
+    "kind": "action",
+    "summary": "Compute and place a native Wall curve from 2..11 ordered control points. Original AddPointAt calculates segment velocities and PlotSpline samples and validates terrain/collisions, supplying the native preview and spline-length price quote. The same isolated native receiver owns Purchase/Finish and model/ghost cleanup. Returns native spline records and sampled preview, created Path/node handles, changed and removed split Paths, cost and an owned history receipt. Requires one owned active-root Region; supplied endpoint handles pin native intersections/split Paths. Original validation causes are retained and uncertain actions must not be replayed.",
+    "parameters": [
+      {
+        "name": "curve",
+        "type": "MT2WallCurve",
+        "description": "Native path/node type, resource name and complete ordered control-point positions including height. No caller-authored spline or sampled preview is required."
+      }
+    ],
+    "returns": "MT2WallCurveResult",
+    "errors": [
+      "World is unavailable or the call is off the current game thread.",
+      "Epoch, original UID registry or complete native scene/topology membership differs.",
+      "Actions require the root world to be the native active scene and native Undo to be idle.",
+      "Native call, cleanup or readback differs; attempted failures are unknown and must not be replayed."
+    ],
+    "native_evidence": [
+      "Multiplayer/src/game/wall_pass_cursor.h",
+      "Multiplayer/src/game/world_path_wall_native.inc",
+      "Multiplayer/src/game/world_path_capture.inc",
+      "Multiplayer/src/game/wall_private_lifecycle.h"
+    ]
+  },
+  {
+    "name": "paths.place_route",
+    "kind": "action",
+    "summary": "Execute the whole original native Road hover/pin/Press transaction, accepting native auto snapping, split targets and up to ten native preview splines. Returns all created Paths/nodes, changed Path before/after values, removed Paths, cost, native spline count and owned history receipt. Native geometry and mixed topology readback own the result; one final Press follows only an acknowledged no-effect pin phase.",
+    "parameters": [
+      {
+        "name": "region",
+        "type": "integer",
+        "description": "Owned native Region ID."
+      },
+      {
+        "name": "start",
+        "type": "number[]",
+        "description": "Three finite start coordinates; native ground projection and auto snapping apply."
+      },
+      {
+        "name": "end",
+        "type": "number[]",
+        "description": "Three finite end coordinates; native ground projection and auto snapping apply."
+      },
+      {
+        "name": "start_node",
+        "type": "MT2Handle",
+        "description": "Optional exact current Intersection that native start hover must choose.",
+        "optional": true
+      },
+      {
+        "name": "end_node",
+        "type": "MT2Handle",
+        "description": "Optional exact current Intersection that native end hover must choose.",
+        "optional": true
+      },
+      {
+        "name": "start_split",
+        "type": "MT2Handle",
+        "description": "Optional exact current Path that native start hover must split.",
+        "optional": true
+      },
+      {
+        "name": "end_split",
+        "type": "MT2Handle",
+        "description": "Optional exact current Path that native end hover must split.",
+        "optional": true
+      }
+    ],
+    "returns": "MT2PathRouteResult",
+    "errors": [
+      "World is unavailable or the call is off the current game thread.",
+      "Epoch, original UID registry or complete native scene/topology membership differs.",
+      "Actions require the root world to be the native active scene and native Undo to be idle.",
+      "Native call, cleanup or readback differs; attempted failures are unknown and must not be replayed."
+    ],
+    "native_evidence": [
+      "Multiplayer/src/game/ui_path_runtime.inc",
+      "Multiplayer/src/game/path_reader.h",
+      "Multiplayer/src/game/path_execution.inc",
+      "Multiplayer/src/game/mixed_path_reader.h",
+      "Multiplayer/src/game/world_path_history.inc"
+    ]
+  },
+  {
+    "name": "paths.graph",
+    "kind": "query",
+    "summary": "Read the complete saved root-world mixed Path graph, including all eleven Path types, six Intersection types, reciprocal node edges and cross-Region membership. Fields contain native handles, Region IDs, names, waypoints and native distances.",
+    "parameters": [],
+    "returns": "MT2PathGraph",
+    "errors": [
+      "World is unavailable or the call is off the current game thread.",
+      "Epoch, original UID registry or complete native scene/topology membership differs.",
+      "Actions require the root world to be the native active scene and native Undo to be idle.",
+      "Native call, cleanup or readback differs; attempted failures are unknown and must not be replayed."
+    ],
+    "native_evidence": [
+      "Multiplayer/src/game/mixed_path_reader.h",
+      "Multiplayer/src/game/mixed_path_graph.h"
+    ]
+  },
+  {
+    "name": "paths.place",
+    "kind": "action",
+    "summary": "Create one native Road segment through an isolated original Road cursor hover/press, native purchase and Undo. Native ground projection sets endpoint height; optional native node handles pin connections. Splitting existing Paths and multi-spline Road previews are rejected. Returns the created Path, cost and owned history receipt; normal native costs and tool effects apply.",
+    "parameters": [
+      {
+        "name": "region",
+        "type": "integer",
+        "description": "Owned native Region ID."
+      },
+      {
+        "name": "start",
+        "type": "number[]",
+        "description": "Three finite coordinates; native surface projection supplies y."
+      },
+      {
+        "name": "end",
+        "type": "number[]",
+        "description": "Three finite coordinates; native surface projection supplies y."
+      },
+      {
+        "name": "start_node",
+        "type": "MT2Handle",
+        "description": "Current RoadNode in the selected Region; position comes from this node.",
+        "optional": true
+      },
+      {
+        "name": "end_node",
+        "type": "MT2Handle",
+        "description": "Distinct current RoadNode in the selected Region; position comes from this node.",
+        "optional": true
+      }
+    ],
+    "returns": "MT2Path",
+    "errors": [
+      "World is unavailable or the call is off the current game thread.",
+      "Epoch, original UID registry or complete native scene/topology membership differs.",
+      "Actions require the root world to be the native active scene and native Undo to be idle.",
+      "Native call, cleanup or readback differs; attempted failures are unknown and must not be replayed."
+    ],
+    "native_evidence": [
+      "Multiplayer/src/game/ui_path_runtime.inc",
+      "Multiplayer/src/game/path_execution.inc",
+      "Multiplayer/src/game/path_reader.h"
+    ]
+  },
+  {
+    "name": "paths.link",
+    "kind": "action",
+    "summary": "Create a native cross-Region Pass through an isolated original Pass receiver and Finish transaction. Confirms both Regions, supplied two-point shape, endpoint identities, remote membership and native Undo. Returns the Pass and owned history receipt; normal native tool effects apply.",
+    "parameters": [
+      {
+        "name": "start_region",
+        "type": "integer",
+        "description": "Owned native start Region ID."
+      },
+      {
+        "name": "end_region",
+        "type": "integer",
+        "description": "Distinct saved native end Region ID."
+      },
+      {
+        "name": "name",
+        "type": "string",
+        "description": "Existing native Pass resource name, 1..256 bytes without NUL."
+      },
+      {
+        "name": "start",
+        "type": "number[]",
+        "description": "Three finite coordinates within the start Region."
+      },
+      {
+        "name": "end",
+        "type": "number[]",
+        "description": "Three finite coordinates within the end Region."
+      },
+      {
+        "name": "start_node",
+        "type": "MT2Handle",
+        "description": "Current Intersection in the start Region.",
+        "optional": true
+      },
+      {
+        "name": "end_node",
+        "type": "MT2Handle",
+        "description": "Current Intersection in the end Region.",
+        "optional": true
+      }
+    ],
+    "returns": "MT2Path",
+    "errors": [
+      "World is unavailable or the call is off the current game thread.",
+      "Epoch, original UID registry or complete native scene/topology membership differs.",
+      "Actions require the root world to be the native active scene and native Undo to be idle.",
+      "Native call, cleanup or readback differs; attempted failures are unknown and must not be replayed."
+    ],
+    "native_evidence": [
+      "Multiplayer/src/game/world_path_replay.inc",
+      "Multiplayer/src/game/wall_pass_cursor.h",
+      "Multiplayer/src/game/mixed_path_reader.h"
+    ]
+  },
+  {
+    "name": "walls.place",
+    "kind": "action",
+    "summary": "Execute a bounded explicit native Wall plan through isolated original Wall/Path/model construction, native Purchase and Finish, then owned cleanup. Native ghost Length supplies the price quote. Supports explicit current node and split-Path handles, including preview split targets. Confirms reciprocal mixed topology, created Path family/scene, retained original Undo and unchanged unrelated Paths. Returns created Paths, native length, cost and owned history receipt.",
+    "parameters": [
+      {
+        "name": "plan",
+        "type": "MT2WallPlan",
+        "description": "Native spline and preview plan in one owned active root Region. This low-level interface accepts the proven native 12-float spline records directly."
+      }
+    ],
+    "returns": "MT2WallResult",
+    "errors": [
+      "World is unavailable or the call is off the current game thread.",
+      "Epoch, original UID registry or complete native scene/topology membership differs.",
+      "Actions require the root world to be the native active scene and native Undo to be idle.",
+      "Native call, cleanup or readback differs; attempted failures are unknown and must not be replayed."
+    ],
+    "native_evidence": [
+      "Multiplayer/src/game/world_path_wall_native.inc",
+      "Multiplayer/src/game/wall_private_lifecycle.h",
+      "Multiplayer/src/game/wall_private_codes.h",
+      "Multiplayer/src/game/wall_pass_cursor.h"
+    ]
+  },
+  {
+    "name": "paths.remove",
+    "kind": "action",
+    "summary": "Remove any current mixed Path, including Wall or Pass, through original native Destroy command and edit transaction. Confirms Path removal, native orphan policy for endpoint types0/1, retained other Intersections, remote/selection retirement and exact Make/Cash inverse UID set. Returns refund, removed node count and owned history receipt.",
+    "parameters": [
+      {
+        "name": "handle",
+        "type": "MT2Handle",
+        "description": "Current native Path handle from paths.graph."
+      }
+    ],
+    "returns": "MT2PathRemoval",
+    "errors": [
+      "World is unavailable or the call is off the current game thread.",
+      "Epoch, original UID registry or complete native scene/topology membership differs.",
+      "Actions require the root world to be the native active scene and native Undo to be idle.",
+      "Native call, cleanup or readback differs; attempted failures are unknown and must not be replayed."
+    ],
+    "native_evidence": [
+      "Multiplayer/src/game/world_path_remove.inc",
+      "Multiplayer/src/game/mixed_path_remove.h",
+      "Multiplayer/src/game/path_delete_execution.inc"
+    ]
+  },
+  {
+    "name": "paths.undo",
+    "kind": "action",
+    "summary": "Run original native undo for one owned Path/Wall receipt at the exact native stack top. Confirms the complete saved mixed topology and exact source/inverse stack transition. Up to twenty receipts are retained in the current World lifetime; an unresolved native history attempt quarantines its receipt.",
+    "parameters": [
+      {
+        "name": "receipt",
+        "type": "string",
+        "description": "Opaque receipt returned by a confirmed Path or Wall placement/removal action."
+      }
+    ],
+    "returns": "MT2PathHistoryResult",
+    "errors": [
+      "World is unavailable or the call is off the current game thread.",
+      "Epoch, original UID registry or complete native scene/topology membership differs.",
+      "Actions require the root world to be the native active scene and native Undo to be idle.",
+      "Native call, cleanup or readback differs; attempted failures are unknown and must not be replayed."
+    ],
+    "native_evidence": [
+      "Multiplayer/src/game/world_path_history.inc",
+      "Multiplayer/src/game/path_history_runtime.inc",
+      "Multiplayer/src/game/building_history_slice/native_bridge.cpp",
+      "Multiplayer/src/game/building_history_slice/stack_transition.h"
+    ]
+  },
+  {
+    "name": "paths.redo",
+    "kind": "action",
+    "summary": "Run original native redo for one owned Path/Wall receipt at the exact native stack top. Confirms the complete saved mixed topology and exact source/inverse stack transition. Up to twenty receipts are retained in the current World lifetime; an unresolved native history attempt quarantines its receipt.",
+    "parameters": [
+      {
+        "name": "receipt",
+        "type": "string",
+        "description": "Opaque receipt returned by a confirmed Path or Wall placement/removal action."
+      }
+    ],
+    "returns": "MT2PathHistoryResult",
+    "errors": [
+      "World is unavailable or the call is off the current game thread.",
+      "Epoch, original UID registry or complete native scene/topology membership differs.",
+      "Actions require the root world to be the native active scene and native Undo to be idle.",
+      "Native call, cleanup or readback differs; attempted failures are unknown and must not be replayed."
+    ],
+    "native_evidence": [
+      "Multiplayer/src/game/world_path_history.inc",
+      "Multiplayer/src/game/path_history_runtime.inc",
+      "Multiplayer/src/game/building_history_slice/native_bridge.cpp",
+      "Multiplayer/src/game/building_history_slice/stack_transition.h"
+    ]
+  }
+]

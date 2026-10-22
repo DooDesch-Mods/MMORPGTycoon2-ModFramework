@@ -1,0 +1,23 @@
+{
+  "exe_sha256": "bbab2dc68babcc644d0a1679548bf1e334b6c52aea669c3f61f6cb9d45c1aaf6",
+  "bodies": [
+    {
+      "rva": "0x5eb530",
+      "size": 544,
+      "sha256": "59ea59450b0ddfb82bcce0b9b4e3f7c092e77b98814d5a7fdb1c695bdc2351d8",
+      "name": "mmoCursorBehaviourWall::AddPointAt(vsVector3D const&)"
+    },
+    {
+      "rva": "0x5e9ab0",
+      "size": 528,
+      "sha256": "f1c98aedc6c22ce683f771d55b0ffce3525a90d90049122f16cd67d295fd64bb",
+      "name": "mmoCursorBehaviourWall::CalculateVelocityOfSegment(int)"
+    },
+    {
+      "rva": "0x5ea480",
+      "size": 4272,
+      "sha256": "ed16a9ab93577f2dbf071207f26c8b4ecf389f6643a6b4d57b4b2db40d89adf3",
+      "name": "mmoCursorBehaviourWall::PlotSpline()"
+    }
+  ]
+}

@@ -2,13 +2,13 @@
   "product": "MT2 Mod Framework",
   "support_slug": "modframework",
   "repository_url": "https://github.com/DooDesch-Mods/MMORPGTycoon2-ModFramework",
-  "version_label": "0.2.6",
-  "release_label": "Framework 0.2.6 - Development preview",
+  "version_label": "0.3.0",
+  "release_label": "Framework 0.3.0 - Experimental gameplay tools",
   "graphic_title": "More room for your ideas.",
   "coverage_title": "Framework feature coverage",
   "asset_directory": "assets/brand",
   "overview_heading": "What can I build today?",
-  "overview_intro": "Included in [Framework 0.2.6](https://github.com/DooDesch-Mods/MMORPGTycoon2-ModFramework/releases/tag/v0.2.6). Experimental features can change between releases.",
+  "overview_intro": "Included in [Framework 0.3.0](https://github.com/DooDesch-Mods/MMORPGTycoon2-ModFramework/releases/tag/v0.3.0). New gameplay tools are experimental. World-changing Lua gameplay operations currently run in singleplayer.",
   "stages": [
     {
       "label": "Available now",
@@ -21,10 +21,10 @@
     },
     {
       "label": "Next priorities",
-      "title": "Reach more of MT2",
+      "title": "Connect more mods",
       "items": [
-        "More game operations",
-        "Native UI and diagnostics",
+        "Shared Lua world actions",
+        "Native UI improvements",
         "Better content workflows"
       ]
     },
@@ -41,54 +41,97 @@
   "features": [
     {
       "name": "Lua mods and reload",
+      "short_name": "Lua / reload",
       "status": "available",
       "scope": "Use a text editor; reload scripts without restarting. A rejected replacement keeps the previous mod running. [Start here](docs/quickstart.md)."
     },
     {
       "name": "Native C++ plugins",
+      "short_name": "C++ plugins",
       "status": "available",
       "scope": "Build with the native SDK. Plugin updates require a game restart. [SDK guide](docs/reference/native.md)."
     },
     {
       "name": "In-game mod apps",
+      "short_name": "Apps",
       "status": "available",
       "scope": "Open Lua and native mods through the central Mods window, with optional game-desktop icons. Lua apps can use native windows, PNGs and document layouts. [Lua app guide](docs/recipes/lua-apps.md)."
     },
     {
       "name": "Static GLB scenery",
+      "short_name": "GLB scenery",
       "status": "available",
       "scope": "Import static models and textures into the scenery catalog. Keep required packs installed for your saves. [Scenery guide](docs/guides/scenery.md)."
     },
     {
       "name": "Camera, objects and world actions",
-      "short_name": "Game APIs",
+      "short_name": "Game basics",
       "status": "available",
       "scope": "Use the documented camera, time, object and checked world-operation APIs. [API reference](docs/reference/index.md)."
     },
     {
+      "name": "Character design",
+      "short_name": "Characters",
+      "status": "experimental",
+      "scope": "Create character definitions and variants; edit stats, appearance, weapons and abilities from Lua. [Gameplay guide](docs/experimental/gameplay.md)."
+    },
+    {
+      "name": "Actors, quests and Monster Zones",
+      "short_name": "Actors / quests",
+      "status": "experimental",
+      "scope": "Place, move and remove supported NPCs, Monsters and Bosses. Edit quests, Boss phases and Monster Zones, including native paint and erase tools."
+    },
+    {
+      "name": "Dungeon tools",
+      "short_name": "Dungeon",
+      "status": "experimental",
+      "scope": "Edit Dungeon cells, themes, lighting, paint, gizmos and instances. Building operations use the active editable Dungeon template."
+    },
+    {
+      "name": "Modular building tools",
+      "short_name": "Modular",
+      "status": "experimental",
+      "scope": "Place modular prefabs, read layouts, add or remove blocks and entrances, and use the supported native Undo and Redo routes."
+    },
+    {
+      "name": "Terrain, paths and scenery tools",
+      "short_name": "World tools",
+      "status": "experimental",
+      "scope": "Edit Regions and terrain, build paths and curved walls, and paint, group or transform scenery through native game operations."
+    },
+    {
+      "name": "Management and development tools",
+      "short_name": "Economy",
+      "status": "experimental",
+      "scope": "Manage fees, loans, staff, marketing, game releases, research projects and server networks from Lua."
+    },
+    {
       "name": "Native patches",
+      "short_name": "Patches",
       "status": "experimental",
       "scope": "Observe named game calls with ordered callbacks and conflict diagnostics. [Patch guide](docs/experimental/patches.md)."
     },
     {
       "name": "Vortex installation",
+      "short_name": "Vortex",
       "status": "available",
       "scope": "Manage the player Runtime and mod ZIPs using the separate Vortex Extension. [Install guide](integrations/vortex/README.md)."
     },
     {
       "name": "Editor types and agent docs",
-      "short_name": "Editor and agent docs",
+      "short_name": "Editor docs",
       "status": "available",
       "scope": "Generated Lua types, complete examples and a versioned machine contract. [Agent entry point](docs/agents/start.md)."
     },
     {
       "name": "Multiplayer mods",
-      "short_name": "Co-op mods",
+      "short_name": "MP",
       "status": "partial",
-      "scope": "Runtime for Multiplayer Early Beta 18, including the native right-click route. Other mods need explicit multiplayer integration; installing the Framework alone does not synchronize them."
+      "scope": "Run the separate Multiplayer mod with its matching requirements. Other mods need their own synchronization; the new Lua gameplay mutations currently run in singleplayer."
     },
     {
       "name": "Animated models and C#",
+      "short_name": "C# / anim",
       "status": "planned",
       "scope": "Future extensions. The current release uses static scenery, Lua and native C++."
     }

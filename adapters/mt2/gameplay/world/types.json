@@ -1,0 +1,6 @@
+{
+  "MT2WorldEntity":{"handle":"MT2Handle","x":"number","y":"number","z":"number","region_active":"boolean","building":"boolean","type":"string","variant":"string"},
+  "MT2SubscriberHandle":{"epoch":"integer","id":"integer"},
+  "MT2SubscriberCandidates":{"epoch":"integer","existing_count":"integer","scanned_count":"integer","eligible_count":"integer","scan_complete":"boolean","handles":"MT2SubscriberHandle[]"},
+  "MT2SubscriberState":{"handle":"MT2SubscriberHandle","subscriber_count":"integer","satisfaction":"integer","addiction":"integer","logged_in_seconds":"number","logged_in":"boolean","needs":"number[]"}
+}

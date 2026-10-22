@@ -1,0 +1,835 @@
+[
+  {
+    "name": "management.fees",
+    "kind": "query",
+    "parameters": [],
+    "returns": "MT2ManagementFees",
+    "summary": "Read game purchase and subscription fees",
+    "errors": [
+      "Exact supported executable and current game thread required",
+      "Loaded world and current epoch required",
+      "Native owner, arguments, or readback differ; inspect unknown actions before retry"
+    ],
+    "native_evidence": [
+      "Multiplayer commit 8a13602: src/game/management_runtime.cpp"
+    ]
+  },
+  {
+    "name": "management.loans",
+    "kind": "query",
+    "parameters": [],
+    "returns": "MT2ManagementLoans",
+    "summary": "Read current loans and eligible loan offers",
+    "errors": [
+      "Exact supported executable and current game thread required",
+      "Loaded world and current epoch required",
+      "Native owner, arguments, or readback differ; inspect unknown actions before retry"
+    ],
+    "native_evidence": [
+      "Multiplayer commit 8a13602: src/game/management_runtime.cpp"
+    ]
+  },
+  {
+    "name": "management.staff",
+    "kind": "query",
+    "parameters": [],
+    "returns": "MT2ManagementStaff",
+    "summary": "Read Game Master employment and exact UID handles",
+    "errors": [
+      "Exact supported executable and current game thread required",
+      "Loaded world and current epoch required",
+      "Native owner, arguments, or readback differ; inspect unknown actions before retry"
+    ],
+    "native_evidence": [
+      "Multiplayer commit 8a13602: src/game/management_runtime.cpp"
+    ]
+  },
+  {
+    "name": "management.statistics",
+    "kind": "query",
+    "parameters": [],
+    "returns": "MT2ManagementStatistics",
+    "summary": "Read software statistics and development point balances",
+    "errors": [
+      "Exact supported executable and current game thread required",
+      "Loaded world and current epoch required",
+      "Native owner, arguments, or readback differ; inspect unknown actions before retry"
+    ],
+    "native_evidence": [
+      "Multiplayer commit 8a13602: src/game/management_runtime.cpp"
+    ]
+  },
+  {
+    "name": "management.release",
+    "kind": "query",
+    "parameters": [],
+    "returns": "MT2ManagementRelease",
+    "summary": "Read software version and the current release",
+    "errors": [
+      "Exact supported executable and current game thread required",
+      "Loaded world and current epoch required",
+      "Native owner, arguments, or readback differ; inspect unknown actions before retry"
+    ],
+    "native_evidence": [
+      "Multiplayer commit 8a13602: src/game/management_runtime.cpp"
+    ]
+  },
+  {
+    "name": "management.policies",
+    "kind": "query",
+    "parameters": [],
+    "returns": "MT2ManagementPolicy[]",
+    "summary": "Read chat and cheat Game Master policies",
+    "errors": [
+      "Exact supported executable and current game thread required",
+      "Loaded world and current epoch required",
+      "Native owner, arguments, or readback differ; inspect unknown actions before retry"
+    ],
+    "native_evidence": [
+      "Multiplayer commit 8a13602: src/game/management_runtime.cpp"
+    ]
+  },
+  {
+    "name": "management.rules",
+    "kind": "query",
+    "parameters": [],
+    "returns": "MT2ManagementRules",
+    "summary": "Read experience, respawn, and feature rules",
+    "errors": [
+      "Exact supported executable and current game thread required",
+      "Loaded world and current epoch required",
+      "Native owner, arguments, or readback differ; inspect unknown actions before retry"
+    ],
+    "native_evidence": [
+      "Multiplayer commit 8a13602: src/game/management_runtime.cpp"
+    ]
+  },
+  {
+    "name": "management.campaigns",
+    "kind": "query",
+    "parameters": [],
+    "returns": "MT2ManagementCampaigns",
+    "summary": "Read active advertising campaigns and native daily costs",
+    "errors": [
+      "Exact supported executable and current game thread required",
+      "Loaded world and current epoch required",
+      "Native owner, arguments, or readback differ; inspect unknown actions before retry"
+    ],
+    "native_evidence": [
+      "Multiplayer commit 8a13602: src/game/management_runtime.cpp"
+    ]
+  },
+  {
+    "name": "management.services",
+    "kind": "query",
+    "parameters": [
+      {
+        "name": "building",
+        "type": "MT2Handle",
+        "description": "Current building handle returned by the world object API"
+      }
+    ],
+    "returns": "MT2ManagementService[]",
+    "summary": "Read services owned by the exact current building",
+    "errors": [
+      "Exact supported executable and current game thread required",
+      "Loaded world and current epoch required",
+      "Native owner, arguments, or readback differ; inspect unknown actions before retry"
+    ],
+    "native_evidence": [
+      "Multiplayer commit 8a13602: src/game/management_services.inc"
+    ]
+  },
+  {
+    "name": "management.release_cycle",
+    "kind": "query",
+    "parameters": [],
+    "returns": "MT2ManagementReleaseCycle",
+    "summary": "Read current native release phase, history count, and free points",
+    "errors": [
+      "Exact supported executable and current game thread required",
+      "Loaded world and current epoch required",
+      "Native owner, arguments, or readback differ; inspect unknown actions before retry"
+    ],
+    "native_evidence": [
+      "Multiplayer commit 8a13602: src/game/release_cycle_runtime.inc"
+    ]
+  },
+  {
+    "name": "management.set_purchase_fee",
+    "kind": "action",
+    "parameters": [
+      {
+        "name": "value",
+        "type": "integer",
+        "description": "Nonnegative int32 native value"
+      }
+    ],
+    "returns": "table",
+    "summary": "Set the game purchase fee",
+    "errors": [
+      "Exact supported executable and current game thread required",
+      "Loaded world and current epoch required",
+      "Native owner, arguments, or readback differ; inspect unknown actions before retry"
+    ],
+    "native_evidence": [
+      "Multiplayer commit 8a13602: src/game/ui_price_runtime.cpp"
+    ]
+  },
+  {
+    "name": "management.set_subscription_fee",
+    "kind": "action",
+    "parameters": [
+      {
+        "name": "value",
+        "type": "integer",
+        "description": "Nonnegative int32 native value"
+      }
+    ],
+    "returns": "table",
+    "summary": "Set the monthly subscription fee",
+    "errors": [
+      "Exact supported executable and current game thread required",
+      "Loaded world and current epoch required",
+      "Native owner, arguments, or readback differ; inspect unknown actions before retry"
+    ],
+    "native_evidence": [
+      "Multiplayer commit 8a13602: src/game/ui_price_runtime.cpp"
+    ]
+  },
+  {
+    "name": "management.allocate_release_funds",
+    "kind": "action",
+    "parameters": [
+      {
+        "name": "value",
+        "type": "integer",
+        "description": "Nonnegative int32 native value"
+      }
+    ],
+    "returns": "table",
+    "summary": "Set allocated release funds using the original charge or refund",
+    "errors": [
+      "Exact supported executable and current game thread required",
+      "Loaded world and current epoch required",
+      "Native owner, arguments, or readback differ; inspect unknown actions before retry"
+    ],
+    "native_evidence": [
+      "Multiplayer commit 8a13602: src/game/management_runtime.cpp"
+    ]
+  },
+  {
+    "name": "management.set_respawn_seconds",
+    "kind": "action",
+    "parameters": [
+      {
+        "name": "value",
+        "type": "integer",
+        "description": "Nonnegative int32 native value"
+      }
+    ],
+    "returns": "table",
+    "summary": "Set subscriber respawn wait in seconds",
+    "errors": [
+      "Exact supported executable and current game thread required",
+      "Loaded world and current epoch required",
+      "Native owner, arguments, or readback differ; inspect unknown actions before retry"
+    ],
+    "native_evidence": [
+      "Multiplayer commit 8a13602: src/game/game_rules_native.cpp"
+    ]
+  },
+  {
+    "name": "management.hire_gm",
+    "kind": "action",
+    "parameters": [],
+    "returns": "table",
+    "summary": "Hire one Game Master",
+    "errors": [
+      "Exact supported executable and current game thread required",
+      "Loaded world and current epoch required",
+      "Native owner, arguments, or readback differ; inspect unknown actions before retry"
+    ],
+    "native_evidence": [
+      "Multiplayer commit 8a13602: src/game/management_runtime.cpp"
+    ]
+  },
+  {
+    "name": "management.fire_gm",
+    "kind": "action",
+    "parameters": [],
+    "returns": "table",
+    "summary": "Fire one Game Master",
+    "errors": [
+      "Exact supported executable and current game thread required",
+      "Loaded world and current epoch required",
+      "Native owner, arguments, or readback differ; inspect unknown actions before retry"
+    ],
+    "native_evidence": [
+      "Multiplayer commit 8a13602: src/game/management_runtime.cpp"
+    ]
+  },
+  {
+    "name": "management.take_loan",
+    "kind": "action",
+    "parameters": [
+      {
+        "name": "key",
+        "type": "string",
+        "description": "Exact key from management.loans"
+      }
+    ],
+    "returns": "table",
+    "summary": "Take an eligible loan offer by exact key",
+    "errors": [
+      "Exact supported executable and current game thread required",
+      "Loaded world and current epoch required",
+      "Native owner, arguments, or readback differ; inspect unknown actions before retry"
+    ],
+    "native_evidence": [
+      "Multiplayer commit 8a13602: src/game/management_runtime.cpp"
+    ]
+  },
+  {
+    "name": "management.repay_loan",
+    "kind": "action",
+    "parameters": [
+      {
+        "name": "key",
+        "type": "string",
+        "description": "Exact key from management.loans"
+      }
+    ],
+    "returns": "table",
+    "summary": "Repay the current loan by exact key",
+    "errors": [
+      "Exact supported executable and current game thread required",
+      "Loaded world and current epoch required",
+      "Native owner, arguments, or readback differ; inspect unknown actions before retry"
+    ],
+    "native_evidence": [
+      "Multiplayer commit 8a13602: src/game/management_runtime.cpp"
+    ]
+  },
+  {
+    "name": "management.purchase_statistic",
+    "kind": "action",
+    "parameters": [
+      {
+        "name": "index",
+        "type": "integer",
+        "description": "Native zero-based statistic index, 0 through 9"
+      }
+    ],
+    "returns": "table",
+    "summary": "Purchase the next native statistic project",
+    "errors": [
+      "Exact supported executable and current game thread required",
+      "Loaded world and current epoch required",
+      "Native owner, arguments, or readback differ; inspect unknown actions before retry"
+    ],
+    "native_evidence": [
+      "Multiplayer commit 8a13602: src/game/management_runtime.cpp"
+    ]
+  },
+  {
+    "name": "management.spend_statistics",
+    "kind": "action",
+    "parameters": [
+      {
+        "name": "values",
+        "type": "integer[]",
+        "description": "Ten nonnegative point allocations in native statistic order"
+      }
+    ],
+    "returns": "table",
+    "summary": "Spend development points through each original statistic function",
+    "errors": [
+      "Exact supported executable and current game thread required",
+      "Loaded world and current epoch required",
+      "Native owner, arguments, or readback differ; inspect unknown actions before retry"
+    ],
+    "native_evidence": [
+      "Multiplayer commit 8a13602: src/game/management_runtime.cpp"
+    ]
+  },
+  {
+    "name": "management.set_policy",
+    "kind": "action",
+    "parameters": [
+      {
+        "name": "policy",
+        "type": "integer",
+        "description": "0 for chat or 1 for cheating"
+      },
+      {
+        "name": "field",
+        "type": "string",
+        "description": "enabled, watchSeconds, checkLog, isBannable, banFavorites, banInfluencers, or warnsBeforeBan"
+      },
+      {
+        "name": "value",
+        "type": "boolean|integer",
+        "description": "Boolean field or watchSeconds 0 through 3600 or warnsBeforeBan 0 through 30"
+      }
+    ],
+    "returns": "table",
+    "summary": "Set one native GM policy property and notify its owner",
+    "errors": [
+      "Exact supported executable and current game thread required",
+      "Loaded world and current epoch required",
+      "Native owner, arguments, or readback differ; inspect unknown actions before retry"
+    ],
+    "native_evidence": [
+      "Multiplayer commit 8a13602: src/game/gm_policy_native.cpp"
+    ]
+  },
+  {
+    "name": "management.set_respawn_delay",
+    "kind": "action",
+    "parameters": [
+      {
+        "name": "value",
+        "type": "boolean",
+        "description": "Requested native Boolean value"
+      }
+    ],
+    "returns": "table",
+    "summary": "Set whether respawn waits for subscribers",
+    "errors": [
+      "Exact supported executable and current game thread required",
+      "Loaded world and current epoch required",
+      "Native owner, arguments, or readback differ; inspect unknown actions before retry"
+    ],
+    "native_evidence": [
+      "Multiplayer commit 8a13602: src/game/game_rules_native.cpp"
+    ]
+  },
+  {
+    "name": "management.set_xp",
+    "kind": "action",
+    "parameters": [
+      {
+        "name": "values",
+        "type": "integer[]",
+        "description": "Exactly thirteen editable native XP values; the hidden first word is preserved"
+      }
+    ],
+    "returns": "table",
+    "summary": "Apply the complete editable experience rule block",
+    "errors": [
+      "Exact supported executable and current game thread required",
+      "Loaded world and current epoch required",
+      "Native owner, arguments, or readback differ; inspect unknown actions before retry"
+    ],
+    "native_evidence": [
+      "Multiplayer commit 8a13602: src/game/game_rules_native.cpp"
+    ]
+  },
+  {
+    "name": "management.set_feature",
+    "kind": "action",
+    "parameters": [
+      {
+        "name": "index",
+        "type": "integer",
+        "description": "0 for PvP duels or 1 for parties"
+      },
+      {
+        "name": "enabled",
+        "type": "boolean",
+        "description": "Requested feature state; technology must be available"
+      }
+    ],
+    "returns": "table",
+    "summary": "Set an unlocked gameplay feature through the original native setter",
+    "errors": [
+      "Exact supported executable and current game thread required",
+      "Loaded world and current epoch required",
+      "Native owner, arguments, or readback differ; inspect unknown actions before retry"
+    ],
+    "native_evidence": [
+      "Multiplayer commit 8a13602: src/game/game_rules_native.cpp"
+    ]
+  },
+  {
+    "name": "management.set_release_type",
+    "kind": "action",
+    "parameters": [
+      {
+        "name": "type",
+        "type": "integer",
+        "description": "1 for hotfix, 2 for minor, or 3 for major"
+      }
+    ],
+    "returns": "table",
+    "summary": "Set release kind and calculate the next native version",
+    "errors": [
+      "Exact supported executable and current game thread required",
+      "Loaded world and current epoch required",
+      "Native owner, arguments, or readback differ; inspect unknown actions before retry"
+    ],
+    "native_evidence": [
+      "Multiplayer commit 8a13602: src/game/release_edit_native.cpp"
+    ]
+  },
+  {
+    "name": "management.set_release_title",
+    "kind": "action",
+    "parameters": [
+      {
+        "name": "text",
+        "type": "string",
+        "description": "Native text, up to 50000 bytes without NUL"
+      }
+    ],
+    "returns": "table",
+    "summary": "Set the release planner title",
+    "errors": [
+      "Exact supported executable and current game thread required",
+      "Loaded world and current epoch required",
+      "Native owner, arguments, or readback differ; inspect unknown actions before retry"
+    ],
+    "native_evidence": [
+      "Multiplayer commit 8a13602: src/game/release_edit_native.cpp"
+    ]
+  },
+  {
+    "name": "management.set_release_announcement",
+    "kind": "action",
+    "parameters": [
+      {
+        "name": "text",
+        "type": "string",
+        "description": "Native text, up to 50000 bytes without NUL"
+      }
+    ],
+    "returns": "table",
+    "summary": "Set the release announcement; empty text restores its native default",
+    "errors": [
+      "Exact supported executable and current game thread required",
+      "Loaded world and current epoch required",
+      "Native owner, arguments, or readback differ; inspect unknown actions before retry"
+    ],
+    "native_evidence": [
+      "Multiplayer commit 8a13602: src/game/release_edit_native.cpp"
+    ]
+  },
+  {
+    "name": "management.set_release_changelog",
+    "kind": "action",
+    "parameters": [
+      {
+        "name": "text",
+        "type": "string",
+        "description": "Native text, up to 50000 bytes without NUL"
+      }
+    ],
+    "returns": "table",
+    "summary": "Set and enable a custom changelog; empty text restores its native default",
+    "errors": [
+      "Exact supported executable and current game thread required",
+      "Loaded world and current epoch required",
+      "Native owner, arguments, or readback differ; inspect unknown actions before retry"
+    ],
+    "native_evidence": [
+      "Multiplayer commit 8a13602: src/game/release_edit_native.cpp"
+    ]
+  },
+  {
+    "name": "management.reset_release_text",
+    "kind": "action",
+    "parameters": [],
+    "returns": "table",
+    "summary": "Restore native default announcement and changelog and disable custom text",
+    "errors": [
+      "Exact supported executable and current game thread required",
+      "Loaded world and current epoch required",
+      "Native owner, arguments, or readback differ; inspect unknown actions before retry"
+    ],
+    "native_evidence": [
+      "Multiplayer commit 8a13602: src/game/release_edit_native.cpp"
+    ]
+  },
+  {
+    "name": "management.enable_release_custom",
+    "kind": "action",
+    "parameters": [],
+    "returns": "table",
+    "summary": "Enable the current native custom release text",
+    "errors": [
+      "Exact supported executable and current game thread required",
+      "Loaded world and current epoch required",
+      "Native owner, arguments, or readback differ; inspect unknown actions before retry"
+    ],
+    "native_evidence": [
+      "Multiplayer commit 8a13602: src/game/release_edit_native.cpp"
+    ]
+  },
+  {
+    "name": "management.show_release",
+    "kind": "action",
+    "parameters": [],
+    "returns": "table",
+    "summary": "Check native release eligibility and show its announcement; launch releases publish immediately",
+    "errors": [
+      "Exact supported executable and current game thread required",
+      "Loaded world and current epoch required",
+      "Native owner, arguments, or readback differ; inspect unknown actions before retry"
+    ],
+    "native_evidence": [
+      "Multiplayer commit 8a13602: src/game/release_cycle_runtime.inc"
+    ]
+  },
+  {
+    "name": "management.begin_release",
+    "kind": "action",
+    "parameters": [],
+    "returns": "table",
+    "summary": "Begin the current release celebration; hotfixes publish immediately",
+    "errors": [
+      "Exact supported executable and current game thread required",
+      "Loaded world and current epoch required",
+      "Native owner, arguments, or readback differ; inspect unknown actions before retry"
+    ],
+    "native_evidence": [
+      "Multiplayer commit 8a13602: src/game/release_cycle_runtime.inc"
+    ]
+  },
+  {
+    "name": "management.abort_release",
+    "kind": "action",
+    "parameters": [],
+    "returns": "table",
+    "summary": "Abort the current release celebration",
+    "errors": [
+      "Exact supported executable and current game thread required",
+      "Loaded world and current epoch required",
+      "Native owner, arguments, or readback differ; inspect unknown actions before retry"
+    ],
+    "native_evidence": [
+      "Multiplayer commit 8a13602: src/game/release_cycle_runtime.inc"
+    ]
+  },
+  {
+    "name": "management.skip_release",
+    "kind": "action",
+    "parameters": [],
+    "returns": "table",
+    "summary": "Skip the current release celebration and publish through the native path",
+    "errors": [
+      "Exact supported executable and current game thread required",
+      "Loaded world and current epoch required",
+      "Native owner, arguments, or readback differ; inspect unknown actions before retry"
+    ],
+    "native_evidence": [
+      "Multiplayer commit 8a13602: src/game/release_cycle_runtime.inc"
+    ]
+  },
+  {
+    "name": "management.publish_release",
+    "kind": "action",
+    "parameters": [],
+    "returns": "table",
+    "summary": "Publish the current announced release by skipping its active celebration",
+    "errors": [
+      "Exact supported executable and current game thread required",
+      "Loaded world and current epoch required",
+      "Native owner, arguments, or readback differ; inspect unknown actions before retry"
+    ],
+    "native_evidence": [
+      "Multiplayer commit 8a13602: src/game/release_cycle_runtime.inc"
+    ]
+  },
+  {
+    "name": "management.set_service_price",
+    "kind": "action",
+    "parameters": [
+      {
+        "name": "building",
+        "type": "MT2Handle",
+        "description": "Current building handle returned by the world object API"
+      },
+      {
+        "name": "ordinal",
+        "type": "integer",
+        "description": "Zero-based service ordinal from management.services"
+      },
+      {
+        "name": "currency",
+        "type": "integer",
+        "description": "0 or 1 in the native Price currency enum"
+      },
+      {
+        "name": "value",
+        "type": "integer",
+        "description": "Nonnegative int32 native value"
+      }
+    ],
+    "returns": "table",
+    "summary": "Set the exact owned service price and update its shared configuration if synchronized",
+    "errors": [
+      "Exact supported executable and current game thread required",
+      "Loaded world and current epoch required",
+      "Native owner, arguments, or readback differ; inspect unknown actions before retry"
+    ],
+    "native_evidence": [
+      "Multiplayer commit 8a13602: src/game/management_services.inc"
+    ]
+  },
+  {
+    "name": "management.set_service_sync",
+    "kind": "action",
+    "parameters": [
+      {
+        "name": "building",
+        "type": "MT2Handle",
+        "description": "Current building handle returned by the world object API"
+      },
+      {
+        "name": "ordinal",
+        "type": "integer",
+        "description": "Zero-based service ordinal from management.services"
+      },
+      {
+        "name": "value",
+        "type": "boolean",
+        "description": "Requested native Boolean value"
+      }
+    ],
+    "returns": "table",
+    "summary": "Set service price synchronization when allowed by its prototype",
+    "errors": [
+      "Exact supported executable and current game thread required",
+      "Loaded world and current epoch required",
+      "Native owner, arguments, or readback differ; inspect unknown actions before retry"
+    ],
+    "native_evidence": [
+      "Multiplayer commit 8a13602: src/game/management_services.inc"
+    ]
+  },
+  {
+    "name": "management.start_campaign",
+    "kind": "action",
+    "parameters": [
+      {
+        "name": "type",
+        "type": "integer",
+        "description": "Native campaign type, 0 through 8"
+      }
+    ],
+    "returns": "table",
+    "summary": "Pay for and start a seven-day native advertising campaign",
+    "errors": [
+      "Exact supported executable and current game thread required",
+      "Loaded world and current epoch required",
+      "Native owner, arguments, or readback differ; inspect unknown actions before retry"
+    ],
+    "native_evidence": [
+      "Multiplayer commit 8a13602: src/game/marketing_authority/native_port.cpp"
+    ]
+  },
+  {
+    "name": "management.abort_campaign",
+    "kind": "action",
+    "parameters": [
+      {
+        "name": "type",
+        "type": "integer",
+        "description": "Native campaign type, 0 through 8"
+      }
+    ],
+    "returns": "table",
+    "summary": "Abort the current native advertising campaign",
+    "errors": [
+      "Exact supported executable and current game thread required",
+      "Loaded world and current epoch required",
+      "Native owner, arguments, or readback differ; inspect unknown actions before retry"
+    ],
+    "native_evidence": [
+      "Multiplayer commit 8a13602: src/game/marketing_authority/native_port.cpp"
+    ]
+  },
+  {
+    "name": "management.set_buzz",
+    "kind": "action",
+    "parameters": [
+      {
+        "name": "positive",
+        "type": "integer",
+        "description": "Signed int32 positive-buzz accumulator"
+      },
+      {
+        "name": "negative",
+        "type": "integer",
+        "description": "Signed int32 negative-buzz accumulator"
+      }
+    ],
+    "returns": "table",
+    "summary": "Set both native marketing buzz accumulators with guarded stores",
+    "errors": [
+      "Exact supported executable and current game thread required",
+      "Loaded world and current epoch required",
+      "Native owner, arguments, or readback differ; inspect unknown actions before retry"
+    ],
+    "native_evidence": [
+      "Multiplayer commit 8a13602: src/game/marketing_authority/native_port.cpp"
+    ]
+  },
+  {
+    "name": "management.purge_expired_awards",
+    "kind": "action",
+    "parameters": [],
+    "returns": "table",
+    "summary": "Purge native awards older than the current six-day retention interval",
+    "errors": [
+      "Exact supported executable and current game thread required",
+      "Loaded world and current epoch required",
+      "Native owner, arguments, or readback differ; inspect unknown actions before retry"
+    ],
+    "native_evidence": [
+      "Multiplayer commit 8a13602: src/game/marketing_authority/native_port.cpp"
+    ]
+  },
+  {
+    "name": "management.add_award",
+    "kind": "action",
+    "parameters": [
+      {
+        "name": "name",
+        "type": "string",
+        "description": "Native LocString base text, up to 256 bytes, without arguments"
+      },
+      {
+        "name": "source",
+        "type": "string",
+        "description": "Native LocString source base text, up to 256 bytes, without arguments"
+      },
+      {
+        "name": "impressions",
+        "type": "integer",
+        "description": "Nonnegative int32 impression count"
+      },
+      {
+        "name": "conversions",
+        "type": "integer",
+        "description": "Nonnegative int32 conversion count"
+      },
+      {
+        "name": "good",
+        "type": "boolean",
+        "description": "Whether the native award is positive"
+      }
+    ],
+    "returns": "table",
+    "summary": "Construct and add a native marketing award for the current game day",
+    "errors": [
+      "Exact supported executable and current game thread required",
+      "Loaded world and current epoch required",
+      "Native owner, arguments, or readback differ; inspect unknown actions before retry"
+    ],
+    "native_evidence": [
+      "Multiplayer commit 8a13602: src/game/marketing_authority/native_port.cpp"
+    ]
+  }
+]

@@ -1,0 +1,11 @@
+{
+  "MT2SceneryClipPoint": {"x": "integer", "z": "integer"},
+  "MT2SceneryDot": {"position": "number[]", "rotation": "number[]?", "scale": "number[]?"},
+  "MT2SceneryStrokeStamp": {"shape": "MT2SceneryClipPoint[][]", "dots": "MT2SceneryDot[]?"},
+  "MT2SceneryBugAnchor": {"handle": "MT2Handle", "position": "number[]", "bugs": "integer[][]"},
+  "MT2SceneryStrokeResult": {"created": "MT2SceneryProp[]", "removed": "MT2SceneryProp[]", "births": "integer", "paid": "integer", "refund": "integer", "bug_anchors_before": "MT2SceneryBugAnchor[]", "bug_anchors_after": "MT2SceneryBugAnchor[]"},
+  "MT2SceneryTransform": {"handle": "MT2Handle", "position": "number[]", "rotation": "number[]?", "scale": "number[]?"},
+  "MT2SceneryProp": {"handle": "MT2Handle", "pose": "number[]", "region": "integer"},
+  "MT2SceneryGroupMember": {"handle": "MT2Handle", "pose": "number[]", "region": "integer", "relative_pose": "number[]"},
+  "MT2SceneryGroup": {"handle": "MT2Handle", "pose": "number[]", "region": "integer", "members": "MT2SceneryGroupMember[]"}
+}

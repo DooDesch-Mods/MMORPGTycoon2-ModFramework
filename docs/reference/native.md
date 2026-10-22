@@ -73,6 +73,9 @@ Lua wrappers use the following operations. `ui.begin` and `ui.end` are native ho
 - `config.get`
 - `config.set`
 - `content.register`
+- `gameplay.action`
+- `gameplay.operations`
+- `gameplay.query`
 - `input.bind`
 - `log`
 - `objects.building`

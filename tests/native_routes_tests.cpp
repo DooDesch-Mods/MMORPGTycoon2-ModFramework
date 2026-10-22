@@ -2,6 +2,7 @@
 #include <cstring>
 #include <iostream>
 #include <stdexcept>
+#include "../src/core/crypto.h"
 
 using namespace mt2fw;
 using namespace mt2fw::mt2;
@@ -80,6 +81,16 @@ int main(){try{
     check(api.hook_enable(api.context,"unique",&receipt)==MT2FW_MT2_OK&&receipt.state==MT2FW_MT2_ROUTE_ENABLED&&enabled==1,"explicit enable after publication");
     check(api.hook_enable(api.context,"unique",&receipt)==MT2FW_MT2_INVALID&&enabled==1,"enabled hook not repeated");
     check(api.code_verify(api.context,"unique",0,pristine.data()+64,16,&receipt)==MT2FW_MT2_OK,"pristine guard and owned active route accepted together");
+    service.set_game_thread(GetCurrentThreadId());
+    std::string body_cause;auto body_sha=digest(std::string(reinterpret_cast<const char*>(pristine.data()+64),64));
+    check(service.verify_body(64,64,body_sha,body_cause),"Gameplay full-body proof accepts acknowledged active hook");
+    check(!service.verify_body(64,64,std::string(64,'0'),body_cause)&&body_cause.find("SHA256")!=std::string::npos,"Gameplay rejects incorrect pristine body hash");
+    check(service.verify_body(64,64,"",body_cause),"Gameplay helper entry uses exact-build pristine proof");
+    live[110]^=1;
+    check(!service.verify_body(64,64,body_sha,body_cause)&&body_cause.find("live body")!=std::string::npos,"Gameplay detects changed bytes beyond the hook entry");live[110]=pristine[110];
+    check(!service.verify_body(64,65537,body_sha,body_cause),"Gameplay body reads stay bounded");
+    service.set_game_thread(101);
+    if(GetCurrentThreadId()!=101)check(!service.verify_body(64,64,body_sha,body_cause)&&body_cause.find("game thread")!=std::string::npos,"Gameplay code verification rejects another thread");
     check(api.code_verify(api.context,"unique",36,pristine.data()+100,8,&receipt)==MT2FW_MT2_OK,"unpatched body guard accepted");
     live[100]^=1;check(api.code_verify(api.context,"unique",36,pristine.data()+100,8,&receipt)==MT2FW_MT2_FAILED,"foreign body modification rejected");live[100]=pristine[100];
     unsigned char wrong[2]={0,0};check(api.code_verify(api.context,"unique",0,wrong,2,&receipt)==MT2FW_MT2_FAILED,"incorrect pristine expectation rejected");

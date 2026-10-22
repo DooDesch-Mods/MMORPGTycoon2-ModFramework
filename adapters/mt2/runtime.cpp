@@ -5,6 +5,7 @@
 #include "world_markers.h"
 #include "document_ui.h"
 #include "native_services.h"
+#include "gameplay/context.h"
 #include "native_routes_windows.h"
 #include "native_ownership.h"
 #include "native_patches.h"
@@ -852,6 +853,10 @@ extern "C" __declspec(dllexport) bool MT2FW_InitInstalled(const MT2FW_Bootstrap*
         });
         runtime->set_patch_authority([](const std::string& operation,std::string& cause){if(!native_patches){cause="Native session authority is unavailable";return false;}return native_patches->authorize(operation,cause);});
         native_routes->configure(reinterpret_cast<uintptr_t>(GetModuleHandleW(nullptr)),mt2::windows_route_backend(fs::path(receipt->game)/"MT2.exe"));
+        mt2::gameplay::configure_code_verifier([](uint64_t rva,size_t bytes,const std::string& sha,std::string& cause){
+            if(!native_routes){cause="Native route service unavailable";return false;}
+            return native_routes->verify_body(rva,bytes,sha,cause);
+        });
         mt2::load_multiplayer_catalog(*native_routes);
         native_routes->catalog("ui.world_marker.draw",0x9c9070,true);
         mt2::world_markers::configure(*runtime);

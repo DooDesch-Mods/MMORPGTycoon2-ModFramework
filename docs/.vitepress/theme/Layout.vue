@@ -27,6 +27,7 @@ const guideLinks = [
   { text: 'Events and input', href: '/guides/events-input.html' },
   { text: 'Lua apps and dashboards', href: '/recipes/lua-apps.html' },
   { text: 'World actions', href: '/guides/world-actions.html' },
+  { text: 'Gameplay APIs', href: '/experimental/gameplay.html' },
   { text: 'Import GLB scenery', href: '/guides/scenery.html' },
   { text: 'Patch callbacks', href: '/experimental/patches.html' },
   { text: 'Profile a mod', href: '/guides/profiling.html' },

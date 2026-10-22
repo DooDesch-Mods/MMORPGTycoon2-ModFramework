@@ -12,3 +12,6 @@ __pycache__/
 *.log
 /examples/*/build/
 /evidence/patches-*/
+/evidence/docs-probe-*/
+/tests/gameplay/**/_build/
+/tests/gameplay/**/build/

@@ -2,6 +2,7 @@
 #include <algorithm>
 #include <cstring>
 #include <optional>
+#include "crypto.h"
 
 namespace mt2fw::mt2 {
 namespace {
@@ -19,6 +20,24 @@ NativeRoutes::NativeRoutes(std::function<Plugin*(const MT2FW_Host*)> lookup):loo
 NativeRoutes::PatchLease::PatchLease(NativeRoutes& value):service(value){std::lock_guard lock(service.gate_);runtime=service.patch_runtime_;if(runtime)++service.patch_inflight_;}
 NativeRoutes::PatchLease::~PatchLease(){if(runtime){std::lock_guard lock(service.gate_);--service.patch_inflight_;}}
 void NativeRoutes::configure(uintptr_t image,Backend backend){image_=image;backend_=std::move(backend);}
+bool NativeRoutes::verify_body(uint64_t rva,size_t bytes,const std::string& sha,std::string& cause){
+    std::lock_guard lock(gate_);
+    if(!image_||!bytes||bytes>65536||rva>UINT32_MAX||bytes>UINT32_MAX-rva||(!sha.empty()&&sha.size()!=64)){cause="Native body proof bounds or hash invalid";return false;}
+    if(!game_thread_.load()||game_thread_.load()!=GetCurrentThreadId()){cause="Native body proof requires the bound game thread";return false;}
+    std::string pristine(bytes,'\0'),actual(bytes,'\0');
+    if(!backend_.pristine||!backend_.read||!backend_.pristine(rva,0,pristine.data(),bytes,cause))return false;
+    if(!sha.empty()&&digest(pristine)!=sha){cause="Native pristine body SHA256 differs";return false;}
+    auto expected=pristine;
+    for(auto& [name,target]:targets_)if(overlaps(rva,bytes,target.rva,32)){
+        if(target.state==MT2FW_MT2_ROUTE_UNKNOWN){cause="Native route outcome unknown: "+name;return false;}
+        if(!validate(target,cause))return false;
+        Bytes route{};if(!compose(target,route,cause))return false;
+        for(size_t i=0;i<route.size();++i)if(target.rva+i>=rva&&target.rva+i-rva<bytes)expected[size_t(target.rva+i-rva)]=char(route[i]);
+    }
+    if(!backend_.read(image_+rva,actual.data(),bytes,cause))return false;
+    if(actual!=expected){cause="Native live body or acknowledged hook differs";return false;}
+    cause.clear();return true;
+}
 void NativeRoutes::catalog(const std::string& name,uint64_t rva,bool shared){
     std::lock_guard lock(gate_);if(!rva||targets_.contains(name))throw std::runtime_error("Native route catalog target absent or duplicated: "+name);
     for(auto& [key,value]:targets_)if(value.rva==rva)throw std::runtime_error("Native route catalog RVA aliases: "+key);

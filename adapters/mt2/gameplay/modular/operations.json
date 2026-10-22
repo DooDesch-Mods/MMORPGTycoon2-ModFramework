@@ -1,0 +1,302 @@
+[
+  {
+    "name": "modular.get_layout",
+    "kind": "query",
+    "parameters": [
+      {
+        "name": "building",
+        "type": "MT2Handle",
+        "description": "Exact current-epoch modular Building handle."
+      }
+    ],
+    "returns": "MT2ModularLayout",
+    "summary": "Capture the complete native Layout and Plan records for an existing modular Scenery/base Building.",
+    "errors": [
+      "Stale epoch or UID/class/owner mismatch",
+      "Native executable proof differs",
+      "Bounded original record capture or cleanup failed",
+      "Native admission rejected",
+      "Native effect or inverse readback differs; attempted work is never replayed"
+    ],
+    "native_evidence": [
+      "src/game/modular_calls.h",
+      "src/game/modular_transaction.h",
+      "src/game/modular_layout_graph.h",
+      "src/game/modular_identity.h",
+      "src/game/modular_code.h",
+      "src/game/subscriber_lifecycle/record_graph.cpp",
+      "src/game/building_history_slice/native_bridge.cpp"
+    ]
+  },
+  {
+    "name": "modular.history",
+    "kind": "query",
+    "parameters": [],
+    "returns": "MT2ModularHistory[]",
+    "summary": "List retained modular edit receipts and exact Undo/Redo top readiness.",
+    "errors": [
+      "Stale epoch or UID/class/owner mismatch",
+      "Native executable proof differs",
+      "Bounded original record capture or cleanup failed",
+      "Native admission rejected",
+      "Native effect or inverse readback differs; attempted work is never replayed"
+    ],
+    "native_evidence": [
+      "src/game/modular_calls.h",
+      "src/game/modular_transaction.h",
+      "src/game/modular_layout_graph.h",
+      "src/game/modular_identity.h",
+      "src/game/modular_code.h",
+      "src/game/subscriber_lifecycle/record_graph.cpp",
+      "src/game/building_history_slice/native_bridge.cpp"
+    ]
+  },
+  {
+    "name": "modular.add_block",
+    "kind": "action",
+    "parameters": [
+      {
+        "name": "building",
+        "type": "MT2Handle",
+        "description": "Existing modular Building."
+      },
+      {
+        "name": "position",
+        "type": "number[]",
+        "description": "Three finite world coordinates; add_block applies the original native position adjustment."
+      }
+    ],
+    "returns": "MT2ModularEditResult",
+    "summary": "Add one native modular block at the adjusted world position. Commit a complete original Layout/Plan/pose inverse to native Undo.",
+    "errors": [
+      "Stale epoch or UID/class/owner mismatch",
+      "Native executable proof differs",
+      "Bounded original record capture or cleanup failed",
+      "Native admission rejected",
+      "Native effect or inverse readback differs; attempted work is never replayed"
+    ],
+    "native_evidence": [
+      "src/game/modular_calls.h",
+      "src/game/modular_transaction.h",
+      "src/game/modular_layout_graph.h",
+      "src/game/modular_identity.h",
+      "src/game/modular_code.h",
+      "src/game/subscriber_lifecycle/record_graph.cpp",
+      "src/game/building_history_slice/native_bridge.cpp"
+    ]
+  },
+  {
+    "name": "modular.remove_block",
+    "kind": "action",
+    "parameters": [
+      {
+        "name": "building",
+        "type": "MT2Handle",
+        "description": "Existing modular Building."
+      },
+      {
+        "name": "position",
+        "type": "number[]",
+        "description": "Three finite world coordinates; add_block applies the original native position adjustment."
+      }
+    ],
+    "returns": "MT2ModularEditResult",
+    "summary": "Remove a native modular block at the world position. Commit a complete original Layout/Plan/pose inverse to native Undo.",
+    "errors": [
+      "Stale epoch or UID/class/owner mismatch",
+      "Native executable proof differs",
+      "Bounded original record capture or cleanup failed",
+      "Native admission rejected",
+      "Native effect or inverse readback differs; attempted work is never replayed"
+    ],
+    "native_evidence": [
+      "src/game/modular_calls.h",
+      "src/game/modular_transaction.h",
+      "src/game/modular_layout_graph.h",
+      "src/game/modular_identity.h",
+      "src/game/modular_code.h",
+      "src/game/subscriber_lifecycle/record_graph.cpp",
+      "src/game/building_history_slice/native_bridge.cpp"
+    ]
+  },
+  {
+    "name": "modular.add_entrance",
+    "kind": "action",
+    "parameters": [
+      {
+        "name": "building",
+        "type": "MT2Handle",
+        "description": "Existing modular Building."
+      },
+      {
+        "name": "position",
+        "type": "number[]",
+        "description": "Three finite world coordinates; add_block applies the original native position adjustment."
+      }
+    ],
+    "returns": "MT2ModularEditResult",
+    "summary": "Add a native modular entrance at the world position. Commit a complete original Layout/Plan/pose inverse to native Undo.",
+    "errors": [
+      "Stale epoch or UID/class/owner mismatch",
+      "Native executable proof differs",
+      "Bounded original record capture or cleanup failed",
+      "Native admission rejected",
+      "Native effect or inverse readback differs; attempted work is never replayed"
+    ],
+    "native_evidence": [
+      "src/game/modular_calls.h",
+      "src/game/modular_transaction.h",
+      "src/game/modular_layout_graph.h",
+      "src/game/modular_identity.h",
+      "src/game/modular_code.h",
+      "src/game/subscriber_lifecycle/record_graph.cpp",
+      "src/game/building_history_slice/native_bridge.cpp"
+    ]
+  },
+  {
+    "name": "modular.remove_entrance",
+    "kind": "action",
+    "parameters": [
+      {
+        "name": "building",
+        "type": "MT2Handle",
+        "description": "Existing modular Building."
+      },
+      {
+        "name": "position",
+        "type": "number[]",
+        "description": "Three finite world coordinates; add_block applies the original native position adjustment."
+      }
+    ],
+    "returns": "MT2ModularEditResult",
+    "summary": "Remove a native modular entrance at the world position. Commit a complete original Layout/Plan/pose inverse to native Undo.",
+    "errors": [
+      "Stale epoch or UID/class/owner mismatch",
+      "Native executable proof differs",
+      "Bounded original record capture or cleanup failed",
+      "Native admission rejected",
+      "Native effect or inverse readback differs; attempted work is never replayed"
+    ],
+    "native_evidence": [
+      "src/game/modular_calls.h",
+      "src/game/modular_transaction.h",
+      "src/game/modular_layout_graph.h",
+      "src/game/modular_identity.h",
+      "src/game/modular_code.h",
+      "src/game/subscriber_lifecycle/record_graph.cpp",
+      "src/game/building_history_slice/native_bridge.cpp"
+    ]
+  },
+  {
+    "name": "modular.undo",
+    "kind": "action",
+    "parameters": [
+      {
+        "name": "history",
+        "type": "string",
+        "description": "Opaque receipt from a confirmed modular edit or prefab placement."
+      }
+    ],
+    "returns": "MT2ModularHistoryResult",
+    "summary": "Undo one confirmed modular edit or prefab placement when its exact graph is the current native stack top. Prefab history includes cleared Scenery and reciprocal Service/Quest closure.",
+    "errors": [
+      "Stale epoch or UID/class/owner mismatch",
+      "Native executable proof differs",
+      "Bounded original record capture or cleanup failed",
+      "Native admission rejected",
+      "Native effect or inverse readback differs; attempted work is never replayed"
+    ],
+    "native_evidence": [
+      "src/game/modular_calls.h",
+      "src/game/modular_transaction.h",
+      "src/game/modular_layout_graph.h",
+      "src/game/modular_identity.h",
+      "src/game/modular_code.h",
+      "src/game/subscriber_lifecycle/record_graph.cpp",
+      "src/game/building_history_slice/native_bridge.cpp"
+    ]
+  },
+  {
+    "name": "modular.redo",
+    "kind": "action",
+    "parameters": [
+      {
+        "name": "history",
+        "type": "string",
+        "description": "Opaque receipt from a confirmed modular edit or prefab placement."
+      }
+    ],
+    "returns": "MT2ModularHistoryResult",
+    "summary": "Redo one confirmed modular edit or prefab placement when its exact graph is the current native stack top. Prefab history includes cleared Scenery and reciprocal Service/Quest closure.",
+    "errors": [
+      "Stale epoch or UID/class/owner mismatch",
+      "Native executable proof differs",
+      "Bounded original record capture or cleanup failed",
+      "Native admission rejected",
+      "Native effect or inverse readback differs; attempted work is never replayed"
+    ],
+    "native_evidence": [
+      "src/game/modular_calls.h",
+      "src/game/modular_transaction.h",
+      "src/game/modular_layout_graph.h",
+      "src/game/modular_identity.h",
+      "src/game/modular_code.h",
+      "src/game/subscriber_lifecycle/record_graph.cpp",
+      "src/game/building_history_slice/native_bridge.cpp"
+    ]
+  },
+  {
+    "name": "modular.place_prefab",
+    "kind": "action",
+    "parameters": [
+      {
+        "name": "layout",
+        "type": "table",
+        "description": "Complete mmoBuildingLayout native record rows, such as get_layout().layout. Grid integer cells are authored directly; Load rebuilds bounds and resets origin Y."
+      },
+      {
+        "name": "plan",
+        "type": "table",
+        "description": "Complete mmoBuildingPlan native record rows, such as get_layout().plan."
+      },
+      {
+        "name": "theme",
+        "type": "string",
+        "description": "Canonical native Theme name."
+      },
+      {
+        "name": "pose",
+        "type": "number[]",
+        "description": "Quaternion XYZW, world position XYZ and positive scale XYZ (10 finite numbers). Native terrain height adjusts world Y."
+      },
+      {
+        "name": "clearance",
+        "type": "number[]",
+        "description": "Local clearance minimum XYZ and maximum XYZ (6 finite numbers). The native transaction clears intersecting Scenery and retains every inverse."
+      }
+    ],
+    "returns": "MT2ModularPrefabResult",
+    "summary": "Load authored Layout/Plan records, purchase and place a modular Scenery/base Building through the complete native transaction, with receipt-based Undo/Redo.",
+    "errors": [
+      "Stale epoch or UID/class/owner mismatch",
+      "Native executable proof differs",
+      "Bounded original record capture or cleanup failed",
+      "Native admission rejected",
+      "Native effect or inverse readback differs; attempted work is never replayed"
+    ],
+    "native_evidence": [
+      "src/game/modular_calls.h",
+      "src/game/modular_transaction.h",
+      "src/game/modular_layout_graph.h",
+      "src/game/modular_identity.h",
+      "src/game/modular_code.h",
+      "src/game/subscriber_lifecycle/record_graph.cpp",
+      "src/game/building_history_slice/native_bridge.cpp",
+      "src/game/modular_port.inc",
+      "src/game/modular_graph.inc",
+      "src/game/modular_dependencies.inc",
+      "src/game/duplicate_service_history.h",
+      "src/game/duplicate_quest_history.h"
+    ]
+  }
+]

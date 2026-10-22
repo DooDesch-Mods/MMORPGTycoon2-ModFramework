@@ -1,0 +1,8 @@
+cmake_minimum_required(VERSION 3.24)
+project(RegionTypeTests LANGUAGES CXX)
+set(CMAKE_CXX_STANDARD 20)
+get_filename_component(FRAMEWORK "${CMAKE_CURRENT_LIST_DIR}/../../.." ABSOLUTE)
+add_executable(region_type_tests test_region_type.cpp "${FRAMEWORK}/adapters/mt2/gameplay/modular/modular.cpp")
+target_include_directories(region_type_tests PRIVATE "${FRAMEWORK}/include" "${FRAMEWORK}/third_party/vendor" "${FRAMEWORK}/adapters/mt2/gameplay")
+enable_testing()
+add_test(NAME region_type_native_guards COMMAND region_type_tests)

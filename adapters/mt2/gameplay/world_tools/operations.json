@@ -1,0 +1,347 @@
+[
+  {
+    "name": "development.staff",
+    "kind": "query",
+    "parameters": [],
+    "returns": "MT2DeveloperPool",
+    "summary": "Read all fifty native developer slots, employment and job/membership state",
+    "errors": [
+      "Exact supported executable, loaded world and current game thread required",
+      "Native object/source must belong to the current world epoch",
+      "Native prerequisites, lifetime, financial record, inverse history or readback differ; inspect unknown outcomes before retry"
+    ],
+    "native_evidence": [
+      "Multiplayer commit 8a13602: src/game/developer_staff/read.cpp"
+    ]
+  },
+  {
+    "name": "development.research",
+    "kind": "query",
+    "parameters": [],
+    "returns": "MT2ProjectSnapshot",
+    "summary": "Read current development progress and all shared project sources",
+    "errors": [
+      "Exact supported executable, loaded world and current game thread required",
+      "Native object/source must belong to the current world epoch",
+      "Native prerequisites, lifetime, financial record, inverse history or readback differ; inspect unknown outcomes before retry"
+    ],
+    "native_evidence": [
+      "Multiplayer commit 8a13602: src/game/general_project_reader.h"
+    ]
+  },
+  {
+    "name": "projects.catalogue",
+    "kind": "query",
+    "parameters": [],
+    "returns": "MT2ProjectCatalogueRow[]",
+    "summary": "Read native project eligibility and technology purchase/deployment flags",
+    "errors": [
+      "Exact supported executable, loaded world and current game thread required",
+      "Native object/source must belong to the current world epoch",
+      "Native prerequisites, lifetime, financial record, inverse history or readback differ; inspect unknown outcomes before retry"
+    ],
+    "native_evidence": [
+      "Multiplayer commit 8a13602: src/game/general_project_runtime.cpp"
+    ]
+  },
+  {
+    "name": "projects.current",
+    "kind": "query",
+    "parameters": [],
+    "returns": "MT2ProjectProgress",
+    "summary": "Read current source, work, code lines, bugs and desired workers",
+    "errors": [
+      "Exact supported executable, loaded world and current game thread required",
+      "Native object/source must belong to the current world epoch",
+      "Native prerequisites, lifetime, financial record, inverse history or readback differ; inspect unknown outcomes before retry"
+    ],
+    "native_evidence": [
+      "Multiplayer commit 8a13602: src/game/general_project_reader.h"
+    ]
+  },
+  {
+    "name": "network.snapshot",
+    "kind": "query",
+    "parameters": [],
+    "returns": "MT2ServerNetwork",
+    "summary": "Read committed server nodes, pipes, waypoints and reciprocal connections",
+    "errors": [
+      "Exact supported executable, loaded world and current game thread required",
+      "Native object/source must belong to the current world epoch",
+      "Native prerequisites, lifetime, financial record, inverse history or readback differ; inspect unknown outcomes before retry"
+    ],
+    "native_evidence": [
+      "Multiplayer commit 8a13602: src/game/connected_network_reader.h"
+    ]
+  },
+  {
+    "name": "network.catalogue",
+    "kind": "query",
+    "parameters": [],
+    "returns": "MT2ServerNodeDefinition[]",
+    "summary": "Read node catalogue keys and current native definition costs",
+    "errors": [
+      "Exact supported executable, loaded world and current game thread required",
+      "Native object/source must belong to the current world epoch",
+      "Native prerequisites, lifetime, financial record, inverse history or readback differ; inspect unknown outcomes before retry"
+    ],
+    "native_evidence": [
+      "Multiplayer commit 8a13602: src/game/ui_network_runtime.inc"
+    ]
+  },
+  {
+    "name": "development.hire",
+    "kind": "action",
+    "parameters": [],
+    "returns": "table",
+    "summary": "Pay the original 500 hiring charge and employ one native developer",
+    "errors": [
+      "Exact supported executable, loaded world and current game thread required",
+      "Native object/source must belong to the current world epoch",
+      "Native prerequisites, lifetime, financial record, inverse history or readback differ; inspect unknown outcomes before retry"
+    ],
+    "native_evidence": [
+      "Multiplayer commit 8a13602: src/game/developer_staff/action_native.cpp"
+    ]
+  },
+  {
+    "name": "development.fire",
+    "kind": "action",
+    "parameters": [],
+    "returns": "table",
+    "summary": "Fire the last employed developer when it has no job or carried object",
+    "errors": [
+      "Exact supported executable, loaded world and current game thread required",
+      "Native object/source must belong to the current world epoch",
+      "Native prerequisites, lifetime, financial record, inverse history or readback differ; inspect unknown outcomes before retry"
+    ],
+    "native_evidence": [
+      "Multiplayer commit 8a13602: src/game/developer_staff/action_native.cpp"
+    ]
+  },
+  {
+    "name": "development.set_state",
+    "kind": "action",
+    "parameters": [
+      {
+        "name": "handle",
+        "type": "MT2Handle",
+        "description": "Current developer handle from development.staff"
+      },
+      {
+        "name": "value",
+        "type": "integer",
+        "description": "Native state 0 Idle, 1 GoingToJob, 2 DoingJob, 3 TransportJob, 4 GoingHome, 5 TechGoingHome, 6 TechDevelop or 7 TechDebug; actor must have no job or carried object"
+      }
+    ],
+    "returns": "table",
+    "summary": "Set a jobless developer state through the verified native property loader",
+    "errors": [
+      "Exact supported executable, loaded world and current game thread required",
+      "Native object/source must belong to the current world epoch",
+      "Native prerequisites, lifetime, financial record, inverse history or readback differ; inspect unknown outcomes before retry"
+    ],
+    "native_evidence": [
+      "Multiplayer commit 8a13602: src/game/developer_staff/scalar_calls.cpp"
+    ]
+  },
+  {
+    "name": "development.set_active",
+    "kind": "action",
+    "parameters": [
+      {
+        "name": "handle",
+        "type": "MT2Handle",
+        "description": "Current developer handle from development.staff"
+      },
+      {
+        "name": "value",
+        "type": "boolean",
+        "description": "Requested active flag; actor must have no job or carried object"
+      }
+    ],
+    "returns": "table",
+    "summary": "Set a jobless developer active property through the native property loader",
+    "errors": [
+      "Exact supported executable, loaded world and current game thread required",
+      "Native object/source must belong to the current world epoch",
+      "Native prerequisites, lifetime, financial record, inverse history or readback differ; inspect unknown outcomes before retry"
+    ],
+    "native_evidence": [
+      "Multiplayer commit 8a13602: src/game/developer_staff/scalar_calls.cpp"
+    ]
+  },
+  {
+    "name": "projects.start",
+    "kind": "action",
+    "parameters": [
+      {
+        "name": "source",
+        "type": "MT2ProjectSource",
+        "description": "Exact current source table from projects.catalogue; includes its world epoch"
+      }
+    ],
+    "returns": "table",
+    "summary": "Pay for and start the selected native research, art, statistic or shared project source",
+    "errors": [
+      "Exact supported executable, loaded world and current game thread required",
+      "Native object/source must belong to the current world epoch",
+      "Native prerequisites, lifetime, financial record, inverse history or readback differ; inspect unknown outcomes before retry"
+    ],
+    "native_evidence": [
+      "Multiplayer commit 8a13602: src/game/general_project_runtime.cpp"
+    ]
+  },
+  {
+    "name": "projects.cancel",
+    "kind": "action",
+    "parameters": [],
+    "returns": "table",
+    "summary": "Cancel and retire the current native project",
+    "errors": [
+      "Exact supported executable, loaded world and current game thread required",
+      "Native object/source must belong to the current world epoch",
+      "Native prerequisites, lifetime, financial record, inverse history or readback differ; inspect unknown outcomes before retry"
+    ],
+    "native_evidence": [
+      "Multiplayer commit 8a13602: src/game/general_project_runtime.cpp"
+    ]
+  },
+  {
+    "name": "projects.commit",
+    "kind": "action",
+    "parameters": [],
+    "returns": "table",
+    "summary": "Deploy and retire the natively completed current project",
+    "errors": [
+      "Exact supported executable, loaded world and current game thread required",
+      "Native object/source must belong to the current world epoch",
+      "Native prerequisites, lifetime, financial record, inverse history or readback differ; inspect unknown outcomes before retry"
+    ],
+    "native_evidence": [
+      "Multiplayer commit 8a13602: src/game/general_project_runtime.cpp"
+    ]
+  },
+  {
+    "name": "projects.set_workers",
+    "kind": "action",
+    "parameters": [
+      {
+        "name": "count",
+        "type": "integer",
+        "description": "Desired worker count 0 through 50, bounded by employed staff and technology maximum"
+      }
+    ],
+    "returns": "table",
+    "summary": "Allocate workers to the current native project",
+    "errors": [
+      "Exact supported executable, loaded world and current game thread required",
+      "Native object/source must belong to the current world epoch",
+      "Native prerequisites, lifetime, financial record, inverse history or readback differ; inspect unknown outcomes before retry"
+    ],
+    "native_evidence": [
+      "Multiplayer commit 8a13602: src/game/tutorial_replication/staff_native.inc"
+    ]
+  },
+  {
+    "name": "development.assign_research_workers",
+    "kind": "action",
+    "parameters": [
+      {
+        "name": "count",
+        "type": "integer",
+        "description": "Desired worker count 0 through 50, bounded by employed staff and technology maximum"
+      }
+    ],
+    "returns": "table",
+    "summary": "Allocate workers to the current native project",
+    "errors": [
+      "Exact supported executable, loaded world and current game thread required",
+      "Native object/source must belong to the current world epoch",
+      "Native prerequisites, lifetime, financial record, inverse history or readback differ; inspect unknown outcomes before retry"
+    ],
+    "native_evidence": [
+      "Multiplayer commit 8a13602: src/game/tutorial_replication/staff_native.inc"
+    ]
+  },
+  {
+    "name": "network.place_node",
+    "kind": "action",
+    "parameters": [
+      {
+        "name": "key",
+        "type": "string",
+        "description": "Exact key from network.catalogue"
+      },
+      {
+        "name": "position",
+        "type": "number[]",
+        "description": "Finite XYZ point; original native surface and legality checks apply"
+      }
+    ],
+    "returns": "table",
+    "summary": "Buy and place a server node with its original native inverse history",
+    "errors": [
+      "Exact supported executable, loaded world and current game thread required",
+      "Native object/source must belong to the current world epoch",
+      "Native prerequisites, lifetime, financial record, inverse history or readback differ; inspect unknown outcomes before retry"
+    ],
+    "native_evidence": [
+      "Multiplayer commit 8a13602: src/game/ui_network_runtime.inc"
+    ]
+  },
+  {
+    "name": "network.place_pipe",
+    "kind": "action",
+    "parameters": [
+      {
+        "name": "start",
+        "type": "MT2Handle",
+        "description": "Current starting network node"
+      },
+      {
+        "name": "end",
+        "type": "MT2Handle|nil",
+        "description": "Existing endpoint node in the same region; omit to create a Junction",
+        "optional": true
+      },
+      {
+        "name": "position",
+        "type": "number[]|nil",
+        "description": "Finite XYZ endpoint for a new Junction; required when end is omitted",
+        "optional": true
+      }
+    ],
+    "returns": "table",
+    "summary": "Create the proved native Cable connection between nodes or to a new Junction, with payment and inverse history",
+    "errors": [
+      "Exact supported executable, loaded world and current game thread required",
+      "Native object/source must belong to the current world epoch",
+      "Native prerequisites, lifetime, financial record, inverse history or readback differ; inspect unknown outcomes before retry"
+    ],
+    "native_evidence": [
+      "Multiplayer commit 8a13602: src/game/ui_network_pipe.inc"
+    ]
+  },
+  {
+    "name": "network.remove",
+    "kind": "action",
+    "parameters": [
+      {
+        "name": "handle",
+        "type": "MT2Handle",
+        "description": "Current server node or pipe handle"
+      }
+    ],
+    "returns": "table",
+    "summary": "Remove the network object through native destruction and verify UID retirement and inverse history",
+    "errors": [
+      "Exact supported executable, loaded world and current game thread required",
+      "Native object/source must belong to the current world epoch",
+      "Native prerequisites, lifetime, financial record, inverse history or readback differ; inspect unknown outcomes before retry"
+    ],
+    "native_evidence": [
+      "Multiplayer commit 8a13602: src/game/network_remove_runtime.inc"
+    ]
+  }
+]

@@ -1,0 +1,93 @@
+[
+  {
+    "name": "scenery.stroke",
+    "kind": "action",
+    "parameters": [
+      {"name": "kind", "type": "string", "description": "paint, category_erase or erase. category_erase uses native brush mode 1; erase uses the general eraser."},
+      {"name": "region", "type": "integer", "description": "Owned Region ID in the actual native active root world."},
+      {"name": "finish_position", "type": "number[]", "description": "Three finite coordinates for the original whole-stroke Finish and paid cash inverse position."},
+      {"name": "stamps", "type": "MT2SceneryStrokeStamp[]", "description": "One to 4096 ordered complete canonical PolyShapes in native integer clipping units. Painting supplies each stamp's complete generated dot poses. Total points and total dots are each bounded to one million."},
+      {"name": "type", "type": "string", "description": "Native catalog directory. Required for paint and category_erase; omitted for erase.", "optional": true},
+      {"name": "variant", "type": "string", "description": "Exact native catalog filename, required unless random_variant is true; omitted for erase.", "optional": true},
+      {"name": "random_variant", "type": "boolean", "description": "Use the native random variant for the chosen directory. Requires an empty variant.", "optional": true, "default": false},
+      {"name": "replace", "type": "boolean", "description": "Native brush replacement setting. General erase requires false.", "optional": true, "default": false},
+      {"name": "bounds", "type": "number[]", "description": "Six finite native brush bounds values. Omitted uses six zeros. General erase requires six zeros.", "optional": true}
+    ],
+    "returns": "MT2SceneryStrokeResult",
+    "summary": "Run complete ordered native SceneryBrush or SceneryEraser AddPaint stamps and one original Finish through isolated private receivers. Returns created/removed Scenery rows, cumulative birth count, paid/refund amounts and before/after Building/Monster bug-anchor records. Confirms complete born/removed full-UID Make/Destroy/cash inverse coverage, saved Make records, unchanged surviving Scenery, Group member removals and native Release edits. Preserves normal native cost, replacement, variant RNG and brush bug effects; confirms general erase leaves RNG/bugs unchanged. Temporarily journals the original Cursor finish position and restores it plus surviving selection. Requires the root world to be the actual native active scene. Partial native owners are retained on uncertain failures; never replay such a result.",
+    "errors": ["Owned Region, exact native catalog identity, canonical integer polygon, finite pose or complete payload bounds differ.", "Native receiver, generated transform callback, AddPaint, Finish or cleanup failed.", "No Scenery changed, complete native inverse/cash/Release coverage differs, or unrelated roster/pose/group changes are observed; attempted failures are unknown and must not be replayed."],
+    "native_evidence": ["Multiplayer/src/game/scenery_stroke_calls.h", "Multiplayer/src/game/scenery_stroke_port.inc", "Multiplayer/src/game/scenery_stroke_native.h", "Multiplayer/src/game/scenery_stroke_graph.h", "Multiplayer/src/game/scenery_make_history.h", "Multiplayer/src/game/scenery_stroke_bugs.h", "Multiplayer/src/game/scenery_stroke_transition.h"]
+  },
+  {
+    "name": "scenery.transform",
+    "kind": "action",
+    "parameters": [{"name": "targets", "type": "MT2SceneryTransform[]", "description": "One to 4096 unique free Scenery handles with finite destination position and optional quaternion/positive scale. Group members must be transformed through their whole Group."}],
+    "returns": "MT2SceneryProp[]",
+    "summary": "Move, rotate or scale multiple free Scenery in one original native Begin/Open/DoMove-per-target/Close/End transaction. Returns target results in input order. Confirms exact inverse UID/prior-pose order, destination Region, unchanged other Scenery and unchanged Groups. Requires the root world to be the actual active scene and owned destination Regions; normal native tool effects apply.",
+    "errors": ["Handle epoch, original UID, unique free Scenery ownership, normalized pose or native CanMove differs.", "Destination Region is not owned by the active root world.", "Native call, cleanup, complete roster or original Undo inverse readback differs; attempted failures are unknown and must not be replayed."],
+    "native_evidence": ["Multiplayer/src/game/selection_move_native.h", "Multiplayer/src/game/selection_move_runtime.inc", "Multiplayer/src/game/selection_move_reader.h", "Multiplayer/src/game/scenery_kiss/lifecycle_native.cpp"]
+  },
+  {
+    "name": "scenery.duplicate",
+    "kind": "action",
+    "parameters": [{"name": "handle", "type": "MT2Handle", "description": "Current free Scenery or whole Group handle in the root world."}, {"name": "position", "type": "number[]", "description": "Three finite destination coordinates within the current root world."}, {"name": "rotation", "type": "number[]", "description": "Normalized quaternion x/y/z/w; omitted preserves source rotation.", "optional": true}, {"name": "scale", "type": "number[]", "description": "Three positive finite scale coordinates; omitted preserves source scale.", "optional": true}],
+    "returns": "table",
+    "summary": "Duplicate free Scenery or a whole Group through original native capability/price/payment, virtual Duplicate, cash/destroy inverses and localized Undo. Confirms created pose, whole Group member ordering/relative poses and untouched sources, plus native release edit and selection readback. Returns a Scenery prop or Group table. Requires the root world to be the native active scene; normal native costs and selection changes apply.",
+    "errors": ["Handle epoch, original UID or current native free Scenery/Group membership differs.", "Native capability, affordability or destination Region rejects the request.", "Native call, cleanup, authored result or original Undo inverse readback differs; attempted failures are unknown and must not be replayed."],
+    "native_evidence": ["Multiplayer/src/game/duplicate_calls.h", "Multiplayer/src/game/duplicate_port.inc", "Multiplayer/src/game/duplicate_native.h", "Multiplayer/src/game/duplicate_codeguards.h", "Multiplayer/src/game/duplicate_transition.h"]
+  },
+  {
+    "name": "scenery.list",
+    "kind": "query",
+    "parameters": [],
+    "returns": "MT2SceneryProp[]",
+    "summary": "Read current root-world Scenery handles, native poses and Region IDs from every actual Region/category roster. A pose contains quaternion x/y/z/w, position x/y/z and scale x/y/z, in that order.",
+    "errors": ["Current World or original Scenery UID, manager, category or scene membership differs."],
+    "native_evidence": ["Multiplayer/src/game/duplicate_reader.h", "Multiplayer/src/game/group_reader.h"]
+  },
+  {
+    "name": "scenery.move_group",
+    "kind": "action",
+    "parameters": [{"name": "group", "type": "MT2Handle", "description": "Current root-world native Group handle."}, {"name": "position", "type": "number[]", "description": "Three finite destination coordinates in the current root world."}, {"name": "rotation", "type": "number[]", "description": "Normalized quaternion x/y/z/w; omitted preserves rotation.", "optional": true}, {"name": "scale", "type": "number[]", "description": "Three positive finite scale coordinates; omitted preserves scale.", "optional": true}],
+    "returns": "MT2SceneryGroup",
+    "summary": "Move, rotate or scale a whole native Group through original DoMove and Undo, preserving its ordered member identities and relative poses. Confirms native destination pose and unchanged other Groups/Scenery. Requires the root world to be the actual native active scene; normal native selection and tool effects apply.",
+    "errors": ["Group handle epoch, original UID, current root or native member reciprocity differs.", "Native call, cleanup, destination or inverse readback differs; attempted failures are unknown and must not be replayed."],
+    "native_evidence": ["Multiplayer/src/game/group_object_calls.h", "Multiplayer/src/game/group_object_runtime.inc", "Multiplayer/src/game/group_object_move_reader.h", "Multiplayer/src/game/group_object_graph.h", "Multiplayer/src/game/move_kiss/native_calls.cpp"]
+  },
+  {
+    "name": "scenery.destroy_group",
+    "kind": "action",
+    "parameters": [{"name": "group", "type": "MT2Handle", "description": "Current root-world native Group handle."}],
+    "returns": "table",
+    "summary": "Destroy a whole native Group through original SelectionManager DestroyProp, retaining normal native refund and Undo behavior. Confirms removal of the Group and every owned Scenery member, plus unchanged unrelated members. Returns destroyed=true and member count. Requires the root world to be the actual native active scene; normal native selection and tool effects apply.",
+    "errors": ["Group handle epoch, original UID, current root or native member reciprocity differs.", "Native call or roster/Undo readback differs; attempted failures are unknown and must not be replayed."],
+    "native_evidence": ["Multiplayer/src/game/group_object_calls.h", "Multiplayer/src/game/group_object_runtime.inc", "Multiplayer/src/game/group_object_transition.h"]
+  },
+  {
+    "name": "scenery.groups",
+    "kind": "query",
+    "parameters": [],
+    "returns": "MT2SceneryGroup[]",
+    "summary": "Read root-world Groups with exact Group and member handles, native ten-float poses, Region IDs and relative member poses.",
+    "errors": ["Current World or original Group/Scenery UID, manager, scene or member reciprocity differs."],
+    "native_evidence": ["Multiplayer/src/game/group_reader.h", "Multiplayer/src/game/duplicate_reader.h"]
+  },
+  {
+    "name": "scenery.group",
+    "kind": "action",
+    "parameters": [{"name": "handles", "type": "MT2Handle[]", "description": "Two or more ordered free Scenery or existing Group handles. Existing Group members must be selected through their parent Group. The first existing Group becomes the target."}],
+    "returns": "MT2SceneryGroup",
+    "summary": "Group or merge root-world Scenery through explicitly rooted native Group creation and the whole original GroupSelection transaction. Confirms ordered membership, unchanged member poses, reciprocal parents and exact native Undo. Requires the root world to be the native active scene and the current native tool to permit selection; normal native selection changes apply.",
+    "errors": ["Handle epoch or original UID registry differs.", "Root world is not the active scene or native Selection/Undo/tool is not ready.", "Native call, member/scene readback or inverse differs; attempted failures are unknown and must not be replayed."],
+    "native_evidence": ["Multiplayer/src/game/group_runtime.inc", "Multiplayer/src/game/group_native.h", "Multiplayer/src/game/group_inverse.h", "Multiplayer/src/game/group_transition.h"]
+  },
+  {
+    "name": "scenery.ungroup",
+    "kind": "action",
+    "parameters": [{"name": "handles", "type": "MT2Handle[]", "description": "One or more ordered native Group handles in the current root world."}],
+    "returns": "table",
+    "summary": "Run the whole original UngroupSelection transaction and confirm removal, free surviving member handles and unchanged member poses, plus original per-Group saved inverse records. Returns ungrouped count and members. Requires the root world to be the native active scene and the current native tool to permit selection; normal native selection changes apply.",
+    "errors": ["Handle epoch or original UID registry differs.", "Root world is not the active scene or native Selection/Undo/tool is not ready.", "Native call, member/scene readback or inverse differs; attempted failures are unknown and must not be replayed."],
+    "native_evidence": ["Multiplayer/src/game/group_runtime.inc", "Multiplayer/src/game/group_native.h", "Multiplayer/src/game/group_inverse.h", "Multiplayer/src/game/group_transition.h"]
+  }
+]

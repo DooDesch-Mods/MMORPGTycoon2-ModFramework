@@ -1,0 +1,142 @@
+{
+  "MT2MonsterZoneSettings": {
+    "character": "MT2CharacterHandle?",
+    "density": "integer?",
+    "level": "integer?"
+  },
+  "MT2MonsterZoneRespawnResult": {
+    "zone": "MT2MonsterZone",
+    "respawned": "integer"
+  },
+  "MT2BossRemovalResult": {
+    "removed": "MT2ActorHandle",
+    "refund": "integer",
+    "refund_undo_confirmed": "boolean",
+    "actor_recreation_undo": "boolean"
+  },
+  "MT2MonsterZoneRemovalResult": {
+    "removed": "MT2ZoneHandle",
+    "monsters_removed": "integer",
+    "quests_removed": "integer",
+    "undo_confirmed": "boolean"
+  },
+  "MT2ZonePaintResult": {
+    "zones": "MT2MonsterZone[]",
+    "retired_zones": "MT2ZoneHandle[]",
+    "retired_monsters": "MT2ActorHandle[]",
+    "created_monsters": "MT2ActorHandle[]",
+    "undo_confirmed": "boolean"
+  },
+  "MT2ActorHandle": {
+    "epoch": "integer",
+    "uid": "string"
+  },
+  "MT2ActorPose": {
+    "position": "number[]",
+    "rotation": "number[]",
+    "scale": "number[]"
+  },
+  "MT2MonsterPose": {
+    "position": "number[]",
+    "rotation": "number[]"
+  },
+  "MT2NpcPlacementResult": {
+    "actor": "MT2Actor",
+    "quests": "MT2NpcQuest[]"
+  },
+  "MT2ActorRemovalResult": {
+    "removed": "MT2ActorHandle",
+    "quests_removed": "integer",
+    "undo_confirmed": "boolean"
+  },
+  "MT2ZoneHandle": {
+    "epoch": "integer",
+    "uid": "string"
+  },
+  "MT2ZonePoint": {
+    "x": "integer",
+    "z": "integer"
+  },
+  "MT2MonsterZoneStamp": {
+    "position": "number[]",
+    "shape": "MT2ZonePoint[][]"
+  },
+  "MT2MonsterZone": {
+    "handle": "MT2ZoneHandle",
+    "region": "integer",
+    "name": "string",
+    "type": "integer",
+    "density": "integer",
+    "level": "integer",
+    "character_index": "integer",
+    "constructed_day": "integer",
+    "shape": "MT2ZonePoint[][]",
+    "monsters": "MT2ActorHandle[]"
+  },
+  "MT2ActorRegion": {
+    "id": "integer",
+    "minimum_level": "integer",
+    "maximum_level": "integer"
+  },
+  "MT2Actor": {
+    "handle": "MT2ActorHandle",
+    "kind": "string",
+    "region": "integer",
+    "name": "string",
+    "position": "number[]",
+    "rotation": "number[]",
+    "scale": "number[]",
+    "character_kind": "integer",
+    "character_index": "integer",
+    "level": "integer",
+    "npc_type": "integer?",
+    "online": "integer?",
+    "force_tint": "boolean?",
+    "tint": "number[]?",
+    "command_level": "integer?"
+  },
+  "MT2NpcQuestHandle": {
+    "epoch": "integer",
+    "owner": "MT2ActorHandle",
+    "slot": "integer",
+    "sequence": "integer"
+  },
+  "MT2NpcQuest": {
+    "handle": "MT2NpcQuestHandle",
+    "name": "string",
+    "description": "string",
+    "type": "integer",
+    "action": "integer",
+    "monsters_to_kill": "integer",
+    "monster_type": "integer",
+    "xp_reward": "integer",
+    "gold_reward": "integer",
+    "destination": "MT2Handle",
+    "accepted_today": "integer",
+    "accepted_total": "integer",
+    "completed_today": "integer",
+    "completed_total": "integer"
+  },
+  "MT2QuestDestinationResult": {
+    "quest": "MT2NpcQuest",
+    "undo_confirmed": "boolean",
+    "path_task_present": "boolean"
+  },
+  "MT2QuestEditResult": {
+    "quests": "MT2NpcQuest[]",
+    "undo_confirmed": "boolean"
+  },
+  "MT2BossPhase": {
+    "name": "string",
+    "health": "integer",
+    "vfx": "string",
+    "color": "number[]",
+    "abilities": "integer[]"
+  },
+  "MT2BossPhaseSettings": {
+    "name": "string?",
+    "health": "integer?",
+    "vfx": "string?",
+    "color": "number[]?"
+  }
+}

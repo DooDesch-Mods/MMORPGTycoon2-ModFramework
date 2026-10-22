@@ -1,0 +1,585 @@
+[
+  {
+    "name": "characters.list",
+    "kind": "query",
+    "parameters": [
+      {
+        "name": "include_deleted",
+        "type": "boolean",
+        "description": "Include native destroyed global slots.",
+        "optional": true,
+        "default": false
+      }
+    ],
+    "returns": "MT2Character[]",
+    "summary": "List current native character type definitions and exact lifetime handles.",
+    "errors": [
+      "world_not_ready",
+      "wrong_thread",
+      "unsupported_game_build",
+      "stale_handle",
+      "invalid_argument"
+    ],
+    "native_evidence": [
+      "MMORPGTycoon2-Multiplayer@8a13602/src/game/character_definition_identity.h",
+      "adapters/mt2/gameplay/characters/native-evidence.json"
+    ]
+  },
+  {
+    "name": "characters.get",
+    "kind": "query",
+    "parameters": [
+      {
+        "name": "handle",
+        "type": "MT2CharacterHandle",
+        "description": "Current exact definition handle from characters.list/get; includes epoch, UID, kind and global index."
+      }
+    ],
+    "returns": "MT2Character",
+    "summary": "Read a current character definition, names, flags and stats.",
+    "errors": [
+      "world_not_ready",
+      "wrong_thread",
+      "unsupported_game_build",
+      "stale_handle",
+      "invalid_argument"
+    ],
+    "native_evidence": [
+      "MMORPGTycoon2-Multiplayer@8a13602/src/game/character_definition_identity.h",
+      "MMORPGTycoon2-Multiplayer@8a13602/src/game/character_rename_runtime.inc",
+      "adapters/mt2/gameplay/characters/native-evidence.json"
+    ]
+  },
+  {
+    "name": "characters.stats",
+    "kind": "query",
+    "parameters": [
+      {
+        "name": "handle",
+        "type": "MT2CharacterHandle",
+        "description": "Current exact definition handle from characters.list/get; includes epoch, UID, kind and global index."
+      }
+    ],
+    "returns": "MT2CharacterStats",
+    "summary": "Read the two native attribute sets, speed and boss phase health.",
+    "errors": [
+      "world_not_ready",
+      "wrong_thread",
+      "unsupported_game_build",
+      "stale_handle",
+      "invalid_argument"
+    ],
+    "native_evidence": [
+      "MMORPGTycoon2-Multiplayer@8a13602/src/game/character_rename_runtime.inc",
+      "adapters/mt2/gameplay/characters/native-evidence.json"
+    ]
+  },
+  {
+    "name": "characters.appearance",
+    "kind": "query",
+    "parameters": [
+      {
+        "name": "handle",
+        "type": "MT2CharacterHandle",
+        "description": "Current exact definition handle from characters.list/get; includes epoch, UID, kind and global index."
+      }
+    ],
+    "returns": "MT2CharacterAppearance",
+    "summary": "Read the complete owned costume record and weapon categories.",
+    "errors": [
+      "world_not_ready",
+      "wrong_thread",
+      "unsupported_game_build",
+      "stale_handle",
+      "invalid_argument"
+    ],
+    "native_evidence": [
+      "MMORPGTycoon2-Multiplayer@8a13602/src/game/costume_record_reader.h",
+      "MMORPGTycoon2-Multiplayer@8a13602/src/game/costume_weapon_read.h",
+      "adapters/mt2/gameplay/characters/native-evidence.json"
+    ]
+  },
+  {
+    "name": "characters.abilities",
+    "kind": "query",
+    "parameters": [
+      {
+        "name": "handle",
+        "type": "MT2CharacterHandle",
+        "description": "Current exact definition handle from characters.list/get; includes epoch, UID, kind and global index."
+      }
+    ],
+    "returns": "MT2CharacterAbility[]",
+    "summary": "Read native ability slots, complete records and exact ability handles.",
+    "errors": [
+      "world_not_ready",
+      "wrong_thread",
+      "unsupported_game_build",
+      "stale_handle",
+      "invalid_argument"
+    ],
+    "native_evidence": [
+      "MMORPGTycoon2-Multiplayer@8a13602/src/game/ability_edit_runtime.inc",
+      "MMORPGTycoon2-Multiplayer@8a13602/src/game/ability_membership_runtime.inc",
+      "adapters/mt2/gameplay/characters/native-evidence.json"
+    ]
+  },
+  {
+    "name": "characters.create",
+    "kind": "action",
+    "parameters": [
+      {
+        "name": "handle",
+        "type": "MT2CharacterHandle",
+        "description": "Current exact definition handle from characters.list/get; includes epoch, UID, kind and global index."
+      },
+      {
+        "name": "kind",
+        "type": "integer",
+        "description": "Native character kind 0 through 4; defaults to the supplied base's kind.",
+        "optional": true
+      }
+    ],
+    "returns": "MT2Character",
+    "summary": "Create a native base character slot in the supplied base's owning collection. Omit kind to use the base kind.",
+    "errors": [
+      "world_not_ready",
+      "wrong_thread",
+      "unsupported_game_build",
+      "stale_handle",
+      "invalid_argument",
+      "native_failure",
+      "unknown_effect",
+      "readback_mismatch"
+    ],
+    "native_evidence": [
+      "MMORPGTycoon2-Multiplayer@8a13602/src/game/character_membership_runtime.inc",
+      "MMORPGTycoon2-Multiplayer@8a13602/src/game/character_membership_codes.h",
+      "adapters/mt2/gameplay/characters/native-evidence.json"
+    ]
+  },
+  {
+    "name": "characters.create_variant",
+    "kind": "action",
+    "parameters": [
+      {
+        "name": "handle",
+        "type": "MT2CharacterHandle",
+        "description": "Current exact definition handle from characters.list/get; includes epoch, UID, kind and global index."
+      },
+      {
+        "name": "name",
+        "type": "string",
+        "description": "Unused nonempty variant name, up to 1024 UTF-8 bytes."
+      }
+    ],
+    "returns": "MT2Character",
+    "summary": "Copy a base's complete native definition into a new variant using MakeVariant.",
+    "errors": [
+      "world_not_ready",
+      "wrong_thread",
+      "unsupported_game_build",
+      "stale_handle",
+      "invalid_argument",
+      "native_failure",
+      "unknown_effect",
+      "readback_mismatch"
+    ],
+    "native_evidence": [
+      "MMORPGTycoon2-Multiplayer@8a13602/src/game/character_membership_runtime.inc",
+      "adapters/mt2/gameplay/characters/native-evidence.json"
+    ]
+  },
+  {
+    "name": "characters.remove",
+    "kind": "action",
+    "parameters": [
+      {
+        "name": "handle",
+        "type": "MT2CharacterHandle",
+        "description": "Current exact definition handle from characters.list/get; includes epoch, UID, kind and global index."
+      }
+    ],
+    "returns": "table",
+    "summary": "Remove the selected character through its original owning collection and confirm definition UID retirement; native actor cleanup follows the game's lifecycle.",
+    "errors": [
+      "world_not_ready",
+      "wrong_thread",
+      "unsupported_game_build",
+      "stale_handle",
+      "invalid_argument",
+      "native_failure",
+      "unknown_effect",
+      "readback_mismatch"
+    ],
+    "native_evidence": [
+      "MMORPGTycoon2-Multiplayer@8a13602/src/game/character_membership_runtime.inc",
+      "MMORPGTycoon2-Multiplayer@8a13602/src/game/character_membership_npc_completion.h",
+      "adapters/mt2/gameplay/characters/native-evidence.json"
+    ]
+  },
+  {
+    "name": "characters.rename",
+    "kind": "action",
+    "parameters": [
+      {
+        "name": "handle",
+        "type": "MT2CharacterHandle",
+        "description": "Current exact definition handle from characters.list/get; includes epoch, UID, kind and global index."
+      },
+      {
+        "name": "name",
+        "type": "string",
+        "description": "Unused nonempty name, up to 1024 UTF-8 bytes."
+      }
+    ],
+    "returns": "MT2Character",
+    "summary": "Set both authored names through native SetName, including its native edited/day and user notifications.",
+    "errors": [
+      "world_not_ready",
+      "wrong_thread",
+      "unsupported_game_build",
+      "stale_handle",
+      "invalid_argument",
+      "native_failure",
+      "unknown_effect",
+      "readback_mismatch"
+    ],
+    "native_evidence": [
+      "MMORPGTycoon2-Multiplayer@8a13602/src/game/character_rename_runtime.inc",
+      "MMORPGTycoon2-Multiplayer@8a13602/src/game/character_rename_codes.h",
+      "adapters/mt2/gameplay/characters/native-evidence.json"
+    ]
+  },
+  {
+    "name": "characters.set_stat",
+    "kind": "action",
+    "parameters": [
+      {
+        "name": "handle",
+        "type": "MT2CharacterHandle",
+        "description": "Current exact definition handle from characters.list/get; includes epoch, UID, kind and global index."
+      },
+      {
+        "name": "field",
+        "type": "\"health\"|\"mana\"|\"rage\"|\"speed\"",
+        "description": "Native character stat to set."
+      },
+      {
+        "name": "value",
+        "type": "number",
+        "description": "Finite native stat value from 0 through 1000000."
+      }
+    ],
+    "returns": "MT2CharacterStats",
+    "summary": "Set native level-one attributes or speed, then synchronize variants. Health sets the second attribute set to twice the first; boss health targets the first phase.",
+    "errors": [
+      "world_not_ready",
+      "wrong_thread",
+      "unsupported_game_build",
+      "stale_handle",
+      "invalid_argument",
+      "native_failure",
+      "unknown_effect",
+      "readback_mismatch"
+    ],
+    "native_evidence": [
+      "MMORPGTycoon2-Multiplayer@8a13602/src/game/character_rename_runtime.inc",
+      "MMORPGTycoon2-Multiplayer@8a13602/src/game/typed_action/character_rename_action.h",
+      "adapters/mt2/gameplay/characters/native-evidence.json"
+    ]
+  },
+  {
+    "name": "characters.set_appearance",
+    "kind": "action",
+    "parameters": [
+      {
+        "name": "handle",
+        "type": "MT2CharacterHandle",
+        "description": "Current exact definition handle from characters.list/get; includes epoch, UID, kind and global index."
+      },
+      {
+        "name": "record",
+        "type": "MT2CostumeRecord",
+        "description": "Complete editable costume returned by characters.appearance."
+      }
+    ],
+    "returns": "MT2CostumeRecord",
+    "summary": "Deep-assign a complete costume with native transform construction and owner edit/costume notifications.",
+    "errors": [
+      "world_not_ready",
+      "wrong_thread",
+      "unsupported_game_build",
+      "stale_handle",
+      "invalid_argument",
+      "native_failure",
+      "unknown_effect",
+      "readback_mismatch"
+    ],
+    "native_evidence": [
+      "MMORPGTycoon2-Multiplayer@8a13602/src/game/costume_native_view.h",
+      "MMORPGTycoon2-Multiplayer@8a13602/src/game/costume_edit_runtime.inc",
+      "adapters/mt2/gameplay/characters/native-evidence.json"
+    ]
+  },
+  {
+    "name": "characters.set_weapon_category",
+    "kind": "action",
+    "parameters": [
+      {
+        "name": "handle",
+        "type": "MT2CharacterHandle",
+        "description": "Current exact definition handle from characters.list/get; includes epoch, UID, kind and global index."
+      },
+      {
+        "name": "category",
+        "type": "string",
+        "description": "Nonempty native weapon-category name."
+      },
+      {
+        "name": "enabled",
+        "type": "boolean",
+        "description": "Add or remove this category."
+      }
+    ],
+    "returns": "string[]",
+    "summary": "Update the native ordered weapon category set and verify its exact result.",
+    "errors": [
+      "world_not_ready",
+      "wrong_thread",
+      "unsupported_game_build",
+      "stale_handle",
+      "invalid_argument",
+      "native_failure",
+      "unknown_effect",
+      "readback_mismatch"
+    ],
+    "native_evidence": [
+      "MMORPGTycoon2-Multiplayer@8a13602/src/game/costume_edit_runtime.inc",
+      "MMORPGTycoon2-Multiplayer@8a13602/src/game/costume_weapon_read.h",
+      "adapters/mt2/gameplay/characters/native-evidence.json"
+    ]
+  },
+  {
+    "name": "characters.create_ability",
+    "kind": "action",
+    "parameters": [
+      {
+        "name": "handle",
+        "type": "MT2CharacterHandle",
+        "description": "Current exact definition handle from characters.list/get; includes epoch, UID, kind and global index."
+      },
+      {
+        "name": "level",
+        "type": "integer",
+        "description": "Native authoring level, 1 through 100; native boss creation uses level 1.",
+        "optional": true,
+        "default": 1
+      }
+    ],
+    "returns": "MT2CharacterAbility[]",
+    "summary": "Create an ability using the game's original NewAbility command and a private native receiver.",
+    "errors": [
+      "world_not_ready",
+      "wrong_thread",
+      "unsupported_game_build",
+      "stale_handle",
+      "invalid_argument",
+      "native_failure",
+      "unknown_effect",
+      "readback_mismatch"
+    ],
+    "native_evidence": [
+      "MMORPGTycoon2-Multiplayer@8a13602/src/game/ability_membership_runtime.inc",
+      "MMORPGTycoon2-Multiplayer@8a13602/src/game/ability_receiver_cleanup.h",
+      "adapters/mt2/gameplay/characters/native-evidence.json"
+    ]
+  },
+  {
+    "name": "characters.copy_ability",
+    "kind": "action",
+    "parameters": [
+      {
+        "name": "handle",
+        "type": "MT2CharacterHandle",
+        "description": "Current exact definition handle from characters.list/get; includes epoch, UID, kind and global index."
+      },
+      {
+        "name": "ability",
+        "type": "MT2AbilityHandle",
+        "description": "Current ability owner, epoch, exact UID and owner-array slot from characters.abilities."
+      },
+      {
+        "name": "level",
+        "type": "integer",
+        "description": "Target authoring level, 1 through 100.",
+        "optional": true,
+        "default": 1
+      }
+    ],
+    "returns": "MT2CharacterAbility[]",
+    "summary": "Copy a complete source ability, including across character owners, through the original native dock transaction. New copies use display slot -1; dock them separately when needed.",
+    "errors": [
+      "world_not_ready",
+      "wrong_thread",
+      "unsupported_game_build",
+      "stale_handle",
+      "invalid_argument",
+      "native_failure",
+      "unknown_effect",
+      "readback_mismatch"
+    ],
+    "native_evidence": [
+      "MMORPGTycoon2-Multiplayer@8a13602/src/game/ability_membership_runtime.inc",
+      "MMORPGTycoon2-Multiplayer@8a13602/src/game/ability_receiver_cleanup.h",
+      "adapters/mt2/gameplay/characters/native-evidence.json"
+    ]
+  },
+  {
+    "name": "characters.remove_ability",
+    "kind": "action",
+    "parameters": [
+      {
+        "name": "handle",
+        "type": "MT2CharacterHandle",
+        "description": "Current exact definition handle from characters.list/get; includes epoch, UID, kind and global index."
+      },
+      {
+        "name": "ability",
+        "type": "MT2AbilityHandle",
+        "description": "Current ability owner, epoch, exact UID and owner-array slot from characters.abilities."
+      }
+    ],
+    "returns": "MT2CharacterAbility[]",
+    "summary": "Remove an ability using its original native Icon transaction and ownership-aware private cleanup.",
+    "errors": [
+      "world_not_ready",
+      "wrong_thread",
+      "unsupported_game_build",
+      "stale_handle",
+      "invalid_argument",
+      "native_failure",
+      "unknown_effect",
+      "readback_mismatch"
+    ],
+    "native_evidence": [
+      "MMORPGTycoon2-Multiplayer@8a13602/src/game/ability_membership_runtime.inc",
+      "MMORPGTycoon2-Multiplayer@8a13602/src/game/ability_receiver_cleanup.h",
+      "adapters/mt2/gameplay/characters/native-evidence.json"
+    ]
+  },
+  {
+    "name": "characters.dock_ability",
+    "kind": "action",
+    "parameters": [
+      {
+        "name": "handle",
+        "type": "MT2CharacterHandle",
+        "description": "Current exact definition handle from characters.list/get; includes epoch, UID, kind and global index."
+      },
+      {
+        "name": "ability",
+        "type": "MT2AbilityHandle",
+        "description": "Current ability owner, epoch, exact UID and owner-array slot from characters.abilities."
+      },
+      {
+        "name": "level",
+        "type": "integer",
+        "description": "Target authoring level, 1 through 100."
+      },
+      {
+        "name": "display_slot",
+        "type": "integer",
+        "description": "Target display slot -1 through 11."
+      }
+    ],
+    "returns": "MT2CharacterAbility[]",
+    "summary": "Set native ability level and display slot through the original dock transaction.",
+    "errors": [
+      "world_not_ready",
+      "wrong_thread",
+      "unsupported_game_build",
+      "stale_handle",
+      "invalid_argument",
+      "native_failure",
+      "unknown_effect",
+      "readback_mismatch"
+    ],
+    "native_evidence": [
+      "MMORPGTycoon2-Multiplayer@8a13602/src/game/ability_membership_runtime.inc",
+      "adapters/mt2/gameplay/characters/native-evidence.json"
+    ]
+  },
+  {
+    "name": "characters.set_ability",
+    "kind": "action",
+    "parameters": [
+      {
+        "name": "handle",
+        "type": "MT2CharacterHandle",
+        "description": "Current exact definition handle from characters.list/get; includes epoch, UID, kind and global index."
+      },
+      {
+        "name": "ability",
+        "type": "MT2AbilityHandle",
+        "description": "Current ability owner, epoch, exact UID and owner-array slot from characters.abilities."
+      },
+      {
+        "name": "record",
+        "type": "MT2AbilityRecord",
+        "description": "Complete editable prototype record returned by characters.abilities; retain at least one effect."
+      }
+    ],
+    "returns": "MT2AbilityRecord",
+    "summary": "Edit native prototype strings, effects, costs, selectors, colors, timings, flags and level; simplify and notify its owner. Native normalization differences remain unknown.",
+    "errors": [
+      "world_not_ready",
+      "wrong_thread",
+      "unsupported_game_build",
+      "stale_handle",
+      "invalid_argument",
+      "native_failure",
+      "unknown_effect",
+      "readback_mismatch"
+    ],
+    "native_evidence": [
+      "MMORPGTycoon2-Multiplayer@8a13602/src/game/ability_edit_runtime.inc",
+      "MMORPGTycoon2-Multiplayer@8a13602/src/game/typed_action/ability_edit_action.h",
+      "adapters/mt2/gameplay/characters/native-evidence.json"
+    ]
+  },
+  {
+    "name": "characters.import",
+    "kind": "action",
+    "parameters": [
+      {
+        "name": "handle",
+        "type": "MT2CharacterHandle",
+        "description": "Current exact definition handle from characters.list/get; includes epoch, UID, kind and global index."
+      },
+      {
+        "name": "compressed_record",
+        "type": "string",
+        "description": "Lowercase hex of the PNG's embedded compressed RecordV1/V2 character definition, at most 30000 bytes before hex encoding."
+      }
+    ],
+    "returns": "table",
+    "summary": "Validate an embedded prefab, round-trip its private original image, invoke native import once and confirm its original success notification through a private native pane. Preserve an existing design selection/notice; initialize a previously unbound hidden component. Reject unsaved native authoring input.",
+    "errors": [
+      "world_not_ready",
+      "wrong_thread",
+      "unsupported_game_build",
+      "stale_handle",
+      "invalid_argument",
+      "native_failure",
+      "unknown_effect",
+      "readback_mismatch"
+    ],
+    "native_evidence": [
+      "MMORPGTycoon2-Multiplayer@8a13602/src/game/character_import_runtime.inc",
+      "MMORPGTycoon2-Multiplayer@8a13602/src/game/character_import_native.cpp",
+      "MMORPGTycoon2-Multiplayer@8a13602/src/game/character_import_payload.h",
+      "adapters/mt2/gameplay/characters/native-evidence.json"
+    ]
+  }
+]

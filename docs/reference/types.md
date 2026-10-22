@@ -83,6 +83,8 @@ Handles carry a world epoch and an exact string UID. Never convert the UID to a 
 | `cause?` | `string` |
 | `native_attempted?` | `boolean` |
 | `object?` | `MT2Object` |
+| `operation?` | `string` |
+| `result?` | `any` |
 
 ## MT2ContentDefinition
 
@@ -395,3 +397,1175 @@ Handles carry a world epoch and an exact string UID. Never convert the UID to a 
 | `open` | `boolean` |
 | `clicked` | `string[]` |
 | `values` | `table<string, string>` |
+
+## MT2CharacterHandle
+
+| Field | Type |
+| --- | --- |
+| `epoch` | `integer` |
+| `uid` | `string` |
+| `kind` | `integer` |
+| `index` | `integer` |
+
+## MT2AbilityHandle
+
+| Field | Type |
+| --- | --- |
+| `owner` | `MT2CharacterHandle` |
+| `epoch` | `integer` |
+| `uid` | `string` |
+| `slot` | `integer` |
+
+## MT2CharacterStats
+
+| Field | Type |
+| --- | --- |
+| `attributes` | `number[][]` |
+| `speed` | `number` |
+| `boss_phases` | `integer` |
+| `boss_health` | `integer` |
+
+## MT2Character
+
+| Field | Type |
+| --- | --- |
+| `handle` | `MT2CharacterHandle` |
+| `name` | `string` |
+| `definition_name` | `string` |
+| `deleted` | `boolean` |
+| `edited` | `boolean` |
+| `released` | `boolean` |
+| `parent` | `MT2CharacterHandle?` |
+| `stats` | `MT2CharacterStats?` |
+| `variant_ordinal` | `integer?` |
+
+## MT2CostumePose
+
+| Field | Type |
+| --- | --- |
+| `rotation` | `number[]` |
+| `position` | `number[]` |
+| `scale` | `number[]` |
+
+## MT2CostumeAttachment
+
+| Field | Type |
+| --- | --- |
+| `name` | `string` |
+| `pose` | `MT2CostumePose` |
+
+## MT2CostumePart
+
+| Field | Type |
+| --- | --- |
+| `bone` | `string` |
+| `model` | `string` |
+| `pose` | `MT2CostumePose` |
+| `model_scale` | `number` |
+| `attachments` | `MT2CostumeAttachment[]` |
+| `colors` | `number[][]` |
+
+## MT2CostumeRecord
+
+| Field | Type |
+| --- | --- |
+| `name` | `string` |
+| `skeleton` | `string` |
+| `flag` | `boolean` |
+| `parts` | `MT2CostumePart[]` |
+
+## MT2CharacterAppearance
+
+| Field | Type |
+| --- | --- |
+| `record` | `MT2CostumeRecord` |
+| `weapon_categories` | `string[]` |
+
+## MT2AbilityEffect
+
+| Field | Type |
+| --- | --- |
+| `integers` | `integer[]` |
+| `values` | `number[]` |
+| `count` | `integer` |
+
+## MT2AbilityRecord
+
+| Field | Type |
+| --- | --- |
+| `text` | `string[]` |
+| `item_value` | `number` |
+| `item_kind` | `integer` |
+| `item_flag` | `boolean` |
+| `selectors` | `integer[]` |
+| `color` | `number[]` |
+| `timing` | `number[]` |
+| `flags` | `boolean[]` |
+| `final_values` | `number[]` |
+| `level` | `integer` |
+| `final_flag` | `boolean` |
+| `costs` | `MT2AbilityEffect[]` |
+| `effects` | `MT2AbilityEffect[]` |
+
+## MT2CharacterAbility
+
+| Field | Type |
+| --- | --- |
+| `handle` | `MT2AbilityHandle` |
+| `display_slot` | `integer` |
+| `record` | `MT2AbilityRecord` |
+
+## MT2DungeonGizmoRuntime
+
+| Field | Type |
+| --- | --- |
+| `triggered?` | `boolean` |
+| `state?` | `integer` |
+| `immediate?` | `integer` |
+| `on_map?` | `boolean` |
+
+## MT2DungeonInstance
+
+| Field | Type |
+| --- | --- |
+| `index` | `integer` |
+| `started` | `boolean` |
+
+## MT2DungeonCell
+
+| Field | Type |
+| --- | --- |
+| `index` | `integer` |
+| `open` | `boolean` |
+| `theme` | `string` |
+| `colors` | `integer[]` |
+
+## MT2DungeonLayout
+
+| Field | Type |
+| --- | --- |
+| `cells` | `MT2DungeonCell[]` |
+| `palette` | `integer[]` |
+
+## MT2DungeonState
+
+| Field | Type |
+| --- | --- |
+| `handle` | `MT2Handle` |
+| `dungeon_uid` | `string` |
+| `desired_instances` | `integer` |
+| `atmosphere` | `integer` |
+| `light` | `number[]` |
+| `palette_defaults` | `boolean` |
+| `instance_count` | `integer` |
+
+## MT2ManagementFees
+
+| Field | Type |
+| --- | --- |
+| `purchase` | `integer` |
+| `subscription` | `integer` |
+
+## MT2ManagementLoan
+
+| Field | Type |
+| --- | --- |
+| `key` | `string` |
+| `name` | `string` |
+| `description` | `string` |
+| `amount` | `integer` |
+| `days` | `integer` |
+| `daily_principal` | `integer` |
+| `daily_interest` | `integer` |
+
+## MT2ManagementOffer
+
+| Field | Type |
+| --- | --- |
+| `key` | `string` |
+| `name` | `string` |
+| `description` | `string` |
+| `amount` | `integer` |
+| `repayment` | `integer` |
+| `days` | `integer` |
+| `eligibility` | `integer` |
+| `available` | `boolean` |
+
+## MT2ManagementLoans
+
+| Field | Type |
+| --- | --- |
+| `loans` | `MT2ManagementLoan[]` |
+| `offers` | `MT2ManagementOffer[]` |
+
+## MT2ManagementGm
+
+| Field | Type |
+| --- | --- |
+| `handle` | `MT2Handle` |
+| `slot` | `integer` |
+| `employed` | `boolean` |
+| `busy` | `boolean` |
+
+## MT2ManagementStaff
+
+| Field | Type |
+| --- | --- |
+| `count` | `integer` |
+| `employed` | `integer` |
+| `staff` | `MT2ManagementGm[]` |
+
+## MT2ManagementStatistics
+
+| Field | Type |
+| --- | --- |
+| `values` | `integer[]` |
+| `spent` | `integer[]` |
+| `purchased` | `integer[]` |
+| `free_points` | `integer` |
+| `purchased_points` | `integer` |
+| `character_slots` | `integer[]` |
+
+## MT2ManagementRelease
+
+| Field | Type |
+| --- | --- |
+| `version` | `integer[]` |
+| `funds` | `integer` |
+| `present` | `boolean` |
+| `planned_version` | `integer[]\|nil` |
+| `type` | `integer\|nil` |
+| `state` | `integer\|nil` |
+| `custom` | `boolean\|nil` |
+| `text` | `string[]\|nil` |
+
+## MT2ManagementReleaseCycle
+
+| Field | Type |
+| --- | --- |
+| `release` | `MT2ManagementRelease` |
+| `phase` | `integer` |
+| `history_count` | `integer` |
+| `free_points` | `integer` |
+
+## MT2ManagementPolicy
+
+| Field | Type |
+| --- | --- |
+| `enabled` | `boolean` |
+| `watchSeconds` | `integer` |
+| `checkLog` | `boolean` |
+| `isBannable` | `boolean` |
+| `banFavorites` | `boolean` |
+| `banInfluencers` | `boolean` |
+| `warnsBeforeBan` | `integer` |
+
+## MT2ManagementRules
+
+| Field | Type |
+| --- | --- |
+| `xp` | `integer[]` |
+| `respawn_seconds` | `integer` |
+| `respawn_delay` | `boolean` |
+| `features` | `integer[]` |
+
+## MT2ManagementCampaign
+
+| Field | Type |
+| --- | --- |
+| `name` | `string` |
+| `type` | `integer` |
+| `started_on` | `integer` |
+| `duration` | `integer` |
+| `impressions` | `integer` |
+| `conversions` | `integer` |
+| `hype` | `integer` |
+| `active` | `boolean` |
+
+## MT2ManagementCampaigns
+
+| Field | Type |
+| --- | --- |
+| `campaigns` | `MT2ManagementCampaign[]` |
+| `awards` | `MT2ManagementAward[]` |
+| `daily_costs` | `integer[]` |
+| `positive_buzz` | `integer` |
+| `negative_buzz` | `integer` |
+
+## MT2ManagementService
+
+| Field | Type |
+| --- | --- |
+| `handle` | `MT2Handle` |
+| `ordinal` | `integer` |
+| `type` | `integer` |
+| `config_key` | `string` |
+| `currency` | `integer` |
+| `price` | `integer` |
+| `synced` | `boolean` |
+| `allow_sync` | `boolean` |
+| `config_manager_present` | `boolean` |
+| `config` | `MT2ManagementServiceConfig\|nil` |
+
+## MT2WorldEntity
+
+| Field | Type |
+| --- | --- |
+| `handle` | `MT2Handle` |
+| `x` | `number` |
+| `y` | `number` |
+| `z` | `number` |
+| `region_active` | `boolean` |
+| `building` | `boolean` |
+| `type` | `string` |
+| `variant` | `string` |
+
+## MT2SubscriberHandle
+
+| Field | Type |
+| --- | --- |
+| `epoch` | `integer` |
+| `id` | `integer` |
+
+## MT2SubscriberCandidates
+
+| Field | Type |
+| --- | --- |
+| `epoch` | `integer` |
+| `existing_count` | `integer` |
+| `scanned_count` | `integer` |
+| `eligible_count` | `integer` |
+| `scan_complete` | `boolean` |
+| `handles` | `MT2SubscriberHandle[]` |
+
+## MT2SubscriberState
+
+| Field | Type |
+| --- | --- |
+| `handle` | `MT2SubscriberHandle` |
+| `subscriber_count` | `integer` |
+| `satisfaction` | `integer` |
+| `addiction` | `integer` |
+| `logged_in_seconds` | `number` |
+| `logged_in` | `boolean` |
+| `needs` | `number[]` |
+
+## MT2DungeonGizmoContents
+
+| Field | Type |
+| --- | --- |
+| `gold?` | `integer` |
+| `loot?` | `integer` |
+| `vendor_trash?` | `integer` |
+| `keys?` | `integer` |
+| `boss_keys?` | `integer` |
+
+## MT2DungeonGizmo
+
+| Field | Type |
+| --- | --- |
+| `handle` | `MT2Handle` |
+| `name` | `string` |
+| `type` | `string` |
+| `variant` | `string` |
+| `position` | `number[]` |
+| `rotation` | `number[]` |
+| `scale` | `number[]` |
+| `triggered` | `boolean` |
+| `state` | `integer` |
+| `immediate` | `integer` |
+| `on_map` | `boolean` |
+| `gold` | `integer` |
+| `loot` | `integer` |
+| `vendor_trash` | `integer` |
+| `keys` | `integer` |
+| `boss_keys` | `integer` |
+| `lock_id` | `integer` |
+| `edge_a` | `integer` |
+| `edge_b` | `integer` |
+
+## MT2DungeonBuilding
+
+| Field | Type |
+| --- | --- |
+| `handle` | `MT2Handle` |
+| `type` | `string` |
+| `variant` | `string` |
+| `position` | `number[]` |
+
+## MT2ManagementAward
+
+| Field | Type |
+| --- | --- |
+| `name` | `string` |
+| `source` | `string` |
+| `day` | `integer` |
+| `impressions` | `integer` |
+| `conversions` | `integer` |
+| `good` | `boolean` |
+
+## MT2ManagementServiceConfig
+
+| Field | Type |
+| --- | --- |
+| `currency` | `integer` |
+| `price` | `integer` |
+
+## MT2RegionHandle
+
+| Field | Type |
+| --- | --- |
+| `epoch` | `integer` |
+| `id` | `integer` |
+
+## MT2RegionPage
+
+| Field | Type |
+| --- | --- |
+| `handles` | `MT2RegionHandle[]` |
+| `total` | `integer` |
+| `next_offset` | `integer` |
+| `complete` | `boolean` |
+
+## MT2RegionDetails
+
+| Field | Type |
+| --- | --- |
+| `handle` | `MT2RegionHandle` |
+| `name` | `string` |
+| `type` | `integer` |
+| `owned` | `boolean` |
+| `status` | `integer` |
+| `level` | `integer` |
+| `max_level` | `integer` |
+| `position` | `number[]` |
+| `preset` | `string` |
+| `styles` | `string[]` |
+| `tint` | `number[]` |
+| `sky` | `number[]` |
+| `light` | `number[]` |
+| `ambient` | `number[]` |
+| `particles` | `integer` |
+| `particle_color` | `number[]` |
+
+## MT2ActorHandle
+
+| Field | Type |
+| --- | --- |
+| `epoch` | `integer` |
+| `uid` | `string` |
+
+## MT2ActorRegion
+
+| Field | Type |
+| --- | --- |
+| `id` | `integer` |
+| `minimum_level` | `integer` |
+| `maximum_level` | `integer` |
+
+## MT2Actor
+
+| Field | Type |
+| --- | --- |
+| `handle` | `MT2ActorHandle` |
+| `kind` | `string` |
+| `region` | `integer` |
+| `name` | `string` |
+| `position` | `number[]` |
+| `rotation` | `number[]` |
+| `scale` | `number[]` |
+| `character_kind` | `integer` |
+| `character_index` | `integer` |
+| `level` | `integer` |
+| `npc_type` | `integer?` |
+| `online` | `integer?` |
+| `force_tint` | `boolean?` |
+| `tint` | `number[]?` |
+| `command_level` | `integer?` |
+
+## MT2NpcQuestHandle
+
+| Field | Type |
+| --- | --- |
+| `epoch` | `integer` |
+| `owner` | `MT2ActorHandle` |
+| `slot` | `integer` |
+| `sequence` | `integer` |
+
+## MT2NpcQuest
+
+| Field | Type |
+| --- | --- |
+| `handle` | `MT2NpcQuestHandle` |
+| `name` | `string` |
+| `description` | `string` |
+| `type` | `integer` |
+| `action` | `integer` |
+| `monsters_to_kill` | `integer` |
+| `monster_type` | `integer` |
+| `xp_reward` | `integer` |
+| `gold_reward` | `integer` |
+| `destination` | `MT2Handle` |
+| `accepted_today` | `integer` |
+| `accepted_total` | `integer` |
+| `completed_today` | `integer` |
+| `completed_total` | `integer` |
+
+## MT2BossPhase
+
+| Field | Type |
+| --- | --- |
+| `name` | `string` |
+| `health` | `integer` |
+| `vfx` | `string` |
+| `color` | `number[]` |
+| `abilities` | `integer[]` |
+
+## MT2BossPhaseSettings
+
+| Field | Type |
+| --- | --- |
+| `name` | `string?` |
+| `health` | `integer?` |
+| `vfx` | `string?` |
+| `color` | `number[]?` |
+
+## MT2QuestDestinationResult
+
+| Field | Type |
+| --- | --- |
+| `quest` | `MT2NpcQuest` |
+| `undo_confirmed` | `boolean` |
+| `path_task_present` | `boolean` |
+
+## MT2TerrainHeightPage
+
+| Field | Type |
+| --- | --- |
+| `handle` | `MT2RegionHandle` |
+| `width` | `integer` |
+| `height` | `integer` |
+| `cell_size` | `number` |
+| `origin` | `number[]` |
+| `offset` | `integer` |
+| `values` | `number[]` |
+| `next_offset` | `integer` |
+| `complete` | `boolean` |
+
+## MT2TerrainHeightResult
+
+| Field | Type |
+| --- | --- |
+| `handle` | `MT2RegionHandle` |
+| `cell` | `integer` |
+| `before` | `number` |
+| `height` | `number` |
+| `cost` | `integer` |
+| `undo_unchanged` | `boolean` |
+
+## MT2Developer
+
+| Field | Type |
+| --- | --- |
+| `handle` | `MT2Handle` |
+| `id` | `integer` |
+| `slot` | `integer` |
+| `state` | `integer` |
+| `employed` | `boolean` |
+| `active` | `boolean` |
+| `on_map` | `boolean` |
+| `job_present` | `boolean` |
+| `carried_present` | `boolean` |
+| `position` | `number[]` |
+
+## MT2DeveloperPool
+
+| Field | Type |
+| --- | --- |
+| `count` | `integer` |
+| `employed` | `integer` |
+| `indoor_count` | `integer` |
+| `outdoor_count` | `integer` |
+| `developers` | `MT2Developer[]` |
+
+## MT2ProjectSource
+
+| Field | Type |
+| --- | --- |
+| `epoch` | `integer` |
+| `kind` | `integer` |
+| `tech` | `string` |
+| `art` | `string` |
+| `statistic` | `integer` |
+
+## MT2ProjectCatalogueRow
+
+| Field | Type |
+| --- | --- |
+| `source` | `MT2ProjectSource` |
+| `valid` | `boolean` |
+| `visible` | `boolean` |
+| `owned` | `boolean` |
+| `can_choose` | `boolean` |
+| `can_afford` | `boolean` |
+| `price` | `integer\|nil` |
+| `maximum_workers` | `integer\|nil` |
+| `purchased` | `boolean\|nil` |
+| `deployed` | `boolean\|nil` |
+| `custom` | `boolean\|nil` |
+
+## MT2ProjectProgress
+
+| Field | Type |
+| --- | --- |
+| `source` | `MT2ProjectSource\|nil` |
+| `work` | `number` |
+| `lines` | `integer` |
+| `bugs_total` | `integer` |
+| `bugs_known` | `integer` |
+| `workers` | `integer` |
+
+## MT2ProjectSnapshot
+
+| Field | Type |
+| --- | --- |
+| `progress` | `MT2ProjectProgress` |
+| `catalogue` | `MT2ProjectCatalogueRow[]` |
+
+## MT2ServerRegion
+
+| Field | Type |
+| --- | --- |
+| `id` | `integer` |
+| `owned` | `boolean` |
+
+## MT2ServerConnection
+
+| Field | Type |
+| --- | --- |
+| `region` | `integer` |
+| `waypoint` | `integer` |
+| `position` | `number[]` |
+| `source_position` | `number[]` |
+| `pending` | `number` |
+| `dynamic` | `number[]` |
+
+## MT2ServerNode
+
+| Field | Type |
+| --- | --- |
+| `handle` | `MT2Handle` |
+| `region` | `integer` |
+| `type` | `string` |
+| `key` | `string` |
+| `cost` | `integer` |
+| `transform` | `number[]` |
+| `definition_values` | `number[]` |
+| `state` | `number[]` |
+| `flags` | `integer[]` |
+| `pipes` | `MT2Handle[]` |
+| `connections` | `MT2ServerConnection[]` |
+
+## MT2ServerPipe
+
+| Field | Type |
+| --- | --- |
+| `handle` | `MT2Handle` |
+| `region` | `integer` |
+| `type` | `string` |
+| `key` | `string` |
+| `base_cost` | `integer` |
+| `definition_values` | `number[]` |
+| `cross_region` | `boolean` |
+| `start_position` | `number[]` |
+| `end_position` | `number[]` |
+| `points` | `number[][]` |
+| `distances` | `number[]` |
+| `current` | `number[]` |
+| `last_current` | `number[]` |
+| `start` | `MT2Handle` |
+| `end` | `MT2Handle` |
+| `connections` | `MT2ServerConnection[]` |
+
+## MT2ServerNetwork
+
+| Field | Type |
+| --- | --- |
+| `regions` | `MT2ServerRegion[]` |
+| `nodes` | `MT2ServerNode[]` |
+| `pipes` | `MT2ServerPipe[]` |
+
+## MT2ServerNodeDefinition
+
+| Field | Type |
+| --- | --- |
+| `key` | `string` |
+| `type` | `string` |
+| `cost` | `integer` |
+| `values` | `number[]` |
+
+## MT2ActorPose
+
+| Field | Type |
+| --- | --- |
+| `position` | `number[]` |
+| `rotation` | `number[]` |
+| `scale` | `number[]` |
+
+## MT2QuestEditResult
+
+| Field | Type |
+| --- | --- |
+| `quests` | `MT2NpcQuest[]` |
+| `undo_confirmed` | `boolean` |
+
+## MT2MonsterPose
+
+| Field | Type |
+| --- | --- |
+| `position` | `number[]` |
+| `rotation` | `number[]` |
+
+## MT2ModularLayout
+
+| Field | Type |
+| --- | --- |
+| `building` | `MT2Handle` |
+| `layout` | `table` |
+| `plan` | `table` |
+
+## MT2ModularHistory
+
+| Field | Type |
+| --- | --- |
+| `history` | `string` |
+| `building` | `MT2Handle` |
+| `undo_ready` | `boolean` |
+| `redo_ready` | `boolean` |
+
+## MT2ModularEditResult
+
+| Field | Type |
+| --- | --- |
+| `history` | `string` |
+| `before` | `MT2ModularLayout` |
+| `after` | `MT2ModularLayout` |
+| `position` | `number[]?` |
+| `direction` | `string?` |
+
+## MT2NpcPlacementResult
+
+| Field | Type |
+| --- | --- |
+| `actor` | `MT2Actor` |
+| `quests` | `MT2NpcQuest[]` |
+
+## MT2SceneryGroupMember
+
+| Field | Type |
+| --- | --- |
+| `handle` | `MT2Handle` |
+| `pose` | `number[]` |
+| `region` | `integer` |
+| `relative_pose` | `number[]` |
+
+## MT2SceneryGroup
+
+| Field | Type |
+| --- | --- |
+| `handle` | `MT2Handle` |
+| `pose` | `number[]` |
+| `region` | `integer` |
+| `members` | `MT2SceneryGroupMember[]` |
+
+## MT2SceneryProp
+
+| Field | Type |
+| --- | --- |
+| `handle` | `MT2Handle` |
+| `pose` | `number[]` |
+| `region` | `integer` |
+
+## MT2ActorRemovalResult
+
+| Field | Type |
+| --- | --- |
+| `removed` | `MT2ActorHandle` |
+| `quests_removed` | `integer` |
+| `undo_confirmed` | `boolean` |
+
+## MT2ZoneHandle
+
+| Field | Type |
+| --- | --- |
+| `epoch` | `integer` |
+| `uid` | `string` |
+
+## MT2ZonePoint
+
+| Field | Type |
+| --- | --- |
+| `x` | `integer` |
+| `z` | `integer` |
+
+## MT2MonsterZoneStamp
+
+| Field | Type |
+| --- | --- |
+| `position` | `number[]` |
+| `shape` | `MT2ZonePoint[][]` |
+
+## MT2MonsterZone
+
+| Field | Type |
+| --- | --- |
+| `handle` | `MT2ZoneHandle` |
+| `region` | `integer` |
+| `name` | `string` |
+| `type` | `integer` |
+| `density` | `integer` |
+| `level` | `integer` |
+| `character_index` | `integer` |
+| `constructed_day` | `integer` |
+| `shape` | `MT2ZonePoint[][]` |
+| `monsters` | `MT2ActorHandle[]` |
+
+## MT2ModularMoney
+
+| Field | Type |
+| --- | --- |
+| `cash` | `integer` |
+| `record` | `integer[]` |
+| `categories` | `integer[][]` |
+
+## MT2ModularPrefabResult
+
+| Field | Type |
+| --- | --- |
+| `history` | `string` |
+| `building` | `MT2Handle` |
+| `authored` | `MT2ModularLayout` |
+| `cleared_scenery` | `MT2Handle[]` |
+| `cost` | `integer` |
+| `before_money` | `MT2ModularMoney` |
+| `after_money` | `MT2ModularMoney` |
+
+## MT2ModularHistoryResult
+
+| Field | Type |
+| --- | --- |
+| `history` | `string` |
+| `direction` | `string` |
+| `before` | `MT2ModularLayout?` |
+| `after` | `MT2ModularLayout?` |
+| `building_uid` | `string?` |
+| `building` | `MT2Handle?` |
+| `cleared_scenery_count` | `integer?` |
+| `service_inverse_count` | `integer?` |
+| `quest_owner_inverse_count` | `integer?` |
+| `before_money` | `MT2ModularMoney?` |
+| `after_money` | `MT2ModularMoney?` |
+
+## MT2TerrainPoint
+
+| Field | Type |
+| --- | --- |
+| `x` | `integer` |
+| `z` | `integer` |
+
+## MT2TerrainStamp
+
+| Field | Type |
+| --- | --- |
+| `position` | `number[]` |
+| `radius` | `number` |
+| `shape` | `MT2TerrainPoint[][]` |
+
+## MT2TerrainContourPage
+
+| Field | Type |
+| --- | --- |
+| `handle` | `MT2RegionHandle` |
+| `style` | `integer` |
+| `path` | `integer` |
+| `total_paths` | `integer` |
+| `total_vertices` | `integer` |
+| `offset` | `integer` |
+| `points` | `MT2TerrainPoint[]` |
+| `next_offset` | `integer` |
+| `complete` | `boolean` |
+
+## MT2TerrainPaintResult
+
+| Field | Type |
+| --- | --- |
+| `handle` | `MT2RegionHandle` |
+| `style` | `integer` |
+| `changed` | `boolean` |
+| `stamps` | `integer` |
+| `undo_confirmed` | `boolean` |
+
+## MT2Path
+
+| Field | Type |
+| --- | --- |
+| `handle` | `MT2Handle` |
+| `region` | `integer` |
+| `second_region?` | `integer` |
+| `type` | `integer` |
+| `name` | `string` |
+| `start?` | `MT2Handle` |
+| `end?` | `MT2Handle` |
+| `points` | `number[][]` |
+| `distances` | `number[]` |
+| `walkpoints` | `number[][]` |
+| `walk_distances` | `number[]` |
+| `cost?` | `integer` |
+| `receipt?` | `string` |
+
+## MT2PathNode
+
+| Field | Type |
+| --- | --- |
+| `handle` | `MT2Handle` |
+| `region` | `integer` |
+| `type` | `integer` |
+| `position` | `number[]` |
+| `edges` | `MT2Handle[]` |
+
+## MT2PathGraph
+
+| Field | Type |
+| --- | --- |
+| `paths` | `MT2Path[]` |
+| `nodes` | `MT2PathNode[]` |
+
+## MT2WallPlan
+
+| Field | Type |
+| --- | --- |
+| `region` | `integer` |
+| `type` | `integer` |
+| `node_type` | `integer` |
+| `name` | `string` |
+| `start` | `number[]` |
+| `end` | `number[]` |
+| `segments` | `number[][]` |
+| `preview` | `number[][]` |
+| `start_node?` | `MT2Handle` |
+| `end_node?` | `MT2Handle` |
+| `start_split?` | `MT2Handle\|string` |
+| `end_split?` | `MT2Handle\|string` |
+
+## MT2WallResult
+
+| Field | Type |
+| --- | --- |
+| `paths` | `MT2Path[]` |
+| `length` | `number` |
+| `cost` | `integer` |
+| `receipt` | `string` |
+
+## MT2PathRemoval
+
+| Field | Type |
+| --- | --- |
+| `destroyed` | `boolean` |
+| `removed_nodes` | `integer` |
+| `refund` | `integer` |
+| `receipt` | `string` |
+
+## MT2PathHistoryResult
+
+| Field | Type |
+| --- | --- |
+| `receipt` | `string` |
+| `direction` | `string` |
+| `paths` | `integer` |
+| `nodes` | `integer` |
+
+## MT2MonsterZoneSettings
+
+| Field | Type |
+| --- | --- |
+| `character` | `MT2CharacterHandle?` |
+| `density` | `integer?` |
+| `level` | `integer?` |
+
+## MT2MonsterZoneRespawnResult
+
+| Field | Type |
+| --- | --- |
+| `zone` | `MT2MonsterZone` |
+| `respawned` | `integer` |
+
+## MT2BossRemovalResult
+
+| Field | Type |
+| --- | --- |
+| `removed` | `MT2ActorHandle` |
+| `refund` | `integer` |
+| `refund_undo_confirmed` | `boolean` |
+| `actor_recreation_undo` | `boolean` |
+
+## MT2PathRouteChange
+
+| Field | Type |
+| --- | --- |
+| `before` | `MT2Path` |
+| `after` | `MT2Path` |
+
+## MT2PathRouteResult
+
+| Field | Type |
+| --- | --- |
+| `paths` | `MT2Path[]` |
+| `nodes` | `MT2PathNode[]` |
+| `changed` | `MT2PathRouteChange[]` |
+| `removed` | `MT2Path[]` |
+| `cost` | `integer` |
+| `native_splines` | `integer` |
+| `receipt` | `string` |
+
+## MT2MonsterZoneRemovalResult
+
+| Field | Type |
+| --- | --- |
+| `removed` | `MT2ZoneHandle` |
+| `monsters_removed` | `integer` |
+| `quests_removed` | `integer` |
+| `undo_confirmed` | `boolean` |
+
+## MT2RegionTypeRetired
+
+| Field | Type |
+| --- | --- |
+| `handle` | `MT2Handle` |
+| `family` | `string` |
+
+## MT2RegionTypeCounts
+
+| Field | Type |
+| --- | --- |
+| `npcs` | `integer` |
+| `parties` | `integer` |
+| `network` | `integer` |
+| `monsters` | `integer` |
+| `bosses` | `integer` |
+| `paths` | `integer` |
+| `gizmos` | `integer` |
+| `buildings` | `integer` |
+| `scenery` | `integer` |
+| `zones` | `integer` |
+| `districts` | `integer` |
+| `path_nodes` | `integer` |
+| `network_nodes` | `integer` |
+| `network_pipes` | `integer` |
+
+## MT2RegionTypeMoney
+
+| Field | Type |
+| --- | --- |
+| `cash` | `integer` |
+| `record` | `integer[]` |
+| `categories` | `integer[][]` |
+
+## MT2RegionTypeResult
+
+| Field | Type |
+| --- | --- |
+| `before` | `MT2RegionDetails` |
+| `after` | `MT2RegionDetails` |
+| `retired` | `MT2RegionTypeRetired[]` |
+| `retired_counts` | `MT2RegionTypeCounts` |
+| `native_undo_operations` | `integer` |
+| `money` | `MT2RegionTypeMoney` |
+
+## MT2SceneryTransform
+
+| Field | Type |
+| --- | --- |
+| `handle` | `MT2Handle` |
+| `position` | `number[]` |
+| `rotation` | `number[]?` |
+| `scale` | `number[]?` |
+
+## MT2SceneryClipPoint
+
+| Field | Type |
+| --- | --- |
+| `x` | `integer` |
+| `z` | `integer` |
+
+## MT2SceneryDot
+
+| Field | Type |
+| --- | --- |
+| `position` | `number[]` |
+| `rotation` | `number[]?` |
+| `scale` | `number[]?` |
+
+## MT2SceneryStrokeStamp
+
+| Field | Type |
+| --- | --- |
+| `shape` | `MT2SceneryClipPoint[][]` |
+| `dots` | `MT2SceneryDot[]?` |
+
+## MT2SceneryBugAnchor
+
+| Field | Type |
+| --- | --- |
+| `handle` | `MT2Handle` |
+| `position` | `number[]` |
+| `bugs` | `integer[][]` |
+
+## MT2SceneryStrokeResult
+
+| Field | Type |
+| --- | --- |
+| `created` | `MT2SceneryProp[]` |
+| `removed` | `MT2SceneryProp[]` |
+| `births` | `integer` |
+| `paid` | `integer` |
+| `refund` | `integer` |
+| `bug_anchors_before` | `MT2SceneryBugAnchor[]` |
+| `bug_anchors_after` | `MT2SceneryBugAnchor[]` |
+
+## MT2WallCurve
+
+| Field | Type |
+| --- | --- |
+| `region` | `integer` |
+| `type` | `integer` |
+| `node_type` | `integer` |
+| `name` | `string` |
+| `points` | `number[][]` |
+| `start_node?` | `MT2Handle` |
+| `end_node?` | `MT2Handle` |
+| `start_split?` | `MT2Handle\|string` |
+| `end_split?` | `MT2Handle\|string` |
+
+## MT2WallCurveResult
+
+| Field | Type |
+| --- | --- |
+| `paths` | `MT2Path[]` |
+| `nodes` | `MT2PathNode[]` |
+| `changed` | `MT2PathRouteChange[]` |
+| `removed` | `MT2Path[]` |
+| `length` | `number` |
+| `cost` | `integer` |
+| `native_splines` | `number[][]` |
+| `preview` | `number[][]` |
+| `receipt` | `string` |
+
+## MT2ZonePaintResult
+
+| Field | Type |
+| --- | --- |
+| `zones` | `MT2MonsterZone[]` |
+| `retired_zones` | `MT2ZoneHandle[]` |
+| `retired_monsters` | `MT2ActorHandle[]` |
+| `created_monsters` | `MT2ActorHandle[]` |
+| `undo_confirmed` | `boolean` |

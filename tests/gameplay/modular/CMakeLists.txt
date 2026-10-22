@@ -1,0 +1,8 @@
+cmake_minimum_required(VERSION 3.24)
+project(ModularTests LANGUAGES CXX)
+set(CMAKE_CXX_STANDARD 20)
+get_filename_component(FRAMEWORK "${CMAKE_CURRENT_LIST_DIR}/../../.." ABSOLUTE)
+add_executable(modular_tests test_modular.cpp)
+target_include_directories(modular_tests PRIVATE "${FRAMEWORK}/include" "${FRAMEWORK}/third_party/vendor" "${FRAMEWORK}/adapters/mt2/gameplay")
+enable_testing()
+add_test(NAME modular_records_and_history_guards COMMAND modular_tests)

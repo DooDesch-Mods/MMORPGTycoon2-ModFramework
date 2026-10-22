@@ -114,7 +114,7 @@ def validate_manifest(data: dict) -> dict:
         raise PackageError('Mod ID must be lowercase and namespaced, for example author.my_mod')
     version(data['version'])
     api = version(data['api_version'])
-    if api[0] != 1 or api > version('1.1.0'):
+    if api[0] != 1 or api > version('1.2.0'):
         raise PackageError('Mod requires an unsupported API version')
     if data['type'] not in ('lua', 'native', 'content'):
         raise PackageError('Mod type must be lua, native or content')

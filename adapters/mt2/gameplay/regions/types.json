@@ -1,0 +1,76 @@
+{
+  "MT2RegionHandle": {
+    "epoch": "integer",
+    "id": "integer"
+  },
+  "MT2RegionPage": {
+    "handles": "MT2RegionHandle[]",
+    "total": "integer",
+    "next_offset": "integer",
+    "complete": "boolean"
+  },
+  "MT2RegionDetails": {
+    "handle": "MT2RegionHandle",
+    "name": "string",
+    "type": "integer",
+    "owned": "boolean",
+    "status": "integer",
+    "level": "integer",
+    "max_level": "integer",
+    "position": "number[]",
+    "preset": "string",
+    "styles": "string[]",
+    "tint": "number[]",
+    "sky": "number[]",
+    "light": "number[]",
+    "ambient": "number[]",
+    "particles": "integer",
+    "particle_color": "number[]"
+  },
+  "MT2TerrainHeightPage": {
+    "handle": "MT2RegionHandle",
+    "width": "integer",
+    "height": "integer",
+    "cell_size": "number",
+    "origin": "number[]",
+    "offset": "integer",
+    "values": "number[]",
+    "next_offset": "integer",
+    "complete": "boolean"
+  },
+  "MT2TerrainHeightResult": {
+    "handle": "MT2RegionHandle",
+    "cell": "integer",
+    "before": "number",
+    "height": "number",
+    "cost": "integer",
+    "undo_unchanged": "boolean"
+  },
+  "MT2TerrainPoint": {
+    "x": "integer",
+    "z": "integer"
+  },
+  "MT2TerrainStamp": {
+    "position": "number[]",
+    "radius": "number",
+    "shape": "MT2TerrainPoint[][]"
+  },
+  "MT2TerrainContourPage": {
+    "handle": "MT2RegionHandle",
+    "style": "integer",
+    "path": "integer",
+    "total_paths": "integer",
+    "total_vertices": "integer",
+    "offset": "integer",
+    "points": "MT2TerrainPoint[]",
+    "next_offset": "integer",
+    "complete": "boolean"
+  },
+  "MT2TerrainPaintResult": {
+    "handle": "MT2RegionHandle",
+    "style": "integer",
+    "changed": "boolean",
+    "stamps": "integer",
+    "undo_confirmed": "boolean"
+  }
+}

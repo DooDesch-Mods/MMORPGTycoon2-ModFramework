@@ -1,0 +1,19 @@
+{
+  "MT2WallCurve": {"region": "integer", "type": "integer", "node_type": "integer", "name": "string", "points": "number[][]", "start_node?": "MT2Handle", "end_node?": "MT2Handle", "start_split?": "MT2Handle|string", "end_split?": "MT2Handle|string"},
+  "MT2WallCurveResult": {"paths": "MT2Path[]", "nodes": "MT2PathNode[]", "changed": "MT2PathRouteChange[]", "removed": "MT2Path[]", "length": "number", "cost": "integer", "native_splines": "number[][]", "preview": "number[][]", "receipt": "string"},
+  "MT2PathRouteChange": {"before": "MT2Path", "after": "MT2Path"},
+  "MT2PathRouteResult": {"paths": "MT2Path[]", "nodes": "MT2PathNode[]", "changed": "MT2PathRouteChange[]", "removed": "MT2Path[]", "cost": "integer", "native_splines": "integer", "receipt": "string"},
+  "MT2Path": {
+    "handle": "MT2Handle", "region": "integer", "second_region?": "integer", "type": "integer", "name": "string",
+    "start?": "MT2Handle", "end?": "MT2Handle", "points": "number[][]", "distances": "number[]", "walkpoints": "number[][]", "walk_distances": "number[]", "cost?": "integer", "receipt?": "string"
+  },
+  "MT2PathNode": {"handle": "MT2Handle", "region": "integer", "type": "integer", "position": "number[]", "edges": "MT2Handle[]"},
+  "MT2PathGraph": {"paths": "MT2Path[]", "nodes": "MT2PathNode[]"},
+  "MT2WallPlan": {
+    "region": "integer", "type": "integer", "node_type": "integer", "name": "string", "start": "number[]", "end": "number[]",
+    "segments": "number[][]", "preview": "number[][]", "start_node?": "MT2Handle", "end_node?": "MT2Handle", "start_split?": "MT2Handle|string", "end_split?": "MT2Handle|string"
+  },
+  "MT2WallResult": {"paths": "MT2Path[]", "length": "number", "cost": "integer", "receipt": "string"},
+  "MT2PathRemoval": {"destroyed": "boolean", "removed_nodes": "integer", "refund": "integer", "receipt": "string"},
+  "MT2PathHistoryResult": {"receipt": "string", "direction": "string", "paths": "integer", "nodes": "integer"}
+}

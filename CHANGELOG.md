@@ -1,5 +1,25 @@
 # Changelog
 
+## 0.3.0
+
+### Added
+
+- Build character editors, Dungeon tools and management mods with Lua.
+- Place and edit modular buildings, scenery, paths, walls and terrain through the game's native tools.
+- Create NPCs, Monsters and Bosses; edit quests, Boss phases and Monster Zones.
+- Manage staff, research projects, server networks, fees, loans, marketing and game releases.
+- Use typed editor completion, generated function pages and a machine contract for the new gameplay APIs.
+- Browse the available gameplay operations with the complete Gameplay API Explorer example.
+
+### Changed
+
+- See the result of your world edits, with clear failure causes when the game cannot confirm a change.
+- Reloading or disabling a Lua mod cancels its old pending world edits. Old references cannot affect a newly loaded world.
+
+### Compatibility
+
+- These gameplay APIs are experimental. Their world-changing operations currently run in singleplayer; a `shared` manifest does not synchronize them in Multiplayer.
+
 ## 0.2.6
 
 ### Added

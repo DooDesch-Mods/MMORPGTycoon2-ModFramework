@@ -1,0 +1,1245 @@
+[
+  {
+    "name": "actors.regions",
+    "kind": "query",
+    "parameters": [],
+    "returns": "MT2ActorRegion[]",
+    "summary": "List saved root Region IDs and native level bounds.",
+    "errors": [
+      "world_not_ready",
+      "wrong_thread",
+      "unsupported_game_build",
+      "stale_handle",
+      "invalid_argument"
+    ],
+    "native_evidence": [
+      "MMORPGTycoon2-Multiplayer@8a13602/src/game/npc_census.h"
+    ]
+  },
+  {
+    "name": "actors.list",
+    "kind": "query",
+    "parameters": [
+      {
+        "name": "region",
+        "type": "integer",
+        "description": "Optional root Region saved ID; omit for all root Regions.",
+        "optional": true
+      }
+    ],
+    "returns": "MT2Actor[]",
+    "summary": "List current root-world NPCs, Monsters and Bosses with exact handles and native manager membership.",
+    "errors": [
+      "world_not_ready",
+      "wrong_thread",
+      "unsupported_game_build",
+      "stale_handle",
+      "invalid_argument"
+    ],
+    "native_evidence": [
+      "MMORPGTycoon2-Multiplayer@8a13602/src/game/npc_census.h",
+      "MMORPGTycoon2-Multiplayer@8a13602/src/game/character_boss_retirement_read.h",
+      "MMORPGTycoon2-Multiplayer@8a13602/src/game/monster_move_read.h"
+    ]
+  },
+  {
+    "name": "npcs.list",
+    "kind": "query",
+    "parameters": [
+      {
+        "name": "region",
+        "type": "integer",
+        "description": "Optional root Region saved ID; omit for all root Regions.",
+        "optional": true
+      }
+    ],
+    "returns": "MT2Actor[]",
+    "summary": "List current root-world NPCs with exact handles and native manager membership.",
+    "errors": [
+      "world_not_ready",
+      "wrong_thread",
+      "unsupported_game_build",
+      "stale_handle",
+      "invalid_argument"
+    ],
+    "native_evidence": [
+      "MMORPGTycoon2-Multiplayer@8a13602/src/game/npc_census.h",
+      "MMORPGTycoon2-Multiplayer@8a13602/src/game/character_boss_retirement_read.h",
+      "MMORPGTycoon2-Multiplayer@8a13602/src/game/monster_move_read.h"
+    ]
+  },
+  {
+    "name": "monsters.list",
+    "kind": "query",
+    "parameters": [
+      {
+        "name": "region",
+        "type": "integer",
+        "description": "Optional root Region saved ID; omit for all root Regions.",
+        "optional": true
+      }
+    ],
+    "returns": "MT2Actor[]",
+    "summary": "List current root-world Monsters with exact handles and native manager membership.",
+    "errors": [
+      "world_not_ready",
+      "wrong_thread",
+      "unsupported_game_build",
+      "stale_handle",
+      "invalid_argument"
+    ],
+    "native_evidence": [
+      "MMORPGTycoon2-Multiplayer@8a13602/src/game/npc_census.h",
+      "MMORPGTycoon2-Multiplayer@8a13602/src/game/character_boss_retirement_read.h",
+      "MMORPGTycoon2-Multiplayer@8a13602/src/game/monster_move_read.h"
+    ]
+  },
+  {
+    "name": "actors.get",
+    "kind": "query",
+    "parameters": [
+      {
+        "name": "handle",
+        "type": "MT2ActorHandle",
+        "description": "Exact current actor UID and world epoch from actors.list."
+      }
+    ],
+    "returns": "MT2Actor",
+    "summary": "Read a current root-world actor's identity, transform, character and level; NPCs include online/tint/command state.",
+    "errors": [
+      "world_not_ready",
+      "wrong_thread",
+      "unsupported_game_build",
+      "stale_handle",
+      "invalid_argument"
+    ],
+    "native_evidence": [
+      "MMORPGTycoon2-Multiplayer@8a13602/src/game/npc_census.h",
+      "MMORPGTycoon2-Multiplayer@8a13602/src/game/npc_property_runtime.inc"
+    ]
+  },
+  {
+    "name": "quests.list",
+    "kind": "query",
+    "parameters": [
+      {
+        "name": "handle",
+        "type": "MT2ActorHandle",
+        "description": "Exact current actor UID and world epoch from actors.list."
+      }
+    ],
+    "returns": "MT2NpcQuest[]",
+    "summary": "Read a QuestGiver NPC's owned quest slots, authored fields, destination handles and daily counters with reciprocal weak ownership checks.",
+    "errors": [
+      "world_not_ready",
+      "wrong_thread",
+      "unsupported_game_build",
+      "stale_handle",
+      "invalid_argument"
+    ],
+    "native_evidence": [
+      "MMORPGTycoon2-Multiplayer@8a13602/src/game/npc_quest_records.h"
+    ]
+  },
+  {
+    "name": "quests.get",
+    "kind": "query",
+    "parameters": [
+      {
+        "name": "handle",
+        "type": "MT2NpcQuestHandle",
+        "description": "Current quest owner/epoch/slot/sequence handle returned by quests.list."
+      }
+    ],
+    "returns": "MT2NpcQuest",
+    "summary": "Read a quest only while its exact current owner, slot and sequence still match.",
+    "errors": [
+      "world_not_ready",
+      "wrong_thread",
+      "unsupported_game_build",
+      "stale_handle",
+      "invalid_argument"
+    ],
+    "native_evidence": [
+      "MMORPGTycoon2-Multiplayer@8a13602/src/game/npc_quest_records.h"
+    ]
+  },
+  {
+    "name": "quests.create",
+    "kind": "action",
+    "parameters": [
+      {
+        "name": "handle",
+        "type": "MT2ActorHandle",
+        "description": "Exact current actor UID and world epoch from actors.list."
+      }
+    ],
+    "returns": "MT2QuestEditResult",
+    "summary": "Generate and append a native quest for a QuestGiver with fewer than five quests and an existing Building fallback destination. Preserve the original native Undo inverse, active visitor state and ledger with complete readback.",
+    "errors": [
+      "world_not_ready",
+      "wrong_thread",
+      "unsupported_game_build",
+      "stale_handle",
+      "invalid_argument",
+      "native_failure",
+      "unknown_effect",
+      "readback_mismatch"
+    ],
+    "native_evidence": [
+      "MMORPGTycoon2-Multiplayer@8a13602/src/game/npc_quest_list_runtime.inc",
+      "MMORPGTycoon2-Multiplayer@8a13602/src/game/npc_quest_list_codes.h",
+      "MMORPGTycoon2-Multiplayer@8a13602/src/game/npc_quest_list_read.h",
+      "MMORPGTycoon2-Multiplayer@8a13602/src/game/npc_quest_visitor_reader.h"
+    ]
+  },
+  {
+    "name": "quests.remove",
+    "kind": "action",
+    "parameters": [
+      {
+        "name": "handle",
+        "type": "MT2NpcQuestHandle",
+        "description": "Current quest owner/epoch/slot/sequence handle returned by quests.list."
+      }
+    ],
+    "returns": "MT2QuestEditResult",
+    "summary": "Remove a current quest through native NPC lifetime cleanup and verify its expired visitor references and reindexed survivors. Preserve the original native Undo inverse, active visitor state and ledger with complete readback.",
+    "errors": [
+      "world_not_ready",
+      "wrong_thread",
+      "unsupported_game_build",
+      "stale_handle",
+      "invalid_argument",
+      "native_failure",
+      "unknown_effect",
+      "readback_mismatch"
+    ],
+    "native_evidence": [
+      "MMORPGTycoon2-Multiplayer@8a13602/src/game/npc_quest_list_runtime.inc",
+      "MMORPGTycoon2-Multiplayer@8a13602/src/game/npc_quest_list_codes.h",
+      "MMORPGTycoon2-Multiplayer@8a13602/src/game/npc_quest_list_read.h",
+      "MMORPGTycoon2-Multiplayer@8a13602/src/game/npc_quest_visitor_reader.h"
+    ]
+  },
+  {
+    "name": "quests.swap",
+    "kind": "action",
+    "parameters": [
+      {
+        "name": "handle",
+        "type": "MT2NpcQuestHandle",
+        "description": "Current quest owner/epoch/slot/sequence handle returned by quests.list."
+      },
+      {
+        "name": "slot",
+        "type": "integer",
+        "description": "Current zero-based destination slot in this NPC's quest list."
+      }
+    ],
+    "returns": "MT2QuestEditResult",
+    "summary": "Swap two quest slots through native ReorderQuest and confirm the complete owner/global records. Preserve the original native Undo inverse, active visitor state and ledger with complete readback.",
+    "errors": [
+      "world_not_ready",
+      "wrong_thread",
+      "unsupported_game_build",
+      "stale_handle",
+      "invalid_argument",
+      "native_failure",
+      "unknown_effect",
+      "readback_mismatch"
+    ],
+    "native_evidence": [
+      "MMORPGTycoon2-Multiplayer@8a13602/src/game/npc_quest_list_runtime.inc",
+      "MMORPGTycoon2-Multiplayer@8a13602/src/game/npc_quest_list_codes.h",
+      "MMORPGTycoon2-Multiplayer@8a13602/src/game/npc_quest_list_read.h",
+      "MMORPGTycoon2-Multiplayer@8a13602/src/game/npc_quest_visitor_reader.h"
+    ]
+  },
+  {
+    "name": "quests.set_name",
+    "kind": "action",
+    "parameters": [
+      {
+        "name": "handle",
+        "type": "MT2NpcQuestHandle",
+        "description": "Current quest owner/epoch/slot/sequence handle returned by quests.list."
+      },
+      {
+        "name": "name",
+        "type": "string",
+        "description": "Nonempty authored title, at most 4096 UTF-8 bytes."
+      }
+    ],
+    "returns": "MT2QuestEditResult",
+    "summary": "Assign the quest title through the native String method. Preserve the original native Undo inverse, active visitor state and ledger with complete readback.",
+    "errors": [
+      "world_not_ready",
+      "wrong_thread",
+      "unsupported_game_build",
+      "stale_handle",
+      "invalid_argument",
+      "native_failure",
+      "unknown_effect",
+      "readback_mismatch"
+    ],
+    "native_evidence": [
+      "MMORPGTycoon2-Multiplayer@8a13602/src/game/npc_quest_list_runtime.inc",
+      "MMORPGTycoon2-Multiplayer@8a13602/src/game/npc_quest_list_codes.h",
+      "MMORPGTycoon2-Multiplayer@8a13602/src/game/npc_quest_list_read.h",
+      "MMORPGTycoon2-Multiplayer@8a13602/src/game/npc_quest_visitor_reader.h"
+    ]
+  },
+  {
+    "name": "quests.set_kills",
+    "kind": "action",
+    "parameters": [
+      {
+        "name": "handle",
+        "type": "MT2NpcQuestHandle",
+        "description": "Current quest owner/epoch/slot/sequence handle returned by quests.list."
+      },
+      {
+        "name": "kills",
+        "type": "integer",
+        "description": "Native kill target from 0 through 1000000."
+      }
+    ],
+    "returns": "MT2QuestEditResult",
+    "summary": "Set the authored kill count with the original selector's field semantics. Preserve the original native Undo inverse, active visitor state and ledger with complete readback.",
+    "errors": [
+      "world_not_ready",
+      "wrong_thread",
+      "unsupported_game_build",
+      "stale_handle",
+      "invalid_argument",
+      "native_failure",
+      "unknown_effect",
+      "readback_mismatch"
+    ],
+    "native_evidence": [
+      "MMORPGTycoon2-Multiplayer@8a13602/src/game/npc_quest_list_runtime.inc",
+      "MMORPGTycoon2-Multiplayer@8a13602/src/game/npc_quest_list_codes.h",
+      "MMORPGTycoon2-Multiplayer@8a13602/src/game/npc_quest_list_read.h",
+      "MMORPGTycoon2-Multiplayer@8a13602/src/game/npc_quest_visitor_reader.h"
+    ]
+  },
+  {
+    "name": "quests.set_rewards",
+    "kind": "action",
+    "parameters": [
+      {
+        "name": "handle",
+        "type": "MT2NpcQuestHandle",
+        "description": "Current quest owner/epoch/slot/sequence handle returned by quests.list."
+      },
+      {
+        "name": "defaults",
+        "type": "boolean",
+        "description": "Use native default awards; cannot be combined with xp or gold.",
+        "optional": true
+      },
+      {
+        "name": "xp",
+        "type": "integer",
+        "description": "Custom XP reward from 0 through int32 maximum; required with gold when defaults is false.",
+        "optional": true
+      },
+      {
+        "name": "gold",
+        "type": "integer",
+        "description": "Custom gold reward from 0 through int32 maximum; required with xp when defaults is false.",
+        "optional": true
+      }
+    ],
+    "returns": "MT2QuestEditResult",
+    "summary": "Set custom or default awards through the original native reward setters. Preserve the original native Undo inverse, active visitor state and ledger with complete readback.",
+    "errors": [
+      "world_not_ready",
+      "wrong_thread",
+      "unsupported_game_build",
+      "stale_handle",
+      "invalid_argument",
+      "native_failure",
+      "unknown_effect",
+      "readback_mismatch"
+    ],
+    "native_evidence": [
+      "MMORPGTycoon2-Multiplayer@8a13602/src/game/npc_quest_list_runtime.inc",
+      "MMORPGTycoon2-Multiplayer@8a13602/src/game/npc_quest_list_codes.h",
+      "MMORPGTycoon2-Multiplayer@8a13602/src/game/npc_quest_list_read.h",
+      "MMORPGTycoon2-Multiplayer@8a13602/src/game/npc_quest_visitor_reader.h"
+    ]
+  },
+  {
+    "name": "quests.set_destination",
+    "kind": "action",
+    "parameters": [
+      {
+        "name": "handle",
+        "type": "MT2NpcQuestHandle",
+        "description": "Current quest owner/epoch/slot/sequence handle returned by quests.list."
+      },
+      {
+        "name": "destination",
+        "type": "MT2Handle",
+        "description": "Current native Building, Monster Zone, Elite Monster or NPC destination handle."
+      },
+      {
+        "name": "kills",
+        "type": "integer",
+        "description": "Optional Zone kill target from 1 through 1000000; other destination families use their native defaults.",
+        "optional": true
+      }
+    ],
+    "returns": "MT2QuestDestinationResult",
+    "summary": "Run original SetDestination with the native default action, then verify all global quest records, reciprocal weak links, its single-operation native Undo inverse, recalculation task and unchanged ledger.",
+    "errors": [
+      "world_not_ready",
+      "wrong_thread",
+      "unsupported_game_build",
+      "stale_handle",
+      "invalid_argument",
+      "native_failure",
+      "unknown_effect",
+      "readback_mismatch"
+    ],
+    "native_evidence": [
+      "MMORPGTycoon2-Multiplayer@8a13602/src/game/npc_quest_authoring_runtime.inc",
+      "MMORPGTycoon2-Multiplayer@8a13602/src/game/npc_quest_authoring_read.h",
+      "MMORPGTycoon2-Multiplayer@8a13602/src/game/monster_quest_retirement.h",
+      "MMORPGTycoon2-Multiplayer@8a13602/src/game/object_identity/remove_runtime/copy/undo_witness.cpp"
+    ]
+  },
+  {
+    "name": "actors.boss_phases",
+    "kind": "query",
+    "parameters": [
+      {
+        "name": "handle",
+        "type": "MT2CharacterHandle",
+        "description": "Current definition handle from characters.list; phases are owned native slots."
+      }
+    ],
+    "returns": "MT2BossPhase[]",
+    "summary": "Read native phase order, health, VFX/color and owner ability-slot membership.",
+    "errors": [
+      "world_not_ready",
+      "wrong_thread",
+      "unsupported_game_build",
+      "stale_handle",
+      "invalid_argument"
+    ],
+    "native_evidence": [
+      "MMORPGTycoon2-Multiplayer@8a13602/src/game/boss_phase_reader.h"
+    ]
+  },
+  {
+    "name": "actors.place_boss",
+    "kind": "action",
+    "parameters": [
+      {
+        "name": "character",
+        "type": "MT2CharacterHandle",
+        "description": "Current kind 3 definition handle from characters.list."
+      },
+      {
+        "name": "region",
+        "type": "integer",
+        "description": "Saved root Region ID containing the placement point."
+      },
+      {
+        "name": "pose",
+        "type": "MT2ActorPose",
+        "description": "Complete finite native pose with a unit quaternion and positive scale."
+      }
+    ],
+    "returns": "MT2Actor",
+    "summary": "Purchase a Boss for the original 1000 cash and create it through native AddBoss; verify exact accounting, actor membership/pose/type/level, original tag progression and unchanged native Undo.",
+    "errors": [
+      "world_not_ready",
+      "wrong_thread",
+      "unsupported_game_build",
+      "stale_handle",
+      "invalid_argument",
+      "native_failure",
+      "unknown_effect",
+      "readback_mismatch"
+    ],
+    "native_evidence": [
+      "MMORPGTycoon2-Multiplayer@8a13602/src/game/boss_placement_calls.h",
+      "MMORPGTycoon2-Multiplayer@8a13602/src/game/boss_placement_execution.inc",
+      "MMORPGTycoon2-Multiplayer@8a13602/src/game/boss_placement_state.h",
+      "MMORPGTycoon2-Multiplayer@8a13602/src/game/boss_placement_reader.h"
+    ]
+  },
+  {
+    "name": "monsters.place",
+    "kind": "action",
+    "parameters": [
+      {
+        "name": "character",
+        "type": "MT2CharacterHandle",
+        "description": "Current kind 1 definition for rank 0/1 or kind 4 definition for rank 2."
+      },
+      {
+        "name": "region",
+        "type": "integer",
+        "description": "Saved active root Region ID containing the placement point."
+      },
+      {
+        "name": "rank",
+        "type": "integer",
+        "description": "Native Monster rank: 0 normal, 1 Elite, 2 DungeonBoss."
+      },
+      {
+        "name": "level",
+        "type": "integer",
+        "description": "Level within the native Region's current minimum/maximum bounds."
+      },
+      {
+        "name": "pose",
+        "type": "MT2MonsterPose",
+        "description": "Finite position and unit quaternion. Original spawning uses unit object scale."
+      }
+    ],
+    "returns": "MT2Actor",
+    "summary": "Spawn through original MonsterManager methods, sound and LevelChanged; confirm native destroy Undo, release edit, global/manager counters, full actor and quest/visitor survivors, and unchanged ledger.",
+    "errors": [
+      "world_not_ready",
+      "wrong_thread",
+      "unsupported_game_build",
+      "stale_handle",
+      "invalid_argument",
+      "native_failure",
+      "unknown_effect",
+      "readback_mismatch"
+    ],
+    "native_evidence": [
+      "MMORPGTycoon2-Multiplayer@8a13602/src/game/monster_action_runtime.inc",
+      "MMORPGTycoon2-Multiplayer@8a13602/src/game/monster_action_codes.h",
+      "MMORPGTycoon2-Multiplayer@8a13602/src/game/monster_zone_probe.inc",
+      "MMORPGTycoon2-Multiplayer@8a13602/src/game/monster_zone_read.h"
+    ]
+  },
+  {
+    "name": "npcs.place",
+    "kind": "action",
+    "parameters": [
+      {
+        "name": "character",
+        "type": "MT2CharacterHandle",
+        "description": "Current native definition handle for the NPC appearance."
+      },
+      {
+        "name": "region",
+        "type": "integer",
+        "description": "Saved active root Region ID containing the placement point."
+      },
+      {
+        "name": "type",
+        "type": "integer",
+        "description": "Native role: 0 QuestGiver, 1 Guard, 2 Service NPC."
+      },
+      {
+        "name": "pose",
+        "type": "MT2ActorPose",
+        "description": "Complete finite pose with unit quaternion and positive scale."
+      }
+    ],
+    "returns": "MT2NpcPlacementResult",
+    "summary": "Create through original NPCManager AddNPC, including two generated quests for a QuestGiver. Verify native cash/destroy Undo, original TypeCost refund, release edit, tag progression, all quest/visitor and actor survivors, and unchanged ledger.",
+    "errors": [
+      "world_not_ready",
+      "wrong_thread",
+      "unsupported_game_build",
+      "stale_handle",
+      "invalid_argument",
+      "native_failure",
+      "unknown_effect",
+      "readback_mismatch"
+    ],
+    "native_evidence": [
+      "MMORPGTycoon2-Multiplayer@8a13602/src/game/npc_action_runtime.inc",
+      "MMORPGTycoon2-Multiplayer@8a13602/src/game/npc_place_probe.inc",
+      "MMORPGTycoon2-Multiplayer@8a13602/src/game/npc_census.h",
+      "MMORPGTycoon2-Multiplayer@8a13602/src/game/typed_action/npc_codec.inc"
+    ]
+  },
+  {
+    "name": "actors.move",
+    "kind": "action",
+    "parameters": [
+      {
+        "name": "handle",
+        "type": "MT2ActorHandle",
+        "description": "Exact current actor UID and world epoch from actors.list."
+      },
+      {
+        "name": "pose",
+        "type": "MT2ActorPose",
+        "description": "Complete finite destination pose for a current on-map NPC, Monster or Boss. A Boss must stay within its native Region."
+      }
+    ],
+    "returns": "MT2Actor",
+    "summary": "Move through native BeginEdit, Undo Open, DoMove, Close and EndEdit. Restore prior selection and verify the complete native inverse, pose, visual lifetime and surviving state. Native Boss movement preserves its existing respawn anchor; NPC/Monster movement updates its spawn point.",
+    "errors": [
+      "world_not_ready",
+      "wrong_thread",
+      "unsupported_game_build",
+      "stale_handle",
+      "invalid_argument",
+      "native_failure",
+      "unknown_effect",
+      "readback_mismatch"
+    ],
+    "native_evidence": [
+      "MMORPGTycoon2-Multiplayer@8a13602/src/game/move_kiss/native_calls.cpp",
+      "MMORPGTycoon2-Multiplayer@8a13602/src/game/npc_move_runtime.inc",
+      "MMORPGTycoon2-Multiplayer@8a13602/src/game/monster_move_runtime.inc",
+      "MMORPGTycoon2-Multiplayer@8a13602/src/game/monster_move_destination.h",
+      "MMORPGTycoon2-Multiplayer@8a13602/src/game/monster_move_read.h"
+    ]
+  },
+  {
+    "name": "actors.remove",
+    "kind": "action",
+    "parameters": [
+      {
+        "name": "handle",
+        "type": "MT2ActorHandle",
+        "description": "Exact current actor UID and world epoch from actors.list."
+      }
+    ],
+    "returns": "MT2ActorRemovalResult",
+    "summary": "Remove an NPC or a Monster outside a generating Zone through original SelectionManager DestroyProp. Confirm UID/manager/spatial/selection absence, full quest and visitor cascade, native actor/quest inverse records, and unchanged zero-cost ledger.",
+    "errors": [
+      "world_not_ready",
+      "wrong_thread",
+      "unsupported_game_build",
+      "stale_handle",
+      "invalid_argument",
+      "native_failure",
+      "unknown_effect",
+      "readback_mismatch"
+    ],
+    "native_evidence": [
+      "MMORPGTycoon2-Multiplayer@8a13602/src/game/npc_remove_runtime.inc",
+      "MMORPGTycoon2-Multiplayer@8a13602/src/game/npc_history_graph.h",
+      "MMORPGTycoon2-Multiplayer@8a13602/src/game/monster_remove_runtime.inc",
+      "MMORPGTycoon2-Multiplayer@8a13602/src/game/monster_remove_read.h",
+      "MMORPGTycoon2-Multiplayer@8a13602/src/game/npc_quest_cascade.h"
+    ]
+  },
+  {
+    "name": "monsters.zones",
+    "kind": "query",
+    "parameters": [
+      {
+        "name": "region",
+        "type": "integer",
+        "description": "Optional saved root Region ID; omit for every root Region.",
+        "optional": true
+      }
+    ],
+    "returns": "MT2MonsterZone[]",
+    "summary": "Read current Monster Zones, native fixed-point polygons, authored properties and reciprocally owned generated Monster handles.",
+    "errors": [
+      "world_not_ready",
+      "wrong_thread",
+      "unsupported_game_build",
+      "stale_handle",
+      "invalid_argument"
+    ],
+    "native_evidence": [
+      "MMORPGTycoon2-Multiplayer@8a13602/src/game/monster_zone_read.h",
+      "MMORPGTycoon2-Multiplayer@8a13602/src/game/npc_quest_targets.h",
+      "MMORPGTycoon2-Multiplayer@8a13602/src/game/native_polyshape.h"
+    ]
+  },
+  {
+    "name": "monsters.get_zone",
+    "kind": "query",
+    "parameters": [
+      {
+        "name": "handle",
+        "type": "MT2ZoneHandle",
+        "description": "Exact current Monster Zone UID/epoch handle from monsters.zones."
+      }
+    ],
+    "returns": "MT2MonsterZone",
+    "summary": "Read a current Monster Zone only while its full UID and root manager membership match.",
+    "errors": [
+      "world_not_ready",
+      "wrong_thread",
+      "unsupported_game_build",
+      "stale_handle",
+      "invalid_argument"
+    ],
+    "native_evidence": [
+      "MMORPGTycoon2-Multiplayer@8a13602/src/game/monster_zone_read.h",
+      "MMORPGTycoon2-Multiplayer@8a13602/src/game/npc_quest_targets.h"
+    ]
+  },
+  {
+    "name": "monsters.create_zone",
+    "kind": "action",
+    "parameters": [
+      {
+        "name": "character",
+        "type": "MT2CharacterHandle",
+        "description": "Current kind 1 definition for generated Monsters."
+      },
+      {
+        "name": "region",
+        "type": "integer",
+        "description": "Saved active root Region ID."
+      },
+      {
+        "name": "level",
+        "type": "integer",
+        "description": "Level within the native Region's current bounds."
+      },
+      {
+        "name": "stamps",
+        "type": "MT2MonsterZoneStamp[]",
+        "description": "1 through 64 original native paint stamps, at most 16384 vertices total, in clear space without an existing Zone intersection."
+      }
+    ],
+    "returns": "MT2MonsterZone",
+    "summary": "Construct a private native Zone brush, paint and finish it with a private current-selection receiver. Native island/Region clipping applies. Verify final clipped geometry, generated Monsters and counters, complete native Undo, release points, unchanged survivors/quests/visitors/ledger, and owned receiver cleanup.",
+    "errors": [
+      "world_not_ready",
+      "wrong_thread",
+      "unsupported_game_build",
+      "stale_handle",
+      "invalid_argument",
+      "native_failure",
+      "unknown_effect",
+      "readback_mismatch"
+    ],
+    "native_evidence": [
+      "MMORPGTycoon2-Multiplayer@8a13602/src/game/monster_zone_action_runtime.inc",
+      "MMORPGTycoon2-Multiplayer@8a13602/src/game/monster_zone_action_codes.h",
+      "MMORPGTycoon2-Multiplayer@8a13602/src/game/monster_zone_effect.h",
+      "MMORPGTycoon2-Multiplayer@8a13602/src/game/native_polyshape.h"
+    ]
+  },
+  {
+    "name": "monsters.set_zone",
+    "kind": "action",
+    "parameters": [
+      {
+        "name": "handle",
+        "type": "MT2ZoneHandle",
+        "description": "Current Monster Zone handle."
+      },
+      {
+        "name": "settings",
+        "type": "MT2MonsterZoneSettings",
+        "description": "One or more native definition, density or level fields."
+      }
+    ],
+    "returns": "MT2MonsterZone",
+    "summary": "Apply original Zone properties and rebuild generated Monsters through the native Undo transaction. Confirm old UID retirement, complete make/destroy/edit inverses, replacement membership and all surviving state.",
+    "errors": [
+      "world_not_ready",
+      "wrong_thread",
+      "unsupported_game_build",
+      "stale_handle",
+      "invalid_argument",
+      "native_failure",
+      "unknown_effect",
+      "readback_mismatch"
+    ],
+    "native_evidence": [
+      "MMORPGTycoon2-Multiplayer@8a13602/src/game/zone_edit_calls.h",
+      "MMORPGTycoon2-Multiplayer@8a13602/src/game/zone_edit_stored.h",
+      "MMORPGTycoon2-Multiplayer@8a13602/src/game/zone_edit_graph.inc",
+      "MMORPGTycoon2-Multiplayer@8a13602/src/game/zone_edit_execute.inc"
+    ]
+  },
+  {
+    "name": "monsters.reset_zone",
+    "kind": "action",
+    "parameters": [
+      {
+        "name": "handle",
+        "type": "MT2ZoneHandle",
+        "description": "Current Monster Zone handle."
+      }
+    ],
+    "returns": "MT2MonsterZone",
+    "summary": "Destroy and rebuild this Zone's generated Monsters through original lifetime and native Undo methods; verify full ownership, retired UIDs, replacement members and untouched authored properties.",
+    "errors": [
+      "world_not_ready",
+      "wrong_thread",
+      "unsupported_game_build",
+      "stale_handle",
+      "invalid_argument",
+      "native_failure",
+      "unknown_effect",
+      "readback_mismatch"
+    ],
+    "native_evidence": [
+      "MMORPGTycoon2-Multiplayer@8a13602/src/game/zone_edit_calls.h",
+      "MMORPGTycoon2-Multiplayer@8a13602/src/game/zone_edit_execute.inc",
+      "MMORPGTycoon2-Multiplayer@8a13602/src/game/zone_edit_graph.inc"
+    ]
+  },
+  {
+    "name": "monsters.respawn_zone",
+    "kind": "action",
+    "parameters": [
+      {
+        "name": "handle",
+        "type": "MT2ZoneHandle",
+        "description": "Current Monster Zone handle."
+      }
+    ],
+    "returns": "MT2MonsterZoneRespawnResult",
+    "summary": "Run the original Zone respawn command for dead members and confirm preserved membership, original spawn positions, death/timer reset and unchanged native Undo and ledger.",
+    "errors": [
+      "world_not_ready",
+      "wrong_thread",
+      "unsupported_game_build",
+      "stale_handle",
+      "invalid_argument",
+      "native_failure",
+      "unknown_effect",
+      "readback_mismatch"
+    ],
+    "native_evidence": [
+      "MMORPGTycoon2-Multiplayer@8a13602/src/game/zone_edit_calls.h",
+      "MMORPGTycoon2-Multiplayer@8a13602/src/game/zone_edit_execute.inc"
+    ]
+  },
+  {
+    "name": "actors.remove_boss",
+    "kind": "action",
+    "parameters": [
+      {
+        "name": "handle",
+        "type": "MT2ActorHandle",
+        "description": "Exact current actor UID and world epoch from actors.list."
+      }
+    ],
+    "returns": "MT2BossRemovalResult",
+    "summary": "Destroy a Boss through the original SelectionManager command and confirm its native 1000 cash refund and refund Undo. The native game does not retain a Boss recreation inverse; the result states this explicitly.",
+    "errors": [
+      "world_not_ready",
+      "wrong_thread",
+      "unsupported_game_build",
+      "stale_handle",
+      "invalid_argument",
+      "native_failure",
+      "unknown_effect",
+      "readback_mismatch"
+    ],
+    "native_evidence": [
+      "MMORPGTycoon2-Multiplayer@8a13602/src/game/boss_placement_calls.h",
+      "MMORPGTycoon2-Multiplayer@8a13602/src/game/character_boss_retirement_read.h",
+      "MMORPGTycoon2-Multiplayer@8a13602/src/game/object_identity/remove_runtime/copy/undo_witness.cpp"
+    ]
+  },
+  {
+    "name": "monsters.remove_zone",
+    "kind": "action",
+    "parameters": [
+      {
+        "name": "handle",
+        "type": "MT2ZoneHandle",
+        "description": "Current Monster Zone handle."
+      }
+    ],
+    "returns": "MT2MonsterZoneRemovalResult",
+    "summary": "Remove a Zone through original SelectionManager destruction, including generated Monsters and incoming quests. Confirm UID, manager, spatial and weak-reference retirement; complete native Zone/Monster/quest Undo records; exact counters and unchanged ledger.",
+    "errors": [
+      "world_not_ready",
+      "wrong_thread",
+      "unsupported_game_build",
+      "stale_handle",
+      "invalid_argument",
+      "native_failure",
+      "unknown_effect",
+      "readback_mismatch"
+    ],
+    "native_evidence": [
+      "MMORPGTycoon2-Multiplayer@8a13602/src/game/zone_edit_remove.inc",
+      "MMORPGTycoon2-Multiplayer@8a13602/src/game/zone_edit_stored.h",
+      "MMORPGTycoon2-Multiplayer@8a13602/src/game/zone_edit_graph.inc",
+      "MMORPGTycoon2-Multiplayer@8a13602/src/game/npc_quest_cascade.h"
+    ]
+  },
+  {
+    "name": "monsters.paint_zone",
+    "kind": "action",
+    "parameters": [
+      {
+        "name": "handle",
+        "type": "MT2ZoneHandle",
+        "description": "Current Monster Zone handle to extend."
+      },
+      {
+        "name": "stamps",
+        "type": "MT2MonsterZoneStamp[]",
+        "description": "1 through 64 native paint stamps within this owned root Region."
+      }
+    ],
+    "returns": "MT2ZonePaintResult",
+    "summary": "Extend an existing Monster Zone through the original private brush transaction. Native island/Region clipping and culling of intersecting Zone families apply. Confirm every stamp's authored/walkable snapshots, emitted actor births/retirements, complete native inverse coverage, quest/visitor cascade, release points and selection cleanup.",
+    "errors": [
+      "world_not_ready",
+      "wrong_thread",
+      "unsupported_game_build",
+      "stale_handle",
+      "invalid_argument",
+      "native_failure",
+      "unknown_effect",
+      "readback_mismatch"
+    ],
+    "native_evidence": [
+      "MMORPGTycoon2-Multiplayer@8a13602/src/game/zone_edit_calls.h",
+      "MMORPGTycoon2-Multiplayer@8a13602/src/game/zone_edit_execute.inc",
+      "MMORPGTycoon2-Multiplayer@8a13602/src/game/zone_edit_graph.inc",
+      "MMORPGTycoon2-Multiplayer@8a13602/src/game/zone_edit_stored.h"
+    ]
+  },
+  {
+    "name": "monsters.erase_zones",
+    "kind": "action",
+    "parameters": [
+      {
+        "name": "region",
+        "type": "integer",
+        "description": "Current owned root Region saved ID."
+      },
+      {
+        "name": "stamps",
+        "type": "MT2MonsterZoneStamp[]",
+        "description": "1 through 64 native erase stamps within this Region."
+      }
+    ],
+    "returns": "MT2ZonePaintResult",
+    "summary": "Erase native Zone coverage through the original private brush across intersecting Zone families. Confirm complete authored/walkable changes, generated Monster and Zone retirement, native Undo and quest/visitor cleanup. Return confirmed no-op only when the original brush acknowledges no emitted mutation and no Undo.",
+    "errors": [
+      "world_not_ready",
+      "wrong_thread",
+      "unsupported_game_build",
+      "stale_handle",
+      "invalid_argument",
+      "native_failure",
+      "unknown_effect",
+      "readback_mismatch"
+    ],
+    "native_evidence": [
+      "MMORPGTycoon2-Multiplayer@8a13602/src/game/zone_edit_calls.h",
+      "MMORPGTycoon2-Multiplayer@8a13602/src/game/zone_edit_execute.inc",
+      "MMORPGTycoon2-Multiplayer@8a13602/src/game/zone_edit_graph.inc",
+      "MMORPGTycoon2-Multiplayer@8a13602/src/game/zone_edit_stored.h"
+    ]
+  },
+  {
+    "name": "npcs.rename",
+    "kind": "action",
+    "parameters": [
+      {
+        "name": "handle",
+        "type": "MT2ActorHandle",
+        "description": "Exact current actor UID and world epoch from actors.list."
+      },
+      {
+        "name": "name",
+        "type": "string",
+        "description": "Nonempty NPC name, at most 256 UTF-8 bytes."
+      }
+    ],
+    "returns": "MT2Actor",
+    "summary": "Rename through the original native actor command and confirm the complete property result.",
+    "errors": [
+      "world_not_ready",
+      "wrong_thread",
+      "unsupported_game_build",
+      "stale_handle",
+      "invalid_argument",
+      "native_failure",
+      "unknown_effect",
+      "readback_mismatch"
+    ],
+    "native_evidence": [
+      "MMORPGTycoon2-Multiplayer@8a13602/src/game/npc_property_runtime.inc"
+    ]
+  },
+  {
+    "name": "npcs.set_online",
+    "kind": "action",
+    "parameters": [
+      {
+        "name": "handle",
+        "type": "MT2ActorHandle",
+        "description": "Exact current actor UID and world epoch from actors.list."
+      },
+      {
+        "name": "mode",
+        "type": "integer",
+        "description": "Native mode 0 through 2; 2 removes forced online/offline tint."
+      }
+    ],
+    "returns": "MT2Actor",
+    "summary": "Set the native online mode and verify its mode, forced-tint flag and color.",
+    "errors": [
+      "world_not_ready",
+      "wrong_thread",
+      "unsupported_game_build",
+      "stale_handle",
+      "invalid_argument",
+      "native_failure",
+      "unknown_effect",
+      "readback_mismatch"
+    ],
+    "native_evidence": [
+      "MMORPGTycoon2-Multiplayer@8a13602/src/game/npc_property_runtime.inc"
+    ]
+  },
+  {
+    "name": "npcs.change_level",
+    "kind": "action",
+    "parameters": [
+      {
+        "name": "handle",
+        "type": "MT2ActorHandle",
+        "description": "Exact current actor UID and world epoch from actors.list."
+      },
+      {
+        "name": "delta",
+        "type": "integer",
+        "description": "-1 lowers or 1 raises the native command level within Region limits."
+      }
+    ],
+    "returns": "MT2Actor",
+    "summary": "Execute the original Raise Level or Lower Level command and verify the current level and preserved properties.",
+    "errors": [
+      "world_not_ready",
+      "wrong_thread",
+      "unsupported_game_build",
+      "stale_handle",
+      "invalid_argument",
+      "native_failure",
+      "unknown_effect",
+      "readback_mismatch"
+    ],
+    "native_evidence": [
+      "MMORPGTycoon2-Multiplayer@8a13602/src/game/npc_property_runtime.inc",
+      "MMORPGTycoon2-Multiplayer@8a13602/src/game/typed_action/npc_property_action.h"
+    ]
+  },
+  {
+    "name": "actors.create_boss_phase",
+    "kind": "action",
+    "parameters": [
+      {
+        "name": "handle",
+        "type": "MT2CharacterHandle",
+        "description": "Current definition handle from characters.list; phases are owned native slots."
+      },
+      {
+        "name": "name",
+        "type": "string",
+        "description": "Optional authored phase name; omit for the native numbered default.",
+        "optional": true
+      }
+    ],
+    "returns": "MT2BossPhase[]",
+    "summary": "Construct and attach a phase through original native allocation/ownership functions.",
+    "errors": [
+      "world_not_ready",
+      "wrong_thread",
+      "unsupported_game_build",
+      "stale_handle",
+      "invalid_argument",
+      "native_failure",
+      "unknown_effect",
+      "readback_mismatch"
+    ],
+    "native_evidence": [
+      "MMORPGTycoon2-Multiplayer@8a13602/src/game/boss_phase_property_runtime.inc"
+    ]
+  },
+  {
+    "name": "actors.remove_boss_phase",
+    "kind": "action",
+    "parameters": [
+      {
+        "name": "handle",
+        "type": "MT2CharacterHandle",
+        "description": "Current definition handle from characters.list; phases are owned native slots."
+      },
+      {
+        "name": "phase",
+        "type": "integer",
+        "description": "Current zero-based phase slot in actors.boss_phases."
+      }
+    ],
+    "returns": "MT2BossPhase[]",
+    "summary": "Remove an owned phase through native RemoveBossPhase and verify all remaining phase records.",
+    "errors": [
+      "world_not_ready",
+      "wrong_thread",
+      "unsupported_game_build",
+      "stale_handle",
+      "invalid_argument",
+      "native_failure",
+      "unknown_effect",
+      "readback_mismatch"
+    ],
+    "native_evidence": [
+      "MMORPGTycoon2-Multiplayer@8a13602/src/game/boss_phase_property_runtime.inc"
+    ]
+  },
+  {
+    "name": "actors.reorder_boss_phase",
+    "kind": "action",
+    "parameters": [
+      {
+        "name": "handle",
+        "type": "MT2CharacterHandle",
+        "description": "Current definition handle from characters.list; phases are owned native slots."
+      },
+      {
+        "name": "phase",
+        "type": "integer",
+        "description": "Current zero-based phase slot in actors.boss_phases."
+      },
+      {
+        "name": "boundary",
+        "type": "integer",
+        "description": "Drop boundary from 0 through phase count; native semantics place the phase before this boundary."
+      }
+    ],
+    "returns": "MT2BossPhase[]",
+    "summary": "Reorder through native phase ownership and verify the complete final order.",
+    "errors": [
+      "world_not_ready",
+      "wrong_thread",
+      "unsupported_game_build",
+      "stale_handle",
+      "invalid_argument",
+      "native_failure",
+      "unknown_effect",
+      "readback_mismatch"
+    ],
+    "native_evidence": [
+      "MMORPGTycoon2-Multiplayer@8a13602/src/game/boss_phase_runtime.inc",
+      "MMORPGTycoon2-Multiplayer@8a13602/src/game/boss_phase_reader.h"
+    ]
+  },
+  {
+    "name": "actors.set_boss_phase",
+    "kind": "action",
+    "parameters": [
+      {
+        "name": "handle",
+        "type": "MT2CharacterHandle",
+        "description": "Current definition handle from characters.list; phases are owned native slots."
+      },
+      {
+        "name": "phase",
+        "type": "integer",
+        "description": "Current zero-based phase slot in actors.boss_phases."
+      },
+      {
+        "name": "settings",
+        "type": "MT2BossPhaseSettings",
+        "description": "One or more authored name, health, VFX or color fields."
+      }
+    ],
+    "returns": "MT2BossPhase[]",
+    "summary": "Edit phase fields between native pre/post change events and verify every phase record.",
+    "errors": [
+      "world_not_ready",
+      "wrong_thread",
+      "unsupported_game_build",
+      "stale_handle",
+      "invalid_argument",
+      "native_failure",
+      "unknown_effect",
+      "readback_mismatch"
+    ],
+    "native_evidence": [
+      "MMORPGTycoon2-Multiplayer@8a13602/src/game/boss_phase_property.h",
+      "MMORPGTycoon2-Multiplayer@8a13602/src/game/boss_phase_property_runtime.inc"
+    ]
+  },
+  {
+    "name": "actors.add_phase_ability",
+    "kind": "action",
+    "parameters": [
+      {
+        "name": "handle",
+        "type": "MT2CharacterHandle",
+        "description": "Current definition handle from characters.list; phases are owned native slots."
+      },
+      {
+        "name": "phase",
+        "type": "integer",
+        "description": "Current zero-based phase slot in actors.boss_phases."
+      },
+      {
+        "name": "ability",
+        "type": "integer",
+        "description": "Current zero-based prototype slot in the owning character's ability array."
+      }
+    ],
+    "returns": "MT2BossPhase[]",
+    "summary": "Construct and attach an owned phase element for a current owner ability.",
+    "errors": [
+      "world_not_ready",
+      "wrong_thread",
+      "unsupported_game_build",
+      "stale_handle",
+      "invalid_argument",
+      "native_failure",
+      "unknown_effect",
+      "readback_mismatch"
+    ],
+    "native_evidence": [
+      "MMORPGTycoon2-Multiplayer@8a13602/src/game/boss_phase_property_runtime.inc"
+    ]
+  },
+  {
+    "name": "actors.remove_phase_ability",
+    "kind": "action",
+    "parameters": [
+      {
+        "name": "handle",
+        "type": "MT2CharacterHandle",
+        "description": "Current definition handle from characters.list; phases are owned native slots."
+      },
+      {
+        "name": "phase",
+        "type": "integer",
+        "description": "Current zero-based phase slot in actors.boss_phases."
+      },
+      {
+        "name": "element",
+        "type": "integer",
+        "description": "Current zero-based element slot within this phase's abilities."
+      }
+    ],
+    "returns": "MT2BossPhase[]",
+    "summary": "Remove an element through native phase ownership between original change events.",
+    "errors": [
+      "world_not_ready",
+      "wrong_thread",
+      "unsupported_game_build",
+      "stale_handle",
+      "invalid_argument",
+      "native_failure",
+      "unknown_effect",
+      "readback_mismatch"
+    ],
+    "native_evidence": [
+      "MMORPGTycoon2-Multiplayer@8a13602/src/game/boss_phase_property_runtime.inc"
+    ]
+  }
+]
