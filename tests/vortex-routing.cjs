@@ -5,7 +5,7 @@ const fs = require('node:fs/promises');
 const path = require('node:path');
 const os = require('node:os');
 const r = require('../integrations/vortex/extension/routing');
-const {createGuardedDeployment} = require('../integrations/vortex/extension/guarded-deployment');
+const {createGuardedDeployment,checkActivator,ID} = require('../integrations/vortex/extension/guarded-deployment');
 const {steamAccount} = require('../integrations/vortex/extension/steam-account');
 test('awaited guards stop deployment and purge before file operations',async()=>{
   const calls=[];
@@ -19,6 +19,34 @@ test('awaited guards stop deployment and purge before file operations',async()=>
   assert.equal(allowed.isSupported({},r.GAME_ID),undefined);
   for(const method of ['prepare','externalChanges','prePurge','purge','deactivate','finalize'])await allowed[method]();
   assert.deepEqual(calls,['prepare','externalChanges','prePurge','purge','deactivate','finalize']);
+});
+test('Vortex can clear an unavailable method without selecting an unprotected one',()=>{
+  for(const activatorId of [undefined,null,'',ID]) {
+    assert.equal(checkActivator({}, {payload:{gameId:r.GAME_ID,activatorId}}),undefined);
+  }
+  for(const activatorId of ['hardlink_activator','symlink_activator_elevated']) {
+    assert.match(checkActivator({}, {payload:{gameId:r.GAME_ID,activatorId}}),/protected hardlink/);
+    assert.equal(checkActivator({}, {payload:{gameId:'other',activatorId}}),undefined);
+  }
+});
+test('empty unmanaged profile skips both built-in purge methods without file operations',async()=>{
+  const calls=[];
+  const deployment=createGuardedDeployment(()=>({prePurge(){calls.push('prePurge');},purge(){calls.push('purge');}}),
+    async()=>{},async()=>false,async()=>{});
+  await deployment.prePurge();await deployment.purge('C:\\staging','F:\\game');
+  assert.deepEqual(calls,[]);
+});
+test('cross-volume failure gives both paths and retains the built-in repair callback',()=>{
+  const fixCallback=()=>{},baseProblem={description:()=> 'Original cause',order:5,fixCallback};
+  const state={};
+  const deployment=createGuardedDeployment(()=>({isSupported:()=>baseProblem}),null,null,null,undefined,
+    ()=>({staging:'C:\\Vortex\\mods',game:'F:\\Steam\\MT2'}));
+  const problem=deployment.isSupported(state,r.GAME_ID,'');
+  assert.match(problem.description(),/C:.*F:/);assert.match(problem.solution(),/Settings > Mods/);
+  assert.equal(problem.fixCallback,fixCallback);assert.equal(problem.order,5);
+  const sameVolume=createGuardedDeployment(()=>({isSupported:()=>baseProblem}),null,null,null,undefined,
+    ()=>({staging:'F:\\mods',game:'F:\\game'}));
+  assert.equal(sameVolume.isSupported(state,r.GAME_ID,''),baseProblem);
 });
 async function fixture() { return fs.mkdtemp(path.join(os.tmpdir(),'mt2fw-vortex-')); }
 async function write(root,name,value) { const dest=path.join(root,name); await fs.mkdir(path.dirname(dest),{recursive:true});await fs.writeFile(dest,typeof value==='object'&&!Buffer.isBuffer(value)?JSON.stringify(value):value); }

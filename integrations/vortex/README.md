@@ -1,4 +1,4 @@
-# MMORPG Tycoon 2 - Vortex support
+# MMORPG Tycoon 2 Vortex Extension
 
 > 🛟 **Need help or found a bug?** Get support at [support.doodesch.de/modframework](https://support.doodesch.de/modframework).
 
@@ -6,12 +6,18 @@ Manage MT2 Framework packages and classic model-only scenery packs through Vorte
 
 ## Install
 
-1. In Vortex **Extensions**, use **Drop File(s)** to install `MMORPGTycoon2-Vortex-0.1.1.zip`, then restart Vortex.
-2. Manage **MMORPG Tycoon 2** and select its Steam installation. Deployment checks the exact supported executable; purge remains available after a game update.
-3. Import `MT2Framework-0.1.3-windows-x64.zip`, enable it and deploy with the game closed.
+1. In Vortex **Extensions**, use **Drop File(s)** to install `MMORPGTycoon2-Vortex-0.1.3.zip`, then restart Vortex.
+2. Manage **MMORPG Tycoon 2** and select its Steam installation. In **Settings > Mods**, keep the **Mod Staging Folder** on the same drive as the game, outside the game folder. Use **Suggest** or choose a folder on that drive, then **Apply**.
+3. Import the current **MT2 Mod Framework Runtime** ZIP, enable it and deploy with the game closed.
 4. Import framework mod ZIPs or a supported classic scenery ZIP, enable them and deploy. Start the game through Steam. F10 opens the framework **Mods** menu; classic scenery uses the game's scenery categories.
 
 The framework is a separate **MT2 Framework runtime** mod type. The extension selects **MT2 protected hardlink deployment**, which delegates file tracking and linking to Vortex after its checks pass. Vortex owns deployment and purge of the loader, runtime, tools and generated configuration. No original game archive is replaced. The same packaged CLI validates mods before deployment. Unknown or modified loader files stop deployment and purge with a concrete error.
+
+### No deployment method available
+
+If the game is on F: and the staging folder is on C:, move the staging folder to F: through **Settings > Mods**. Let Vortex perform the move. The extension allows Vortex to clear an unavailable deployment method while you repair this setting. An empty unmanaged profile does not remove or replace existing game files during that transition.
+
+If deployment then reports an unknown `WSOCK32.dll`, another loader is already installed or a managed file has changed. Follow that loader's own uninstall instructions or use its original helper before deploying the Framework Runtime through Vortex. Keep existing saves and profiles. The extension does not take ownership of an unfamiliar DLL.
 
 For authoring, download the separate **MT2Framework-SDK** from GitHub and keep it outside the game folder. Create mods outside Vortex's deployed folders, then check and pack them with the SDK helper/CLI. Import the mod ZIP into Vortex. Use Vortex to enable or remove managed packages; do not install a second manual framework over them. The runtime's small native `mt2fw.exe` provides only the package check used during deployment.
 

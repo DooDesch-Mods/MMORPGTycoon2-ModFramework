@@ -148,7 +148,7 @@ async function verifyOwnership(game, nextFiles = {}, transitionProfile) {
         catch(error) { if(error.code !== 'EEXIST' || !bytes.equals(await fs.readFile(filename))) throw error; }
       }
     } else if (!owner?.files[name] || hash(bytes) !== owner.files[name]) {
-      fail('Refusing to replace an unknown or modified file: ' + name + '. Preserve it and remove a manual framework with its own helper first.');
+      fail('Refusing to replace an unknown or modified file: ' + name + '. This file is not owned by Vortex or has changed. Remove the previous loader with its own uninstall instructions or helper before deploying. Keep your saves and profiles.');
     }
   }
   return owner;

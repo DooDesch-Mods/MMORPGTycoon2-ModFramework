@@ -103,6 +103,16 @@ async function willPurge(api,id) {
   const profile = api.getState().persistent.profiles[id];
   if (profile?.gameId !== GAME_ID) return;
   const game = gamePath(api); await requireClosed(game);
+  const mods = api.getState().persistent.mods[GAME_ID] || {};
+  if (Object.keys(mods).length === 0) {
+    try { await fs.lstat(path.join(game,routing.OWNER)); }
+    catch (cause) {
+      // No package and no ownership record means this method has deployed nothing.
+      // Skip the built-in purge entirely, preserving any unrelated loader.
+      if (cause.code === 'ENOENT') return false;
+      throw cause;
+    }
+  }
   await routing.verifyOwnership(game,{},routing.profilePath(game,id));
 }
 function main(context) {
@@ -111,10 +121,9 @@ function main(context) {
     ()=>util.getActivator('hardlink_activator'),
     ()=>willDeploy(api,profileId(api)),
     ()=>willPurge(api,profileId(api)),
-    ()=>requireClosed(gamePath(api))));
-  context.registerActionCheck('SET_ACTIVATOR',(_state,action)=>
-    action.payload.gameId === GAME_ID && action.payload.activatorId !== deployment.ID
-      ? 'MT2 Framework requires protected hardlink deployment' : undefined);
+    ()=>requireClosed(gamePath(api)),undefined,
+    state=>({staging:selectors.installPathForGame(state,GAME_ID),game:state.settings.gameMode.discovered[GAME_ID]?.path})));
+  context.registerActionCheck('SET_ACTIVATOR',deployment.checkActivator);
   context.registerGame({
     id:GAME_ID,name:'MMORPG Tycoon 2',mergeMods:true,
     queryPath:()=>util.GameStoreHelper.findByAppId(['486860'],'steam').then(game=>game.gamePath),

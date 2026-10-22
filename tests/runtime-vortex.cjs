@@ -38,3 +38,22 @@ test('existing Vortex deployment validates mods with the native player checker',
     await assert.rejects(extension.willDeploy({getState:()=>state},'test'),/failed the shared CLI validation.*Unknown capability/s);
   } finally {Module._load=originalLoad;routing.assertGame=originalAssert;}
 });
+
+test('empty-profile recovery preserves an unrelated loader and installed packages keep ownership guards',async()=>{
+  const root=path.resolve(__dirname,'../artifacts/runtime-vortex');await fs.mkdir(root,{recursive:true});
+  const game=await fs.mkdtemp(path.join(root,'empty-profile-'));
+  const loader=path.join(game,'WSOCK32.dll');await fs.writeFile(loader,'unrelated loader');
+  const state={settings:{gameMode:{discovered:{mmorpgtycoon2:{path:game}}}},persistent:{
+    profiles:{test:{gameId:routing.GAME_ID}},mods:{[routing.GAME_ID]:{}}}};
+  const extension=require('../integrations/vortex/extension/index');
+  assert.equal(await extension.willPurge({getState:()=>state},'test'),false);
+  assert.equal(await fs.readFile(loader,'utf8'),'unrelated loader');
+  state.persistent.mods[routing.GAME_ID].runtime={};
+  await assert.rejects(extension.willPurge({getState:()=>state},'test'),/unknown or modified/);
+  delete state.persistent.mods[routing.GAME_ID].runtime;
+  await fs.writeFile(path.join(game,routing.OWNER),JSON.stringify({owner:'mt2fw-vortex',files:{}}));
+  await assert.rejects(extension.willPurge({getState:()=>state},'test'),/unknown or modified/);
+  await fs.writeFile(path.join(game,routing.OWNER),JSON.stringify({owner:'mt2fw-vortex',files:{'WSOCK32.dll':routing.hash('unrelated loader')}}));
+  assert.equal(await extension.willPurge({getState:()=>state},'test'),undefined);
+  assert.equal(await fs.readFile(loader,'utf8'),'unrelated loader');
+});
