@@ -65,6 +65,15 @@ class ReleaseDeliveryTests(unittest.TestCase):
             with self.assertRaisesRegex(ValueError, 'different text'):
                 delivery.sync_changelog(self.plan, self.directory, request)
 
+    def test_nexus_html_escapes_are_decoded_once_before_changelog_comparison(self):
+        expected = "Settings > Mods & profiles: Vortex's menu"
+        self.assertEqual(delivery.changelog_status({'0.1.2': ['Settings &gt; Mods &amp; profiles: Vortex&#39;s menu']},
+                                                  '0.1.2', expected), 'confirmed')
+        self.assertEqual(delivery.changelog_status({'0.1.2': ['Show &amp;gt; literally']},
+                                                  '0.1.2', 'Show &gt; literally'), 'confirmed')
+        with self.assertRaisesRegex(ValueError, 'different text'):
+            delivery.changelog_status({'0.1.2': ['Settings &gt; Downloads']}, '0.1.2', 'Settings > Mods')
+
     def test_note_correction_cannot_publish_a_new_version_or_message(self):
         for status, update, message_id in [('ready', True, '123'), ('already-present', False, '123'),
                                           ('already-present', True, None), ('already-present', True, 'invalid')]:

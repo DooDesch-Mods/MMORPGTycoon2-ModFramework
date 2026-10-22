@@ -1,5 +1,6 @@
 """Complete Nexus changelogs and acknowledged Discord release announcements."""
 import argparse
+import html
 import json
 import os
 from pathlib import Path
@@ -49,8 +50,10 @@ def request_json(url, method='GET', body=None, headers=None, service='Nexus'):
         raise RuntimeError(f'{service} {method} acknowledgement failed ({type(error).__name__}); inspect destination before retrying a write') from None
 
 
-def normalized_notes(value):
+def normalized_notes(value, html_encoded=False):
     lines = [line for item in value for line in item.splitlines()] if isinstance(value, list) else value.splitlines()
+    if html_encoded:
+        lines = [html.unescape(line) for line in lines]
     return ' '.join(re.sub(r'^\s*[-*]\s+', '', line).strip() for line in lines if line.strip())
 
 
@@ -58,7 +61,7 @@ def changelog_status(existing, version, expected):
     rows = existing.get(version, [])
     if not rows:
         return 'missing'
-    if normalized_notes(rows) == normalized_notes(expected):
+    if normalized_notes(rows, html_encoded=True) == normalized_notes(expected):
         return 'confirmed'
     raise ValueError(f'Nexus changelog {version} already contains different text; additive API must not append a duplicate')
 
