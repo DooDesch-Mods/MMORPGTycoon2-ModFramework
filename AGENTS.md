@@ -2,7 +2,7 @@
 
 Read `README.md`, `CONTRIBUTING.md` and `docs/agents/start.md`. For a mod rather than a framework change, use the generated project's own AGENTS.md and bundled API/SDK.
 
-- This source version targets Framework 0.3.0 and Lua API 1.2.0. C ABI remains 1. Match the installed release and keep these versions distinct from the supported game executable hash.
+- This source version targets Framework 0.3.1 and Lua API 1.2.0. C ABI remains 1. Match the installed release and keep these versions distinct from the supported game executable hash.
 - Public Lua declarations and metadata originate in `api/contract.json`. Run `python tools/generate_docs.py`; do not hand-edit `sdk/mt2.lua`, `api/generated` or generated reference pages.
 - Native ABI declarations originate in `include/mt2fw/plugin.h`. Native game layouts and hooks belong to `adapters/mt2`, outside the stable public API.
 - Experimental gameplay operations must have an implemented adapter handler, argument metadata and a native result contract. Preserve exact UID strings and action outcomes. Never turn an accepted call or a successful build into a claim about game effects.

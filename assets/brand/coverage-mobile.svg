@@ -3,7 +3,7 @@
 <desc id="description">available: 7 of 16; partial: 1 of 16; experimental: 7 of 16; planned: 1 of 16. Each tile is one tracked feature area. Percentages describe the listed areas, not overall project completion or stability.</desc>
 <path fill="#0b1723" d="M0 0h600v1486H0z"/>
 <text x="28" y="44" font-family="Arial" font-size="30" fill="#f2f7fb" font-weight="700">Framework feature coverage</text>
-<text x="28" y="78" font-family="Arial" font-size="22" fill="#b8cad8" font-weight="400">Framework 0.3.0 - Experimental gameplay tools</text>
+<text x="28" y="78" font-family="Arial" font-size="22" fill="#b8cad8" font-weight="400">Framework 0.3.1 - Experimental gameplay tools</text>
 <text x="28" y="124" font-family="Arial" font-size="26" fill="#64e4d5" font-weight="700">43.8% Available (7/16)</text>
 <text x="28" y="162" font-family="Arial" font-size="26" fill="#ffca67" font-weight="700">6.2% Partial (1/16)</text>
 <text x="28" y="200" font-family="Arial" font-size="26" fill="#8cb9ff" font-weight="700">43.8% Experimental (7/16)</text>

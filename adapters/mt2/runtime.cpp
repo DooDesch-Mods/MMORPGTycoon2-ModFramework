@@ -744,6 +744,8 @@ bool poll(SDL_Event* event) {
         if(event->type==SDL_EVENT_KEY_UP&&event->key.scancode==SDL_SCANCODE_F10)continue;
         bool overlay_visible=show_menu||(!mt2::desktop::visible()&&!runtime->plugins().empty())||!pending_capture.empty();
         if(ui_ready&&overlay_visible)ImGui_ImplSDL3_ProcessEvent(event);
+        if(mt2::desktop::input(*event,window?SDL_GetWindowID(window):0,
+            show_menu||mt2::desktop::visible()||(ui_ready&&overlay_visible&&ImGui::GetIO().WantCaptureKeyboard)))continue;
         if(event->type==SDL_EVENT_KEY_DOWN&&!event->key.repeat&&!show_menu&&!mt2::desktop::visible()) {
             std::vector<Json> owned;
             bool typing=ui_ready&&ImGui::GetIO().WantTextInput;

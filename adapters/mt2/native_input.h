@@ -2,6 +2,20 @@
 #include "mt2fw/core.h"
 
 namespace mt2fw::native_input {
+inline std::string submit(const Json& item,const Json& widgets){
+    if(!item.contains("submit"))return {};
+    if(item.at("type")!="input"||!item.at("submit").is_string())throw std::runtime_error("Native input submit must name a button in the same window");
+    auto id=item.at("submit").get<std::string>();
+    if(id.empty()||id.size()>48||id.find_first_not_of("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_")!=std::string::npos||id.ends_with("_label"))throw std::runtime_error("Native input submit button ID is invalid");
+    for(const auto& widget:widgets)if(widget.at("id")==id&&widget.at("type")=="button")return id;
+    throw std::runtime_error("Native input submit target is not a button in the same window: "+id);
+}
+struct SubmitKeys {
+    std::set<uint32_t> held;
+    bool release(uint32_t key){return held.erase(key)!=0;}
+    bool capture(uint32_t key,bool repeat){return !repeat&&held.insert(key).second;}
+    void reset(){held.clear();}
+};
 inline size_t limit(const Json& item){
     if(!item.contains("max_bytes"))return 128;
     if(!item.at("max_bytes").is_number_integer())throw std::runtime_error("Native input max_bytes must be an integer from 1 to 1024");

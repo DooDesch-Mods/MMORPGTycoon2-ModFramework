@@ -1,5 +1,6 @@
 #pragma once
 #include "adapter.h"
+union SDL_Event;
 
 namespace mt2fw::mt2::desktop {
 using Details = std::function<void(const std::string&, bool)>;
@@ -8,6 +9,7 @@ std::vector<Hook> hooks();
 void frame(bool german);
 void end_frame();
 bool command(void* mode, const void* text);
+bool input(const SDL_Event& event, uint32_t game_window, bool keyboard_captured);
 void request_toggle();
 bool visible();
 Json status();

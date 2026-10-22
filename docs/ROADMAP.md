@@ -2,7 +2,7 @@
 
 > 🛟 **Need help or found a bug?** Get support at [support.doodesch.de/modframework](https://support.doodesch.de/modframework).
 
-Included in [Framework 0.3.0](https://github.com/DooDesch-Mods/MMORPGTycoon2-ModFramework/releases/tag/v0.3.0). New gameplay tools are experimental. World-changing Lua gameplay operations currently run in singleplayer.
+Included in [Framework 0.3.1](https://github.com/DooDesch-Mods/MMORPGTycoon2-ModFramework/releases/tag/v0.3.1). New gameplay tools are experimental. World-changing Lua gameplay operations currently run in singleplayer.
 
 ## Available now: Start creating
 
@@ -26,7 +26,7 @@ Priorities can change. No release dates are promised.
 
 ## Feature coverage
 
-| Feature | 0.3.0 | What is covered |
+| Feature | 0.3.1 | What is covered |
 | --- | --- | --- |
 | Lua mods and reload | ✅ Available | Use a text editor; reload scripts without restarting. A rejected replacement keeps the previous mod running. [Start here](quickstart.md). |
 | Native C++ plugins | ✅ Available | Build with the native SDK. Plugin updates require a game restart. [SDK guide](reference/native.md). |

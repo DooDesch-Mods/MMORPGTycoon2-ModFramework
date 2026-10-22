@@ -1,5 +1,16 @@
 # Changelog
 
+## 0.3.1
+
+### Added
+
+- Send Multiplayer chat messages with Enter when using Early Beta 22 or later.
+- Modders can connect Enter in a native text field to a button in the same window with `submit`.
+
+### Changed
+
+- Keep the text field focused after sending. Holding Enter sends once, and clicking away never sends a message.
+
 ## 0.3.0
 
 ### Added

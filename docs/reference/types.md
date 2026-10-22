@@ -338,6 +338,7 @@ Handles carry a world epoch and an exact string UID. Never convert the UID to a 
 | `visible?` | `boolean` |
 | `disabled?` | `boolean` |
 | `selected?` | `boolean` |
+| `submit?` | `string` |
 
 ## MT2NativeWindow
 

@@ -236,6 +236,7 @@
 ---@field visible? boolean
 ---@field disabled? boolean
 ---@field selected? boolean
+---@field submit? string
 
 ---@class MT2NativeWindow
 ---@field id string

@@ -80,7 +80,8 @@
       "visible?": "boolean, default true",
       "disabled?": "boolean, buttons only",
       "selected?": "boolean, buttons only",
-      "style?": "button|tab|row|quiet"
+      "style?": "button|tab|row|quiet",
+      "submit?": "input only; same-window button ID; Return/keypad Enter activates once per press, preserves text/focus; immutable layout; requires Framework 0.3.1"
     },
     "Document": {
       "id": "string <=128 bytes",

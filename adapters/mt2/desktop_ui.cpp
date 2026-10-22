@@ -3,6 +3,7 @@
 #include "crypto.h"
 #include "native_input.h"
 #include "native_app_state.h"
+#include <SDL3/SDL_events.h>
 #include <windows.h>
 #include <array>
 #include <chrono>
@@ -59,6 +60,7 @@ struct NativeWindow {
     bool requested = false, suspended = false;
 };
 std::map<std::string, NativeWindow> native_windows;
+native_input::SubmitKeys submit_keys;
 std::map<std::string, std::string> native_images;
 uint64_t native_instances = 0;
 using MenuElements = void(*)(void*, const void*, float);
@@ -657,6 +659,42 @@ void frame(bool use_german) {
             {"mode", mode_index}, {"selected", selected}, {"page", page}, {"commands", commands}, {"last_command", last_command}};
     } catch (const std::exception& error) { fault = error.what(); log_error(fault); throw; }
 }
+// Native input submission is routed before MT2 ends its single-line StringMode.
+bool native_input_flag(void* pane,size_t offset,const char* cause){
+    uint8_t value=0;require(read(pane,offset,value)&&value<=1,cause);return value!=0;
+}
+bool input(const SDL_Event& event,uint32_t game_window,bool keyboard_captured){
+    if(event.type==SDL_EVENT_WINDOW_FOCUS_LOST&&event.window.windowID==game_window){submit_keys.reset();return false;}
+    if(event.type!=SDL_EVENT_KEY_DOWN&&event.type!=SDL_EVENT_KEY_UP)return false;
+    if(!game_window||event.key.windowID!=game_window)return false;
+    const auto key=uint32_t(event.key.scancode);
+    if(key!=SDL_SCANCODE_RETURN&&key!=SDL_SCANCODE_KP_ENTER)return false;
+    if(event.type==SDL_EVENT_KEY_UP)return submit_keys.release(key);
+    if(submit_keys.held.contains(key))return true;
+    if(event.key.repeat||keyboard_captured||panel_open||!runtime||!mode||thread!=GetCurrentThreadId())return false;
+    bool owned=false;
+    try{
+        NativeWindow* selected=nullptr;std::string submit_button;
+        for(auto& [id,window]:native_windows){
+            if(!window.panel||window.mode!=mode||!window.requested||window.suspended)continue;
+            bool active=false;for(const auto& plugin:runtime->plugins())if(plugin.get()==window.owner&&plugin->active)active=true;
+            if(!active||!native_input_flag(window.panel,0x45f,"Native submit window visibility unreadable"))continue;
+            for(const auto& widget:window.widgets){
+                if(widget.at("type")!="input"||widget.at("submit")=="")continue;
+                auto* pane=native_pane(window.panel,widget.at("id").get<std::string>());
+                if(!native_input_flag(pane,0x584,"Native submit input focus unreadable"))continue;
+                if(!native_input_flag(pane,0x69,"Native submit input visibility unreadable")||!native_input_flag(pane,0x2b4,"Native submit input visibility unreadable")||!native_input_flag(pane,0x3d8,"Native submit input editable state unreadable"))continue;
+                owned=true;require(!selected,"Native submit has more than one focused input");selected=&window;submit_button=widget.at("submit").get<std::string>();
+            }
+        }
+        if(!selected)return false;
+        auto* target=native_pane(selected->panel,submit_button);
+        bool shown=native_input_flag(target,0x69,"Native submit button visibility unreadable")&&native_input_flag(target,0x2b4,"Native submit button visibility unreadable");
+        bool disabled=native_input_flag(target,0x46d,"Native submit button disabled state unreadable");
+        if(submit_keys.capture(key,event.key.repeat)&&shown&&!disabled){require(selected->clicked.size()<16,"Native app event queue is full");selected->clicked.push_back(submit_button);}
+        return true;
+    }catch(const std::exception& error){log_error(error.what());if(owned)submit_keys.capture(key,event.key.repeat);return owned;}
+}
 bool command(void* receiver, const void* input) {
     std::string value;
     if (!text(input, value) || !value.starts_with("MT2FW")) return false;
@@ -892,9 +930,9 @@ Json native_window(const Json& args) {
         if(type=="input")native_input::validate(item.value("value",std::string()),maximum);
         require(style == "button" || style == "tab" || style == "row" || style == "quiet", "Unsupported native app widget style");
         require(tone.empty() || tone == "muted" || tone == "error" || tone == "subtle" || tone == "preview", "Unsupported native app widget tone");
-        structure.push_back({{"id",name},{"type",type},{"x",x},{"y",y},{"width",w},{"height",h},{"size",size},{"tone",tone},{"style",style},{"max_bytes",maximum}});
+        structure.push_back({{"id",name},{"type",type},{"x",x},{"y",y},{"width",w},{"height",h},{"size",size},{"tone",tone},{"style",style},{"max_bytes",maximum},{"submit",native_input::submit(item,items)}});
     }
-    auto shape = digest(Json{{"format",5},{"widgets",structure},{"width",width},{"height",height},{"title",registration->second.title}}.dump());
+    auto shape = digest(Json{{"format",6},{"widgets",structure},{"width",width},{"height",height},{"title",registration->second.title}}.dump());
     auto& window = native_windows[owner];
     if (window.owner != registration->second.owner) {
         if (window.panel && window.mode == mode) check(show(window.panel, false), "Hide previous mod instance window");

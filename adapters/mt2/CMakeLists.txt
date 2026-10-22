@@ -48,6 +48,17 @@ target_link_libraries(mt2fw_release_boundary_tests PRIVATE mt2fw_native_ownershi
 add_test(NAME framework_release_boundary COMMAND mt2fw_release_boundary_tests)
 set_tests_properties(framework_release_boundary PROPERTIES TIMEOUT 15)
 find_package(Python3 REQUIRED COMPONENTS Interpreter)
+set(NATIVE_INPUT_DISPATCH "${CMAKE_CURRENT_BINARY_DIR}/native-input/native_input_dispatch.inc")
+add_custom_command(OUTPUT "${NATIVE_INPUT_DISPATCH}"
+  COMMAND "${Python3_EXECUTABLE}" -B -X utf8 "${FRAMEWORK}/tests/native-input-submit/extract_input.py"
+    "${CMAKE_CURRENT_SOURCE_DIR}/desktop_ui.cpp" "${NATIVE_INPUT_DISPATCH}"
+  DEPENDS desktop_ui.cpp "${FRAMEWORK}/tests/native-input-submit/extract_input.py" VERBATIM)
+add_executable(mt2fw_native_input_submit_tests ../../tests/native-input-submit/input_tests.cpp "${NATIVE_INPUT_DISPATCH}")
+target_include_directories(mt2fw_native_input_submit_tests PRIVATE . "${FRAMEWORK}/include" "${MT2FW_VENDOR}" "${MT2FW_VENDOR}/SDL3/include" "${CMAKE_CURRENT_BINARY_DIR}/native-input")
+target_compile_options(mt2fw_native_input_submit_tests PRIVATE /W4 /WX /utf-8)
+target_compile_definitions(mt2fw_native_input_submit_tests PRIVATE _SILENCE_CXX20_U8PATH_DEPRECATION_WARNING)
+add_test(NAME framework_native_input_submit COMMAND mt2fw_native_input_submit_tests)
+set_tests_properties(framework_native_input_submit PROPERTIES TIMEOUT 10)
 set(RELEASE_MODE_ENTRY "${CMAKE_CURRENT_BINARY_DIR}/release-entry/release_mode_entry.inc")
 add_custom_command(OUTPUT "${RELEASE_MODE_ENTRY}"
   COMMAND "${Python3_EXECUTABLE}" -B -X utf8 "${FRAMEWORK}/tests/release-boundary/extract_entry.py"
