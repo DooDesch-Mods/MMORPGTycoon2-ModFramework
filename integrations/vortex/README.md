@@ -2,22 +2,22 @@
 
 > 🛟 **Need help or found a bug?** Get support at [support.doodesch.de/modframework](https://support.doodesch.de/modframework).
 
-Manage MT2 Framework packages and classic model-only scenery packs through Vortex. This extension discovers Steam app 486860, installs the framework at the game root and deploys framework mods beneath their manifest IDs. Each Vortex profile gets its own framework settings, storage and game data under `<game>/.mt2fw-vortex/profiles/vortex-<profile-id>`. The runtime and mod targets share the game volume, which permits normal Vortex hardlink deployment.
+Install and manage your MMORPG Tycoon 2 mods through Vortex. Each Vortex profile has its own mod selection, settings and saves. Your staging folder can stay on a different drive from the game.
 
 ## Install
 
-1. In Vortex **Extensions**, use **Drop File(s)** to install `MMORPGTycoon2-Vortex-0.1.3.zip`, then restart Vortex.
-2. Manage **MMORPG Tycoon 2** and select its Steam installation. In **Settings > Mods**, keep the **Mod Staging Folder** on the same drive as the game, outside the game folder. Use **Suggest** or choose a folder on that drive, then **Apply**.
+1. In Vortex **Extensions**, use **Drop File(s)** to install `MMORPGTycoon2-Vortex-0.1.4.zip`, then restart Vortex.
+2. Manage **MMORPG Tycoon 2** and select its Steam installation. Keep your existing staging folder.
 3. Import the current **MT2 Mod Framework Runtime** ZIP, enable it and deploy with the game closed.
 4. Import framework mod ZIPs or a supported classic scenery ZIP, enable them and deploy. Start the game through Steam. F10 opens the framework **Mods** menu; classic scenery uses the game's scenery categories.
 
-The framework is a separate **MT2 Framework runtime** mod type. The extension selects **MT2 protected hardlink deployment**, which delegates file tracking and linking to Vortex after its checks pass. Vortex owns deployment and purge of the loader, runtime, tools and generated configuration. No original game archive is replaced. The same packaged CLI validates mods before deployment. Unknown or modified loader files stop deployment and purge with a concrete error.
+The extension selects **MT2 protected deployment**. It copies enabled packages to their destinations and records their checksums. Staging files stay in place. Disabling a mod or purging removes only its unchanged, managed files. Your saves and settings remain. No original game archive is replaced.
 
-### No deployment method available
+### Existing loaders
 
-If the game is on F: and the staging folder is on C:, move the staging folder to F: through **Settings > Mods**. Let Vortex perform the move. The extension allows Vortex to clear an unavailable deployment method while you repair this setting. An empty unmanaged profile does not remove or replace existing game files during that transition.
+Version 0.1.4 supports staging and game folders on different drives. After updating the extension, restart Vortex and deploy again. You do not need to move your staging folder.
 
-If deployment then reports an unknown `WSOCK32.dll`, another loader is already installed or a managed file has changed. Follow that loader's own uninstall instructions or use its original helper before deploying the Framework Runtime through Vortex. Keep existing saves and profiles. The extension does not take ownership of an unfamiliar DLL.
+The recognized standalone Multiplayer Beta 12 loader is backed up before the Framework takes over. Vortex shows the backup location. Only an exact released checksum qualifies for this migration. Other unknown or modified loader files remain protected: remove them with their original installer before deploying the Runtime. File checks and purging unrelated Vortex mods do not overwrite or remove them.
 
 For authoring, download the separate **MT2Framework-SDK** from GitHub and keep it outside the game folder. Create mods outside Vortex's deployed folders, then check and pack them with the SDK helper/CLI. Import the mod ZIP into Vortex. Use Vortex to enable or remove managed packages; do not install a second manual framework over them. The runtime's small native `mt2fw.exe` provides only the package check used during deployment.
 
@@ -29,7 +29,7 @@ Supported classic archives contain one named pack folder with `.vmb` models unde
 
 Classic packs use the selected profile's `game-data/<SteamID>/mod/<pack-id>` directory. Start Steam and sign in before the first deployment so the extension can select the account the game will use. An existing single account directory also permits removal when Steam is closed. The framework runtime remains required for profile isolation. Original AppData mods and multiplayer profiles are not moved. Scenery changes require a full game restart.
 
-Classic packs use the game's native loader and save references. They do not gain the framework's content-dependency metadata; keep their original packages with worlds that use them. Validation covers Vortex deployment and native model loading. Interactive catalog selection and placement have not been exercised. See the [scenery acceptance record](https://github.com/DooDesch-Mods/MMORPGTycoon2-ModFramework/blob/main/evidence/vortex-scenery-acceptance.json) for exact checks and limits.
+Classic packs use the game's native loader and save references. Keep their original packages with worlds that use them.
 
 ## Existing installations and profiles
 
@@ -46,15 +46,15 @@ Disable framework mods and the framework runtime in Vortex, then deploy or purge
 - Windows x64 Steam only. Verified MT2.exe SHA256: `bbab2dc68babcc644d0a1679548bf1e334b6c52aea669c3f61f6cb9d45c1aaf6`.
 - The extension targets Vortex 2.8.2 or newer. Native plugins and content changes require a game restart.
 - Framework `mod.json` ZIPs, owned framework bundles and the classic model-only layout above are supported. Original archive replacements and the separate MT2 Mod Manager's `manifest.json` format are reported rather than silently converted.
-- Multiplayer bridge acceptance and human newcomer timing remain pending.
+- Install the matching Framework Runtime and Multiplayer versions listed on the Multiplayer release page. Multiplayer remains Early Beta.
 
 ## Build and checks
 
 ```powershell
-node --test tests/vortex-routing.cjs
+node --test tests/vortex-routing.cjs tests/vortex-copy.cjs tests/runtime-vortex.cjs
 python tools/package_vortex.py
 ```
 
-The archive has `index.js`, `routing.js`, `guarded-deployment.js`, `steam-account.js`, `info.json`, `gameart.png`, `package.json`, `README.md` and `LICENSE` at its root. The numerical Nexus game ID is 4452, identified by the game's [official tile URL](https://staticdelivery.nexusmods.com/images/games/4_3/tile_4452.jpg). Packaging follows the [official extension specification](https://github.com/Nexus-Mods/Vortex/wiki/How-to-package-a-game-extension). Extension discovery on Nexus is separate from a GitHub build; no Nexus page is automatically created.
+The archive has `index.js`, `routing.js`, `guarded-deployment.js`, `copy-deployment.js`, `steam-account.js`, `info.json`, `gameart.png`, `package.json`, `README.md` and `LICENSE` at its root. Steam app ID: 486860. Nexus game ID: 4452. The extension uses Vortex's public deployment interface. Its ownership journal is `.mt2fw-copy-deployment.json` in each target directory. Framework profiles are under `<game>/.mt2fw-vortex/profiles/vortex-<profile-id>`. Existing hardlink deployments are adopted only when the destination and recorded staging file have the same filesystem identity.
 
 Original extension code is MIT. The real-game artwork has separate rights recorded in `media.json` in the source repository.

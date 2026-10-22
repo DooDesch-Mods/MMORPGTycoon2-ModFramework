@@ -8,6 +8,7 @@ const {promisify} = require('node:util');
 const {util,selectors,actions} = require('vortex-api');
 const routing = require('./routing');
 const deployment = require('./guarded-deployment');
+const {createCopyDeployment} = require('./copy-deployment');
 const {steamAccount} = require('./steam-account');
 const run = promisify(execFile);
 const {GAME_ID,FRAMEWORK_TYPE,SCENERY_TYPE} = routing;
@@ -72,7 +73,6 @@ async function willDeploy(api, id) {
   if (runtimes.length) {
     const [,runtime] = runtimes[0]; const directory = path.join(staging,runtime.installationPath);
     const owner = await routing.readJSON(directory,routing.OWNER);
-    await routing.verifyOwnership(game,owner.files,target);
     for (const [name,expected] of Object.entries(owner.files)) {
       routing.frameworkName(name);
       if (routing.hash(await routing.readFile(directory,name)) !== expected) error('Staged framework checksum differs: ' + name);
@@ -93,36 +93,28 @@ async function willDeploy(api, id) {
       catch (cause) { error('Mod '+modId+' failed the shared CLI validation: '+(cause.stderr || cause.message)); }
     }
     routing.checkSceneryConflicts(scenery);
+    await routing.verifyOwnership(game,owner.files,target,true);
+    const backup = await routing.migrateLegacyLoader(game,target);
+    if (backup) api.sendNotification?.({type:'info',title:'Previous Multiplayer loader backed up',message:'The old standalone loader was replaced by Framework deployment. Backup: '+backup});
+    await routing.releaseRetainedConfiguration(game,target);
+    await routing.verifyOwnership(game,owner.files,target);
     // Vortex tracks this generated file. Update the staging copy before it deploys the selected profile.
     await fs.writeFile(path.join(directory,'mt2fw.json'),JSON.stringify({profile:target,enabled:true},null,2));
-  } else {
-    await routing.verifyOwnership(game,{},target);
   }
 }
 async function willPurge(api,id) {
   const profile = api.getState().persistent.profiles[id];
   if (profile?.gameId !== GAME_ID) return;
-  const game = gamePath(api); await requireClosed(game);
-  const mods = api.getState().persistent.mods[GAME_ID] || {};
-  if (Object.keys(mods).length === 0) {
-    try { await fs.lstat(path.join(game,routing.OWNER)); }
-    catch (cause) {
-      // No package and no ownership record means this method has deployed nothing.
-      // Skip the built-in purge entirely, preserving any unrelated loader.
-      if (cause.code === 'ENOENT') return false;
-      throw cause;
-    }
-  }
-  await routing.verifyOwnership(game,{},routing.profilePath(game,id));
+  await requireClosed(gamePath(api));
 }
 function main(context) {
   const api = context.api;
+  const copy = createCopyDeployment();
   context.registerDeploymentMethod(deployment.createGuardedDeployment(
-    ()=>util.getActivator('hardlink_activator'),
+    ()=>copy,
     ()=>willDeploy(api,profileId(api)),
     ()=>willPurge(api,profileId(api)),
-    ()=>requireClosed(gamePath(api)),undefined,
-    state=>({staging:selectors.installPathForGame(state,GAME_ID),game:state.settings.gameMode.discovered[GAME_ID]?.path})));
+    ()=>requireClosed(gamePath(api)),async()=>{}));
   context.registerActionCheck('SET_ACTIVATOR',deployment.checkActivator);
   context.registerGame({
     id:GAME_ID,name:'MMORPG Tycoon 2',mergeMods:true,

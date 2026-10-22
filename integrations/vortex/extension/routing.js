@@ -42,7 +42,6 @@ function frameworkName(name) {
 function profilePath(gamePath, profileId) {
   if (!gamePath || !path.isAbsolute(gamePath)) fail('Discover the Steam game first');
   if (!profileId || !/^[A-Za-z0-9_-]+$/.test(profileId)) fail('Select a Vortex profile before deploying');
-  // Runtime and mod targets share a volume, so Vortex hardlink deployment works.
   return path.join(path.resolve(gamePath), '.mt2fw-vortex', 'profiles', 'vortex-' + profileId);
 }
 async function assertGame(gamePath, expected = EXE_SHA256) {
@@ -128,7 +127,29 @@ async function prepareProfile(profile) {
 async function optionalJSON(folder, name) {
   try { return await readJSON(folder,name); } catch(error) { if(error.code === 'ENOENT') return undefined; throw error; }
 }
-async function verifyOwnership(game, nextFiles = {}, transitionProfile) {
+// Exact release checksum from the standalone Multiplayer Beta 12 package.
+// Matching a DLL name or embedded string is not sufficient to replace a loader.
+const LEGACY_LOADERS = new Set(['b74272cd89ce6c0d6be2df80e16c665e238458b2b356f8298f15b42cb0623b97']);
+async function migrateLegacyLoader(game, profile) {
+  if (await optionalJSON(game,OWNER)) return;
+  let bytes;
+  try { bytes = await readFile(game,'WSOCK32.dll'); }
+  catch (error) { if (error.code === 'ENOENT') return; throw error; }
+  const checksum = hash(bytes);
+  if (!LEGACY_LOADERS.has(checksum)) return;
+  const backup = path.join(profile,'backups','standalone-multiplayer',checksum);
+  await prepareProfile(profile);
+  await fs.mkdir(backup,{recursive:true});
+  const filename = path.join(backup,'WSOCK32.dll');
+  try { await fs.writeFile(filename,bytes,{flag:'wx'}); }
+  catch (error) { if (error.code !== 'EEXIST') throw error; }
+  if (!bytes.equals(await fs.readFile(filename))) fail('Standalone loader backup checksum differs');
+  await fs.writeFile(path.join(backup,'migration.json'),JSON.stringify({format:1,source:'Multiplayer Beta 12 standalone loader',sha256:checksum,original:path.join(game,'WSOCK32.dll'),backup:filename},null,2));
+  if (hash(await readFile(game,'WSOCK32.dll')) !== checksum) fail('Standalone loader changed during backup');
+  await fs.unlink(path.join(game,'WSOCK32.dll'));
+  return filename;
+}
+async function verifyOwnership(game, nextFiles = {}, transitionProfile, allowKnownLegacy = false) {
   const owner = await optionalJSON(game, OWNER);
   if (owner && (owner.owner !== 'mt2fw-vortex' || !owner.files)) fail('Invalid Vortex ownership record');
   const names = new Set([...Object.keys(owner?.files || {}), ...Object.keys(nextFiles), 'WSOCK32.dll', 'MT2Framework.dll', 'mt2fw.json']);
@@ -148,10 +169,22 @@ async function verifyOwnership(game, nextFiles = {}, transitionProfile) {
         catch(error) { if(error.code !== 'EEXIST' || !bytes.equals(await fs.readFile(filename))) throw error; }
       }
     } else if (!owner?.files[name] || hash(bytes) !== owner.files[name]) {
+      if (allowKnownLegacy && !owner && name === 'WSOCK32.dll' && LEGACY_LOADERS.has(hash(bytes))) continue;
       fail('Refusing to replace an unknown or modified file: ' + name + '. This file is not owned by Vortex or has changed. Remove the previous loader with its own uninstall instructions or helper before deploying. Keep your saves and profiles.');
     }
   }
   return owner;
+}
+async function releaseRetainedConfiguration(game, profile) {
+  if (await optionalJSON(game,OWNER)) return;
+  let bytes;
+  try { bytes = await readFile(game,'mt2fw.json'); }
+  catch (error) { if (error.code === 'ENOENT') return; throw error; }
+  const name='backups/vortex-transition/configuration-'+hash(bytes)+'.json';
+  if (!bytes.equals(await readFile(profile,name))) fail('Retained configuration backup differs');
+  // verifyOwnership has already saved this exact configuration. Free its
+  // destination so copy deployment never needs to adopt an unowned file.
+  await fs.unlink(path.join(game,'mt2fw.json'));
 }
 async function installArchive(files, extraction, profile) {
   const rows = archiveFiles(files);
@@ -195,4 +228,4 @@ async function installArchive(files, extraction, profile) {
   instructions.push({type:'attribute',key:'mt2fwModId',value:manifest.id});
   return {instructions};
 }
-module.exports = {GAME_ID,FRAMEWORK_TYPE,SCENERY_TYPE,SCENERY_RECORD,OWNER,EXE_SHA256,hash,relative,archiveFiles,readJSON,readFile,frameworkName,profilePath,sceneryPath,validSteamAccount,assertGame,prepareProfile,verifyOwnership,installArchive,checkScenery,checkSceneryConflicts};
+module.exports = {GAME_ID,FRAMEWORK_TYPE,SCENERY_TYPE,SCENERY_RECORD,OWNER,EXE_SHA256,hash,relative,archiveFiles,readJSON,readFile,frameworkName,profilePath,sceneryPath,validSteamAccount,assertGame,prepareProfile,verifyOwnership,migrateLegacyLoader,releaseRetainedConfiguration,installArchive,checkScenery,checkSceneryConflicts};

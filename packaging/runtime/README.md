@@ -38,7 +38,7 @@ The runtime's `mt2fw/mt2fw.exe check <mod-directory>` only validates packages. I
 
 ## Compatibility and diagnostics
 
-Only the verified Windows x64 Steam build is supported. The adapter stays disabled for other game builds. Multiplayer compatibility is not established. See the [compatibility guide](https://doodesch-mods.github.io/MMORPGTycoon2-ModFramework/compatibility.html).
+Only the verified Windows x64 Steam build is supported. The adapter stays disabled for other game builds. For Multiplayer, install the matching Runtime and plugin versions listed on the [Multiplayer release page](https://github.com/DooDesch-Mods/MMORPGTycoon2-Multiplayer/releases). Multiplayer remains Early Beta. See the [compatibility guide](https://doodesch-mods.github.io/MMORPGTycoon2-ModFramework/compatibility.html).
 
 Read `<profile>/bootstrap.jsonl` and `<profile>/logs/framework.jsonl` for diagnostics. Native plugins and content changes require a restart; Lua mods can be reloaded from **Mods**.
 

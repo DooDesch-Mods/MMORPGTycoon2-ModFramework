@@ -188,6 +188,23 @@ Close the game and update the Framework Runtime. Players only need the Runtime Z
 
 Published as [v0.1.0](https://github.com/DooDesch-Mods/MMORPGTycoon2-ModFramework/releases/tag/v0.1.0), with framework 0.1.0 and separate Vortex extension 0.1.1. The tag identifies the exact accepted package source. Multiplayer bridge acceptance and human newcomer timing remain pending.
 
+## Vortex extension 0.1.4
+
+### Fixed
+
+- Install mods when Vortex staging and the game are on different drives. No folder move is needed.
+- Check and purge Vortex mods without getting blocked by an unrelated loader in the game folder.
+- Back up the recognized old standalone Multiplayer loader before switching to Framework mods.
+
+### Changed
+
+- Protected deployment now copies files and keeps track of their checksums. Unknown or edited files stay protected.
+- Keep your saves, mod settings and staging packages when disabling or removing mods.
+
+### Install
+
+Install the extension ZIP in Vortex's Extensions view, then restart Vortex and deploy. Keep your existing staging folder. Framework and Multiplayer downloads are unchanged.
+
 ## Vortex extension 0.1.3
 
 ### Fixed

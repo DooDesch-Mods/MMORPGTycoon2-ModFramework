@@ -13,7 +13,7 @@ if art.stat().st_size>1024*1024:raise RuntimeError('Vortex game art exceeds 1 MB
 output=ROOT/'dist/vortex';output.mkdir(parents=True,exist_ok=True)
 archive=output/f'MMORPGTycoon2-Vortex-{info["version"]}.zip'
 with zipfile.ZipFile(archive,'w',zipfile.ZIP_DEFLATED) as stream:
-    for name in ('index.js','routing.js','guarded-deployment.js','steam-account.js','info.json','gameart.png','package.json'):
+    for name in ('index.js','routing.js','guarded-deployment.js','copy-deployment.js','steam-account.js','info.json','gameart.png','package.json'):
         stream.write(source/name,name)
     stream.write(ROOT/'LICENSE','LICENSE')
     stream.write(ROOT/'integrations/vortex/README.md','README.md')

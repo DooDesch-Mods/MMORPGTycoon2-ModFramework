@@ -25,7 +25,7 @@ test('Vortex can clear an unavailable method without selecting an unprotected on
     assert.equal(checkActivator({}, {payload:{gameId:r.GAME_ID,activatorId}}),undefined);
   }
   for(const activatorId of ['hardlink_activator','symlink_activator_elevated']) {
-    assert.match(checkActivator({}, {payload:{gameId:r.GAME_ID,activatorId}}),/protected hardlink/);
+    assert.match(checkActivator({}, {payload:{gameId:r.GAME_ID,activatorId}}),/protected deployment/);
     assert.equal(checkActivator({}, {payload:{gameId:'other',activatorId}}),undefined);
   }
 });
@@ -98,6 +98,9 @@ test('retained manual profile configuration is backed up before transition',asyn
   await write(game,'mt2fw.json',original);await r.verifyOwnership(game,{},profile);
   assert.equal((await fs.readFile(path.join(profile,'backups/vortex-transition/configuration-'+r.hash(original)+'.json'))).toString(),original);
   assert.equal((await fs.readFile(path.join(game,'mt2fw.json'))).toString(),original);
+  await r.releaseRetainedConfiguration(game,profile);
+  await assert.rejects(fs.stat(path.join(game,'mt2fw.json')),/ENOENT/);
+  assert.equal((await fs.readFile(path.join(profile,'backups/vortex-transition/configuration-'+r.hash(original)+'.json'))).toString(),original);
 });
 test('exact executable identity is required',async()=>{
   const game=await fixture();await write(game,'MT2.exe','fixture');

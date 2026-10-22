@@ -1,0 +1,20 @@
+{
+  "extension_version": "0.1.4",
+  "vortex_version": "2.9.0",
+  "framework_version": "0.3.0",
+  "multiplayer_version": "0.1.0-beta.19",
+  "archive_sha256": "50347f8efef6cfe1b4f5a859e5075373222978468ed0f949f42bf9e886cead30",
+  "environment": "Isolated real Windows Vortex instance; staging on C:, target game copy on F:",
+  "confirmed": [
+    "Install both published Runtime and Multiplayer archives through Vortex",
+    "Deploy both archives across volumes using the registered deployment method",
+    "Match deployed runtime and plugin checksums to staging inventories",
+    "Disable Multiplayer, deploy, enable Multiplayer and deploy again",
+    "Purge deployed runtime and plugin files through Vortex",
+    "Retain unrelated files, staging packages, profile settings and save fixture",
+    "Back up the exact released standalone Multiplayer Beta 12 loader before migration",
+    "Back up retained manual configuration before selecting the Vortex profile",
+    "Preserve an unknown loader during checks and purge; reject its replacement"
+  ],
+  "scope": "Vortex deployment acceptance. The game was not launched by this test."
+}

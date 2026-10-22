@@ -5,18 +5,18 @@ function checkActivator(_state,action) {
   const {gameId,activatorId} = action.payload;
   // Vortex clears an unavailable method before the user repairs the staging path.
   return gameId === 'mmorpgtycoon2' && activatorId != null && activatorId !== '' && activatorId !== ID
-    ? 'MT2 Framework requires protected hardlink deployment' : undefined;
+    ? 'MT2 Framework requires protected deployment' : undefined;
 }
 function createGuardedDeployment(getBase,preflight,purgeGuard,removeGuard,changesGuard=purgeGuard,paths) {
   const base = () => {
     const value = getBase();
-    if (!value) throw new Error('MT2 Framework: Vortex hardlink deployment is unavailable');
+    if (!value) throw new Error('MT2 Framework: protected deployment is unavailable');
     return value;
   };
   // Event notifications do not propagate rejection to Vortex's deployment pipeline.
-  // Guard the awaited deployment methods before the built-in implementation writes files.
+  // Guard awaited deployment methods before the backend writes files.
   const guarded = {
-    id:ID,name:'MT2 protected hardlink deployment',priority:0,compatible:['hardlink_activator'],
+    id:ID,name:'MT2 protected deployment',priority:0,compatible:['hardlink_activator'],
     isSupported(state,gameId,typeId) {
       if (gameId !== 'mmorpgtycoon2') return {description:()=> 'MT2 Framework only'};
       const problem = base().isSupported(state,gameId,typeId);
