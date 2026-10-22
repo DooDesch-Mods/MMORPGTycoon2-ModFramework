@@ -11,6 +11,19 @@ import urllib.parse
 import urllib.request
 
 from nexus_release import API, REPOSITORY, gh, targets
+from release_notes import plain, bbcode
+
+
+def corrected_plan(plan, text, update=False, message_id=None):
+    if not text.strip():
+        return plan
+    if plan['status'] != 'already-present' or not update or not re.fullmatch(r'\d+', message_id or ''):
+        raise ValueError('Corrected notes require an existing Nexus version and an explicit existing Discord message update')
+    text = text.strip()
+    if len(text) > 10000 or '\0' in text:
+        raise ValueError('Corrected notes must be valid text of at most 10000 characters')
+    return {**plan, 'notes': text, 'notes_plain': plain(text), 'notes_bbcode': bbcode(text),
+            'notes_correction': 'explicit workflow update of existing release text'}
 
 def announcement_title(plan):
     name = targets()[plan['product']]['name']
@@ -187,6 +200,8 @@ def main():
     plan = json.loads((args.directory / 'plan.json').read_text(encoding='utf-8'))
     if plan['status'] not in ('ready', 'already-present'):
         raise ValueError('Release has no deployable product')
+    plan = corrected_plan(plan, os.environ.get('CORRECTED_NOTES', ''), args.update_announcement, args.message_id)
+    (args.directory / 'plan.json').write_text(json.dumps(plan, indent=2) + '\n', encoding='utf-8')
     sync_changelog(plan, args.directory)
     if args.announce:
         if args.message_id and not re.fullmatch(r'\d+', args.message_id):

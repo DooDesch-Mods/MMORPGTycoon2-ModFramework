@@ -65,6 +65,24 @@ class ReleaseDeliveryTests(unittest.TestCase):
             with self.assertRaisesRegex(ValueError, 'different text'):
                 delivery.sync_changelog(self.plan, self.directory, request)
 
+    def test_note_correction_cannot_publish_a_new_version_or_message(self):
+        for status, update, message_id in [('ready', True, '123'), ('already-present', False, '123'),
+                                          ('already-present', True, None), ('already-present', True, 'invalid')]:
+            with self.subTest(status=status, update=update, message_id=message_id):
+                with self.assertRaisesRegex(ValueError, 'existing'):
+                    delivery.corrected_plan({**self.plan, 'status': status}, '- Correct text.', update, message_id)
+
+    def test_note_correction_preserves_release_identity_and_checks_existing_changelog(self):
+        plan = {**self.plan, 'status': 'already-present'}
+        result = delivery.corrected_plan(plan, '### Fixed\n\n- **Build** together.', True, '123')
+        for key in ('product', 'version', 'tag', 'sha256', 'release_url'):
+            self.assertEqual(result[key], plan[key])
+        self.assertEqual(plan['notes'], self.plan['notes'])
+        self.assertEqual(delivery.changelog_status({plan['version']: ['Fixed', '- Build together.']},
+                                                  plan['version'], result['notes_plain']), 'confirmed')
+        self.assertIn('**Build** together.', delivery.discord_payload(result)['embeds'][0]['description'])
+        self.assertIs(delivery.corrected_plan(plan, ''), plan)
+
     def test_missing_changelog_readback_is_a_failure(self):
         with patch.dict(os.environ, {'NEXUSMODS_API_KEY': 'fixture'}):
             with self.assertRaisesRegex(RuntimeError, 'readback is missing'):

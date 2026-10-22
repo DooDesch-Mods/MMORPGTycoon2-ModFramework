@@ -29,6 +29,10 @@ on:
         description: Update the identified existing Discord release post instead of sending
         type: boolean
         default: false
+      corrected_notes:
+        description: Optional corrected Markdown for an existing message update; repair the Nexus changelog to match first
+        type: string
+        required: false
 permissions:
   contents: read
 jobs:
@@ -113,6 +117,7 @@ jobs:
           ANNOUNCE: ${{ github.event_name == 'release' || inputs.announce }}
           DISCORD_MESSAGE_ID: ${{ inputs.discord_message_id }}
           UPDATE_ANNOUNCEMENT: ${{ inputs.update_announcement }}
+          CORRECTED_NOTES: ${{ inputs.corrected_notes }}
         run: |
           options=()
           if [[ "$ANNOUNCE" == true ]]; then options+=(--announce); fi
