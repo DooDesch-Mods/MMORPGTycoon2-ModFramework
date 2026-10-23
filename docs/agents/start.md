@@ -4,7 +4,7 @@ title: Build a mod with an agent
 
 # Build a mod with an agent
 
-Use the same public contract and complete examples as a human modder. Framework **0.3.0** provides Lua API **1.2.0**; the native C ABI stays at **1**. Match the contract to the installed runtime. The [compatibility page](../compatibility.md) identifies the supported game build.
+Use the same public contract and complete examples as a human modder. Framework **0.3.2** provides Lua API **1.2.0**; the native C ABI stays at **1**. Match the contract to the installed runtime. The [compatibility page](../compatibility.md) identifies the supported game build.
 
 ## Context to give your agent
 

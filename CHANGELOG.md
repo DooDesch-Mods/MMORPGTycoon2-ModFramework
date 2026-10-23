@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.3.2
+
+### Changed
+
+- Reduce startup pauses for compatible mods by setting up several game features together.
+
 ## 0.3.1
 
 ### Added

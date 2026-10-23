@@ -20,7 +20,7 @@ The Framework owns MinHook, individual target activation and rollback. Plugins n
 
 Each receipt includes executable hash, RVA, entry, trampoline, detour, generation, owner, acknowledged pristine/current prefixes, state and original cause. The Windows backend reads the exact executable once, requires its supported SHA256, maps executable PE sections and checks live bytes. Enabled paths must also resolve through a bounded jump proof to the acknowledged detour. A receipt is a current observation, not permission to ignore later changes.
 
-## Explicit batch activation (unreleased)
+## Explicit batch activation (Framework 0.3.2)
 
 The experimental `RoutesV2` extension uses the same `MT2FW_MT2_QueryRoutes`
 export and the same authenticated owner. Initialize `MT2FW_MT2_RoutesV2` to zero
