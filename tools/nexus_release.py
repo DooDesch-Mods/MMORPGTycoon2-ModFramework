@@ -226,12 +226,17 @@ def prepare(args):
         notes_source = plan.pop('notes_source', None)
         notes = section(notes_source if notes_source is not None else (ROOT / 'CHANGELOG.md').read_text(encoding='utf-8'), args.product, plan['version'])
         plan.update(notes=notes, notes_plain=plain(notes), notes_bbcode=bbcode(notes))
+        if 'file_description' in target:
+            description = target['file_description']
+            if not isinstance(description, str) or not description.strip() or len(description) > 255 or '\n' in description or '\r' in description:
+                raise ValueError('Nexus file description must be one non-empty line of at most 255 characters')
+            plan['file_description'] = description
     directory.mkdir(parents=True, exist_ok=True)
     (directory / 'plan.json').write_text(json.dumps(plan, indent=2) + '\n', encoding='utf-8')
     result = {'status': plan['status']}
     if 'version' in plan:
         result.update({name: plan[name] for name in ('filename', 'version', 'file_id', 'mod_uid')})
-        result.update({'display_name': target['name'], 'description': plan['notes_bbcode']})
+        result.update({'display_name': target['name'], 'description': plan.get('file_description', plan['notes_bbcode'])})
     outputs(result)
     print(json.dumps(plan))
     if summary := os.environ.get('GITHUB_STEP_SUMMARY'):

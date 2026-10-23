@@ -24,6 +24,7 @@
     "source_repository": "DooDesch-Mods/MMORPGTycoon2-Multiplayer",
     "receipt_tag": "v0.2.0",
     "manual_only": true,
+    "file_description": "Build an MMO world with a friend through Steam. Requires MT2 Mod Framework Runtime 0.3.1 and Vortex Extension 0.1.4 on both computers. Close both games before updating. Early Beta - expect bugs and desyncs.",
     "icon_url": "https://raw.githubusercontent.com/DooDesch-Mods/MMORPGTycoon2-Multiplayer/main/assets/ui/desktop_multiplayer/multiplayer.png",
     "footer": "MMORPG Tycoon 2 - MMORPGTycoon2-Multiplayer"
   },

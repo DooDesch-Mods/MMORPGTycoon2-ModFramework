@@ -8,6 +8,7 @@ import unittest
 from unittest.mock import patch
 import urllib.error
 import zipfile
+from types import SimpleNamespace
 
 spec = importlib.util.spec_from_file_location('nexus_release', Path(__file__).resolve().parents[1] / 'tools/nexus_release.py')
 nexus = importlib.util.module_from_spec(spec)
@@ -90,6 +91,36 @@ class NexusReleaseTests(unittest.TestCase):
         with patch.dict(os.environ, {'NEXUSMODS_API_KEY': 'private-fixture-key'}), patch.object(nexus.urllib.request, 'urlopen', side_effect=error):
             with self.assertRaisesRegex(RuntimeError, 'HTTP 403') as caught:nexus.api_get('/mods/1/files')
         self.assertNotIn('private-fixture-key', str(caught.exception))
+
+    def test_short_file_description_does_not_truncate_changelog(self):
+        target = nexus.targets()['multiplayer']
+        self.assertLessEqual(len(target['file_description']), 255)
+        notes = '# Changelog\n\n## 0.1.0-beta.23\n\n### Fixed\n\n- ' + 'Detailed release note. ' * 30
+        plan = {'product': 'multiplayer', 'tag': 'v0.1.0-beta.23', 'version': '0.1.0-beta.23',
+                'filename': 'release.zip', 'sha256': 'a' * 64, 'notes_source': notes}
+        root = nexus.ROOT / 'artifacts/nexus-tests'
+        root.mkdir(parents=True, exist_ok=True)
+        with tempfile.TemporaryDirectory(dir=root) as directory:
+            args = SimpleNamespace(product='multiplayer', tag=plan['tag'], directory=directory, optional=False)
+            environment = {'NEXUS_FILE_ID': target['file_id'], 'NEXUS_MOD_ID': target['mod_uid']}
+            with patch.dict(os.environ, environment), patch.object(nexus, 'fetch_release', return_value=plan), \
+                 patch.object(nexus, 'check_destination', return_value='ready'), patch.object(nexus, 'outputs') as outputs, \
+                 patch('builtins.print'):
+                nexus.prepare(args)
+            saved = json.loads((Path(directory) / 'plan.json').read_text(encoding='utf-8'))
+            self.assertEqual(outputs.call_args.args[0]['description'], target['file_description'])
+            self.assertGreater(len(saved['notes_plain']), 255)
+            self.assertIn('Detailed release note.', saved['notes_bbcode'])
+
+    def test_invalid_configured_file_description_blocks_before_upload(self):
+        target = {**nexus.targets()['multiplayer'], 'file_description': 'x' * 256}
+        plan = {'product': 'multiplayer', 'tag': 'v0.1.0-beta.23', 'version': '0.1.0-beta.23',
+                'notes_source': '# Changelog\n\n## 0.1.0-beta.23\n\n- A change.'}
+        environment = {'NEXUS_FILE_ID': target['file_id'], 'NEXUS_MOD_ID': target['mod_uid']}
+        with patch.dict(os.environ, environment), patch.object(nexus, 'targets', return_value={'multiplayer': target}), \
+             patch.object(nexus, 'fetch_release', return_value=plan), patch.object(nexus, 'check_destination', return_value='ready'):
+            with self.assertRaisesRegex(ValueError, 'at most 255'):
+                nexus.prepare(SimpleNamespace(product='multiplayer', tag=plan['tag'], directory='unused', optional=False))
 
 
 if __name__ == '__main__':unittest.main()
