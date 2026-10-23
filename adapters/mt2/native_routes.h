@@ -19,6 +19,7 @@ public:
         std::function<bool(void*,void*,std::string&)> prove;
         std::function<bool(void*,std::string&)> remove;
         std::function<bool(void*,std::string&)> disable;
+        std::function<bool(const std::vector<std::pair<void*,void*>>&,std::string&)> enable_batch;
     };
     using CreateOriginal=void*(*)(void*,const void*,const void*,const void*,void*,void*,void*,bool);
     using RemoveOriginal=void(*)(void*,void*);
@@ -94,6 +95,7 @@ private:
     static MT2FW_MT2_Result MT2FW_CALL next_remove(void*);
     static MT2FW_MT2_Result MT2FW_CALL hook_prepare(void*,const char*,void*,MT2FW_MT2_RouteReceipt*);
     static MT2FW_MT2_Result MT2FW_CALL hook_enable(void*,const char*,MT2FW_MT2_RouteReceipt*);
+    static MT2FW_MT2_Result MT2FW_CALL hook_enable_batch(void*,const char* const*,uint32_t,MT2FW_MT2_RouteReceipt*,uint32_t);
     static MT2FW_MT2_Result MT2FW_CALL hook_remove(void*,const char*,MT2FW_MT2_RouteReceipt*);
     static MT2FW_MT2_Result MT2FW_CALL route_read(void*,const char*,MT2FW_MT2_RouteReceipt*);
     static MT2FW_MT2_Result MT2FW_CALL code_verify(void*,const char*,uint32_t,const void*,uint32_t,MT2FW_MT2_RouteReceipt*);

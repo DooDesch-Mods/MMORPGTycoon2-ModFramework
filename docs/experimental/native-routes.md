@@ -20,6 +20,50 @@ The Framework owns MinHook, individual target activation and rollback. Plugins n
 
 Each receipt includes executable hash, RVA, entry, trampoline, detour, generation, owner, acknowledged pristine/current prefixes, state and original cause. The Windows backend reads the exact executable once, requires its supported SHA256, maps executable PE sections and checks live bytes. Enabled paths must also resolve through a bounded jump proof to the acknowledged detour. A receipt is a current observation, not permission to ignore later changes.
 
+## Explicit batch activation (unreleased)
+
+The experimental `RoutesV2` extension uses the same `MT2FW_MT2_QueryRoutes`
+export and the same authenticated owner. Initialize `MT2FW_MT2_RoutesV2` to zero
+and call the existing `MT2FW_MT2_QueryRoutesFn` with version
+`MT2FW_MT2_ROUTES_BATCH_VERSION` (2), `&routes.v1` and `sizeof(routes)`.
+Require `OK`, `routes.v1.version == 2`, `routes.v1.size == sizeof(routes)`, the
+expected context and a non-null `hook_enable_batch`. The older 0.3.1 query
+rejects version 2 with `INVALID` without writing the output. A caller with
+correct non-null buffer/capacity may then discover version 1 and use its
+immediate activation path. Other failures or malformed returned identities
+must stay visible. Plugin ABI 1 and the size/layout of `RoutesV1` are unchanged.
+
+Prepare all targets in a feature, verify their original bytes and publish all
+disabled receivers and actual trampoline pointers before calling
+`routes.hook_enable_batch(routes.v1.context, names, count, receipts, capacity)`.
+The count is 1-128. Capacity counts receipt elements; initialize every receipt's
+`size`. Names must be unique private targets in `PREPARED` state owned by this
+same active plugin. Receipts follow the input order and retain each target's
+owner, RVA, generation and trampoline. Admission validates the entire list and
+the current live code before making any change. Missing batch support never
+silently substitutes a loop of individual calls.
+
+The Windows backend holds its private MinHook registry lock, rejects an
+existing pending queue from another caller and uses one thread freeze for
+exactly the named slots. Unrelated prepared hooks stay disabled. No global
+enable-all operation is used. Remaining queued intent is cleared even if
+activation fails partway through, so a later queue cannot apply it by accident.
+Already applied patches are not rolled back or replayed automatically.
+
+`OK` requires a bounded native detour proof and full 32-byte live readback for
+every entry. Adjacent entries are composed together before validating their
+shared receipt bytes. If the backend is attempted and fails, throws, or has
+unconfirmed readback, every member is `UNKNOWN` with the original cause.
+Readable `current` fields in those failed batch receipts contain the actual
+observed bytes. Unreadable readback adds its cause and retains prior receipt
+data; it must not be treated as a live observation. Never fall back to
+individual enable calls or retry an unknown batch. Retain receivers and native
+code storage and use the existing explicit cleanup/retention rules.
+
+Version 1 `hook_enable` still activates immediately and returns its existing
+enabled receipt. This extension does not defer legacy calls across features,
+change receiver guards, skip live code checks or establish game-level effects.
+
 ## Original code admission
 
 Keep existing native guard expectations. For a patched named target, call `code_verify` with its target-relative offset and the original expected bytes. This checks the expected bytes against the verified executable, the acknowledged current patch and unchanged live body bytes outside the patch prefix. Windows, DLL and address values stay in the private adapter contract.

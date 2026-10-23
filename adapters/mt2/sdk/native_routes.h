@@ -6,6 +6,8 @@ extern "C" {
 #endif
 
 #define MT2FW_MT2_ROUTES_VERSION 1u
+#define MT2FW_MT2_ROUTES_BATCH_VERSION 2u
+#define MT2FW_MT2_ROUTES_BATCH_MAX 128u
 typedef enum MT2FW_MT2_RouteState {
     MT2FW_MT2_ROUTE_PRISTINE=0,
     MT2FW_MT2_ROUTE_PREPARED=1,
@@ -88,6 +90,20 @@ typedef struct MT2FW_MT2_RoutesV1 {
        never bypass the shared observer using a receipt's trampoline. */
     MT2FW_MT2_Result (MT2FW_CALL *code_verify)(void*,const char* name,uint32_t offset,const void* expected,uint32_t length,MT2FW_MT2_RouteReceipt*);
 } MT2FW_MT2_RoutesV1;
+
+/* Query the existing MT2FW_MT2_QueryRoutes export with version 2, &output.v1
+   and sizeof(output). Version 1 and immediate hook_enable stay unchanged. */
+typedef struct MT2FW_MT2_RoutesV2 {
+    MT2FW_MT2_RoutesV1 v1;
+    /* Names and receipt slots are in the same order, count 1..128.
+       All hooks must already be PREPARED by this owner, with receivers and
+       trampoline pointers published before this synchronous call. Each
+       receipt.size must be initialized, receipt_capacity is an element count.
+       Admission failure makes no changes. Once activation starts, any failure
+       marks the entire batch UNKNOWN; inspect and clean up explicitly, never
+       replay it automatically. OK requires actual per-route enabled proof. */
+    MT2FW_MT2_Result (MT2FW_CALL *hook_enable_batch)(void*,const char* const* names,uint32_t count,MT2FW_MT2_RouteReceipt* receipts,uint32_t receipt_capacity);
+} MT2FW_MT2_RoutesV2;
 typedef MT2FW_MT2_Result (MT2FW_CALL *MT2FW_MT2_QueryRoutesFn)(const MT2FW_Host*,uint32_t,MT2FW_MT2_RoutesV1*,uint32_t);
 
 #ifdef __cplusplus

@@ -1,6 +1,7 @@
 #include "native_routes_windows.h"
 #include "crypto.h"
 #include <MinHook.h>
+#include "minhook_batch.h"
 #include <windows.h>
 #include <fstream>
 #include <cstring>
@@ -58,6 +59,13 @@ NativeRoutes::Backend windows_route_backend(const fs::path& executable){
     result.read=memory;result.prove=prove;
     result.create=[](void* address,void* detour,void** original,std::string& cause){auto status=MH_CreateHook(address,detour,original);if(status==MH_OK)return true;cause=MH_StatusToString(status);return false;};
     result.enable=[](void* address,void* detour,std::string& cause){auto status=MH_EnableHook(address);if(status!=MH_OK){cause=MH_StatusToString(status);return false;}return prove(address,detour,cause);};
+    result.enable_batch=[](const std::vector<std::pair<void*,void*>>& hooks,std::string& cause){
+        std::vector<void*> targets;targets.reserve(hooks.size());for(const auto& hook:hooks)targets.push_back(hook.first);
+        UINT failed=0;const char* phase="admission";auto status=MT2FW_MH_EnableBatch(targets.data(),static_cast<UINT>(targets.size()),&failed,&phase);
+        if(status!=MH_OK){cause=std::string("Native batch ")+phase+" index="+std::to_string(failed)+": "+MH_StatusToString(status);return false;}
+        for(const auto& [address,detour]:hooks)if(!prove(address,detour,cause))return false;
+        return true;
+    };
     result.remove=[](void* address,std::string& cause){auto status=MH_DisableHook(address);if(status!=MH_OK&&status!=MH_ERROR_DISABLED){cause=MH_StatusToString(status);return false;}status=MH_RemoveHook(address);if(status!=MH_OK){cause=MH_StatusToString(status);return false;}return true;};
     result.disable=[](void* address,std::string& cause){auto status=MH_DisableHook(address);if(status==MH_OK||status==MH_ERROR_DISABLED)return true;cause=MH_StatusToString(status);return false;};
     return result;

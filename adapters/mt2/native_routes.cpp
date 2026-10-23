@@ -57,7 +57,8 @@ void NativeRoutes::report(Owner& value,const std::string& cause){
 }
 std::vector<std::pair<Plugin*,std::string>> NativeRoutes::drain_errors(){std::lock_guard lock(gate_);if(errors_.empty())return {};auto result=std::move(errors_);errors_.clear();errors_.reserve(128);return result;}
 MT2FW_MT2_Result NativeRoutes::query(const MT2FW_Host* host,uint32_t version,MT2FW_MT2_RoutesV1* output,uint32_t capacity){
-    if(!output||capacity<sizeof(*output)||version!=MT2FW_MT2_ROUTES_VERSION)return MT2FW_MT2_INVALID;
+    if(!output||(version!=MT2FW_MT2_ROUTES_VERSION&&version!=MT2FW_MT2_ROUTES_BATCH_VERSION)||
+       capacity<(version==MT2FW_MT2_ROUTES_BATCH_VERSION?sizeof(MT2FW_MT2_RoutesV2):sizeof(*output)))return MT2FW_MT2_INVALID;
     auto plugin=lookup_(host);if(!plugin||!plugin->active||plugin->staging||plugin->manifest.type!="native")return MT2FW_MT2_UNAVAILABLE;
     std::lock_guard lock(gate_);auto& stored=owners_[plugin];if(!stored){stored=std::make_unique<Owner>();stored->service=this;stored->plugin=plugin;}
     if(!stored->active)return MT2FW_MT2_UNAVAILABLE;
@@ -71,7 +72,12 @@ MT2FW_MT2_Result NativeRoutes::query(const MT2FW_Host* host,uint32_t version,MT2
         [](void* c,const char* name,MT2FW_MT2_RouteReceipt* out){return boundary(c,MT2FW_MT2_FAILED,[&]{return hook_remove(c,name,out);});},
         [](void* c,const char* name,MT2FW_MT2_RouteReceipt* out){return boundary(c,MT2FW_MT2_FAILED,[&]{return route_read(c,name,out);});},
         [](void* c,const char* name,uint32_t offset,const void* expected,uint32_t length,MT2FW_MT2_RouteReceipt* out){return boundary(c,MT2FW_MT2_FAILED,[&]{return code_verify(c,name,offset,expected,length,out);});}
-    };return MT2FW_MT2_OK;
+    };
+    if(version==MT2FW_MT2_ROUTES_BATCH_VERSION){
+        auto extended=reinterpret_cast<MT2FW_MT2_RoutesV2*>(output);extended->v1.size=sizeof(*extended);extended->v1.version=version;
+        extended->hook_enable_batch=[](void* c,const char* const* names,uint32_t count,MT2FW_MT2_RouteReceipt* receipts,uint32_t capacity){return boundary(c,MT2FW_MT2_FAILED,[&]{return hook_enable_batch(c,names,count,receipts,capacity);});};
+    }
+    return MT2FW_MT2_OK;
 }
 uint64_t MT2FW_CALL NativeRoutes::create_subscribe(void* context,MT2FW_MT2_CreateBefore before,MT2FW_MT2_CreateAfter after,void* user){
     auto value=owner(context);if(!value||!before||!after)return 0;auto& service=*value->service;std::lock_guard lock(service.gate_);
@@ -244,6 +250,67 @@ MT2FW_MT2_Result MT2FW_CALL NativeRoutes::hook_enable(void* context,const char* 
     Bytes actual{};
     if(okay&&service.backend_.read(service.image_+target.rva,actual.data(),32,cause)&&service.accept_enabled(target,actual,cause)){target.cause.clear();service.receipt(target,*output);return MT2FW_MT2_OK;}
     target.state=MT2FW_MT2_ROUTE_UNKNOWN;target.cause="Native enable outcome unknown: "+cause;service.report(*value,target.cause);service.receipt(target,*output);return MT2FW_MT2_FAILED;
+}
+MT2FW_MT2_Result MT2FW_CALL NativeRoutes::hook_enable_batch(void* context,const char* const* names,uint32_t count,MT2FW_MT2_RouteReceipt* output,uint32_t capacity){
+    auto value=owner(context);if(!value)return MT2FW_MT2_UNAVAILABLE;
+    if(!names||!output||!count||count>MT2FW_MT2_ROUTES_BATCH_MAX||capacity<count)return MT2FW_MT2_INVALID;
+    for(uint32_t i=0;i<count;++i)if(!output_ok(output+i))return MT2FW_MT2_INVALID;
+    auto& service=*value->service;std::lock_guard lock(service.gate_);
+    if(!value->active||!value->plugin->active)return MT2FW_MT2_UNAVAILABLE;
+    std::vector<Target*> targets(count,nullptr);std::vector<Bytes> actual(count);
+    std::vector<std::pair<void*,void*>> hooks;hooks.reserve(count);
+    MT2FW_MT2_Result admission=MT2FW_MT2_OK;
+    for(uint32_t i=0;i<count;++i){
+        output[i]={sizeof(output[i]),MT2FW_MT2_ROUTE_UNKNOWN};
+        if(!names[i]){admission=MT2FW_MT2_INVALID;copy(output[i].cause,"Native batch target name is null");continue;}
+        auto found=service.targets_.find(names[i]);
+        if(found==service.targets_.end()||found->second.shared||found->second.owner!=value){admission=MT2FW_MT2_UNAVAILABLE;copy(output[i].cause,"Native batch target is not prepared by this owner");continue;}
+        auto& target=found->second;targets[i]=&target;service.receipt(target,output[i]);
+        std::string cause;
+        if(std::find(targets.begin(),targets.begin()+i,&target)!=targets.begin()+i){admission=MT2FW_MT2_INVALID;cause="Native batch target is duplicated";}
+        else if(target.state!=MT2FW_MT2_ROUTE_PREPARED||!target.created||!target.trampoline){admission=MT2FW_MT2_INVALID;cause="Native batch target must be prepared with a published trampoline";}
+        else if(!service.validate(target,cause))admission=MT2FW_MT2_FAILED;
+        if(!cause.empty())copy(output[i].cause,cause);
+    }
+    if(admission!=MT2FW_MT2_OK)return admission;
+    if(!service.backend_.enable_batch){for(uint32_t i=0;i<count;++i)copy(output[i].cause,"Native batch backend is unavailable");return MT2FW_MT2_UNAVAILABLE;}
+    for(auto* target:targets)hooks.push_back({reinterpret_cast<void*>(service.image_+target->rva),target->detour});
+    // Mark the entire cohort unknown before entering the mutating backend.
+    // No receiver may assume that a failed call enabled none of its hooks.
+    for(auto* target:targets)target->state=MT2FW_MT2_ROUTE_UNKNOWN;
+    std::string cause;bool okay=false;
+    try{okay=service.backend_.enable_batch(hooks,cause);}catch(const std::exception& problem){cause=problem.what();}catch(...){cause="unknown native exception";}
+    if(!okay&&cause.empty())cause="Native batch backend failed without a cause";
+    try{if(okay)for(uint32_t i=0;i<count;++i){
+        auto& target=*targets[i];
+        if(!service.backend_.read(service.image_+target.rva,actual[i].data(),32,cause)){okay=false;break;}
+        auto& bytes=actual[i];uint32_t length=0;
+        if(bytes[0]==0xe9)length=5;else if(bytes[0]==0xeb)length=2;
+        else if(bytes[0]==0xff&&bytes[1]==0x25){int32_t displacement=0;std::memcpy(&displacement,bytes.data()+2,4);length=displacement==0?14:6;}
+        if(!length){cause="Native batch enable has no supported owned jump prefix";okay=false;break;}
+        for(const auto& [name,peer]:service.targets_)if(&peer!=&target&&peer.patch_size&&overlaps(target.rva,length,peer.rva,peer.patch_size)){cause="Native batch owned patch spans overlap: "+name;okay=false;break;}
+        if(!okay)break;
+        if(std::equal(bytes.begin(),bytes.begin()+length,target.pristine.begin())){cause="Native batch enable did not change its own entry bytes";okay=false;break;}
+        if(!service.backend_.prove||!service.backend_.prove(hooks[i].first,target.detour,cause)){okay=false;break;}
+        target.current=target.pristine;std::copy_n(bytes.begin(),length,target.current.begin());
+        target.patch_size=length;target.patch_generation=target.generation;target.state=MT2FW_MT2_ROUTE_ENABLED;
+    }
+    // First stage all individually proved entries, then validate their complete
+    // composed windows. Adjacent entries can legitimately share receipt bytes.
+    if(okay)for(auto* target:targets)if(!service.validate(*target,cause)){okay=false;break;}
+    }catch(const std::exception& problem){okay=false;cause=problem.what();}catch(...){okay=false;cause="unknown native readback exception";}
+    if(okay){for(uint32_t i=0;i<count;++i){targets[i]->cause.clear();service.receipt(*targets[i],output[i]);}return MT2FW_MT2_OK;}
+    if(cause.empty())cause="Native batch readback failed without a cause";
+    for(auto* target:targets){target->state=MT2FW_MT2_ROUTE_UNKNOWN;target->cause="Native batch enable outcome unknown: "+cause;}
+    service.report(*value,targets.front()->cause);
+    for(uint32_t i=0;i<count;++i){
+        service.receipt(*targets[i],output[i]);std::string read_cause;
+        bool readable=false;try{readable=service.backend_.read(service.image_+targets[i]->rva,actual[i].data(),32,read_cause);}
+        catch(const std::exception& problem){read_cause=problem.what();}catch(...){read_cause="unknown native readback exception";}
+        if(readable)std::memcpy(output[i].current,actual[i].data(),32);
+        else copy(output[i].cause,targets[i]->cause+"; readback: "+read_cause);
+    }
+    return MT2FW_MT2_FAILED;
 }
 MT2FW_MT2_Result MT2FW_CALL NativeRoutes::hook_remove(void* context,const char* name,MT2FW_MT2_RouteReceipt* output){
     auto value=static_cast<Owner*>(context);if(!value)return MT2FW_MT2_UNAVAILABLE;if(!name||!output_ok(output))return MT2FW_MT2_INVALID;
