@@ -58,6 +58,18 @@ target_link_libraries(mt2fw_release_boundary_tests PRIVATE mt2fw_native_ownershi
 add_test(NAME framework_release_boundary COMMAND mt2fw_release_boundary_tests)
 set_tests_properties(framework_release_boundary PROPERTIES TIMEOUT 15)
 find_package(Python3 REQUIRED COMPONENTS Interpreter)
+set(DIAGNOSTIC_RESPONSE "${CMAKE_CURRENT_BINARY_DIR}/diagnostic-response/diagnostic_response.inc")
+add_custom_command(OUTPUT "${DIAGNOSTIC_RESPONSE}"
+  COMMAND "${Python3_EXECUTABLE}" -B -X utf8 "${FRAMEWORK}/tests/diagnostic-response/extract_response.py"
+    "${CMAKE_CURRENT_SOURCE_DIR}/runtime.cpp" "${DIAGNOSTIC_RESPONSE}"
+  DEPENDS runtime.cpp "${FRAMEWORK}/tests/diagnostic-response/extract_response.py" VERBATIM)
+add_executable(mt2fw_diagnostic_response_tests ../../tests/diagnostic-response/response_tests.cpp "${DIAGNOSTIC_RESPONSE}")
+target_include_directories(mt2fw_diagnostic_response_tests PRIVATE "${CMAKE_CURRENT_BINARY_DIR}/diagnostic-response")
+target_link_libraries(mt2fw_diagnostic_response_tests PRIVATE mt2fw_core)
+target_compile_options(mt2fw_diagnostic_response_tests PRIVATE /W4 /WX /utf-8)
+target_compile_definitions(mt2fw_diagnostic_response_tests PRIVATE WIN32_LEAN_AND_MEAN NOMINMAX _SILENCE_CXX20_U8PATH_DEPRECATION_WARNING)
+add_test(NAME framework_diagnostic_response COMMAND mt2fw_diagnostic_response_tests)
+set_tests_properties(framework_diagnostic_response PROPERTIES TIMEOUT 10)
 set(NATIVE_INPUT_DISPATCH "${CMAKE_CURRENT_BINARY_DIR}/native-input/native_input_dispatch.inc")
 add_custom_command(OUTPUT "${NATIVE_INPUT_DISPATCH}"
   COMMAND "${Python3_EXECUTABLE}" -B -X utf8 "${FRAMEWORK}/tests/native-input-submit/extract_input.py"

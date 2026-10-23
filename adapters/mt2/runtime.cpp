@@ -91,6 +91,10 @@ Json click_native_samples=Json::array();
 uint64_t click_native_samples_dropped=0;
 std::string click_native_read_cause;
 std::string pending_capture,last_request,last_error,log_filter;
+std::optional<Json> pending_diagnostic_response;
+std::string diagnostic_response_error;
+bool diagnostic_response_terminal=false;
+uint64_t diagnostic_response_attempts=0;
 std::string details_mod;
 char filter[128]{};
 char console_input[2048]="{\"mod\":\"example.hello\",\"operation\":\"world.status\",\"arguments\":{}}";
@@ -405,6 +409,8 @@ Json status() {
     value["desktop_app"]=mt2::desktop::status();
     value["error"]=last_error;value["process_start_time"]=process_started;value["confirmed_saves"]=confirmed_saves;value["last_save"]=last_save;value["confirmed_initial_saves"]=confirmed_initial_saves;value["last_initial_save"]=last_initial_save;
     value["menu_input_active"]=menu_input_active;
+    value["diagnostic_response"]={{"pending_id",pending_diagnostic_response?pending_diagnostic_response->at("id"):Json(nullptr)},
+        {"terminal",diagnostic_response_terminal},{"publication_attempts",diagnostic_response_attempts},{"error",diagnostic_response_error}};
     value["diagnostic_click_native_readback"]={{"samples",click_native_samples},{"dropped",click_native_samples_dropped},
         {"motion_x_offset",offsetof(SDL_MouseMotionEvent,x)},{"motion_y_offset",offsetof(SDL_MouseMotionEvent,y)},
         {"motion_which_offset",offsetof(SDL_MouseMotionEvent,which)},{"sdl_version",SDL_VERSION}};
@@ -546,8 +552,36 @@ void capture() {
     auto path=confined(root/"diagnostics",pending_capture+".bmp");std::ofstream stream(path,std::ios::binary);stream.write(reinterpret_cast<char*>(&file),sizeof(file));stream.write(reinterpret_cast<char*>(&info),sizeof(info));stream.write(reinterpret_cast<char*>(pixels.data()),pixels.size());stream.close();if(!stream)throw std::runtime_error("Screenshot file write failed");
     atomic_json(root/"diagnostics"/"capture.json",{{"id",pending_capture},{"path",path_text(path)},{"width",width},{"height",height},{"sha256",file_digest(path)}});pending_capture.clear();
 }
+bool publish_diagnostic_response(){
+    if(!pending_diagnostic_response)return true;
+    if(diagnostic_response_terminal)return false;
+    ++diagnostic_response_attempts;
+    try{atomic_json(root/"diagnostics"/"response.json",*pending_diagnostic_response);}
+    catch(const std::exception& problem){
+        const std::string cause=problem.what();
+        diagnostic_response_terminal=cause!="Atomic JSON replacement failed Win32=32";
+        const auto message="Diagnostic response publication failed id="+pending_diagnostic_response->at("id").get<std::string>()+
+            " target="+path_text(root/"diagnostics"/"response.json")+" cause="+cause+
+            (diagnostic_response_terminal?"; terminal, completed response retained; operation will not replay":"; completed response retained for publication retry; operation will not replay");
+        if(diagnostic_response_error!=message){
+            diagnostic_response_error=message;
+            if(diagnostic_response_terminal)report(message);
+            else runtime->log("diagnostics","warn",message);
+        }
+        return false;
+    }
+    const auto id=pending_diagnostic_response->at("id").get<std::string>();
+    pending_diagnostic_response.reset();
+    const bool recovered=!diagnostic_response_error.empty();
+    if(last_error==diagnostic_response_error)last_error.clear();
+    diagnostic_response_error.clear();
+    if(recovered)runtime->log("diagnostics","info","Diagnostic response publication recovered id="+id+" attempts="+std::to_string(diagnostic_response_attempts)+"; operation was not replayed");
+    return true;
+}
+
 void diagnostics() {
     auto now=std::chrono::steady_clock::now();if(now-previous_diagnostic<std::chrono::milliseconds(100))return;previous_diagnostic=now;
+    if(pending_diagnostic_response){publish_diagnostic_response();return;}
     auto path=root/"diagnostics"/"request.json";if(!fs::exists(path))return;
     auto request=read_json(path);auto id=request.at("id").get<std::string>();if(id==last_request)return;
     last_request=id;
@@ -594,8 +628,10 @@ void diagnostics() {
             result=runtime->request(**found,args.at("operation"),args.value("arguments",Json::object()));
         }else result=mt2::diagnostic(op,args);
         response["ok"]=true;response["result"]=result;
-    }catch(const std::exception& error){response["ok"]=false;response["error"]=error.what();runtime->log("diagnostics","error",error.what());}
-    atomic_json(root/"diagnostics"/"response.json",response);
+    }catch(const std::exception& error){response["ok"]=false;response["error"]=error.what();}
+    pending_diagnostic_response=std::move(response);diagnostic_response_error.clear();diagnostic_response_terminal=false;diagnostic_response_attempts=0;
+    if(!pending_diagnostic_response->at("ok").get<bool>())runtime->log("diagnostics","error",pending_diagnostic_response->at("error").get<std::string>());
+    publish_diagnostic_response();
 }
 void update(void* game,float dt) {
     {std::lock_guard lock(gate);sample_click_native("game_update_entry_after_input");}
