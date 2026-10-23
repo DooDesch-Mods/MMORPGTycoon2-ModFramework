@@ -1,6 +1,7 @@
 """Validate release artifacts and Nexus destinations; uploading stays in the official action."""
 from pathlib import Path, PurePosixPath
 import argparse
+import base64
 import fnmatch
 import hashlib
 import json
@@ -69,10 +70,16 @@ def archive_version(path, product):
                 raise ValueError('Multiplayer inventory differs')
             if (mod.get('id') != 'doodesch.multiplayer' or mod.get('type') != 'native'
                     or mod.get('entry') != 'MT2MultiplayerPlugin.dll' or mod.get('api_version') != '1.0.0'
-                    or mod.get('version') != metadata.get('version') or metadata.get('package_mode') != 'vortex'
-                    or metadata.get('release_tag') != 'v' + str(metadata.get('version'))
-                    or not re.fullmatch(r'[0-9a-f]{40}', str(metadata.get('source_commit', '')))):
+                    or mod.get('version') != metadata.get('version') or metadata.get('package_mode') != 'vortex'):
                 raise ValueError('Multiplayer release identity differs')
+            if 'source_commit' in metadata or 'release_tag' in metadata:
+                if (metadata.get('release_tag') != 'v' + str(metadata.get('version'))
+                        or not re.fullmatch(r'[0-9a-f]{40}', str(metadata.get('source_commit', '')))):
+                    raise ValueError('Multiplayer explicit source identity differs')
+            elif (metadata.get('schema_version') != 2 or metadata.get('candidate') != 'framework-native-plugin'
+                    or metadata.get('inputs', {}).get('mod_manifest_sha256') != hashlib.sha256(archive.read('mod.json')).hexdigest()
+                    or not re.fullmatch(r'[0-9a-f]{64}', str(metadata.get('inputs', {}).get('candidate_receipt_sha256', '')))):
+                raise ValueError('Multiplayer canonical package identity differs')
             for name in required:
                 data = archive.read(name)
                 record = metadata['files'][name]
@@ -108,13 +115,40 @@ def gh(*args):
 def gh_repository(repository, *args):
     if repository not in (REPOSITORY, 'DooDesch-Mods/MMORPGTycoon2-Multiplayer'):
         raise ValueError('Release source repository is not allowlisted')
-    result = subprocess.run(['gh', *args, '--repo', repository], capture_output=True, text=True, timeout=600)
+    if args[0] == 'api':
+        if not args[1].startswith('repos/' + repository + '/'):
+            raise ValueError('GitHub API path differs from the release repository')
+        command = ['gh', *args]
+    else:
+        command = ['gh', *args, '--repo', repository]
+    result = subprocess.run(command, capture_output=True, text=True, timeout=600)
     if result.returncode:
         cause = result.stderr.strip()
         for name in ('GH_TOKEN', 'GITHUB_TOKEN', 'NEXUSMODS_API_KEY', 'DISCORD_RELEASE_WEBHOOK'):
             if value := os.environ.get(name):cause = cause.replace(value, '[redacted]')
         raise RuntimeError(f'GitHub release {args[1]} failed (exit {result.returncode}): {cause[:2000]}')
     return result.stdout
+
+
+def multiplayer_source_commit(manifest, mod, repository, tag, commit, call):
+    if tag != 'v' + str(manifest.get('version')) or not re.fullmatch(r'[0-9a-f]{40}', str(commit)):
+        raise ValueError('Multiplayer release source commit differs')
+    if 'source_commit' in manifest:
+        if manifest['source_commit'] != commit:
+            raise ValueError('Multiplayer source commit differs from its published release')
+    else:
+        # Canonical schema2 packages bind to their authenticated published tag
+        # and source manifest instead of legacy in-package provenance fields.
+        resolved = json.loads(call('api', f'repos/{repository}/commits/{tag}'))
+        if resolved.get('sha') != commit:
+            raise ValueError('Multiplayer GitHub tag source commit differs from its release')
+        source = json.loads(call('api', f'repos/{repository}/contents/mod.json?ref={commit}'))
+        if source.get('type') != 'file' or source.get('encoding') != 'base64':
+            raise ValueError('Multiplayer source manifest response is not a file')
+        source_mod = json.loads(base64.b64decode(source['content']))
+        if source_mod != mod:
+            raise ValueError('Multiplayer packaged manifest differs from the exact tagged source')
+    return commit
 
 
 def fetch_release(tag, product, directory, optional=False):
@@ -152,8 +186,8 @@ def fetch_release(tag, product, directory, optional=False):
     if product == 'multiplayer':
         with zipfile.ZipFile(path) as archive:
             manifest = json.loads(archive.read('package.json'))
-        if tag != 'v' + version or metadata.get('targetCommitish') != manifest['source_commit']:
-            raise ValueError('Multiplayer source commit differs from its published release')
+            mod = json.loads(archive.read('mod.json'))
+        plan['source_commit'] = multiplayer_source_commit(manifest, mod, repository, tag, metadata.get('targetCommitish'), call)
         notes_request = urllib.request.Request(f'https://raw.githubusercontent.com/{repository}/{tag}/CHANGELOG.md',
                                                headers={'User-Agent': 'MT2-release-validation'})
         with urllib.request.urlopen(notes_request, timeout=30) as response:

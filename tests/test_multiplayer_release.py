@@ -1,6 +1,7 @@
 """Exercise the explicit cross-repository native-plugin publication boundary."""
 from pathlib import Path
 import hashlib
+import base64
 import io
 import json
 import shutil
@@ -85,6 +86,45 @@ class MultiplayerReleaseTests(unittest.TestCase):
         result = subprocess.run([sys.executable, str(ROOT / 'tools/nexus_release.py'), 'matrix', '--target', 'all'],
                                 check=True, capture_output=True, text=True)
         self.assertEqual({row['product'] for row in json.loads(result.stdout)['include']}, {'framework', 'vortex'})
+
+    def test_canonical_schema2_package_without_legacy_provenance(self):
+        self.metadata.pop('source_commit'); self.metadata.pop('release_tag')
+        self.metadata.update(schema_version=2, candidate='framework-native-plugin', inputs={
+            'mod_manifest_sha256': hashlib.sha256(self.entries['mod.json']).hexdigest(),
+            'candidate_receipt_sha256': 'c' * 64})
+        self.entries['package.json'] = json.dumps(self.metadata).encode(); self.write()
+        self.assertEqual(nexus.archive_version(self.archive, 'multiplayer'), self.version)
+        self.metadata['inputs']['mod_manifest_sha256'] = 'd' * 64
+        self.entries['package.json'] = json.dumps(self.metadata).encode(); self.write()
+        with self.assertRaisesRegex(ValueError, 'canonical package identity'):
+            nexus.archive_version(self.archive, 'multiplayer')
+
+    def test_schema2_does_not_ignore_conflicting_explicit_provenance(self):
+        self.metadata.update(schema_version=2, candidate='framework-native-plugin', release_tag='v0.1.0-beta.99')
+        self.entries['package.json'] = json.dumps(self.metadata).encode(); self.write()
+        with self.assertRaisesRegex(ValueError, 'explicit source identity'):
+            nexus.archive_version(self.archive, 'multiplayer')
+
+    def test_canonical_package_requires_exact_github_tag_and_source_manifest(self):
+        manifest = {'version': self.version}
+        mod = json.loads(self.entries['mod.json'])
+        repository = 'DooDesch-Mods/MMORPGTycoon2-Multiplayer'
+        tag_commit = {'sha': self.commit}
+        source = {'type': 'file', 'encoding': 'base64', 'content': base64.b64encode(self.entries['mod.json']).decode()}
+        calls = []
+        def api(*args):
+            calls.append(args)
+            return json.dumps(source if '/contents/' in args[1] else tag_commit)
+        self.assertEqual(nexus.multiplayer_source_commit(manifest, mod, repository, 'v'+self.version, self.commit, api), self.commit)
+        self.assertEqual(calls, [('api', f'repos/{repository}/commits/v{self.version}'),
+                                 ('api', f'repos/{repository}/contents/mod.json?ref={self.commit}')])
+        tag_commit['sha'] = 'b' * 40
+        with self.assertRaisesRegex(ValueError, 'tag source commit differs'):
+            nexus.multiplayer_source_commit(manifest, mod, repository, 'v'+self.version, self.commit, api)
+        tag_commit['sha'] = self.commit
+        source['content'] = base64.b64encode(json.dumps({**mod, 'version': '0.1.0-beta.99'}).encode()).decode()
+        with self.assertRaisesRegex(ValueError, 'manifest differs'):
+            nexus.multiplayer_source_commit(manifest, mod, repository, 'v'+self.version, self.commit, api)
 
     def test_receipt_is_read_from_cohort_but_announcement_points_to_mod(self):
         plan = {'product': 'multiplayer', 'version': self.version, 'tag': 'v' + self.version,
