@@ -8,6 +8,8 @@ title: "mt2.management.purchase_statistic"
 
 Purchase the next native statistic project
 
+Introduced in Lua API **1.2.0**. Requires Framework **0.3.0** or newer.
+
 ```lua
 mt2.management.purchase_statistic(index: integer): MT2Action
 ```

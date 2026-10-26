@@ -8,6 +8,8 @@ title: "mt2.development.set_active"
 
 Set a jobless developer active property through the native property loader
 
+Introduced in Lua API **1.2.0**. Requires Framework **0.3.0** or newer.
+
 ```lua
 mt2.development.set_active(handle: MT2Handle, value: boolean): MT2Action
 ```

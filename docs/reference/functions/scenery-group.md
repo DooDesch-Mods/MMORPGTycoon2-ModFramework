@@ -8,6 +8,8 @@ title: "mt2.scenery.group"
 
 Group or merge root-world Scenery through explicitly rooted native Group creation and the whole original GroupSelection transaction. Confirms ordered membership, unchanged member poses, reciprocal parents and exact native Undo. Requires the root world to be the native active scene and the current native tool to permit selection; normal native selection changes apply.
 
+Introduced in Lua API **1.2.0**. Requires Framework **0.3.0** or newer.
+
 ```lua
 mt2.scenery.group(handles: MT2Handle[]): MT2Action
 ```

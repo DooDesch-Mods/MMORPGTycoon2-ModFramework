@@ -8,6 +8,8 @@ title: "mt2.monsters.get_zone"
 
 Read a current Monster Zone only while its full UID and root manager membership match.
 
+Introduced in Lua API **1.2.0**. Requires Framework **0.3.0** or newer.
+
 ```lua
 mt2.monsters.get_zone(handle: MT2ZoneHandle): MT2MonsterZone
 ```

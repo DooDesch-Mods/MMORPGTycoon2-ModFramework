@@ -8,6 +8,8 @@ title: "mt2.management.release_cycle"
 
 Read current native release phase, history count, and free points
 
+Introduced in Lua API **1.2.0**. Requires Framework **0.3.0** or newer.
+
 ```lua
 mt2.management.release_cycle(): MT2ManagementReleaseCycle
 ```

@@ -6,7 +6,7 @@ title: "API reference"
 
 # API reference
 
-Public Lua API **1.2.0**, native ABI **1**, framework **0.3.2**.
+Public Lua API **1.3.0**, native ABI **1**, framework **0.4.0**.
 
 [Events](events.md) | [Types](types.md) | [Capabilities](capabilities.md) | [Native ABI](native.md) | [Manifests](manifests.md)
 
@@ -181,6 +181,8 @@ Public Lua API **1.2.0**, native ABI **1**, framework **0.3.2**.
 - [`mt2.management.set_buzz`](functions/management-set_buzz.md): Set both native marketing buzz accumulators with guarded stores
 - [`mt2.management.purge_expired_awards`](functions/management-purge_expired_awards.md): Purge native awards older than the current six-day retention interval
 - [`mt2.management.add_award`](functions/management-add_award.md): Construct and add a native marketing award for the current game day
+- [`mt2.management.service`](functions/management-service.md): Read one building service with its current price and synchronization settings.
+- [`mt2.management.set_fees`](functions/management-set_fees.md): Queue both game fees in one checked game-thread action.
 
 ## modular
 
@@ -215,6 +217,8 @@ Public Lua API **1.2.0**, native ABI **1**, framework **0.3.2**.
 - [`mt2.network.place_node`](functions/network-place_node.md): Buy and place a server node with its original native inverse history
 - [`mt2.network.place_pipe`](functions/network-place_pipe.md): Create the proved native Cable connection between nodes or to a new Junction, with payment and inverse history
 - [`mt2.network.remove`](functions/network-remove.md): Remove the network object through native destruction and verify UID retirement and inverse history
+- [`mt2.network.node`](functions/network-node.md): Read one current server node and its checked connections.
+- [`mt2.network.pipe`](functions/network-pipe.md): Read one current network pipe, geometry and checked endpoints.
 
 ## npcs
 
@@ -258,6 +262,7 @@ Public Lua API **1.2.0**, native ABI **1**, framework **0.3.2**.
 - [`mt2.projects.cancel`](functions/projects-cancel.md): Cancel and retire the current native project
 - [`mt2.projects.commit`](functions/projects-commit.md): Deploy and retire the natively completed current project
 - [`mt2.projects.set_workers`](functions/projects-set_workers.md): Allocate workers to the current native project
+- [`mt2.projects.get`](functions/projects-get.md): Read the current availability, price and worker limit for one project source.
 
 ## quests
 
@@ -290,6 +295,7 @@ Public Lua API **1.2.0**, native ABI **1**, framework **0.3.2**.
 - [`mt2.regions.set_preset`](functions/regions-set_preset.md): Apply an original Region preset, confirm its styles and refresh the visible native inspector.
 - [`mt2.regions.purchase`](functions/regions-purchase.md): Buy unowned land through the original native tool, with complete actor level clamp, payment and inverse readback.
 - [`mt2.regions.sell`](functions/regions-sell.md): Sell owned land through the original native tool, with complete actor level clamp, refund and inverse readback.
+- [`mt2.regions.at`](functions/regions-at.md): Find the saved root Region at a world position; return nil outside the map.
 
 ## scenery
 
@@ -319,6 +325,8 @@ Public Lua API **1.2.0**, native ABI **1**, framework **0.3.2**.
 - [`mt2.terrain.change_height`](functions/terrain-change_height.md): Use the original height brush once and confirm the complete grid, 100 cash payment, restored cursor and unchanged Undo history.
 - [`mt2.terrain.contours`](functions/terrain-contours.md): Read a bounded page of exact native integer terrain polygon coordinates.
 - [`mt2.terrain.paint`](functions/terrain-paint.md): Complete an original terrain paint stroke and confirm its contour inverse, native Undo, Region and ledger readback. The result states whether contours changed.
+- [`mt2.terrain.sample`](functions/terrain-sample.md): Read one raw terrain height-grid sample without copying the whole grid.
+- [`mt2.terrain.samples`](functions/terrain-samples.md): Read a bounded set of raw height-grid samples, preserving requested order.
 
 ## time
 

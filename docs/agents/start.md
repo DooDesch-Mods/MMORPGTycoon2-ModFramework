@@ -4,17 +4,25 @@ title: Build a mod with an agent
 
 # Build a mod with an agent
 
-Use the same public contract and complete examples as a human modder. Framework **0.3.2** provides Lua API **1.2.0**; the native C ABI stays at **1**. Match the contract to the installed runtime. The [compatibility page](../compatibility.md) identifies the supported game build.
+Use the same public contract and complete examples as a human modder. This source targets Framework **0.4.0** and Lua API **1.3.0**; native C ABI stays at **1**. New API 1.3 functions require Framework 0.4.0 or later. The [compatibility page](../compatibility.md) identifies the supported game build.
 
 ## Context to give your agent
 
-Read this page, the [quickstart](../quickstart.md), [API reference](../reference/index.md) and [machine contract](../public/api/1.2.0/api.json). A generated project includes `AGENTS.md`, `.mt2fw/mt2.lua` and `.mt2fw/api.json` for offline use. Source examples are under `examples/` in the SDK documentation bundle and repository.
+Read this page, the [quickstart](../quickstart.md), [API reference](../reference/index.md) and [machine contract](../public/api/1.3.0/api.json). A generated project includes `AGENTS.md`, `.mt2fw/mt2.lua` and `.mt2fw/api.json` for offline use. Source examples are under `examples/` in the SDK documentation bundle and repository. Use the retained [1.2.0 contract](../public/api/1.2.0/api.json) when targeting an older API 1.2 runtime.
 
 For central Mods entries, native windows, document layouts and read-only world dashboards, use the [Lua apps guide](../recipes/lua-apps.md) and its three complete examples. Set the package's API requirement to 1.1.0. UI calls belong directly in render callbacks; game snapshots belong in game-thread update/world_ready callbacks.
 
-Use `.md` counterparts of the HTML pages for compact reading, or follow [llms.txt](../public/llms.txt). Discovery by an agent is not automatic; provide the entry file or link explicitly. Documentation exports include a versioned Markdown copy under `versions/1.2.0/`.
+Use `.md` counterparts of the HTML pages for compact reading, or follow [llms.txt](../public/llms.txt). Discovery by an agent is not automatic; provide the entry file or link explicitly. Documentation exports include a versioned Markdown copy under `versions/1.3.0/`.
 
 For direct Dungeon, character, actor, Region and management operations, use the [experimental gameplay guide](../experimental/gameplay.md) and [gameplay contract](../public/api/experimental/gameplay.json). Require API 1.2.0 and the matching runtime. Query from game callbacks, cache for render, and inspect `action_completed` or action status before treating a mutation as complete.
+
+For the new API 1.3.0 queries and paired fee action, read the
+[world-query recipes](../recipes/world-queries.md). `terrain.sample` and
+`terrain.samples` take zero-based grid coordinates and return raw height values.
+They do not interpolate terrain or perform collision tests. Targeted network
+queries still validate the current graph, so cache results outside render and
+avoid repeated network scans each frame. A paired fee action has no automatic
+rollback; a partial native failure remains unknown.
 
 Experimental typed patches require Framework 0.2.0 or newer. Read the [patch guide](../experimental/patches.md) and [patch target contract](../public/api/experimental/patches.json) before using them. Never infer Host authority from a manifest or a missing session flag.
 

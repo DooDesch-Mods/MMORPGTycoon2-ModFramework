@@ -8,6 +8,8 @@ title: "mt2.modular.place_prefab"
 
 Load authored Layout/Plan records, purchase and place a modular Scenery/base Building through the complete native transaction, with receipt-based Undo/Redo.
 
+Introduced in Lua API **1.2.0**. Requires Framework **0.3.0** or newer.
+
 ```lua
 mt2.modular.place_prefab(layout: table, plan: table, theme: string, pose: number[], clearance: number[]): MT2Action
 ```

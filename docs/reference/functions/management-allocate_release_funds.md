@@ -8,6 +8,8 @@ title: "mt2.management.allocate_release_funds"
 
 Set allocated release funds using the original charge or refund
 
+Introduced in Lua API **1.2.0**. Requires Framework **0.3.0** or newer.
+
 ```lua
 mt2.management.allocate_release_funds(value: integer): MT2Action
 ```

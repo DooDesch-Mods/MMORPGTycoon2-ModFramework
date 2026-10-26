@@ -129,7 +129,9 @@ def outputs(c):
     for f in c['functions']:
         example=ROOT/f['example']
         if not example.is_file():raise ValueError('Referenced example is missing: '+f['example'])
-        body=f['summary']+'\n\n```lua\n'+signature(f)+'\n```\n\n'
+        body=f['summary']+'\n\nIntroduced in Lua API **'+f['since']+'**.'
+        if f.get('minimum_framework_version'):body+=' Requires Framework **'+f['minimum_framework_version']+'** or newer.'
+        body+='\n\n```lua\n'+signature(f)+'\n```\n\n'
         if f['parameters']:
             body+='## Parameters\n\n| Name | Type | Default | Meaning |\n| --- | --- | --- | --- |\n'
             for p in f['parameters']:
@@ -192,7 +194,8 @@ def main():
         path=ROOT/name
         if args.check:
             if not path.is_file() or path.read_text(encoding='utf-8')!=body:stale.append(name)
-        else:path.parent.mkdir(parents=True,exist_ok=True);path.write_text(body,encoding='utf-8')
+        elif not path.is_file() or path.read_text(encoding='utf-8')!=body:
+            path.parent.mkdir(parents=True,exist_ok=True);path.write_text(body,encoding='utf-8')
     if stale:raise ValueError('Generated outputs differ; run python tools/generate_docs.py: '+', '.join(stale))
     print(f'info: {"checked" if args.check else "generated"} {len(generated)} API/SDK outputs from {len(contract["functions"])} functions')
 if __name__=='__main__':

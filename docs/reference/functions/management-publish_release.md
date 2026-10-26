@@ -8,6 +8,8 @@ title: "mt2.management.publish_release"
 
 Publish the current announced release by skipping its active celebration
 
+Introduced in Lua API **1.2.0**. Requires Framework **0.3.0** or newer.
+
 ```lua
 mt2.management.publish_release(): MT2Action
 ```

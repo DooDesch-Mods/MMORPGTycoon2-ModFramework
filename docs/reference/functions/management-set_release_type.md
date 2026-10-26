@@ -8,6 +8,8 @@ title: "mt2.management.set_release_type"
 
 Set release kind and calculate the next native version
 
+Introduced in Lua API **1.2.0**. Requires Framework **0.3.0** or newer.
+
 ```lua
 mt2.management.set_release_type(type: integer): MT2Action
 ```

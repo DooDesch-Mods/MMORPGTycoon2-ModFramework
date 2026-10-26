@@ -8,6 +8,8 @@ title: "mt2.dungeons.get"
 
 Read native desired instance count, atmosphere, authored light and pool count.
 
+Introduced in Lua API **1.2.0**. Requires Framework **0.3.0** or newer.
+
 ```lua
 mt2.dungeons.get(handle: MT2Handle): MT2DungeonState
 ```

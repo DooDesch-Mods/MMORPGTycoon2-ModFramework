@@ -1,5 +1,19 @@
 # Changelog
 
+## 0.4.0
+
+### Added
+
+- Build terrain inspectors and world tools with Region lookup and individual or batched height-grid samples.
+- Look up a specific network node, pipe, project or building service from Lua.
+- Change purchase and subscription fees together from Lua and check when the change is complete.
+- Start with the new Terrain Reader example and query recipes. Editor hints and API documentation cover all 254 Lua functions.
+
+### Fixed
+
+- Keep matching Framework and Lua API versions when regenerating the SDK.
+- Avoid unnecessary native rebuilds when generated API files have not changed.
+
 ## 0.3.2
 
 ### Changed

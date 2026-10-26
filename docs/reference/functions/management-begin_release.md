@@ -8,6 +8,8 @@ title: "mt2.management.begin_release"
 
 Begin the current release celebration; hotfixes publish immediately
 
+Introduced in Lua API **1.2.0**. Requires Framework **0.3.0** or newer.
+
 ```lua
 mt2.management.begin_release(): MT2Action
 ```

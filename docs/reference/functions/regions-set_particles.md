@@ -8,6 +8,8 @@ title: "mt2.regions.set_particles"
 
 Set the original Region particle type and enabled state.
 
+Introduced in Lua API **1.2.0**. Requires Framework **0.3.0** or newer.
+
 ```lua
 mt2.regions.set_particles(handle: MT2RegionHandle, type: integer): MT2Action
 ```

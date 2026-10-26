@@ -8,6 +8,8 @@ title: "mt2.management.show_release"
 
 Check native release eligibility and show its announcement; launch releases publish immediately
 
+Introduced in Lua API **1.2.0**. Requires Framework **0.3.0** or newer.
+
 ```lua
 mt2.management.show_release(): MT2Action
 ```

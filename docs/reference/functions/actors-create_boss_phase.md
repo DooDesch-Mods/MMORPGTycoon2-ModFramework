@@ -8,6 +8,8 @@ title: "mt2.actors.create_boss_phase"
 
 Construct and attach a phase through original native allocation/ownership functions.
 
+Introduced in Lua API **1.2.0**. Requires Framework **0.3.0** or newer.
+
 ```lua
 mt2.actors.create_boss_phase(handle: MT2CharacterHandle, name?: string): MT2Action
 ```

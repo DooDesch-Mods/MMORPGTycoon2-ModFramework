@@ -8,6 +8,8 @@ title: "mt2.paths.place"
 
 Create one native Road segment through an isolated original Road cursor hover/press, native purchase and Undo. Native ground projection sets endpoint height; optional native node handles pin connections. Splitting existing Paths and multi-spline Road previews are rejected. Returns the created Path, cost and owned history receipt; normal native costs and tool effects apply.
 
+Introduced in Lua API **1.2.0**. Requires Framework **0.3.0** or newer.
+
 ```lua
 mt2.paths.place(region: integer, start: number[], end: number[], start_node?: MT2Handle, end_node?: MT2Handle): MT2Action
 ```

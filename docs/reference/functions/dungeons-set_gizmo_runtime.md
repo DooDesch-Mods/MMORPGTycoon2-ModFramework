@@ -8,6 +8,8 @@ title: "mt2.dungeons.set_gizmo_runtime"
 
 Set exact live triggered/state/immediate fields by compare-and-exchange and on_map through native SetOnMap; scalar adoption does not dispatch trigger callbacks.
 
+Introduced in Lua API **1.2.0**. Requires Framework **0.3.0** or newer.
+
 ```lua
 mt2.dungeons.set_gizmo_runtime(handle: MT2Handle, gizmo: MT2Handle, state: MT2DungeonGizmoRuntime, instance?: integer): MT2Action
 ```

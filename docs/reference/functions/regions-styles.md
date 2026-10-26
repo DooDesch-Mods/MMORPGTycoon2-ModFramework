@@ -8,6 +8,8 @@ title: "mt2.regions.styles"
 
 Read the nine canonical terrain style names.
 
+Introduced in Lua API **1.2.0**. Requires Framework **0.3.0** or newer.
+
 ```lua
 mt2.regions.styles(): string[]
 ```

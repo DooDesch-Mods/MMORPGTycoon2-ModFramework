@@ -8,6 +8,8 @@ title: "mt2.quests.set_rewards"
 
 Set custom or default awards through the original native reward setters. Preserve the original native Undo inverse, active visitor state and ledger with complete readback.
 
+Introduced in Lua API **1.2.0**. Requires Framework **0.3.0** or newer.
+
 ```lua
 mt2.quests.set_rewards(handle: MT2NpcQuestHandle, defaults?: boolean, xp?: integer, gold?: integer): MT2Action
 ```

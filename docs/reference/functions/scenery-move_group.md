@@ -8,6 +8,8 @@ title: "mt2.scenery.move_group"
 
 Move, rotate or scale a whole native Group through original DoMove and Undo, preserving its ordered member identities and relative poses. Confirms native destination pose and unchanged other Groups/Scenery. Requires the root world to be the actual native active scene; normal native selection and tool effects apply.
 
+Introduced in Lua API **1.2.0**. Requires Framework **0.3.0** or newer.
+
 ```lua
 mt2.scenery.move_group(group: MT2Handle, position: number[], rotation?: number[], scale?: number[]): MT2Action
 ```

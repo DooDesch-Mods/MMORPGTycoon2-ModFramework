@@ -8,6 +8,8 @@ title: "mt2.management.purge_expired_awards"
 
 Purge native awards older than the current six-day retention interval
 
+Introduced in Lua API **1.2.0**. Requires Framework **0.3.0** or newer.
+
 ```lua
 mt2.management.purge_expired_awards(): MT2Action
 ```

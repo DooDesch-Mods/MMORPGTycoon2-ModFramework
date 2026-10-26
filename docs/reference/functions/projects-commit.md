@@ -8,6 +8,8 @@ title: "mt2.projects.commit"
 
 Deploy and retire the natively completed current project
 
+Introduced in Lua API **1.2.0**. Requires Framework **0.3.0** or newer.
+
 ```lua
 mt2.projects.commit(): MT2Action
 ```

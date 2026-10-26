@@ -72,5 +72,15 @@
     "changed": "boolean",
     "stamps": "integer",
     "undo_confirmed": "boolean"
+  },
+  "MT2TerrainSamplePoint": {
+    "column": "integer",
+    "row": "integer"
+  },
+  "MT2TerrainSample": {
+    "column": "integer",
+    "row": "integer",
+    "index": "integer",
+    "height": "number"
   }
 }

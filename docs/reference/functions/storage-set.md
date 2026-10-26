@@ -8,6 +8,8 @@ title: "mt2.storage.set"
 
 Store mod-owned profile or world data.
 
+Introduced in Lua API **1.0.0**.
+
 ```lua
 mt2.storage.set(key: string, value: any, scope?: 'profile'|'world'): boolean
 ```

@@ -34,6 +34,13 @@ repository. Native helpers with no retained body digest use
 `Context::verify_original`, which checks the exact supported executable's
 pristine bytes and any acknowledged Framework route composition.
 
+The paired fee action uses the two original Business setters also observed in
+the Overview `UpdateSaleValues` path: Purchase at `0x54ce0` and Subscription at
+`0x54cf0`. Both four-byte native bodies are checked before either call. The full
+twenty-category financial ledger must remain unchanged. Both inputs are checked
+before execution; a partial native failure is unknown, with no rollback or retry.
+This wrapper does not import the Multiplayer UI hook, controller or transport.
+
 All operations require the current loaded world and game thread. Public object
 references use epoch-scoped UID strings. Native mutations set the attempted
 receipt before the call, preserve faults, compare intended state with native

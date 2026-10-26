@@ -8,6 +8,8 @@ title: "mt2.quests.remove"
 
 Remove a current quest through native NPC lifetime cleanup and verify its expired visitor references and reindexed survivors. Preserve the original native Undo inverse, active visitor state and ledger with complete readback.
 
+Introduced in Lua API **1.2.0**. Requires Framework **0.3.0** or newer.
+
 ```lua
 mt2.quests.remove(handle: MT2NpcQuestHandle): MT2Action
 ```

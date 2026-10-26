@@ -8,6 +8,8 @@ title: "mt2.monsters.paint_zone"
 
 Extend an existing Monster Zone through the original private brush transaction. Native island/Region clipping and culling of intersecting Zone families apply. Confirm every stamp's authored/walkable snapshots, emitted actor births/retirements, complete native inverse coverage, quest/visitor cascade, release points and selection cleanup.
 
+Introduced in Lua API **1.2.0**. Requires Framework **0.3.0** or newer.
+
 ```lua
 mt2.monsters.paint_zone(handle: MT2ZoneHandle, stamps: MT2MonsterZoneStamp[]): MT2Action
 ```

@@ -8,6 +8,8 @@ title: "mt2.experimental.operations"
 
 Discover the experimental Lua gameplay operations in this runtime.
 
+Introduced in Lua API **1.2.0**. Requires Framework **0.3.0** or newer.
+
 ```lua
 mt2.experimental.operations(): table[]
 ```

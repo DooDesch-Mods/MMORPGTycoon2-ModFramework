@@ -8,6 +8,8 @@ title: "mt2.management.set_service_price"
 
 Set the exact owned service price and update its shared configuration if synchronized
 
+Introduced in Lua API **1.2.0**. Requires Framework **0.3.0** or newer.
+
 ```lua
 mt2.management.set_service_price(building: MT2Handle, ordinal: integer, currency: integer, value: integer): MT2Action
 ```

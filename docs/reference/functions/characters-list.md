@@ -8,6 +8,8 @@ title: "mt2.characters.list"
 
 List current native character type definitions and exact lifetime handles.
 
+Introduced in Lua API **1.2.0**. Requires Framework **0.3.0** or newer.
+
 ```lua
 mt2.characters.list(include_deleted?: boolean): MT2Character[]
 ```

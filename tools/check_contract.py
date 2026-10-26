@@ -38,11 +38,15 @@ def main():
         required_examples={
             'native-app':{'ui.app','ui.native'},
             'document-app':{'ui.app','ui.document'},
-            'world-dashboard':{'ui.app','ui.native','objects.building','world.region','world.simulation','world.software'}
+            'world-dashboard':{'ui.app','ui.native','objects.building','world.region','world.simulation','world.software'},
+            'terrain-reader':{'gameplay.query','camera.get','world.status'}
         }
         observed={row['operation'] for row in value['host_calls']}
         missing=required_examples.get(directory.name,set())-observed
         if missing:raise RuntimeError('Complete example did not exercise its API: '+directory.name+': '+str(missing))
+        if directory.name=='terrain-reader':
+            gameplay={row['arguments']['operation'] for row in value['host_calls'] if row['operation']=='gameplay.query'}
+            if gameplay!={'regions.at','terrain.heights','terrain.samples'}:raise RuntimeError('Terrain Reader did not exercise its three native query wrappers')
         if directory==probe:
             expected={f['name'][4:] for f in contract['functions']}
             if set(value['exports'])!=expected:raise RuntimeError('Actual loaded Lua exports differ: '+str(set(value['exports'])^expected))

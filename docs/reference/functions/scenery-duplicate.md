@@ -8,6 +8,8 @@ title: "mt2.scenery.duplicate"
 
 Duplicate free Scenery or a whole Group through original native capability/price/payment, virtual Duplicate, cash/destroy inverses and localized Undo. Confirms created pose, whole Group member ordering/relative poses and untouched sources, plus native release edit and selection readback. Returns a Scenery prop or Group table. Requires the root world to be the native active scene; normal native costs and selection changes apply.
 
+Introduced in Lua API **1.2.0**. Requires Framework **0.3.0** or newer.
+
 ```lua
 mt2.scenery.duplicate(handle: MT2Handle, position: number[], rotation?: number[], scale?: number[]): MT2Action
 ```

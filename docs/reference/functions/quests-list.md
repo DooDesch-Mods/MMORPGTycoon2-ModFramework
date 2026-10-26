@@ -8,6 +8,8 @@ title: "mt2.quests.list"
 
 Read a QuestGiver NPC's owned quest slots, authored fields, destination handles and daily counters with reciprocal weak ownership checks.
 
+Introduced in Lua API **1.2.0**. Requires Framework **0.3.0** or newer.
+
 ```lua
 mt2.quests.list(handle: MT2ActorHandle): MT2NpcQuest[]
 ```

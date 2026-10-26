@@ -8,6 +8,8 @@ title: "mt2.characters.create_variant"
 
 Copy a base's complete native definition into a new variant using MakeVariant.
 
+Introduced in Lua API **1.2.0**. Requires Framework **0.3.0** or newer.
+
 ```lua
 mt2.characters.create_variant(handle: MT2CharacterHandle, name: string): MT2Action
 ```

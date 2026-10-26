@@ -8,6 +8,8 @@ title: "mt2.modular.redo"
 
 Redo one confirmed modular edit or prefab placement when its exact graph is the current native stack top. Prefab history includes cleared Scenery and reciprocal Service/Quest closure.
 
+Introduced in Lua API **1.2.0**. Requires Framework **0.3.0** or newer.
+
 ```lua
 mt2.modular.redo(history: string): MT2Action
 ```

@@ -8,6 +8,8 @@ title: "mt2.paths.place_route"
 
 Execute the whole original native Road hover/pin/Press transaction, accepting native auto snapping, split targets and up to ten native preview splines. Returns all created Paths/nodes, changed Path before/after values, removed Paths, cost, native spline count and owned history receipt. Native geometry and mixed topology readback own the result; one final Press follows only an acknowledged no-effect pin phase.
 
+Introduced in Lua API **1.2.0**. Requires Framework **0.3.0** or newer.
+
 ```lua
 mt2.paths.place_route(region: integer, start: number[], end: number[], start_node?: MT2Handle, end_node?: MT2Handle, start_split?: MT2Handle, end_split?: MT2Handle): MT2Action
 ```

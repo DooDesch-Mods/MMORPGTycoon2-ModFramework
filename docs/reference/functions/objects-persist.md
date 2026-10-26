@@ -8,6 +8,8 @@ title: "mt2.objects.persist"
 
 Create a mod-owned persistent building reference.
 
+Introduced in Lua API **1.0.0**.
+
 ```lua
 mt2.objects.persist(handle: MT2Handle): string
 ```

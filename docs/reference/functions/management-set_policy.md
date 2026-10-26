@@ -8,6 +8,8 @@ title: "mt2.management.set_policy"
 
 Set one native GM policy property and notify its owner
 
+Introduced in Lua API **1.2.0**. Requires Framework **0.3.0** or newer.
+
 ```lua
 mt2.management.set_policy(policy: integer, field: string, value: boolean|integer): MT2Action
 ```

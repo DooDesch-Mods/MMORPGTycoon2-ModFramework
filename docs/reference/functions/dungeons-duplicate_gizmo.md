@@ -8,6 +8,8 @@ title: "mt2.dungeons.duplicate_gizmo"
 
 Duplicate one offline template Gizmo through native payment, Duplicate, inverse graph and Undo, preserving local selection.
 
+Introduced in Lua API **1.2.0**. Requires Framework **0.3.0** or newer.
+
 ```lua
 mt2.dungeons.duplicate_gizmo(handle: MT2Handle, gizmo: MT2Handle, position: number[], rotation?: number[], scale?: number[]): MT2Action
 ```

@@ -8,6 +8,8 @@ title: "mt2.characters.create_ability"
 
 Create an ability using the game's original NewAbility command and a private native receiver.
 
+Introduced in Lua API **1.2.0**. Requires Framework **0.3.0** or newer.
+
 ```lua
 mt2.characters.create_ability(handle: MT2CharacterHandle, level?: integer): MT2Action
 ```

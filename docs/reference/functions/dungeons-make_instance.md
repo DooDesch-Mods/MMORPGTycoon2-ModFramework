@@ -8,6 +8,8 @@ title: "mt2.dungeons.make_instance"
 
 Run native MakeInstance and confirm one appended pool member; native camera effects apply.
 
+Introduced in Lua API **1.2.0**. Requires Framework **0.3.0** or newer.
+
 ```lua
 mt2.dungeons.make_instance(handle: MT2Handle): MT2Action
 ```

@@ -8,6 +8,8 @@ title: "mt2.actors.remove_boss"
 
 Destroy a Boss through the original SelectionManager command and confirm its native 1000 cash refund and refund Undo. The native game does not retain a Boss recreation inverse; the result states this explicitly.
 
+Introduced in Lua API **1.2.0**. Requires Framework **0.3.0** or newer.
+
 ```lua
 mt2.actors.remove_boss(handle: MT2ActorHandle): MT2Action
 ```

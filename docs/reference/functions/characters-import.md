@@ -8,6 +8,8 @@ title: "mt2.characters.import"
 
 Validate an embedded prefab, round-trip its private original image, invoke native import once and confirm its original success notification through a private native pane. Preserve an existing design selection/notice; initialize a previously unbound hidden component. Reject unsaved native authoring input.
 
+Introduced in Lua API **1.2.0**. Requires Framework **0.3.0** or newer.
+
 ```lua
 mt2.characters.import(handle: MT2CharacterHandle, compressed_record: string): MT2Action
 ```

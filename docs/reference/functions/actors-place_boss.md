@@ -8,6 +8,8 @@ title: "mt2.actors.place_boss"
 
 Purchase a Boss for the original 1000 cash and create it through native AddBoss; verify exact accounting, actor membership/pose/type/level, original tag progression and unchanged native Undo.
 
+Introduced in Lua API **1.2.0**. Requires Framework **0.3.0** or newer.
+
 ```lua
 mt2.actors.place_boss(character: MT2CharacterHandle, region: integer, pose: MT2ActorPose): MT2Action
 ```

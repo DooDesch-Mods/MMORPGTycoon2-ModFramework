@@ -8,6 +8,8 @@ title: "mt2.development.research"
 
 Read current development progress and all shared project sources
 
+Introduced in Lua API **1.2.0**. Requires Framework **0.3.0** or newer.
+
 ```lua
 mt2.development.research(): MT2ProjectSnapshot
 ```

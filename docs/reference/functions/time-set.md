@@ -8,6 +8,8 @@ title: "mt2.time.set"
 
 Set pause and speed, then read them back.
 
+Introduced in Lua API **1.0.0**.
+
 ```lua
 mt2.time.set(paused: boolean, speed?: number): MT2Clock
 ```

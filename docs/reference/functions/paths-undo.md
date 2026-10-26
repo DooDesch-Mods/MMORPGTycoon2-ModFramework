@@ -8,6 +8,8 @@ title: "mt2.paths.undo"
 
 Run original native undo for one owned Path/Wall receipt at the exact native stack top. Confirms the complete saved mixed topology and exact source/inverse stack transition. Up to twenty receipts are retained in the current World lifetime; an unresolved native history attempt quarantines its receipt.
 
+Introduced in Lua API **1.2.0**. Requires Framework **0.3.0** or newer.
+
 ```lua
 mt2.paths.undo(receipt: string): MT2Action
 ```

@@ -8,6 +8,8 @@ title: "mt2.management.services"
 
 Read services owned by the exact current building
 
+Introduced in Lua API **1.2.0**. Requires Framework **0.3.0** or newer.
+
 ```lua
 mt2.management.services(building: MT2Handle): MT2ManagementService[]
 ```

@@ -8,6 +8,8 @@ title: "mt2.actors.add_phase_ability"
 
 Construct and attach an owned phase element for a current owner ability.
 
+Introduced in Lua API **1.2.0**. Requires Framework **0.3.0** or newer.
+
 ```lua
 mt2.actors.add_phase_ability(handle: MT2CharacterHandle, phase: integer, ability: integer): MT2Action
 ```

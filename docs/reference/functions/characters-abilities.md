@@ -8,6 +8,8 @@ title: "mt2.characters.abilities"
 
 Read native ability slots, complete records and exact ability handles.
 
+Introduced in Lua API **1.2.0**. Requires Framework **0.3.0** or newer.
+
 ```lua
 mt2.characters.abilities(handle: MT2CharacterHandle): MT2CharacterAbility[]
 ```

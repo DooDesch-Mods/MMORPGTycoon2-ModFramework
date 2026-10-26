@@ -8,6 +8,8 @@ title: "mt2.quests.set_kills"
 
 Set the authored kill count with the original selector's field semantics. Preserve the original native Undo inverse, active visitor state and ledger with complete readback.
 
+Introduced in Lua API **1.2.0**. Requires Framework **0.3.0** or newer.
+
 ```lua
 mt2.quests.set_kills(handle: MT2NpcQuestHandle, kills: integer): MT2Action
 ```

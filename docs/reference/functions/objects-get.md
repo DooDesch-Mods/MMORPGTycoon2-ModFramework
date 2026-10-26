@@ -8,6 +8,8 @@ title: "mt2.objects.get"
 
 Read a supported object.
 
+Introduced in Lua API **1.0.0**.
+
 ```lua
 mt2.objects.get(handle: MT2Handle): MT2Object
 ```

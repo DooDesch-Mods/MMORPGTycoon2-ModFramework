@@ -8,6 +8,8 @@ title: "mt2.management.set_release_announcement"
 
 Set the release announcement; empty text restores its native default
 
+Introduced in Lua API **1.2.0**. Requires Framework **0.3.0** or newer.
+
 ```lua
 mt2.management.set_release_announcement(text: string): MT2Action
 ```

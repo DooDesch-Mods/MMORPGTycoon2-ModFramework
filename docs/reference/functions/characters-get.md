@@ -8,6 +8,8 @@ title: "mt2.characters.get"
 
 Read a current character definition, names, flags and stats.
 
+Introduced in Lua API **1.2.0**. Requires Framework **0.3.0** or newer.
+
 ```lua
 mt2.characters.get(handle: MT2CharacterHandle): MT2Character
 ```

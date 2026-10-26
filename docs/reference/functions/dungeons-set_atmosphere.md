@@ -8,6 +8,8 @@ title: "mt2.dungeons.set_atmosphere"
 
 Run the native Dungeon sound command and confirm the selected atmosphere.
 
+Introduced in Lua API **1.2.0**. Requires Framework **0.3.0** or newer.
+
 ```lua
 mt2.dungeons.set_atmosphere(handle: MT2Handle, atmosphere: integer): MT2Action
 ```

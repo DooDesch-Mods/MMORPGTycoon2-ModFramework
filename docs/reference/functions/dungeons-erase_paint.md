@@ -8,6 +8,8 @@ title: "mt2.dungeons.erase_paint"
 
 Erase existing Dungeon Canvas paint inside supplied native clipping paths through the original Canvas erase and retained DungeonPaint Undo graph.
 
+Introduced in Lua API **1.2.0**. Requires Framework **0.3.0** or newer.
+
 ```lua
 mt2.dungeons.erase_paint(handle: MT2Handle, paths: table): MT2Action
 ```

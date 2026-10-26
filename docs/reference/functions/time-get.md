@@ -8,6 +8,8 @@ title: "mt2.time.get"
 
 Read pause, simulation speed and clock.
 
+Introduced in Lua API **1.0.0**.
+
 ```lua
 mt2.time.get(): MT2Clock
 ```

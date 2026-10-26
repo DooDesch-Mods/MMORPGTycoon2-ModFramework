@@ -8,6 +8,8 @@ title: "mt2.dungeons.rename_gizmo"
 
 Rename a scene-owned Gizmo through its original native Rename method and confirm the exact resulting name.
 
+Introduced in Lua API **1.2.0**. Requires Framework **0.3.0** or newer.
+
 ```lua
 mt2.dungeons.rename_gizmo(handle: MT2Handle, gizmo: MT2Handle, name: string, instance?: integer): MT2Action
 ```

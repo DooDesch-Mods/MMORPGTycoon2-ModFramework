@@ -8,6 +8,8 @@ title: "mt2.actors.set_boss_phase"
 
 Edit phase fields between native pre/post change events and verify every phase record.
 
+Introduced in Lua API **1.2.0**. Requires Framework **0.3.0** or newer.
+
 ```lua
 mt2.actors.set_boss_phase(handle: MT2CharacterHandle, phase: integer, settings: MT2BossPhaseSettings): MT2Action
 ```

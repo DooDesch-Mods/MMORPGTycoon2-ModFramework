@@ -8,6 +8,8 @@ title: "mt2.ui.native"
 
 Display a native MT2 window with buttons, tabs, inputs, panels and PNG images.
 
+Introduced in Lua API **1.1.0**.
+
 ```lua
 mt2.ui.native(options: MT2NativeWindow): MT2NativeResult
 ```

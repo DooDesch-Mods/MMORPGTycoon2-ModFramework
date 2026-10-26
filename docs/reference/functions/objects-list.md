@@ -8,6 +8,8 @@ title: "mt2.objects.list"
 
 Read a bounded list of supported props.
 
+Introduced in Lua API **1.0.0**.
+
 ```lua
 mt2.objects.list(limit?: integer): MT2Object[]
 ```

@@ -8,6 +8,8 @@ title: "mt2.monsters.zones"
 
 Read current Monster Zones, native fixed-point polygons, authored properties and reciprocally owned generated Monster handles.
 
+Introduced in Lua API **1.2.0**. Requires Framework **0.3.0** or newer.
+
 ```lua
 mt2.monsters.zones(region?: integer): MT2MonsterZone[]
 ```

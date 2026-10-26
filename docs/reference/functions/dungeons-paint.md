@@ -8,6 +8,8 @@ title: "mt2.dungeons.paint"
 
 Load a detached native Fill from portable Records, confirm its exact native save readback, then paint supplied clipping paths through original Stroke/Canvas lifecycle and DungeonPaint Undo.
 
+Introduced in Lua API **1.2.0**. Requires Framework **0.3.0** or newer.
+
 ```lua
 mt2.dungeons.paint(handle: MT2Handle, paths: table, fill_records: table): MT2Action
 ```

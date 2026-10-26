@@ -8,6 +8,8 @@ title: "mt2.camera.get"
 
 Read camera position, focus and edit state.
 
+Introduced in Lua API **1.0.0**.
+
 ```lua
 mt2.camera.get(): MT2Camera
 ```

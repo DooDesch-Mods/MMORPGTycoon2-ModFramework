@@ -8,6 +8,8 @@ title: "mt2.management.set_respawn_delay"
 
 Set whether respawn waits for subscribers
 
+Introduced in Lua API **1.2.0**. Requires Framework **0.3.0** or newer.
+
 ```lua
 mt2.management.set_respawn_delay(value: boolean): MT2Action
 ```

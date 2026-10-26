@@ -8,6 +8,8 @@ title: "mt2.management.set_feature"
 
 Set an unlocked gameplay feature through the original native setter
 
+Introduced in Lua API **1.2.0**. Requires Framework **0.3.0** or newer.
+
 ```lua
 mt2.management.set_feature(index: integer, enabled: boolean): MT2Action
 ```

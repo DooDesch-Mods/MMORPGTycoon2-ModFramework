@@ -8,6 +8,8 @@ title: "mt2.regions.set_type"
 
 Apply the original private Lift/Land transaction to an unowned Region, clear its native contents and retain the original Undo graph.
 
+Introduced in Lua API **1.2.0**. Requires Framework **0.3.0** or newer.
+
 ```lua
 mt2.regions.set_type(handle: MT2RegionHandle, type: integer, position: number[]): MT2Action
 ```

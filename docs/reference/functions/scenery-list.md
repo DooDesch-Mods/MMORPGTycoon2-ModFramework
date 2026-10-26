@@ -8,6 +8,8 @@ title: "mt2.scenery.list"
 
 Read current root-world Scenery handles, native poses and Region IDs from every actual Region/category roster. A pose contains quaternion x/y/z/w, position x/y/z and scale x/y/z, in that order.
 
+Introduced in Lua API **1.2.0**. Requires Framework **0.3.0** or newer.
+
 ```lua
 mt2.scenery.list(): MT2SceneryProp[]
 ```

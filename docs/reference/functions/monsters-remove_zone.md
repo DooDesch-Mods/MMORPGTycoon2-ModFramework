@@ -8,6 +8,8 @@ title: "mt2.monsters.remove_zone"
 
 Remove a Zone through original SelectionManager destruction, including generated Monsters and incoming quests. Confirm UID, manager, spatial and weak-reference retirement; complete native Zone/Monster/quest Undo records; exact counters and unchanged ledger.
 
+Introduced in Lua API **1.2.0**. Requires Framework **0.3.0** or newer.
+
 ```lua
 mt2.monsters.remove_zone(handle: MT2ZoneHandle): MT2Action
 ```

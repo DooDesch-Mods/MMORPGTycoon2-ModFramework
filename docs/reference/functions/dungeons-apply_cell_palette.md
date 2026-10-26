@@ -8,6 +8,8 @@ title: "mt2.dungeons.apply_cell_palette"
 
 Apply the current Dungeon palette to one open cell through native SetCellData and Undo.
 
+Introduced in Lua API **1.2.0**. Requires Framework **0.3.0** or newer.
+
 ```lua
 mt2.dungeons.apply_cell_palette(handle: MT2Handle, cell: integer): MT2Action
 ```

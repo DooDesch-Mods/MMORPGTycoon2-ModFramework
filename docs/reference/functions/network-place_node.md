@@ -8,6 +8,8 @@ title: "mt2.network.place_node"
 
 Buy and place a server node with its original native inverse history
 
+Introduced in Lua API **1.2.0**. Requires Framework **0.3.0** or newer.
+
 ```lua
 mt2.network.place_node(key: string, position: number[]): MT2Action
 ```

@@ -8,6 +8,8 @@ title: "mt2.ui.button"
 
 Draw a button; true on the frame it is pressed.
 
+Introduced in Lua API **1.0.0**.
+
 ```lua
 mt2.ui.button(label: string): boolean
 ```

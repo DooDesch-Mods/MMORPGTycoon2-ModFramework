@@ -8,6 +8,8 @@ title: "mt2.quests.set_name"
 
 Assign the quest title through the native String method. Preserve the original native Undo inverse, active visitor state and ledger with complete readback.
 
+Introduced in Lua API **1.2.0**. Requires Framework **0.3.0** or newer.
+
 ```lua
 mt2.quests.set_name(handle: MT2NpcQuestHandle, name: string): MT2Action
 ```

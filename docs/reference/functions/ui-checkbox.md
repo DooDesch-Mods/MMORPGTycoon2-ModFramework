@@ -8,6 +8,8 @@ title: "mt2.ui.checkbox"
 
 Draw a checkbox and return its current value.
 
+Introduced in Lua API **1.0.0**.
+
 ```lua
 mt2.ui.checkbox(label: string, value: boolean): boolean
 ```

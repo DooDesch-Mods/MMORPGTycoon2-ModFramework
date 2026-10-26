@@ -8,6 +8,8 @@ title: "mt2.log.error"
 
 Write a mod-labelled error log entry.
 
+Introduced in Lua API **1.0.0**.
+
 ```lua
 mt2.log.error(message: any): boolean
 ```

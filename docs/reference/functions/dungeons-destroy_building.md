@@ -8,6 +8,8 @@ title: "mt2.dungeons.destroy_building"
 
 Remove one native Building or DungeonPortal through original DestroyProps and confirm retained native Undo. Requires the requested offline template to already be the native active scene; normal native tool and selection changes apply.
 
+Introduced in Lua API **1.2.0**. Requires Framework **0.3.0** or newer.
+
 ```lua
 mt2.dungeons.destroy_building(handle: MT2Handle, building: MT2Handle): MT2Action
 ```

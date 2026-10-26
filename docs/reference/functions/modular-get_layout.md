@@ -8,6 +8,8 @@ title: "mt2.modular.get_layout"
 
 Capture the complete native Layout and Plan records for an existing modular Scenery/base Building.
 
+Introduced in Lua API **1.2.0**. Requires Framework **0.3.0** or newer.
+
 ```lua
 mt2.modular.get_layout(building: MT2Handle): MT2ModularLayout
 ```

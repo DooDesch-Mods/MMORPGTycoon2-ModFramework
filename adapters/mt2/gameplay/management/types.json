@@ -116,5 +116,9 @@
     "allow_sync": "boolean",
     "config_manager_present": "boolean",
     "config": "MT2ManagementServiceConfig|nil"
+  },
+  "MT2ManagementFeeChange": {
+    "before": "MT2ManagementFees",
+    "after": "MT2ManagementFees"
   }
 }

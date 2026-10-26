@@ -8,6 +8,8 @@ title: "mt2.scenery.stroke"
 
 Run complete ordered native SceneryBrush or SceneryEraser AddPaint stamps and one original Finish through isolated private receivers. Returns created/removed Scenery rows, cumulative birth count, paid/refund amounts and before/after Building/Monster bug-anchor records. Confirms complete born/removed full-UID Make/Destroy/cash inverse coverage, saved Make records, unchanged surviving Scenery, Group member removals and native Release edits. Preserves normal native cost, replacement, variant RNG and brush bug effects; confirms general erase leaves RNG/bugs unchanged. Temporarily journals the original Cursor finish position and restores it plus surviving selection. Requires the root world to be the actual native active scene. Partial native owners are retained on uncertain failures; never replay such a result.
 
+Introduced in Lua API **1.2.0**. Requires Framework **0.3.0** or newer.
+
 ```lua
 mt2.scenery.stroke(kind: string, region: integer, finish_position: number[], stamps: MT2SceneryStrokeStamp[], type?: string, variant?: string, random_variant?: boolean, replace?: boolean, bounds?: number[]): MT2Action
 ```

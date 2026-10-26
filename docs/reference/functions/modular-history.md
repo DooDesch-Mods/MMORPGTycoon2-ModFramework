@@ -8,6 +8,8 @@ title: "mt2.modular.history"
 
 List retained modular edit receipts and exact Undo/Redo top readiness.
 
+Introduced in Lua API **1.2.0**. Requires Framework **0.3.0** or newer.
+
 ```lua
 mt2.modular.history(): MT2ModularHistory[]
 ```

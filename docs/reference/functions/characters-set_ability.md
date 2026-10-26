@@ -8,6 +8,8 @@ title: "mt2.characters.set_ability"
 
 Edit native prototype strings, effects, costs, selectors, colors, timings, flags and level; simplify and notify its owner. Native normalization differences remain unknown.
 
+Introduced in Lua API **1.2.0**. Requires Framework **0.3.0** or newer.
+
 ```lua
 mt2.characters.set_ability(handle: MT2CharacterHandle, ability: MT2AbilityHandle, record: MT2AbilityRecord): MT2Action
 ```

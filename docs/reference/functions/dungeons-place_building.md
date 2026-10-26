@@ -8,6 +8,8 @@ title: "mt2.dungeons.place_building"
 
 Place a native Building or DungeonPortal through an isolated original Build receiver and maker/Undo. Requires the requested offline template to already be the native active scene; normal native tool and selection changes apply.
 
+Introduced in Lua API **1.2.0**. Requires Framework **0.3.0** or newer.
+
 ```lua
 mt2.dungeons.place_building(handle: MT2Handle, type: string, variant: string, position: number[], rotation?: number[], scale?: number[]): MT2Action
 ```

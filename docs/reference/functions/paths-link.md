@@ -8,6 +8,8 @@ title: "mt2.paths.link"
 
 Create a native cross-Region Pass through an isolated original Pass receiver and Finish transaction. Confirms both Regions, supplied two-point shape, endpoint identities, remote membership and native Undo. Returns the Pass and owned history receipt; normal native tool effects apply.
 
+Introduced in Lua API **1.2.0**. Requires Framework **0.3.0** or newer.
+
 ```lua
 mt2.paths.link(start_region: integer, end_region: integer, name: string, start: number[], end: number[], start_node?: MT2Handle, end_node?: MT2Handle): MT2Action
 ```

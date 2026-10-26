@@ -8,6 +8,8 @@ title: "mt2.characters.set_stat"
 
 Set native level-one attributes or speed, then synchronize variants. Health sets the second attribute set to twice the first; boss health targets the first phase.
 
+Introduced in Lua API **1.2.0**. Requires Framework **0.3.0** or newer.
+
 ```lua
 mt2.characters.set_stat(handle: MT2CharacterHandle, field: "health"|"mana"|"rage"|"speed", value: number): MT2Action
 ```

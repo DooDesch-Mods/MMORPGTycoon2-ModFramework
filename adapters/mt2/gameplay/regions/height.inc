@@ -1,10 +1,11 @@
 struct Heights {
-    int32_t width=0,height=0;float cell=0;std::array<float,3> origin{};std::vector<float> values;
+    int32_t width=0,height=0;float cell=0;std::array<float,3> origin{};std::vector<float> values;uintptr_t data=0;
+    bool operator==(const Heights&)const=default;
 };
 Heights heights(Context& c,uintptr_t region,size_t offset=0,size_t limit=1000000){
     Heights out;out.width=c.read<int32_t>(region+0xc0);out.height=c.read<int32_t>(region+0xc4);
     out.cell=c.read<float>(region+0xc8);out.origin=c.read<std::array<float,3>>(region+0x138);
-    ap(c,region+0xe8,0x1749340);auto data=c.read<uintptr_t>(region+0xf0);
+    ap(c,region+0xe8,0x1749340);auto data=c.read<uintptr_t>(region+0xf0);out.data=data;
     auto count=c.read<int32_t>(region+0xf8),capacity=c.read<int32_t>(region+0xfc);
     need(out.width>0&&out.height>0&&int64_t(out.width)*out.height<=1000000&&count==int64_t(out.width)*out.height&&capacity>=count&&data,
         "Terrain height array or dimensions differ");
@@ -29,6 +30,16 @@ Json height_page(Context& c,const Json& args){
     return {{"handle",args.at("handle")},{"width",grid.width},{"height",grid.height},{"cell_size",grid.cell},{"origin",grid.origin},
         {"offset",offset},{"values",values},{"next_offset",size_t(offset)+values.size()},{"complete",size_t(offset)+values.size()==size_t(grid.width)*size_t(grid.height)}};
 }
+Json height_samples(Context& c,const Json& args,bool single){
+    const auto region=select(c,args.at("handle"));const auto before=heights(c,region.object,0,0);
+    const auto points=single?Json::array({{{"column",args.at("column")},{"row",args.at("row")}}}):args.at("points");
+    auto result=sample_grid(before.width,before.height,points,[&](size_t index){
+        need(index<=(UINTPTR_MAX-before.data)/sizeof(float),"Terrain sample address exceeds native range");
+        return c.read<float>(before.data+index*sizeof(float));
+    });
+    need(heights(c,region.object,0,0)==before,"Terrain sample grid identity changed during read");c.require_world();
+    return single?result.at(0):result;
+}
 std::vector<uintptr_t> history_array(Context& c,uintptr_t object){
     ap(c,object,0x16e1320);auto data=c.read<uintptr_t>(object+8);auto count=c.read<int32_t>(object+0x10),capacity=c.read<int32_t>(object+0x14);
     need(count>=0&&count<=20&&capacity>=count&&(!count||data),"Terrain Undo history array differs");
@@ -50,6 +61,12 @@ void height_add(Json& value,int64_t delta){auto next=integer(value,"financial va
 DWORD height_region(uintptr_t image,uintptr_t map,const float* point,uintptr_t& region){
     __try{region=uintptr_t(reinterpret_cast<void*(*)(void*,const void*,void*)>(image+0x32a990)(reinterpret_cast<void*>(map),point,nullptr));return 0;}
     __except(EXCEPTION_EXECUTE_HANDLER){return GetExceptionCode();}}
+DWORD region_at(uintptr_t image,uintptr_t map,const float* point,uintptr_t& region){
+    __try{
+        if(!reinterpret_cast<bool(*)(void*,const void*)>(image+0x508540)(reinterpret_cast<void*>(map+0x1c0),point)){region=0;return 0;}
+        region=uintptr_t(reinterpret_cast<void*(*)(void*,const void*,void*)>(image+0x32a990)(reinterpret_cast<void*>(map),point,nullptr));return 0;
+    }__except(EXCEPTION_EXECUTE_HANDLER){return GetExceptionCode();}
+}
 struct HeightCall {bool constructed=false,returned=false,borrowed=false,destroyed=false;DWORD restore=0,cleanup=0;};
 DWORD change_height(uintptr_t image,unsigned char* brush,uintptr_t cursor,uintptr_t model,const float* point,float radius,bool up,HeightCall& result){
     std::array<float,3> prior{};float prior_radius=0;DWORD code=0;

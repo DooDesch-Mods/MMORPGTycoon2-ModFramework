@@ -8,6 +8,8 @@ title: "mt2.objects.resolve"
 
 Resolve a saved reference to a fresh session handle.
 
+Introduced in Lua API **1.0.0**.
+
 ```lua
 mt2.objects.resolve(id: string): MT2Object
 ```

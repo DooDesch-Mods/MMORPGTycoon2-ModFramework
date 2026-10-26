@@ -8,6 +8,8 @@ title: "mt2.monsters.place"
 
 Spawn through original MonsterManager methods, sound and LevelChanged; confirm native destroy Undo, release edit, global/manager counters, full actor and quest/visitor survivors, and unchanged ledger.
 
+Introduced in Lua API **1.2.0**. Requires Framework **0.3.0** or newer.
+
 ```lua
 mt2.monsters.place(character: MT2CharacterHandle, region: integer, rank: integer, level: integer, pose: MT2MonsterPose): MT2Action
 ```

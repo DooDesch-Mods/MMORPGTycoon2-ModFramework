@@ -8,6 +8,8 @@ title: "mt2.dungeons.spawn_monster"
 
 Spawn one Dungeon Monster from a live Monster Character definition through native creation, Destroy inverse and Undo; apply the selected level, achievement and placement sound.
 
+Introduced in Lua API **1.2.0**. Requires Framework **0.3.0** or newer.
+
 ```lua
 mt2.dungeons.spawn_monster(handle: MT2Handle, character: MT2CharacterHandle, rank: integer, level: integer, position: number[], rotation?: number[], instance?: integer): MT2Action
 ```

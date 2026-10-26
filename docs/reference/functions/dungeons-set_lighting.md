@@ -8,6 +8,8 @@ title: "mt2.dungeons.set_lighting"
 
 Apply native lighting inputs and confirm the exact 23 authored light values from native conversion.
 
+Introduced in Lua API **1.2.0**. Requires Framework **0.3.0** or newer.
+
 ```lua
 mt2.dungeons.set_lighting(handle: MT2Handle, spinners: integer[], sliders: integer[], colors: table): MT2Action
 ```

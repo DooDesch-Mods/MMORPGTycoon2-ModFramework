@@ -8,6 +8,8 @@ title: "mt2.ui.app"
 
 Register your mod in the central Mods launcher and consume its open request.
 
+Introduced in Lua API **1.1.0**.
+
 ```lua
 mt2.ui.app(options: MT2AppOptions): MT2AppResult
 ```

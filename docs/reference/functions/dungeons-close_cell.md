@@ -8,6 +8,8 @@ title: "mt2.dungeons.close_cell"
 
 Close one unobstructed open cell through the native edit and Undo transaction; closed cells return changed=false.
 
+Introduced in Lua API **1.2.0**. Requires Framework **0.3.0** or newer.
+
 ```lua
 mt2.dungeons.close_cell(handle: MT2Handle, cell: integer): MT2Action
 ```

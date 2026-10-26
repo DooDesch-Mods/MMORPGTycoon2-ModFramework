@@ -8,6 +8,8 @@ title: "mt2.actors.move"
 
 Move through native BeginEdit, Undo Open, DoMove, Close and EndEdit. Restore prior selection and verify the complete native inverse, pose, visual lifetime and surviving state. Native Boss movement preserves its existing respawn anchor; NPC/Monster movement updates its spawn point.
 
+Introduced in Lua API **1.2.0**. Requires Framework **0.3.0** or newer.
+
 ```lua
 mt2.actors.move(handle: MT2ActorHandle, pose: MT2ActorPose): MT2Action
 ```

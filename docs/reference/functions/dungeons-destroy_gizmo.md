@@ -8,6 +8,8 @@ title: "mt2.dungeons.destroy_gizmo"
 
 Destroy one offline template Gizmo through native DestroyProps, confirm original Undo and preserve surviving local selection.
 
+Introduced in Lua API **1.2.0**. Requires Framework **0.3.0** or newer.
+
 ```lua
 mt2.dungeons.destroy_gizmo(handle: MT2Handle, gizmo: MT2Handle): MT2Action
 ```

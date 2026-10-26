@@ -2,13 +2,13 @@
   "product": "MT2 Mod Framework",
   "support_slug": "modframework",
   "repository_url": "https://github.com/DooDesch-Mods/MMORPGTycoon2-ModFramework",
-  "version_label": "0.3.2",
-  "release_label": "Framework 0.3.2 - Experimental gameplay tools",
+  "version_label": "0.4.0",
+  "release_label": "Framework 0.4.0 - Experimental gameplay tools",
   "graphic_title": "More room for your ideas.",
   "coverage_title": "Framework feature coverage",
   "asset_directory": "assets/brand",
   "overview_heading": "What can I build today?",
-  "overview_intro": "Included in [Framework 0.3.2](https://github.com/DooDesch-Mods/MMORPGTycoon2-ModFramework/releases/tag/v0.3.2). New gameplay tools are experimental. World-changing Lua gameplay operations currently run in singleplayer.",
+  "overview_intro": "Included in [Framework 0.4.0](https://github.com/DooDesch-Mods/MMORPGTycoon2-ModFramework/releases/tag/v0.4.0). New gameplay tools are experimental. World-changing Lua gameplay operations currently run in singleplayer.",
   "stages": [
     {
       "label": "Available now",

@@ -8,6 +8,8 @@ title: "mt2.regions.set_levels"
 
 Set the Region level range with the original tool transaction, complete actor level clamp, restored input and native Undo inverse.
 
+Introduced in Lua API **1.2.0**. Requires Framework **0.3.0** or newer.
+
 ```lua
 mt2.regions.set_levels(handle: MT2RegionHandle, minimum: integer, maximum: integer, position?: number[]): MT2Action
 ```

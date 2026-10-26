@@ -8,6 +8,8 @@ title: "mt2.regions.set_particle_color"
 
 Set the original Region particle color.
 
+Introduced in Lua API **1.2.0**. Requires Framework **0.3.0** or newer.
+
 ```lua
 mt2.regions.set_particle_color(handle: MT2RegionHandle, values: number[]): MT2Action
 ```

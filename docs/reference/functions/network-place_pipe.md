@@ -8,6 +8,8 @@ title: "mt2.network.place_pipe"
 
 Create the proved native Cable connection between nodes or to a new Junction, with payment and inverse history
 
+Introduced in Lua API **1.2.0**. Requires Framework **0.3.0** or newer.
+
 ```lua
 mt2.network.place_pipe(start: MT2Handle, end?: MT2Handle|nil, position?: number[]|nil): MT2Action
 ```

@@ -8,6 +8,8 @@ title: "mt2.quests.set_destination"
 
 Run original SetDestination with the native default action, then verify all global quest records, reciprocal weak links, its single-operation native Undo inverse, recalculation task and unchanged ledger.
 
+Introduced in Lua API **1.2.0**. Requires Framework **0.3.0** or newer.
+
 ```lua
 mt2.quests.set_destination(handle: MT2NpcQuestHandle, destination: MT2Handle, kills?: integer): MT2Action
 ```

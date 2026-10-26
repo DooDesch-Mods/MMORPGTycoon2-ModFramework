@@ -8,6 +8,8 @@ title: "mt2.terrain.paint"
 
 Complete an original terrain paint stroke and confirm its contour inverse, native Undo, Region and ledger readback. The result states whether contours changed.
 
+Introduced in Lua API **1.2.0**. Requires Framework **0.3.0** or newer.
+
 ```lua
 mt2.terrain.paint(handle: MT2RegionHandle, style: integer, stamps: MT2TerrainStamp[], label?: string): MT2Action
 ```

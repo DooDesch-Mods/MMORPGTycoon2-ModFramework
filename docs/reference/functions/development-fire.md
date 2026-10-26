@@ -8,6 +8,8 @@ title: "mt2.development.fire"
 
 Fire the last employed developer when it has no job or carried object
 
+Introduced in Lua API **1.2.0**. Requires Framework **0.3.0** or newer.
+
 ```lua
 mt2.development.fire(): MT2Action
 ```

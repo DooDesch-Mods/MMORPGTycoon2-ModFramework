@@ -8,6 +8,8 @@ title: "mt2.world.software"
 
 Read the current game rating and fun values.
 
+Introduced in Lua API **1.1.0**.
+
 ```lua
 mt2.world.software(): MT2Software
 ```

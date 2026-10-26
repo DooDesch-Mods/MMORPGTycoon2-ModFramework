@@ -8,6 +8,8 @@ title: "mt2.dungeons.set_gizmo_state"
 
 Run original native Gizmo SetState including trigger, Door unlock, animation and gameplay callbacks, then confirm state/trigger/scene unlocked bits. Requires the requested native active scene; the original info_gizmo Window is rebound to this target without human input.
 
+Introduced in Lua API **1.2.0**. Requires Framework **0.3.0** or newer.
+
 ```lua
 mt2.dungeons.set_gizmo_state(handle: MT2Handle, gizmo: MT2Handle, state: integer, instance?: integer): MT2Action
 ```

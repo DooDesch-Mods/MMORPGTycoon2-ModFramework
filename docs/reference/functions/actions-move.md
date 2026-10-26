@@ -8,6 +8,8 @@ title: "mt2.actions.move"
 
 Queue a checked native move.
 
+Introduced in Lua API **1.0.0**.
+
 ```lua
 mt2.actions.move(handle: MT2Handle, x: number, y: number, z: number): MT2Action
 ```

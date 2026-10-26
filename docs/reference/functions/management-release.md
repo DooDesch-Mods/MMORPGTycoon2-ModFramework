@@ -8,6 +8,8 @@ title: "mt2.management.release"
 
 Read software version and the current release
 
+Introduced in Lua API **1.2.0**. Requires Framework **0.3.0** or newer.
+
 ```lua
 mt2.management.release(): MT2ManagementRelease
 ```

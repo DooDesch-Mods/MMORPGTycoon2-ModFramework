@@ -8,6 +8,8 @@ title: "mt2.world.simulation"
 
 Read cash, logged-in subscribers, game clock and the current financial ledger.
 
+Introduced in Lua API **1.1.0**.
+
 ```lua
 mt2.world.simulation(): MT2Simulation
 ```

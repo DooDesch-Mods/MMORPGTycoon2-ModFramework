@@ -8,6 +8,8 @@ title: "mt2.characters.dock_ability"
 
 Set native ability level and display slot through the original dock transaction.
 
+Introduced in Lua API **1.2.0**. Requires Framework **0.3.0** or newer.
+
 ```lua
 mt2.characters.dock_ability(handle: MT2CharacterHandle, ability: MT2AbilityHandle, level: integer, display_slot: integer): MT2Action
 ```

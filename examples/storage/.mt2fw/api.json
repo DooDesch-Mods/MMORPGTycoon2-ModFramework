@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
-  "framework_version": "0.3.2",
-  "api_version": "1.2.0",
+  "framework_version": "0.4.0",
+  "api_version": "1.3.0",
   "abi_version": 1,
   "capabilities": [
     "ui",
@@ -1123,6 +1123,20 @@
       "retired_monsters": "MT2ActorHandle[]",
       "created_monsters": "MT2ActorHandle[]",
       "undo_confirmed": "boolean"
+    },
+    "MT2ManagementFeeChange": {
+      "before": "MT2ManagementFees",
+      "after": "MT2ManagementFees"
+    },
+    "MT2TerrainSamplePoint": {
+      "column": "integer",
+      "row": "integer"
+    },
+    "MT2TerrainSample": {
+      "column": "integer",
+      "row": "integer",
+      "index": "integer",
+      "height": "number"
     }
   },
   "events": [
@@ -8916,6 +8930,93 @@
       "capabilities": [
         "world.read"
       ],
+      "since": "1.3.0",
+      "minimum_framework_version": "0.4.0",
+      "experimental_contract": "gameplay",
+      "experimental_contract_version": 1,
+      "stability": "experimental-gameplay-1",
+      "thread": "Framework game-thread callback.",
+      "lifecycle": "After world_ready and before world_leave; do not perform game calls in render callbacks.",
+      "side_effects": "Reads a bounded native snapshot without changing the world.",
+      "reload": "Old handles expire on world change. Accepted actions from replaced mod instances are rejected before native execution.",
+      "persistence": "No implicit persistence. Do not persist live handles across world loads.",
+      "example": "examples/gameplay/main.lua",
+      "name": "mt2.management.service",
+      "returns": "MT2ManagementService",
+      "parameters": [
+        {
+          "name": "building",
+          "type": "MT2Handle",
+          "description": "Building that owns the requested service."
+        },
+        {
+          "name": "handle",
+          "type": "MT2Handle",
+          "description": "Current world epoch and exact UID string."
+        }
+      ],
+      "summary": "Read one building service with its current price and synchronization settings.",
+      "errors": [
+        "The world, handle or native owner expired, or the requested object is absent.",
+        "The native roster, type or snapshot changed during the checked read."
+      ],
+      "native_evidence": [
+        "Framework gameplay adapter ownership, native registry and bounded snapshot readers"
+      ],
+      "group": "management",
+      "gameplay_kind": "query",
+      "host_operations": [
+        "gameplay.query"
+      ]
+    },
+    {
+      "capabilities": [
+        "objects.write"
+      ],
+      "since": "1.3.0",
+      "minimum_framework_version": "0.4.0",
+      "experimental_contract": "gameplay",
+      "experimental_contract_version": 1,
+      "stability": "experimental-gameplay-1",
+      "thread": "Framework game-thread callback.",
+      "lifecycle": "After world_ready and before world_leave; do not perform game calls in render callbacks.",
+      "side_effects": "Queues one game-thread mutation. Accepted is not success; inspect actions.status or action_completed. Unknown outcomes are never automatically replayed.",
+      "reload": "Old handles expire on world change. Accepted actions from replaced mod instances are rejected before native execution.",
+      "persistence": "No implicit persistence. Do not persist live handles across world loads.",
+      "example": "examples/gameplay/main.lua",
+      "name": "mt2.management.set_fees",
+      "returns": "MT2Action",
+      "parameters": [
+        {
+          "name": "purchase",
+          "type": "integer",
+          "description": "Nonnegative native int32 purchase price."
+        },
+        {
+          "name": "subscription",
+          "type": "integer",
+          "description": "Nonnegative native int32 subscription price."
+        }
+      ],
+      "summary": "Queue both game fees in one checked game-thread action.",
+      "errors": [
+        "Invalid prices or an unavailable native owner reject the request before execution.",
+        "A partial native failure is unknown and is never retried or rolled back automatically."
+      ],
+      "native_evidence": [
+        "Framework gameplay adapter ownership, native registry and bounded snapshot readers"
+      ],
+      "group": "management",
+      "gameplay_kind": "action",
+      "host_operations": [
+        "gameplay.action"
+      ],
+      "native_result": "MT2ManagementFeeChange"
+    },
+    {
+      "capabilities": [
+        "world.read"
+      ],
       "since": "1.2.0",
       "minimum_framework_version": "0.3.0",
       "experimental_contract": "gameplay",
@@ -10860,6 +10961,140 @@
     },
     {
       "capabilities": [
+        "world.read"
+      ],
+      "since": "1.3.0",
+      "minimum_framework_version": "0.4.0",
+      "experimental_contract": "gameplay",
+      "experimental_contract_version": 1,
+      "stability": "experimental-gameplay-1",
+      "thread": "Framework game-thread callback.",
+      "lifecycle": "After world_ready and before world_leave; do not perform game calls in render callbacks.",
+      "side_effects": "Reads a bounded native snapshot without changing the world.",
+      "reload": "Old handles expire on world change. Accepted actions from replaced mod instances are rejected before native execution.",
+      "persistence": "No implicit persistence. Do not persist live handles across world loads.",
+      "example": "examples/terrain-reader/main.lua",
+      "name": "mt2.regions.at",
+      "returns": "MT2RegionHandle|nil",
+      "parameters": [
+        {
+          "name": "x",
+          "type": "number",
+          "description": "Finite root-world X coordinate."
+        },
+        {
+          "name": "z",
+          "type": "number",
+          "description": "Finite root-world Z coordinate."
+        }
+      ],
+      "summary": "Find the saved root Region at a world position; return nil outside the map.",
+      "errors": [
+        "The world, handle or native owner expired, or the requested object is absent.",
+        "The native roster, type or snapshot changed during the checked read."
+      ],
+      "native_evidence": [
+        "Framework gameplay adapter ownership, native registry and bounded snapshot readers"
+      ],
+      "group": "regions",
+      "gameplay_kind": "query",
+      "host_operations": [
+        "gameplay.query"
+      ]
+    },
+    {
+      "capabilities": [
+        "world.read"
+      ],
+      "since": "1.3.0",
+      "minimum_framework_version": "0.4.0",
+      "experimental_contract": "gameplay",
+      "experimental_contract_version": 1,
+      "stability": "experimental-gameplay-1",
+      "thread": "Framework game-thread callback.",
+      "lifecycle": "After world_ready and before world_leave; do not perform game calls in render callbacks.",
+      "side_effects": "Reads a bounded native snapshot without changing the world.",
+      "reload": "Old handles expire on world change. Accepted actions from replaced mod instances are rejected before native execution.",
+      "persistence": "No implicit persistence. Do not persist live handles across world loads.",
+      "example": "examples/terrain-reader/main.lua",
+      "name": "mt2.terrain.sample",
+      "returns": "MT2TerrainSample",
+      "parameters": [
+        {
+          "name": "handle",
+          "type": "MT2RegionHandle",
+          "description": "Region handle from regions.list or regions.at in this world."
+        },
+        {
+          "name": "column",
+          "type": "integer",
+          "description": "Zero-based column in the native height grid."
+        },
+        {
+          "name": "row",
+          "type": "integer",
+          "description": "Zero-based row in the native height grid."
+        }
+      ],
+      "summary": "Read one raw terrain height-grid sample without copying the whole grid.",
+      "errors": [
+        "The world, handle or native owner expired, or the requested object is absent.",
+        "The native roster, type or snapshot changed during the checked read."
+      ],
+      "native_evidence": [
+        "Framework gameplay adapter ownership, native registry and bounded snapshot readers"
+      ],
+      "group": "terrain",
+      "gameplay_kind": "query",
+      "host_operations": [
+        "gameplay.query"
+      ]
+    },
+    {
+      "capabilities": [
+        "world.read"
+      ],
+      "since": "1.3.0",
+      "minimum_framework_version": "0.4.0",
+      "experimental_contract": "gameplay",
+      "experimental_contract_version": 1,
+      "stability": "experimental-gameplay-1",
+      "thread": "Framework game-thread callback.",
+      "lifecycle": "After world_ready and before world_leave; do not perform game calls in render callbacks.",
+      "side_effects": "Reads a bounded native snapshot without changing the world.",
+      "reload": "Old handles expire on world change. Accepted actions from replaced mod instances are rejected before native execution.",
+      "persistence": "No implicit persistence. Do not persist live handles across world loads.",
+      "example": "examples/terrain-reader/main.lua",
+      "name": "mt2.terrain.samples",
+      "returns": "MT2TerrainSample[]",
+      "parameters": [
+        {
+          "name": "handle",
+          "type": "MT2RegionHandle",
+          "description": "Region handle from regions.list or regions.at in this world."
+        },
+        {
+          "name": "points",
+          "type": "MT2TerrainSamplePoint[]",
+          "description": "1..128 grid coordinates. Results preserve input order; duplicate coordinates are read once."
+        }
+      ],
+      "summary": "Read a bounded set of raw height-grid samples, preserving requested order.",
+      "errors": [
+        "The world, handle or native owner expired, or the requested object is absent.",
+        "The native roster, type or snapshot changed during the checked read."
+      ],
+      "native_evidence": [
+        "Framework gameplay adapter ownership, native registry and bounded snapshot readers"
+      ],
+      "group": "terrain",
+      "gameplay_kind": "query",
+      "host_operations": [
+        "gameplay.query"
+      ]
+    },
+    {
+      "capabilities": [
         "objects.write"
       ],
       "since": "1.2.0",
@@ -12093,6 +12328,120 @@
         "gameplay.action"
       ],
       "native_result": "table"
+    },
+    {
+      "capabilities": [
+        "world.read"
+      ],
+      "since": "1.3.0",
+      "minimum_framework_version": "0.4.0",
+      "experimental_contract": "gameplay",
+      "experimental_contract_version": 1,
+      "stability": "experimental-gameplay-1",
+      "thread": "Framework game-thread callback.",
+      "lifecycle": "After world_ready and before world_leave; do not perform game calls in render callbacks.",
+      "side_effects": "Reads a bounded native snapshot without changing the world.",
+      "reload": "Old handles expire on world change. Accepted actions from replaced mod instances are rejected before native execution.",
+      "persistence": "No implicit persistence. Do not persist live handles across world loads.",
+      "example": "examples/gameplay/main.lua",
+      "name": "mt2.network.node",
+      "returns": "MT2ServerNode",
+      "parameters": [
+        {
+          "name": "handle",
+          "type": "MT2Handle",
+          "description": "Current world epoch and exact UID string."
+        }
+      ],
+      "summary": "Read one current server node and its checked connections.",
+      "errors": [
+        "The world, handle or native owner expired, or the requested object is absent.",
+        "The native roster, type or snapshot changed during the checked read."
+      ],
+      "native_evidence": [
+        "Framework gameplay adapter ownership, native registry and bounded snapshot readers"
+      ],
+      "group": "network",
+      "gameplay_kind": "query",
+      "host_operations": [
+        "gameplay.query"
+      ]
+    },
+    {
+      "capabilities": [
+        "world.read"
+      ],
+      "since": "1.3.0",
+      "minimum_framework_version": "0.4.0",
+      "experimental_contract": "gameplay",
+      "experimental_contract_version": 1,
+      "stability": "experimental-gameplay-1",
+      "thread": "Framework game-thread callback.",
+      "lifecycle": "After world_ready and before world_leave; do not perform game calls in render callbacks.",
+      "side_effects": "Reads a bounded native snapshot without changing the world.",
+      "reload": "Old handles expire on world change. Accepted actions from replaced mod instances are rejected before native execution.",
+      "persistence": "No implicit persistence. Do not persist live handles across world loads.",
+      "example": "examples/gameplay/main.lua",
+      "name": "mt2.network.pipe",
+      "returns": "MT2ServerPipe",
+      "parameters": [
+        {
+          "name": "handle",
+          "type": "MT2Handle",
+          "description": "Current world epoch and exact UID string."
+        }
+      ],
+      "summary": "Read one current network pipe, geometry and checked endpoints.",
+      "errors": [
+        "The world, handle or native owner expired, or the requested object is absent.",
+        "The native roster, type or snapshot changed during the checked read."
+      ],
+      "native_evidence": [
+        "Framework gameplay adapter ownership, native registry and bounded snapshot readers"
+      ],
+      "group": "network",
+      "gameplay_kind": "query",
+      "host_operations": [
+        "gameplay.query"
+      ]
+    },
+    {
+      "capabilities": [
+        "world.read"
+      ],
+      "since": "1.3.0",
+      "minimum_framework_version": "0.4.0",
+      "experimental_contract": "gameplay",
+      "experimental_contract_version": 1,
+      "stability": "experimental-gameplay-1",
+      "thread": "Framework game-thread callback.",
+      "lifecycle": "After world_ready and before world_leave; do not perform game calls in render callbacks.",
+      "side_effects": "Reads a bounded native snapshot without changing the world.",
+      "reload": "Old handles expire on world change. Accepted actions from replaced mod instances are rejected before native execution.",
+      "persistence": "No implicit persistence. Do not persist live handles across world loads.",
+      "example": "examples/gameplay/main.lua",
+      "name": "mt2.projects.get",
+      "returns": "MT2ProjectCatalogueRow",
+      "parameters": [
+        {
+          "name": "source",
+          "type": "MT2ProjectSource",
+          "description": "Exact source from the current projects.catalogue snapshot."
+        }
+      ],
+      "summary": "Read the current availability, price and worker limit for one project source.",
+      "errors": [
+        "The world, handle or native owner expired, or the requested object is absent.",
+        "The native roster, type or snapshot changed during the checked read."
+      ],
+      "native_evidence": [
+        "Framework gameplay adapter ownership, native registry and bounded snapshot readers"
+      ],
+      "group": "projects",
+      "gameplay_kind": "query",
+      "host_operations": [
+        "gameplay.query"
+      ]
     },
     {
       "capabilities": [

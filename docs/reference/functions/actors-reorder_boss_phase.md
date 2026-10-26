@@ -8,6 +8,8 @@ title: "mt2.actors.reorder_boss_phase"
 
 Reorder through native phase ownership and verify the complete final order.
 
+Introduced in Lua API **1.2.0**. Requires Framework **0.3.0** or newer.
+
 ```lua
 mt2.actors.reorder_boss_phase(handle: MT2CharacterHandle, phase: integer, boundary: integer): MT2Action
 ```

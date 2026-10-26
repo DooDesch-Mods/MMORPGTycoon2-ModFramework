@@ -8,6 +8,8 @@ title: "mt2.walls.place_curve"
 
 Compute and place a native Wall curve from 2..11 ordered control points. Original AddPointAt calculates segment velocities and PlotSpline samples and validates terrain/collisions, supplying the native preview and spline-length price quote. The same isolated native receiver owns Purchase/Finish and model/ghost cleanup. Returns native spline records and sampled preview, created Path/node handles, changed and removed split Paths, cost and an owned history receipt. Requires one owned active-root Region; supplied endpoint handles pin native intersections/split Paths. Original validation causes are retained and uncertain actions must not be replayed.
 
+Introduced in Lua API **1.2.0**. Requires Framework **0.3.0** or newer.
+
 ```lua
 mt2.walls.place_curve(curve: MT2WallCurve): MT2Action
 ```

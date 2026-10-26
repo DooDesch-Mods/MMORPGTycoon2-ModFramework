@@ -8,6 +8,8 @@ title: "mt2.actors.list"
 
 List current root-world NPCs, Monsters and Bosses with exact handles and native manager membership.
 
+Introduced in Lua API **1.2.0**. Requires Framework **0.3.0** or newer.
+
 ```lua
 mt2.actors.list(region?: integer): MT2Actor[]
 ```

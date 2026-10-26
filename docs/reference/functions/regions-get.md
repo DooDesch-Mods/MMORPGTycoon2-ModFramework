@@ -8,6 +8,8 @@ title: "mt2.regions.get"
 
 Read a Region name, type, levels, styles and complete environment settings.
 
+Introduced in Lua API **1.2.0**. Requires Framework **0.3.0** or newer.
+
 ```lua
 mt2.regions.get(handle: MT2RegionHandle): MT2RegionDetails
 ```

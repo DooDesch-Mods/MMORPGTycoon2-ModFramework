@@ -8,6 +8,8 @@ title: "mt2.monsters.erase_zones"
 
 Erase native Zone coverage through the original private brush across intersecting Zone families. Confirm complete authored/walkable changes, generated Monster and Zone retirement, native Undo and quest/visitor cleanup. Return confirmed no-op only when the original brush acknowledges no emitted mutation and no Undo.
 
+Introduced in Lua API **1.2.0**. Requires Framework **0.3.0** or newer.
+
 ```lua
 mt2.monsters.erase_zones(region: integer, stamps: MT2MonsterZoneStamp[]): MT2Action
 ```

@@ -8,6 +8,8 @@ title: "mt2.objects.selected"
 
 Read the first supported selected object, or nil.
 
+Introduced in Lua API **1.0.0**.
+
 ```lua
 mt2.objects.selected(): MT2Object|nil
 ```

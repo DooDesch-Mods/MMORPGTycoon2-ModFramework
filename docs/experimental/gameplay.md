@@ -12,6 +12,10 @@ This is **gameplay protocol 1**, introduced with Lua API **1.2.0**. It requires 
 matching Framework **0.3.0** runtime. These APIs are experimental. A compiled native
 binding and a synthetic-host test do not establish that every game combination works.
 
+Framework **0.4.0 / API 1.3.0** adds targeted queries, sparse terrain
+samples and paired fee changes. These additions require Framework 0.4.0 or
+later. Existing API 1.2 functions remain available.
+
 ## Find the operation
 
 Use the [generated API reference](../reference/index.md) and

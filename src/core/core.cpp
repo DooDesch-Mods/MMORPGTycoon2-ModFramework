@@ -107,7 +107,7 @@ Manifest Manifest::parse(const Json& value) {
     static const std::regex id(R"([a-z][a-z0-9]*(\.[a-z0-9][a-z0-9_-]*)+)");
     if (!std::regex_match(m.id,id)) throw std::runtime_error("Mod ID must be lowercase and namespaced, for example author.my_mod");
     parse_version(m.version);
-    if (!version_matches("1.2.0",">="+text(value,"api_version")) || parse_version(text(value,"api_version")).core[0]!="1")
+    if (!version_matches("1.3.0",">="+text(value,"api_version")) || parse_version(text(value,"api_version")).core[0]!="1")
         throw std::runtime_error("Mod requires an unsupported API version");
     if (m.type!="lua"&&m.type!="native"&&m.type!="content") throw std::runtime_error("Mod type must be lua, native or content");
     if (fs::path(m.entry).is_absolute() || m.entry.find(':')!=std::string::npos || m.entry.find("..")!=std::string::npos || m.entry.find('\\')!=std::string::npos)
@@ -489,6 +489,6 @@ std::vector<std::string> Runtime::multiplayer_conflicts(const Json& peer) const 
 }
 Json Runtime::status() const {
     Json mods=Json::array();for(auto& p:plugins_)mods.push_back({{"id",p->manifest.id},{"name",p->manifest.name},{"version",p->manifest.version},{"type",p->manifest.type},{"active",p->active},{"error",p->error},{"calls",p->calls},{"last_ms",p->last_ms},{"total_ms",p->total_ms},{"settings",p->config},{"schema",p->config_schema}});
-    return {{"version",MT2FW_VERSION},{"api_version","1.2.0"},{"epoch",epoch},{"world",world_},{"mods",mods},{"multiplayer_bridge",false}};
+    return {{"version",MT2FW_VERSION},{"api_version","1.3.0"},{"epoch",epoch},{"world",world_},{"mods",mods},{"multiplayer_bridge",false}};
 }
 }

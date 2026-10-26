@@ -8,6 +8,8 @@ title: "mt2.regions.rename"
 
 Rename a Region through its native widget notification.
 
+Introduced in Lua API **1.2.0**. Requires Framework **0.3.0** or newer.
+
 ```lua
 mt2.regions.rename(handle: MT2RegionHandle, name: string): MT2Action
 ```

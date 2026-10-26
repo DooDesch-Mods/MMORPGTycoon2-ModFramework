@@ -8,6 +8,8 @@ title: "mt2.characters.remove"
 
 Remove the selected character through its original owning collection and confirm definition UID retirement; native actor cleanup follows the game's lifecycle.
 
+Introduced in Lua API **1.2.0**. Requires Framework **0.3.0** or newer.
+
 ```lua
 mt2.characters.remove(handle: MT2CharacterHandle): MT2Action
 ```

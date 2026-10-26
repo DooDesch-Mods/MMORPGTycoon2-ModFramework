@@ -8,6 +8,8 @@ title: "mt2.ui.number"
 
 Draw a numeric slider and return its value.
 
+Introduced in Lua API **1.0.0**.
+
 ```lua
 mt2.ui.number(label: string, value: number, min: number, max: number): number
 ```

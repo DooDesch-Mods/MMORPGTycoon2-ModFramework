@@ -55,8 +55,14 @@ int main(){try{
     put(config,uintptr_t(c.image+0x1736660));put_text(config+0x18,"healing");put(config+0x38,uintptr_t(c.image+0x174ab50));put(config+0x50,std::array<int32_t,2>{0,20});
     Json service_args={{"building",{{"epoch",7},{"uid","900"}}}};auto services=m::query(c,"management.services",service_args);expect(services&&services->size()==1&&(*services)[0]["config"]["price"]==20&&(*services)[0]["handle"]["uid"]=="901","Native service configuration or UID query differs");
     put(service+0x150,uintptr_t(0x99999999));rejects([&]{m::query(c,"management.services",service_args);});put(service+0x150,config);
+    auto one=service_args;one["handle"]={{"epoch",7},{"uid","901"}};
+    auto selected=m::query(c,"management.service",one);expect(selected&&*selected==(*services)[0],"Single service lost current configuration or exact UID");
+    auto bad=one;bad["handle"]["epoch"]=8;rejects([&]{m::query(c,"management.service",bad);});
+    bad=one;bad["handle"]["uid"]="900";rejects([&]{m::query(c,"management.service",bad);});
     bool attempted=false;Json result;std::string cause;
     rejects([&]{m::action(c,"management.set_purchase_fee",{{"value",-1}},attempted,result,cause);});expect(!attempted,"Invalid price attempted native mutation");
+    rejects([&]{m::action(c,"management.set_fees",{{"purchase",41},{"subscription",-1}},attempted,result,cause);});expect(!attempted,"Invalid second fee attempted first setter");
+    rejects([&]{m::action(c,"management.set_fees",{{"purchase",41},{"subscription",11}},attempted,result,cause);});expect(!attempted,"Unverified paired setters reached native execution");
     rejects([&]{m::action(c,"management.set_policy",{{"policy",2},{"field","enabled"},{"value",true}},attempted,result,cause);});expect(!attempted,"Invalid policy attempted native mutation");
     rejects([&]{m::action(c,"management.set_purchase_fee",{{"value",30}},attempted,result,cause);});expect(!attempted,"Synthetic native guard failure attempted mutation");
     c.epoch=8;rejects([&]{m::query(c,"management.fees",{});});

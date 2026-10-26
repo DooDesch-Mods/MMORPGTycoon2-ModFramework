@@ -8,6 +8,8 @@ title: "mt2.dungeons.open_cell"
 
 Open one eligible cell through an isolated native edit and Undo transaction; existing open cells return changed=false.
 
+Introduced in Lua API **1.2.0**. Requires Framework **0.3.0** or newer.
+
 ```lua
 mt2.dungeons.open_cell(handle: MT2Handle, cell: integer, theme: string): MT2Action
 ```

@@ -8,6 +8,8 @@ title: "mt2.npcs.rename"
 
 Rename through the original native actor command and confirm the complete property result.
 
+Introduced in Lua API **1.2.0**. Requires Framework **0.3.0** or newer.
+
 ```lua
 mt2.npcs.rename(handle: MT2ActorHandle, name: string): MT2Action
 ```

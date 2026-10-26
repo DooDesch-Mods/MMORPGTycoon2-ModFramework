@@ -7,6 +7,12 @@ import generate_docs
 import build_docs
 from mt2fw import packages
 class DocumentationContractTests(unittest.TestCase):
+    def test_function_page_exposes_its_api_and_framework_requirements(self):
+        contract=generate_docs.read(ROOT/'api/contract.json')
+        page=generate_docs.outputs(contract)['docs/reference/functions/terrain-sample.md']
+        function=next(f for f in contract['functions'] if f['name']=='mt2.terrain.sample')
+        self.assertIn('Lua API **'+function['since']+'**',page)
+        self.assertIn('Framework **'+function['minimum_framework_version']+'**',page)
     def test_source_machine_links_resolve_in_repository(self):
         import re
         from urllib.parse import urlsplit
@@ -62,7 +68,7 @@ class DocumentationContractTests(unittest.TestCase):
         def relative(value):packages.relative(value);return True
         validator=jsonschema.Draft202012Validator(schema,format_checker=checker)
         valid=packages.read_json(ROOT/'templates/hello/mod.json')
-        cases=[valid,{**valid,'api_version':'1.1.0'},{**valid,'api_version':'1.2.0'},{**valid,'version':'1.2.0-beta.1+build'},
+        cases=[valid,{**valid,'api_version':'1.1.0'},{**valid,'api_version':'1.2.0'},{**valid,'api_version':'1.3.0'},{**valid,'api_version':'1.4.0'},{**valid,'version':'1.2.0-beta.1+build'},
                {**valid,'entry':'../escape.lua'},{**valid,'api_version':'2.0.0'},
                {**valid,'version':'1.0.0-01'},{**valid,'capabilities':['objects.write']},
                {key:value for key,value in valid.items() if key!='capabilities'}]

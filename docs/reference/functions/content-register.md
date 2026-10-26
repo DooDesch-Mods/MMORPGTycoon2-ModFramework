@@ -8,6 +8,8 @@ title: "mt2.content.register"
 
 Register static scenery resources at startup.
 
+Introduced in Lua API **1.0.0**.
+
 ```lua
 mt2.content.register(definitions: MT2ContentDefinition[]): MT2ContentReceipt
 ```

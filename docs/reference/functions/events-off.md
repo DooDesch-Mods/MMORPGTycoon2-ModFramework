@@ -8,6 +8,8 @@ title: "mt2.events.off"
 
 Remove your subscription.
 
+Introduced in Lua API **1.0.0**.
+
 ```lua
 mt2.events.off(subscription: integer): nil
 ```

@@ -8,6 +8,8 @@ title: "mt2.regions.list"
 
 List saved root-world Region handles using bounded pages.
 
+Introduced in Lua API **1.2.0**. Requires Framework **0.3.0** or newer.
+
 ```lua
 mt2.regions.list(offset?: integer, limit?: integer): MT2RegionPage
 ```

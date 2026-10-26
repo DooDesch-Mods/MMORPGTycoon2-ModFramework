@@ -8,6 +8,8 @@ title: "mt2.regions.set_light"
 
 Set native Region light.
 
+Introduced in Lua API **1.2.0**. Requires Framework **0.3.0** or newer.
+
 ```lua
 mt2.regions.set_light(handle: MT2RegionHandle, values: number[]): MT2Action
 ```

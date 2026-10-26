@@ -8,6 +8,8 @@ title: "mt2.management.spend_statistics"
 
 Spend development points through each original statistic function
 
+Introduced in Lua API **1.2.0**. Requires Framework **0.3.0** or newer.
+
 ```lua
 mt2.management.spend_statistics(values: integer[]): MT2Action
 ```

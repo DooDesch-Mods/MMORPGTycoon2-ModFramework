@@ -8,6 +8,8 @@ title: "mt2.log.warn"
 
 Write a mod-labelled warn log entry.
 
+Introduced in Lua API **1.0.0**.
+
 ```lua
 mt2.log.warn(message: any): boolean
 ```

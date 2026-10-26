@@ -8,6 +8,8 @@ title: "mt2.characters.set_weapon_category"
 
 Update the native ordered weapon category set and verify its exact result.
 
+Introduced in Lua API **1.2.0**. Requires Framework **0.3.0** or newer.
+
 ```lua
 mt2.characters.set_weapon_category(handle: MT2CharacterHandle, category: string, enabled: boolean): MT2Action
 ```

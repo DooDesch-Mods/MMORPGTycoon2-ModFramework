@@ -8,6 +8,8 @@ title: "mt2.dungeons.destroy_instance"
 
 Run native DestroyInstance and confirm removal from its Dungeon pool.
 
+Introduced in Lua API **1.2.0**. Requires Framework **0.3.0** or newer.
+
 ```lua
 mt2.dungeons.destroy_instance(handle: MT2Handle, instance: integer): MT2Action
 ```

@@ -8,6 +8,8 @@ title: "mt2.dungeons.configure_instances"
 
 Run the original native config transaction and confirm desired count; normal native costs apply.
 
+Introduced in Lua API **1.2.0**. Requires Framework **0.3.0** or newer.
+
 ```lua
 mt2.dungeons.configure_instances(handle: MT2Handle, count: integer): MT2Action
 ```

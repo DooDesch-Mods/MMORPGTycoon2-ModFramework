@@ -8,6 +8,8 @@ title: "mt2.camera.focus"
 
 Request the native edit camera to focus a position.
 
+Introduced in Lua API **1.0.0**.
+
 ```lua
 mt2.camera.focus(x: number, y: number, z: number, distance: number): MT2Accepted
 ```

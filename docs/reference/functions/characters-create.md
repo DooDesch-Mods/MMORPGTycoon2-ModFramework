@@ -8,6 +8,8 @@ title: "mt2.characters.create"
 
 Create a native base character slot in the supplied base's owning collection. Omit kind to use the base kind.
 
+Introduced in Lua API **1.2.0**. Requires Framework **0.3.0** or newer.
+
 ```lua
 mt2.characters.create(handle: MT2CharacterHandle, kind?: integer): MT2Action
 ```

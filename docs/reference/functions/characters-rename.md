@@ -8,6 +8,8 @@ title: "mt2.characters.rename"
 
 Set both authored names through native SetName, including its native edited/day and user notifications.
 
+Introduced in Lua API **1.2.0**. Requires Framework **0.3.0** or newer.
+
 ```lua
 mt2.characters.rename(handle: MT2CharacterHandle, name: string): MT2Action
 ```

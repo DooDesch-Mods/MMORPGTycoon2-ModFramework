@@ -8,7 +8,7 @@ int main(){try{
     size_t checks=0;auto require=[&](bool value,const char* cause){++checks;if(!value)throw std::runtime_error(cause);};
     auto root=fs::current_path()/"evidence"/("gameplay-lua-"+std::to_string(std::chrono::steady_clock::now().time_since_epoch().count()));
     auto directory=root/"mods/test.gameplay";fs::create_directories(directory);
-    atomic_json(directory/"mod.json",{{"id","test.gameplay"},{"name","Gameplay fixture"},{"version","1.0.0"},{"api_version","1.2.0"},
+    atomic_json(directory/"mod.json",{{"id","test.gameplay"},{"name","Gameplay fixture"},{"version","1.0.0"},{"api_version","1.3.0"},
         {"type","lua"},{"entry","main.lua"},{"capabilities",{"world.read","objects.write"}},{"multiplayer","singleplayer"}});
     {std::ofstream file(directory/"main.lua");file<<R"lua(
 local ran = false
@@ -18,7 +18,16 @@ mt2.events.on('update',function()
     assert(#mt2.experimental.operations() == 1)
     assert(mt2.characters.list(false)[1].handle.uid == '9007199254740993')
     assert(mt2.management.fees().subscription == 12)
+    local region = mt2.regions.at(1, 3)
+    assert(region.id == 2 and mt2.regions.at(999, 999) == nil)
+    assert(mt2.terrain.sample(region, 2, 1).height == 2.5)
+    assert(#mt2.terrain.samples(region, {{column=2,row=1},{column=2,row=1}}) == 2)
     local h = {epoch=1,uid='9007199254740993'}
+    assert(mt2.network.node(h).handle.uid == h.uid)
+    assert(mt2.network.pipe(h).handle.uid == h.uid)
+    assert(mt2.projects.get({epoch=1,kind=0,tech='Test',art='',statistic=-1}).price == 400)
+    assert(mt2.management.service(h,h).handle.uid == h.uid)
+    assert(mt2.management.set_fees(41,11).status == 'accepted')
     assert(mt2.characters.rename(h, 'My class').status == 'accepted')
     assert(mt2.dungeons.place_gizmo(h, 'Door', 'door', {0,0,0}).status == 'accepted')
     assert(mt2.network.place_pipe(h, {epoch=1,uid='9007199254740995'}).status == 'accepted')
@@ -43,10 +52,16 @@ end)
                 return Json::array({{{"handle",{{"epoch",1},{"uid","9007199254740993"}}}}});
             }
             if(operation=="management.fees")return {{"subscription",12}};
+            if(operation=="regions.at")return args.at("arguments").at("x")==999?Json():Json{{"epoch",1},{"id",2}};
+            if(operation=="terrain.sample")return {{"height",2.5}};
+            if(operation=="terrain.samples")return args.at("arguments").at("points");
+            if(operation=="network.node"||operation=="network.pipe"||operation=="management.service")return {{"handle",args.at("arguments").at("handle")}};
+            if(operation=="projects.get")return {{"price",400}};
         }
         if(op=="gameplay.action"){
             ++actions;const auto& value=args.at("arguments");
             if(args.at("operation")=="characters.rename")require(value.at("name")=="My class"&&value.at("handle").at("uid")=="9007199254740993","Character action lost exact data");
+            else if(args.at("operation")=="management.set_fees")require(value.at("purchase")==41&&value.at("subscription")==11,"Paired fee action lost its values");
             else if(args.at("operation")=="dungeons.place_gizmo")require(value.at("rotation")==Json::array({0,0,0,1})&&value.at("scale")==Json::array({1,1,1}),"Lua default vectors are not real tables");
             else if(args.at("operation")=="network.place_pipe")require(value.at("end").at("uid")=="9007199254740995"&&!value.contains("position"),"Lua keyword endpoint or omitted optional argument was corrupted");
             else if(args.at("operation")=="terrain.paint")require(value.at("stamps")[0].at("shape")[0][0].at("x").is_number_integer()&&value.at("stamps")[0].at("shape")[0][0].at("x").get<int64_t>()==9007199254740993ll&&value.at("label")=="Paint terrain","Lua terrain geometry lost integer precision or its label default");
@@ -58,9 +73,9 @@ end)
     runtime.set_patch_authority([](const std::string& op,std::string& cause){if(op=="api.gameplay.action")return true;cause="Fixture operation denied";return false;});
     runtime.load();runtime.world_ready("Fixture");runtime.emit("update");runtime.rendering=true;runtime.emit("render");runtime.rendering=false;
     require(runtime.plugins().size()==1&&runtime.plugins()[0]->active,"Real Lua gameplay callbacks failed");
-    require(queries==2&&actions==4,"Gameplay bridge executed missing or duplicate operations");
+    require(queries==10&&actions==5,"Gameplay bridge executed missing or duplicate operations");
     auto& plugin=*runtime.plugins()[0];runtime.multiplayer=true;bool denied=false;
     try{runtime.request(plugin,"gameplay.action",{{"operation","characters.rename"},{"arguments",Json::object()}});}catch(const std::exception& error){denied=std::string(error.what()).find("Singleplayer mod")!=std::string::npos;}
-    require(denied&&actions==4,"Lua mutation bypassed multiplayer authority");
+    require(denied&&actions==5,"Lua mutation bypassed multiplayer authority");
     std::cout<<checks<<" real Lua gameplay checks passed\n";return 0;
 }catch(const std::exception& error){std::cerr<<error.what()<<"\n";return 1;}}

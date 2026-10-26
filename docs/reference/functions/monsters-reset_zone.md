@@ -8,6 +8,8 @@ title: "mt2.monsters.reset_zone"
 
 Destroy and rebuild this Zone's generated Monsters through original lifetime and native Undo methods; verify full ownership, retired UIDs, replacement members and untouched authored properties.
 
+Introduced in Lua API **1.2.0**. Requires Framework **0.3.0** or newer.
+
 ```lua
 mt2.monsters.reset_zone(handle: MT2ZoneHandle): MT2Action
 ```

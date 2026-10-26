@@ -8,6 +8,8 @@ title: "mt2.management.set_respawn_seconds"
 
 Set subscriber respawn wait in seconds
 
+Introduced in Lua API **1.2.0**. Requires Framework **0.3.0** or newer.
+
 ```lua
 mt2.management.set_respawn_seconds(value: integer): MT2Action
 ```

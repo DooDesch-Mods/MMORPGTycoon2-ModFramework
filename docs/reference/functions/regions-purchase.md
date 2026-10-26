@@ -8,6 +8,8 @@ title: "mt2.regions.purchase"
 
 Buy unowned land through the original native tool, with complete actor level clamp, payment and inverse readback.
 
+Introduced in Lua API **1.2.0**. Requires Framework **0.3.0** or newer.
+
 ```lua
 mt2.regions.purchase(handle: MT2RegionHandle, position?: number[]): MT2Action
 ```

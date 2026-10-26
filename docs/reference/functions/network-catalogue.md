@@ -8,6 +8,8 @@ title: "mt2.network.catalogue"
 
 Read node catalogue keys and current native definition costs
 
+Introduced in Lua API **1.2.0**. Requires Framework **0.3.0** or newer.
+
 ```lua
 mt2.network.catalogue(): MT2ServerNodeDefinition[]
 ```

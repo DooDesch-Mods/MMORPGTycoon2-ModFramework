@@ -8,6 +8,8 @@ title: "mt2.scenery.destroy_group"
 
 Destroy a whole native Group through original SelectionManager DestroyProp, retaining normal native refund and Undo behavior. Confirms removal of the Group and every owned Scenery member, plus unchanged unrelated members. Returns destroyed=true and member count. Requires the root world to be the actual native active scene; normal native selection and tool effects apply.
 
+Introduced in Lua API **1.2.0**. Requires Framework **0.3.0** or newer.
+
 ```lua
 mt2.scenery.destroy_group(group: MT2Handle): MT2Action
 ```

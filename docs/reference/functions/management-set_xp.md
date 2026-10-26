@@ -8,6 +8,8 @@ title: "mt2.management.set_xp"
 
 Apply the complete editable experience rule block
 
+Introduced in Lua API **1.2.0**. Requires Framework **0.3.0** or newer.
+
 ```lua
 mt2.management.set_xp(values: integer[]): MT2Action
 ```

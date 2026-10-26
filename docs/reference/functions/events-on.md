@@ -8,6 +8,8 @@ title: "mt2.events.on"
 
 Subscribe to an event.
 
+Introduced in Lua API **1.0.0**.
+
 ```lua
 mt2.events.on(event: MT2EventName, callback: fun(event:MT2EventPayload)): integer
 ```

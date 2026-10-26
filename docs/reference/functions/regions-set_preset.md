@@ -8,6 +8,8 @@ title: "mt2.regions.set_preset"
 
 Apply an original Region preset, confirm its styles and refresh the visible native inspector.
 
+Introduced in Lua API **1.2.0**. Requires Framework **0.3.0** or newer.
+
 ```lua
 mt2.regions.set_preset(handle: MT2RegionHandle, name: string): MT2Action
 ```

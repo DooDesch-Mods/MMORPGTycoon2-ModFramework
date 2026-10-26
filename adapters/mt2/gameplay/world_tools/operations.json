@@ -343,5 +343,71 @@
     "native_evidence": [
       "Multiplayer commit 8a13602: src/game/network_remove_runtime.inc"
     ]
+  },
+  {
+    "name": "network.node",
+    "kind": "query",
+    "returns": "MT2ServerNode",
+    "parameters": [
+      {
+        "name": "handle",
+        "type": "MT2Handle",
+        "description": "Current world epoch and exact UID string."
+      }
+    ],
+    "summary": "Read one current server node and its checked connections.",
+    "since": "1.3.0",
+    "minimum_framework_version": "0.4.0",
+    "errors": [
+      "The world, handle or native owner expired, or the requested object is absent.",
+      "The native roster, type or snapshot changed during the checked read."
+    ],
+    "native_evidence": [
+      "Framework gameplay adapter ownership, native registry and bounded snapshot readers"
+    ]
+  },
+  {
+    "name": "network.pipe",
+    "kind": "query",
+    "returns": "MT2ServerPipe",
+    "parameters": [
+      {
+        "name": "handle",
+        "type": "MT2Handle",
+        "description": "Current world epoch and exact UID string."
+      }
+    ],
+    "summary": "Read one current network pipe, geometry and checked endpoints.",
+    "since": "1.3.0",
+    "minimum_framework_version": "0.4.0",
+    "errors": [
+      "The world, handle or native owner expired, or the requested object is absent.",
+      "The native roster, type or snapshot changed during the checked read."
+    ],
+    "native_evidence": [
+      "Framework gameplay adapter ownership, native registry and bounded snapshot readers"
+    ]
+  },
+  {
+    "name": "projects.get",
+    "kind": "query",
+    "returns": "MT2ProjectCatalogueRow",
+    "parameters": [
+      {
+        "name": "source",
+        "type": "MT2ProjectSource",
+        "description": "Exact source from the current projects.catalogue snapshot."
+      }
+    ],
+    "summary": "Read the current availability, price and worker limit for one project source.",
+    "since": "1.3.0",
+    "minimum_framework_version": "0.4.0",
+    "errors": [
+      "The world, handle or native owner expired, or the requested object is absent.",
+      "The native roster, type or snapshot changed during the checked read."
+    ],
+    "native_evidence": [
+      "Framework gameplay adapter ownership, native registry and bounded snapshot readers"
+    ]
   }
 ]

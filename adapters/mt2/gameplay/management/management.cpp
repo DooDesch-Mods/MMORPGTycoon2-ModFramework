@@ -73,7 +73,7 @@ Ledger ledger(Context& c){auto b=business(c),r=c.read<uintptr_t>(b+0x100);typed(
 std::string ledger_difference(const Ledger& expected,const Ledger& actual){auto field=[](const std::string& name,int32_t a,int32_t b){return name+" required="+std::to_string(a)+" measured="+std::to_string(b);};if(expected.cash!=actual.cash)return field("cash",expected.cash,actual.cash);for(size_t n=0;n<5;++n)if(expected.record[n]!=actual.record[n])return field("record["+std::to_string(n)+"]",expected.record[n],actual.record[n]);for(size_t n=0;n<20;++n)for(size_t f=0;f<2;++f)if(expected.lines[n][f]!=actual.lines[n][f])return field("category["+std::to_string(n)+"]["+std::to_string(f)+"]",expected.lines[n][f],actual.lines[n][f]);return "unchanged";}
 void add(int32_t& value,int64_t delta){auto n=int64_t(value)+delta;require(n>=INT32_MIN&&n<=INT32_MAX,"Management financial value overflows int32");value=int32_t(n);}
 template<class F>Json stable(F&& read){auto before=read(),after=read();require(before==after,"Management native values changed during double read");return after;}
-enum class Call {Void,IntVoid,IntBool,StringBool,ServicePrice,ServiceSync,Policy,RespawnSeconds,RespawnDelay,XP,SetType,StringAssign,Custom,CampaignStart,CampaignAbort,SpendStatistics,Feature,ReleaseShow,Buzz,Award};
+enum class Call {Void,IntVoid,IntBool,StringBool,Fees,ServicePrice,ServiceSync,Policy,RespawnSeconds,RespawnDelay,XP,SetType,StringAssign,Custom,CampaignStart,CampaignAbort,SpendStatistics,Feature,ReleaseShow,Buzz,Award};
 struct Invocation {Call kind;uintptr_t image=0,target=0,rva=0;int32_t value=0,index=0,before=0;const char* text=nullptr;size_t length=0;const void* data=nullptr;bool accepted=false,constructed=false,cleaned=false;int64_t amount=0;int32_t category=-1;bool subtract=false;const char* second_text=nullptr;size_t second_length=0;uintptr_t allocated=0;};
 uint32_t publish_script(uintptr_t image) noexcept {alignas(8) unsigned char record[0x78]{};bool constructed=false;uint32_t error=0;
     __try {reinterpret_cast<void(*)(void*,const char*)>(image+0x967370)(record,"MessageTo Mode LevelUp");constructed=true;reinterpret_cast<void(*)(void*)>(image+0x4fbff0)(record);}__except(EXCEPTION_EXECUTE_HANDLER){error=GetExceptionCode();}
@@ -85,6 +85,7 @@ uint32_t invoke(Invocation* v) noexcept {
     __try {auto target=reinterpret_cast<void*>(v->target);switch(v->kind){
     case Call::Void:reinterpret_cast<void(*)(void*)>(v->image+v->rva)(target);v->accepted=true;break;
     case Call::IntVoid:reinterpret_cast<void(*)(void*,int32_t)>(v->image+v->rva)(target,v->value);v->accepted=true;break;
+    case Call::Fees:reinterpret_cast<void(*)(void*,int32_t)>(v->image+0x54ce0)(target,v->value);reinterpret_cast<void(*)(void*,int32_t)>(v->image+0x54cf0)(target,v->index);v->accepted=true;break;
     case Call::IntBool:v->accepted=reinterpret_cast<bool(*)(void*,int32_t)>(v->image+v->rva)(target,v->value);break;
     case Call::StringBool:v->accepted=reinterpret_cast<bool(*)(void*,const void*)>(v->image+v->rva)(target,&text);break;
     case Call::ServiceSync:reinterpret_cast<void(*)(void*,bool)>(v->image+0x245000)(target,v->value!=0);v->accepted=true;break;
@@ -108,6 +109,7 @@ uint32_t invoke(Invocation* v) noexcept {
 }
 void execute(Context& c,Invocation& call,bool& attempted){
     switch(call.kind){
+    case Call::Fees:c.verify(0x54ce0,{0x89,0x51,0x40,0xc3});c.verify(0x54cf0,{0x89,0x51,0x44,0xc3});break;
     case Call::Void:case Call::IntVoid:case Call::IntBool:case Call::StringBool:c.verify_original(call.rva);break;
     case Call::ServicePrice:for(auto rva:{0x86d260,0x244f50,0x89da30})c.verify_original(rva);break;
     case Call::ServiceSync:c.verify_original(0x245000);break;
@@ -152,6 +154,11 @@ bool complete(bool ok,Json before,Json after,Json& result,std::string& cause){re
 }
 
 std::optional<Json> query(Context& c,const std::string& op,const Json& args){
+    if(op=="management.service"){
+        c.require_world();const auto service=c.resolve(args.at("handle"),0x1718480);const auto expected=handle(c,service);
+        return stable([&]{const auto rows=service_rows(c,args);const auto found=std::find_if(rows.begin(),rows.end(),[&](const Json& row){return row.at("handle")==expected;});
+            require(found!=rows.end(),"Management service does not belong to the requested building");return *found;});
+    }
     if(op!="management.fees"&&op!="management.loans"&&op!="management.staff"&&op!="management.statistics"&&op!="management.release"&&op!="management.policies"&&op!="management.rules"&&op!="management.campaigns"&&op!="management.services"&&op!="management.release_cycle")return std::nullopt;
     c.require_world();
     if(op=="management.fees")return stable([&]{return fees(c);});
@@ -168,6 +175,12 @@ std::optional<Json> query(Context& c,const std::string& op,const Json& args){
 
 bool action(Context& c,const std::string& op,const Json& args,bool& attempted,Json& result,std::string& cause){
     c.require_world();
+    if(op=="management.set_fees"){
+        const auto purchase=model::integer(args.at("purchase")),subscription=model::integer(args.at("subscription"));
+        const auto before=*query(c,"management.fees",{});Invocation call{Call::Fees};call.target=business(c);call.value=purchase;call.index=subscription;
+        execute(c,call,attempted);const auto after=*query(c,"management.fees",{});
+        return complete(after==Json{{"purchase",purchase},{"subscription",subscription}},before,after,result,cause);
+    }
     if(op=="management.set_purchase_fee"||op=="management.set_subscription_fee"){
         const bool purchase=op=="management.set_purchase_fee";auto value=model::integer(args.at("value"));auto before=*query(c,"management.fees",{});auto expected=before;expected[purchase?"purchase":"subscription"]=value;
         if(purchase)c.verify(0x54ce0,{0x89,0x51,0x40,0xc3});else c.verify(0x54cf0,{0x89,0x51,0x44,0xc3});

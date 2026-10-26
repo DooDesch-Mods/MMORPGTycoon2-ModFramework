@@ -8,6 +8,8 @@ title: "mt2.monsters.set_zone"
 
 Apply original Zone properties and rebuild generated Monsters through the native Undo transaction. Confirm old UID retirement, complete make/destroy/edit inverses, replacement membership and all surviving state.
 
+Introduced in Lua API **1.2.0**. Requires Framework **0.3.0** or newer.
+
 ```lua
 mt2.monsters.set_zone(handle: MT2ZoneHandle, settings: MT2MonsterZoneSettings): MT2Action
 ```

@@ -16,6 +16,8 @@ class PackageTests(unittest.TestCase):
         value['api_version']='1.2.0'
         self.assertEqual(packages.validate_manifest(value)['api_version'],'1.2.0')
         value['api_version']='1.3.0'
+        self.assertEqual(packages.validate_manifest(value)['api_version'],'1.3.0')
+        value['api_version']='1.4.0'
         with self.assertRaises(packages.PackageError):packages.validate_manifest(value)
     def test_new_project_includes_current_agent_contract_and_license(self):
         mod=self.root/'agent-project';packages.new_mod(mod,'test.agent')

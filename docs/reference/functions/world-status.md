@@ -8,6 +8,8 @@ title: "mt2.world.status"
 
 Read the loaded world name and current epoch.
 
+Introduced in Lua API **1.0.0**.
+
 ```lua
 mt2.world.status(): MT2World
 ```

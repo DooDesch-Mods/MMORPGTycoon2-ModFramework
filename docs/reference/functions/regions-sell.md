@@ -8,6 +8,8 @@ title: "mt2.regions.sell"
 
 Sell owned land through the original native tool, with complete actor level clamp, refund and inverse readback.
 
+Introduced in Lua API **1.2.0**. Requires Framework **0.3.0** or newer.
+
 ```lua
 mt2.regions.sell(handle: MT2RegionHandle, position?: number[]): MT2Action
 ```

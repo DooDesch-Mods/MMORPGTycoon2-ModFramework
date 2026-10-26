@@ -8,6 +8,8 @@ title: "mt2.dungeons.move_gizmo"
 
 Move one offline template Gizmo through the original Move/Undo transaction and preserve local selection.
 
+Introduced in Lua API **1.2.0**. Requires Framework **0.3.0** or newer.
+
 ```lua
 mt2.dungeons.move_gizmo(handle: MT2Handle, gizmo: MT2Handle, position: number[], rotation?: number[], scale?: number[]): MT2Action
 ```

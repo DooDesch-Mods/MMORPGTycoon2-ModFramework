@@ -8,6 +8,8 @@ title: "mt2.projects.catalogue"
 
 Read native project eligibility and technology purchase/deployment flags
 
+Introduced in Lua API **1.2.0**. Requires Framework **0.3.0** or newer.
+
 ```lua
 mt2.projects.catalogue(): MT2ProjectCatalogueRow[]
 ```

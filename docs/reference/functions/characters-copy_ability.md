@@ -8,6 +8,8 @@ title: "mt2.characters.copy_ability"
 
 Copy a complete source ability, including across character owners, through the original native dock transaction. New copies use display slot -1; dock them separately when needed.
 
+Introduced in Lua API **1.2.0**. Requires Framework **0.3.0** or newer.
+
 ```lua
 mt2.characters.copy_ability(handle: MT2CharacterHandle, ability: MT2AbilityHandle, level?: integer): MT2Action
 ```

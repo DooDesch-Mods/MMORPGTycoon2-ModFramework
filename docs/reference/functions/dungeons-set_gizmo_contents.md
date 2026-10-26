@@ -8,6 +8,8 @@ title: "mt2.dungeons.set_gizmo_contents"
 
 Adopt one or more native container content counts by guarded compare-and-exchange and exact authored readback; existing native editor limits 0..5 apply.
 
+Introduced in Lua API **1.2.0**. Requires Framework **0.3.0** or newer.
+
 ```lua
 mt2.dungeons.set_gizmo_contents(handle: MT2Handle, gizmo: MT2Handle, contents: MT2DungeonGizmoContents, instance?: integer): MT2Action
 ```

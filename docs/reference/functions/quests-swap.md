@@ -8,6 +8,8 @@ title: "mt2.quests.swap"
 
 Swap two quest slots through native ReorderQuest and confirm the complete owner/global records. Preserve the original native Undo inverse, active visitor state and ledger with complete readback.
 
+Introduced in Lua API **1.2.0**. Requires Framework **0.3.0** or newer.
+
 ```lua
 mt2.quests.swap(handle: MT2NpcQuestHandle, slot: integer): MT2Action
 ```

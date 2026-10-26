@@ -8,6 +8,8 @@ title: "mt2.config.define"
 
 Define a typed setting shown in the Mods menu.
 
+Introduced in Lua API **1.0.0**.
+
 ```lua
 mt2.config.define(key: string, schema: MT2Setting): boolean|string|number
 ```

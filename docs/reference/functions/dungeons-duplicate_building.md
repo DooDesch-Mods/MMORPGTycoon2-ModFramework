@@ -8,6 +8,8 @@ title: "mt2.dungeons.duplicate_building"
 
 Duplicate one native Building or DungeonPortal through original payment, Duplicate, native release edit, selection and Undo transaction. Requires the requested offline template to already be the native active scene; normal native tool and selection changes apply.
 
+Introduced in Lua API **1.2.0**. Requires Framework **0.3.0** or newer.
+
 ```lua
 mt2.dungeons.duplicate_building(handle: MT2Handle, building: MT2Handle, position: number[], rotation?: number[], scale?: number[]): MT2Action
 ```

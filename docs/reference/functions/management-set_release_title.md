@@ -8,6 +8,8 @@ title: "mt2.management.set_release_title"
 
 Set the release planner title
 
+Introduced in Lua API **1.2.0**. Requires Framework **0.3.0** or newer.
+
 ```lua
 mt2.management.set_release_title(text: string): MT2Action
 ```

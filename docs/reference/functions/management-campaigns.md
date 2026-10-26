@@ -8,6 +8,8 @@ title: "mt2.management.campaigns"
 
 Read active advertising campaigns and native daily costs
 
+Introduced in Lua API **1.2.0**. Requires Framework **0.3.0** or newer.
+
 ```lua
 mt2.management.campaigns(): MT2ManagementCampaigns
 ```

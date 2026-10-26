@@ -8,6 +8,8 @@ title: "mt2.actions.place"
 
 Queue a checked native building placement.
 
+Introduced in Lua API **1.0.0**.
+
 ```lua
 mt2.actions.place(definition: string, x: number, y: number, z: number): MT2Action
 ```

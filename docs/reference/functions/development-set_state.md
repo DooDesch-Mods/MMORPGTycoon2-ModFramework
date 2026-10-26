@@ -8,6 +8,8 @@ title: "mt2.development.set_state"
 
 Set a jobless developer state through the verified native property loader
 
+Introduced in Lua API **1.2.0**. Requires Framework **0.3.0** or newer.
+
 ```lua
 mt2.development.set_state(handle: MT2Handle, value: integer): MT2Action
 ```

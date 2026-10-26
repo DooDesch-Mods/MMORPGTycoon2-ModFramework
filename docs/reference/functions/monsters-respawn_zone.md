@@ -8,6 +8,8 @@ title: "mt2.monsters.respawn_zone"
 
 Run the original Zone respawn command for dead members and confirm preserved membership, original spawn positions, death/timer reset and unchanged native Undo and ledger.
 
+Introduced in Lua API **1.2.0**. Requires Framework **0.3.0** or newer.
+
 ```lua
 mt2.monsters.respawn_zone(handle: MT2ZoneHandle): MT2Action
 ```

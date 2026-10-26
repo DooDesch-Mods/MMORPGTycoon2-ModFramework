@@ -8,6 +8,8 @@ title: "mt2.management.set_subscription_fee"
 
 Set the monthly subscription fee
 
+Introduced in Lua API **1.2.0**. Requires Framework **0.3.0** or newer.
+
 ```lua
 mt2.management.set_subscription_fee(value: integer): MT2Action
 ```

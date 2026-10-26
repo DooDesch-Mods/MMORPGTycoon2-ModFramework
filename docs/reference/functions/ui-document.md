@@ -8,6 +8,8 @@ title: "mt2.ui.document"
 
 Draw a resizable document with lists, columns, text inputs and buttons.
 
+Introduced in Lua API **1.1.0**.
+
 ```lua
 mt2.ui.document(document: MT2Document): MT2DocumentResult
 ```

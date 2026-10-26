@@ -8,6 +8,8 @@ title: "mt2.management.set_service_sync"
 
 Set service price synchronization when allowed by its prototype
 
+Introduced in Lua API **1.2.0**. Requires Framework **0.3.0** or newer.
+
 ```lua
 mt2.management.set_service_sync(building: MT2Handle, ordinal: integer, value: boolean): MT2Action
 ```

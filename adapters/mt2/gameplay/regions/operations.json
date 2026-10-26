@@ -574,5 +574,94 @@
       "Multiplayer/src/game/ui_terrain_runtime.inc",
       "Multiplayer/src/game/terrain_history_runtime.inc"
     ]
+  },
+  {
+    "name": "regions.at",
+    "kind": "query",
+    "returns": "MT2RegionHandle|nil",
+    "parameters": [
+      {
+        "name": "x",
+        "type": "number",
+        "description": "Finite root-world X coordinate."
+      },
+      {
+        "name": "z",
+        "type": "number",
+        "description": "Finite root-world Z coordinate."
+      }
+    ],
+    "summary": "Find the saved root Region at a world position; return nil outside the map.",
+    "since": "1.3.0",
+    "minimum_framework_version": "0.4.0",
+    "errors": [
+      "The world, handle or native owner expired, or the requested object is absent.",
+      "The native roster, type or snapshot changed during the checked read."
+    ],
+    "native_evidence": [
+      "Framework gameplay adapter ownership, native registry and bounded snapshot readers"
+    ],
+    "example": "examples/terrain-reader/main.lua"
+  },
+  {
+    "name": "terrain.sample",
+    "kind": "query",
+    "returns": "MT2TerrainSample",
+    "parameters": [
+      {
+        "name": "handle",
+        "type": "MT2RegionHandle",
+        "description": "Region handle from regions.list or regions.at in this world."
+      },
+      {
+        "name": "column",
+        "type": "integer",
+        "description": "Zero-based column in the native height grid."
+      },
+      {
+        "name": "row",
+        "type": "integer",
+        "description": "Zero-based row in the native height grid."
+      }
+    ],
+    "summary": "Read one raw terrain height-grid sample without copying the whole grid.",
+    "since": "1.3.0",
+    "minimum_framework_version": "0.4.0",
+    "errors": [
+      "The world, handle or native owner expired, or the requested object is absent.",
+      "The native roster, type or snapshot changed during the checked read."
+    ],
+    "native_evidence": [
+      "Framework gameplay adapter ownership, native registry and bounded snapshot readers"
+    ],
+    "example": "examples/terrain-reader/main.lua"
+  },
+  {
+    "name": "terrain.samples",
+    "kind": "query",
+    "returns": "MT2TerrainSample[]",
+    "parameters": [
+      {
+        "name": "handle",
+        "type": "MT2RegionHandle",
+        "description": "Region handle from regions.list or regions.at in this world."
+      },
+      {
+        "name": "points",
+        "type": "MT2TerrainSamplePoint[]",
+        "description": "1..128 grid coordinates. Results preserve input order; duplicate coordinates are read once."
+      }
+    ],
+    "summary": "Read a bounded set of raw height-grid samples, preserving requested order.",
+    "since": "1.3.0",
+    "minimum_framework_version": "0.4.0",
+    "errors": [
+      "The world, handle or native owner expired, or the requested object is absent.",
+      "The native roster, type or snapshot changed during the checked read."
+    ],
+    "native_evidence": [
+      "Framework gameplay adapter ownership, native registry and bounded snapshot readers"
+    ],
+    "example": "examples/terrain-reader/main.lua"
   }
 ]

@@ -8,6 +8,8 @@ title: "mt2.patches.add"
 
 Register an owned experimental Before/After patch on a named target.
 
+Introduced in Lua API **1.0.0**. Requires Framework **0.2.0** or newer.
+
 ```lua
 mt2.patches.add(spec: MT2PatchSpec, callbacks: MT2PatchCallbacks): string
 ```

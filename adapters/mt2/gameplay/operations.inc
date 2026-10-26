@@ -3064,6 +3064,49 @@ std::string(R"MT2gameplay([
     "native_result": "table"
   },
   {
+    "name": "management.service",
+    "kind": "query",
+    "parameters": [
+      {
+        "name": "building",
+        "type": "MT2Handle",
+        "description": "Building that owns the requested service."
+      },
+      {
+        "name": "handle",
+        "type": "MT2Handle",
+        "description": "Current world epoch and exact UID string."
+      }
+    ],
+    "summary": "Read one building service with its current price and synchronization settings.",
+    "returns": "MT2ManagementService",
+    "native_evidence": [
+      "Framework gameplay adapter ownership, native registry and bounded snapshot readers"
+    ]
+  },
+  {
+    "name": "management.set_fees",
+    "kind": "action",
+    "parameters": [
+      {
+        "name": "purchase",
+        "type": "integer",
+        "description": "Nonnegative native int32 purchase price."
+      },
+      {
+        "name": "subscription",
+        "type": "integer",
+        "description": "Nonnegative native int32 subscription price."
+      }
+    ],
+    "summary": "Queue both game fees in one checked game-thread action.",
+    "returns": "MT2Action",
+    "native_evidence": [
+      "Framework gameplay adapter ownership, native registry and bounded snapshot readers"
+    ],
+    "native_result": "MT2ManagementFeeChange"
+  },
+  {
     "name": "modular.get_layout",
     "kind": "query",
     "parameters": [
@@ -3144,7 +3187,8 @@ std::string(R"MT2gameplay([
         "description": "Three finite world coordinates; add_block applies the original native position adjustment."
       }
     ],
-    "summary": "Remove a native modular block at the world position. Commit a complete original Layout/Plan/pose inverse to native Undo.",
+    "summary": "Remove a native modular block at the world posit)MT2gameplay"
++ R"MT2gameplay(ion. Commit a complete original Layout/Plan/pose inverse to native Undo.",
     "returns": "MT2Action",
     "native_evidence": [
       "src/game/modular_calls.h",
@@ -3180,8 +3224,7 @@ std::string(R"MT2gameplay([
       "src/game/modular_layout_graph.h",
       "src/game/modular_identity.h",
       "src/game/modular_code.h",
-      "src/g)MT2gameplay"
-+ R"MT2gameplay(ame/subscriber_lifecycle/record_graph.cpp",
+      "src/game/subscriber_lifecycle/record_graph.cpp",
       "src/game/building_history_slice/native_bridge.cpp"
     ],
     "native_result": "MT2ModularEditResult"
@@ -3256,7 +3299,8 @@ std::string(R"MT2gameplay([
       "src/game/modular_identity.h",
       "src/game/modular_code.h",
       "src/game/subscriber_lifecycle/record_graph.cpp",
-      "src/game/building_history_slice/native_bridge.cpp"
+      "src/game/buil)MT2gameplay"
++ R"MT2gameplay(ding_history_slice/native_bridge.cpp"
     ],
     "native_result": "MT2ModularHistoryResult"
   },
@@ -3290,8 +3334,7 @@ std::string(R"MT2gameplay([
         "description": "Local clearance minimum XYZ and maximum XYZ (6 finite numbers). The native transaction clears intersecting Scenery and retains every inverse."
       }
     ],
-    "summary": "Load authored Layout/Plan records, purchase and place a modular Scenery/base Build)MT2gameplay"
-+ R"MT2gameplay(ing through the complete native transaction, with receipt-based Undo/Redo.",
+    "summary": "Load authored Layout/Plan records, purchase and place a modular Scenery/base Building through the complete native transaction, with receipt-based Undo/Redo.",
     "returns": "MT2Action",
     "native_evidence": [
       "src/game/modular_calls.h",
@@ -3351,7 +3394,8 @@ std::string(R"MT2gameplay([
       {
         "name": "start_node",
         "type": "MT2Handle",
-        "description": "Optional exact current Intersection that native start hover must choose.",
+        "description": "Optional exact current Intersection that native start hover mu)MT2gameplay"
++ R"MT2gameplay(st choose.",
         "optional": true
       },
       {
@@ -3379,8 +3423,7 @@ std::string(R"MT2gameplay([
       "Multiplayer/src/game/ui_path_runtime.inc",
       "Multiplayer/src/game/path_reader.h",
       "Multiplayer/src/game/path_execution.inc",
-      "Multiplayer/)MT2gameplay"
-+ R"MT2gameplay(src/game/mixed_path_reader.h",
+      "Multiplayer/src/game/mixed_path_reader.h",
       "Multiplayer/src/game/world_path_history.inc"
     ],
     "native_result": "MT2PathRouteResult"
@@ -3458,7 +3501,8 @@ std::string(R"MT2gameplay([
       },
       {
         "name": "start",
-        "type": "number[]",
+        "ty)MT2gameplay"
++ R"MT2gameplay(pe": "number[]",
         "description": "Three finite coordinates within the start Region."
       },
       {
@@ -3495,8 +3539,7 @@ std::string(R"MT2gameplay([
       {
         "name": "plan",
         "type": "MT2WallPlan",
-        ")MT2gameplay"
-+ R"MT2gameplay(description": "Native spline and preview plan in one owned active root Region. This low-level interface accepts the proven native 12-float spline records directly."
+        "description": "Native spline and preview plan in one owned active root Region. This low-level interface accepts the proven native 12-float spline records directly."
       }
     ],
     "summary": "Execute a bounded explicit native Wall plan through isolated original Wall/Path/model construction, native Purchase and Finish, then owned cleanup. Native ghost Length supplies the price quote. Supports explicit current node and split-Path handles, including preview split targets. Confirms reciprocal mixed topology, created Path family/scene, retained original Undo and unchanged unrelated Paths. Returns created Paths, native length, cost and owned history receipt.",
@@ -3546,7 +3589,8 @@ std::string(R"MT2gameplay([
       "Multiplayer/src/game/building_history_slice/native_bridge.cpp",
       "Multiplayer/src/game/building_history_slice/stack_transition.h"
     ],
-    "native_result": "MT2PathHistoryResult"
+    "native_result": "M)MT2gameplay"
++ R"MT2gameplay(T2PathHistoryResult"
   },
   {
     "name": "paths.redo",
@@ -3580,8 +3624,7 @@ std::string(R"MT2gameplay([
       {
         "name": "type",
         "type": "integer",
-        "description": "Original nat)MT2gameplay"
-+ R"MT2gameplay(ive type: 0 lowers to Ocean; 1 raises to land."
+        "description": "Original native type: 0 lowers to Ocean; 1 raises to land."
       },
       {
         "name": "position",
@@ -3668,7 +3711,8 @@ std::string(R"MT2gameplay([
       },
       {
         "name": "name",
-        "type": "string",
+        "type": )MT2gameplay"
++ R"MT2gameplay("string",
         "description": "Region name, 1..256 UTF-8 bytes."
       }
     ],
@@ -3712,8 +3756,7 @@ std::string(R"MT2gameplay([
       {
         "name": "handle",
         "type": "MT2RegionHandle",
-        "description": "C)MT2gameplay"
-+ R"MT2gameplay(urrent Region identity."
+        "description": "Current Region identity."
       },
       {
         "name": "values",
@@ -3808,7 +3851,8 @@ std::string(R"MT2gameplay([
     "parameters": [
       {
         "name": "handle",
-        "type": "MT2RegionHandle",
+        "t)MT2gameplay"
++ R"MT2gameplay(ype": "MT2RegionHandle",
         "description": "Current Region identity."
       },
       {
@@ -3852,8 +3896,7 @@ std::string(R"MT2gameplay([
         "type": "string[]",
         "description": "Four exact names returned by styles()."
       }
-)MT2gameplay"
-+ R"MT2gameplay(    ],
+    ],
     "summary": "Apply all four terrain styles through the original native EditManager transaction.",
     "returns": "MT2Action",
     "native_evidence": [
@@ -3946,7 +3989,8 @@ std::string(R"MT2gameplay([
         "name": "maximum",
         "type": "integer",
         "description": "Maximum level within the native widget domain."
-      },
+      },)MT2gameplay"
++ R"MT2gameplay(
       {
         "name": "position",
         "type": "number[]",
@@ -3989,8 +4033,7 @@ std::string(R"MT2gameplay([
     "kind": "action",
     "parameters": [
       {
-        "name": )MT2gameplay"
-+ R"MT2gameplay("handle",
+        "name": "handle",
         "type": "MT2RegionHandle",
         "description": "Current Region identity."
       },
@@ -4083,7 +4126,8 @@ std::string(R"MT2gameplay([
     "kind": "action",
     "parameters": [
       {
-        "name": "handle",
+        "name)MT2gameplay"
++ R"MT2gameplay(": "handle",
         "type": "MT2RegionHandle",
         "description": "Current Region identity."
       },
@@ -4114,14 +4158,81 @@ std::string(R"MT2gameplay([
     "native_result": "MT2TerrainPaintResult"
   },
   {
+    "name": "regions.at",
+    "kind": "query",
+    "parameters": [
+      {
+        "name": "x",
+        "type": "number",
+        "description": "Finite root-world X coordinate."
+      },
+      {
+        "name": "z",
+        "type": "number",
+        "description": "Finite root-world Z coordinate."
+      }
+    ],
+    "summary": "Find the saved root Region at a world position; return nil outside the map.",
+    "returns": "MT2RegionHandle|nil",
+    "native_evidence": [
+      "Framework gameplay adapter ownership, native registry and bounded snapshot readers"
+    ]
+  },
+  {
+    "name": "terrain.sample",
+    "kind": "query",
+    "parameters": [
+      {
+        "name": "handle",
+        "type": "MT2RegionHandle",
+        "description": "Region handle from regions.list or regions.at in this world."
+      },
+      {
+        "name": "column",
+        "type": "integer",
+        "description": "Zero-based column in the native height grid."
+      },
+      {
+        "name": "row",
+        "type": "integer",
+        "description": "Zero-based row in the native height grid."
+      }
+    ],
+    "summary": "Read one raw terrain height-grid sample without copying the whole grid.",
+    "returns": "MT2TerrainSample",
+    "native_evidence": [
+      "Framework gameplay adapter ownership, native registry and bounded snapshot readers"
+    ]
+  },
+  {
+    "name": "terrain.samples",
+    "kind": "query",
+    "parameters": [
+      {
+        "name": "handle",
+        "type": "MT2RegionHandle",
+        "description": "Region handle from regions.list or regions.at in this world."
+      },
+      {
+        "name": "points",
+        "type": "MT2TerrainSamplePoint[]",
+        "description": "1..128 grid coordinates. Results preserve input order; duplicate coordinates are read once."
+      }
+    ],
+    "summary": "Read a bounded set of raw height-grid samples, preserving requested order.",
+    "returns": "MT2TerrainSample[]",
+    "native_evidence": [
+      "Framework gameplay adapter ownership, native registry and bounded snapshot readers"
+    ]
+  },
+  {
     "name": "scenery.stroke",
     "kind": "action",
     "parameters": [
       {
         "name": "kind",
         "type": "string",
-        "description": "paint, category_erase or erase. category_erase uses native brush mode 1; er)MT2gameplay"
-+ R"MT2gameplay(ase uses the general eraser."
+        "description": "paint, category_erase or erase. category_erase uses native brush mode 1; erase uses the general eraser."
       },
       {
         "name": "region",
@@ -4136,7 +4247,8 @@ std::string(R"MT2gameplay([
       {
         "name": "stamps",
         "type": "MT2SceneryStrokeStamp[]",
-        "description": "One to 4096 ordered complete canonical PolyShapes in native integer clipping units. Painting supplies each stamp's complete generated dot poses. Total points and total dots are each bounded to one million."
+        "description": "One to 4096 ordered complete canonical PolyShapes in native integer clipping units. Painting supplies each stamp's complete generated dot poses. Total points and total dots are eac)MT2gameplay"
++ R"MT2gameplay(h bounded to one million."
       },
       {
         "name": "type",
@@ -4198,8 +4310,7 @@ std::string(R"MT2gameplay([
     "returns": "MT2Action",
     "native_evidence": [
       "Multiplayer/src/game/selection_move_native.h",
- )MT2gameplay"
-+ R"MT2gameplay(     "Multiplayer/src/game/selection_move_runtime.inc",
+      "Multiplayer/src/game/selection_move_runtime.inc",
       "Multiplayer/src/game/selection_move_reader.h",
       "Multiplayer/src/game/scenery_kiss/lifecycle_native.cpp"
     ],
@@ -4221,7 +4332,8 @@ std::string(R"MT2gameplay([
       },
       {
         "name": "rotation",
-        "type": "number[]",
+     )MT2gameplay"
++ R"MT2gameplay(   "type": "number[]",
         "description": "Normalized quaternion x/y/z/w; omitted preserves source rotation.",
         "optional": true
       },
@@ -4302,8 +4414,7 @@ std::string(R"MT2gameplay([
         "description": "Current root-world native Group handle."
       }
     ],
-    "summary": "Destroy a whole native Group th)MT2gameplay"
-+ R"MT2gameplay(rough original SelectionManager DestroyProp, retaining normal native refund and Undo behavior. Confirms removal of the Group and every owned Scenery member, plus unchanged unrelated members. Returns destroyed=true and member count. Requires the root world to be the actual native active scene; normal native selection and tool effects apply.",
+    "summary": "Destroy a whole native Group through original SelectionManager DestroyProp, retaining normal native refund and Undo behavior. Confirms removal of the Group and every owned Scenery member, plus unchanged unrelated members. Returns destroyed=true and member count. Requires the root world to be the actual native active scene; normal native selection and tool effects apply.",
     "returns": "MT2Action",
     "native_evidence": [
       "Multiplayer/src/game/group_object_calls.h",
@@ -4315,7 +4426,8 @@ std::string(R"MT2gameplay([
   {
     "name": "scenery.groups",
     "kind": "query",
-    "parameters": [],
+    "parameters")MT2gameplay"
++ R"MT2gameplay(: [],
     "summary": "Read root-world Groups with exact Group and member handles, native ten-float poses, Region IDs and relative member poses.",
     "returns": "MT2SceneryGroup[]",
     "native_evidence": [
@@ -4398,8 +4510,7 @@ std::string(R"MT2gameplay([
       {
         "name": "handle",
         "type": "MT2SubscriberHandle",
-        "description": "Subscriber identity returned by candidates() in the current )MT2gameplay"
-+ R"MT2gameplay(world epoch."
+        "description": "Subscriber identity returned by candidates() in the current world epoch."
       }
     ],
     "summary": "Read a subscriber's satisfaction, addiction, login state and seven native needs.",
@@ -4422,7 +4533,8 @@ std::string(R"MT2gameplay([
     "name": "development.research",
     "kind": "query",
     "parameters": [],
-    "summary": "Read current development progress and all shared project sources",
+    "summa)MT2gameplay"
++ R"MT2gameplay(ry": "Read current development progress and all shared project sources",
     "returns": "MT2ProjectSnapshot",
     "native_evidence": [
       "Multiplayer commit 8a13602: src/game/general_project_reader.h"
@@ -4527,8 +4639,7 @@ std::string(R"MT2gameplay([
         "description": "Requested active flag; actor must have no job or carried object"
       }
     ],
-    "summary": "Set a jobless develope)MT2gameplay"
-+ R"MT2gameplay(r active property through the native property loader",
+    "summary": "Set a jobless developer active property through the native property loader",
     "returns": "MT2Action",
     "native_evidence": [
       "Multiplayer commit 8a13602: src/game/developer_staff/scalar_calls.cpp"
@@ -4548,7 +4659,8 @@ std::string(R"MT2gameplay([
     "summary": "Pay for and start the selected native research, art, statistic or shared project source",
     "returns": "MT2Action",
     "native_evidence": [
-      "Multiplayer commit 8a13602: src/game/general_project_runtime.cpp"
+      "Multiplayer co)MT2gameplay"
++ R"MT2gameplay(mmit 8a13602: src/game/general_project_runtime.cpp"
     ],
     "native_result": "table"
   },
@@ -4662,8 +4774,7 @@ std::string(R"MT2gameplay([
   {
     "name": "network.remove",
     "kind": "action",
-    ")MT2gameplay"
-+ R"MT2gameplay(parameters": [
+    "parameters": [
       {
         "name": "handle",
         "type": "MT2Handle",
@@ -4676,6 +4787,55 @@ std::string(R"MT2gameplay([
       "Multiplayer commit 8a13602: src/game/network_remove_runtime.inc"
     ],
     "native_result": "table"
+  },
+  {
+    "name": "network.node",
+    "kind": "query",
+    "parameters": [
+      {
+        "name": "handle",
+        "type": "MT2Handle",
+        "description": "Current world epoch and exact UID string."
+      }
+    ],
+    "summary": ")MT2gameplay"
++ R"MT2gameplay(Read one current server node and its checked connections.",
+    "returns": "MT2ServerNode",
+    "native_evidence": [
+      "Framework gameplay adapter ownership, native registry and bounded snapshot readers"
+    ]
+  },
+  {
+    "name": "network.pipe",
+    "kind": "query",
+    "parameters": [
+      {
+        "name": "handle",
+        "type": "MT2Handle",
+        "description": "Current world epoch and exact UID string."
+      }
+    ],
+    "summary": "Read one current network pipe, geometry and checked endpoints.",
+    "returns": "MT2ServerPipe",
+    "native_evidence": [
+      "Framework gameplay adapter ownership, native registry and bounded snapshot readers"
+    ]
+  },
+  {
+    "name": "projects.get",
+    "kind": "query",
+    "parameters": [
+      {
+        "name": "source",
+        "type": "MT2ProjectSource",
+        "description": "Exact source from the current projects.catalogue snapshot."
+      }
+    ],
+    "summary": "Read the current availability, price and worker limit for one project source.",
+    "returns": "MT2ProjectCatalogueRow",
+    "native_evidence": [
+      "Framework gameplay adapter ownership, native registry and bounded snapshot readers"
+    ]
   }
 ]
 )MT2gameplay"

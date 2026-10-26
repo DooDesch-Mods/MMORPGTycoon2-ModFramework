@@ -8,6 +8,8 @@ title: "mt2.actions.remove"
 
 Queue a checked native removal.
 
+Introduced in Lua API **1.0.0**.
+
 ```lua
 mt2.actions.remove(handle: MT2Handle): MT2Action
 ```

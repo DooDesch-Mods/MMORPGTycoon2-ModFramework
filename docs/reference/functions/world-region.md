@@ -8,6 +8,8 @@ title: "mt2.world.region"
 
 Read region ownership, native type and the current region purchase price.
 
+Introduced in Lua API **1.1.0**.
+
 ```lua
 mt2.world.region(x: number, z: number): MT2Region
 ```

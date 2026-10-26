@@ -8,6 +8,8 @@ title: "mt2.input.bind"
 
 Bind an owned keyboard shortcut.
 
+Introduced in Lua API **1.0.0**.
+
 ```lua
 mt2.input.bind(name: string, scancode: integer, callback: fun(event:MT2InputEvent)): integer
 ```

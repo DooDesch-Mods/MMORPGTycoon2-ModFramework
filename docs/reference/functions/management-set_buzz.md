@@ -8,6 +8,8 @@ title: "mt2.management.set_buzz"
 
 Set both native marketing buzz accumulators with guarded stores
 
+Introduced in Lua API **1.2.0**. Requires Framework **0.3.0** or newer.
+
 ```lua
 mt2.management.set_buzz(positive: integer, negative: integer): MT2Action
 ```

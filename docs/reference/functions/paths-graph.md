@@ -8,6 +8,8 @@ title: "mt2.paths.graph"
 
 Read the complete saved root-world mixed Path graph, including all eleven Path types, six Intersection types, reciprocal node edges and cross-Region membership. Fields contain native handles, Region IDs, names, waypoints and native distances.
 
+Introduced in Lua API **1.2.0**. Requires Framework **0.3.0** or newer.
+
 ```lua
 mt2.paths.graph(): MT2PathGraph
 ```

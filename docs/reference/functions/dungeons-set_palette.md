@@ -8,6 +8,8 @@ title: "mt2.dungeons.set_palette"
 
 Set the four packed palette colors and defaults flag through native explicit-owner leaves; existing cells retain their colors.
 
+Introduced in Lua API **1.2.0**. Requires Framework **0.3.0** or newer.
+
 ```lua
 mt2.dungeons.set_palette(handle: MT2Handle, colors: table, defaults?: boolean): MT2Action
 ```

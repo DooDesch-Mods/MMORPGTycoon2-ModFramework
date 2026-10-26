@@ -3042,6 +3042,49 @@
       "native_result": "table"
     },
     {
+      "name": "management.service",
+      "kind": "query",
+      "parameters": [
+        {
+          "name": "building",
+          "type": "MT2Handle",
+          "description": "Building that owns the requested service."
+        },
+        {
+          "name": "handle",
+          "type": "MT2Handle",
+          "description": "Current world epoch and exact UID string."
+        }
+      ],
+      "summary": "Read one building service with its current price and synchronization settings.",
+      "returns": "MT2ManagementService",
+      "native_evidence": [
+        "Framework gameplay adapter ownership, native registry and bounded snapshot readers"
+      ]
+    },
+    {
+      "name": "management.set_fees",
+      "kind": "action",
+      "parameters": [
+        {
+          "name": "purchase",
+          "type": "integer",
+          "description": "Nonnegative native int32 purchase price."
+        },
+        {
+          "name": "subscription",
+          "type": "integer",
+          "description": "Nonnegative native int32 subscription price."
+        }
+      ],
+      "summary": "Queue both game fees in one checked game-thread action.",
+      "returns": "MT2Action",
+      "native_evidence": [
+        "Framework gameplay adapter ownership, native registry and bounded snapshot readers"
+      ],
+      "native_result": "MT2ManagementFeeChange"
+    },
+    {
       "name": "modular.get_layout",
       "kind": "query",
       "parameters": [
@@ -4084,6 +4127,74 @@
       "native_result": "MT2TerrainPaintResult"
     },
     {
+      "name": "regions.at",
+      "kind": "query",
+      "parameters": [
+        {
+          "name": "x",
+          "type": "number",
+          "description": "Finite root-world X coordinate."
+        },
+        {
+          "name": "z",
+          "type": "number",
+          "description": "Finite root-world Z coordinate."
+        }
+      ],
+      "summary": "Find the saved root Region at a world position; return nil outside the map.",
+      "returns": "MT2RegionHandle|nil",
+      "native_evidence": [
+        "Framework gameplay adapter ownership, native registry and bounded snapshot readers"
+      ]
+    },
+    {
+      "name": "terrain.sample",
+      "kind": "query",
+      "parameters": [
+        {
+          "name": "handle",
+          "type": "MT2RegionHandle",
+          "description": "Region handle from regions.list or regions.at in this world."
+        },
+        {
+          "name": "column",
+          "type": "integer",
+          "description": "Zero-based column in the native height grid."
+        },
+        {
+          "name": "row",
+          "type": "integer",
+          "description": "Zero-based row in the native height grid."
+        }
+      ],
+      "summary": "Read one raw terrain height-grid sample without copying the whole grid.",
+      "returns": "MT2TerrainSample",
+      "native_evidence": [
+        "Framework gameplay adapter ownership, native registry and bounded snapshot readers"
+      ]
+    },
+    {
+      "name": "terrain.samples",
+      "kind": "query",
+      "parameters": [
+        {
+          "name": "handle",
+          "type": "MT2RegionHandle",
+          "description": "Region handle from regions.list or regions.at in this world."
+        },
+        {
+          "name": "points",
+          "type": "MT2TerrainSamplePoint[]",
+          "description": "1..128 grid coordinates. Results preserve input order; duplicate coordinates are read once."
+        }
+      ],
+      "summary": "Read a bounded set of raw height-grid samples, preserving requested order.",
+      "returns": "MT2TerrainSample[]",
+      "native_evidence": [
+        "Framework gameplay adapter ownership, native registry and bounded snapshot readers"
+      ]
+    },
+    {
       "name": "scenery.stroke",
       "kind": "action",
       "parameters": [
@@ -4640,6 +4751,54 @@
         "Multiplayer commit 8a13602: src/game/network_remove_runtime.inc"
       ],
       "native_result": "table"
+    },
+    {
+      "name": "network.node",
+      "kind": "query",
+      "parameters": [
+        {
+          "name": "handle",
+          "type": "MT2Handle",
+          "description": "Current world epoch and exact UID string."
+        }
+      ],
+      "summary": "Read one current server node and its checked connections.",
+      "returns": "MT2ServerNode",
+      "native_evidence": [
+        "Framework gameplay adapter ownership, native registry and bounded snapshot readers"
+      ]
+    },
+    {
+      "name": "network.pipe",
+      "kind": "query",
+      "parameters": [
+        {
+          "name": "handle",
+          "type": "MT2Handle",
+          "description": "Current world epoch and exact UID string."
+        }
+      ],
+      "summary": "Read one current network pipe, geometry and checked endpoints.",
+      "returns": "MT2ServerPipe",
+      "native_evidence": [
+        "Framework gameplay adapter ownership, native registry and bounded snapshot readers"
+      ]
+    },
+    {
+      "name": "projects.get",
+      "kind": "query",
+      "parameters": [
+        {
+          "name": "source",
+          "type": "MT2ProjectSource",
+          "description": "Exact source from the current projects.catalogue snapshot."
+        }
+      ],
+      "summary": "Read the current availability, price and worker limit for one project source.",
+      "returns": "MT2ProjectCatalogueRow",
+      "native_evidence": [
+        "Framework gameplay adapter ownership, native registry and bounded snapshot readers"
+      ]
     }
   ],
   "documentation": "experimental/gameplay.html",

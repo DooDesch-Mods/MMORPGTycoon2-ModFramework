@@ -8,6 +8,8 @@ title: "mt2.ui.text"
 
 Draw text in the current window.
 
+Introduced in Lua API **1.0.0**.
+
 ```lua
 mt2.ui.text(text: any): boolean
 ```

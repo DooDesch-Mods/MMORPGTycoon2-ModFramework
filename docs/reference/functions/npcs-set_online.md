@@ -8,6 +8,8 @@ title: "mt2.npcs.set_online"
 
 Set the native online mode and verify its mode, forced-tint flag and color.
 
+Introduced in Lua API **1.2.0**. Requires Framework **0.3.0** or newer.
+
 ```lua
 mt2.npcs.set_online(handle: MT2ActorHandle, mode: integer): MT2Action
 ```

@@ -8,6 +8,8 @@ title: "mt2.log.info"
 
 Write a mod-labelled info log entry.
 
+Introduced in Lua API **1.0.0**.
+
 ```lua
 mt2.log.info(message: any): boolean
 ```

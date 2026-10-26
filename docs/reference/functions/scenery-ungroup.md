@@ -8,6 +8,8 @@ title: "mt2.scenery.ungroup"
 
 Run the whole original UngroupSelection transaction and confirm removal, free surviving member handles and unchanged member poses, plus original per-Group saved inverse records. Returns ungrouped count and members. Requires the root world to be the native active scene and the current native tool to permit selection; normal native selection changes apply.
 
+Introduced in Lua API **1.2.0**. Requires Framework **0.3.0** or newer.
+
 ```lua
 mt2.scenery.ungroup(handles: MT2Handle[]): MT2Action
 ```

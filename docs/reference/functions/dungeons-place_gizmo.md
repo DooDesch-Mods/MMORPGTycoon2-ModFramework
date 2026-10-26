@@ -8,6 +8,8 @@ title: "mt2.dungeons.place_gizmo"
 
 Place a Door, Key or Treasure in the offline template through original purchase, creation, inverse graph and Undo; native cost and sound apply.
 
+Introduced in Lua API **1.2.0**. Requires Framework **0.3.0** or newer.
+
 ```lua
 mt2.dungeons.place_gizmo(handle: MT2Handle, tool: string, type: string, position: number[], variant?: string, rotation?: number[], scale?: number[]): MT2Action
 ```

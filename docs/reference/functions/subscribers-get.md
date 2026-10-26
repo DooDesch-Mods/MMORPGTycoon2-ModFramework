@@ -8,6 +8,8 @@ title: "mt2.subscribers.get"
 
 Read a subscriber's satisfaction, addiction, login state and seven native needs.
 
+Introduced in Lua API **1.2.0**. Requires Framework **0.3.0** or newer.
+
 ```lua
 mt2.subscribers.get(handle: MT2SubscriberHandle): MT2SubscriberState
 ```

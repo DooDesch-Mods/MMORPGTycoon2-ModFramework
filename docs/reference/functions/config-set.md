@@ -8,6 +8,8 @@ title: "mt2.config.set"
 
 Validate and save a setting.
 
+Introduced in Lua API **1.0.0**.
+
 ```lua
 mt2.config.set(key: string, value: boolean|string|number): boolean
 ```

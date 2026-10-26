@@ -8,6 +8,8 @@ title: "mt2.terrain.heights"
 
 Read a bounded page of the original Region height grid.
 
+Introduced in Lua API **1.2.0**. Requires Framework **0.3.0** or newer.
+
 ```lua
 mt2.terrain.heights(handle: MT2RegionHandle, offset?: integer, limit?: integer): MT2TerrainHeightPage
 ```

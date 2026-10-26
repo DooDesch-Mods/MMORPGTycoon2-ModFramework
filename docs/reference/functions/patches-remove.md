@@ -8,6 +8,8 @@ title: "mt2.patches.remove"
 
 Remove an owned patch and return whether its owner has no in-flight callbacks.
 
+Introduced in Lua API **1.0.0**. Requires Framework **0.2.0** or newer.
+
 ```lua
 mt2.patches.remove(id: string): boolean
 ```

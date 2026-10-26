@@ -8,6 +8,8 @@ title: "mt2.terrain.contours"
 
 Read a bounded page of exact native integer terrain polygon coordinates.
 
+Introduced in Lua API **1.2.0**. Requires Framework **0.3.0** or newer.
+
 ```lua
 mt2.terrain.contours(handle: MT2RegionHandle, style: integer, path?: integer, offset?: integer, limit?: integer): MT2TerrainContourPage
 ```

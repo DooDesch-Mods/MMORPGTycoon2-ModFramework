@@ -8,6 +8,8 @@ title: "mt2.management.hire_gm"
 
 Hire one Game Master
 
+Introduced in Lua API **1.2.0**. Requires Framework **0.3.0** or newer.
+
 ```lua
 mt2.management.hire_gm(): MT2Action
 ```

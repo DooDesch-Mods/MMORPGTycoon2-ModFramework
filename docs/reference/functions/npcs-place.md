@@ -8,6 +8,8 @@ title: "mt2.npcs.place"
 
 Create through original NPCManager AddNPC, including two generated quests for a QuestGiver. Verify native cash/destroy Undo, original TypeCost refund, release edit, tag progression, all quest/visitor and actor survivors, and unchanged ledger.
 
+Introduced in Lua API **1.2.0**. Requires Framework **0.3.0** or newer.
+
 ```lua
 mt2.npcs.place(character: MT2CharacterHandle, region: integer, type: integer, pose: MT2ActorPose): MT2Action
 ```

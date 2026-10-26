@@ -8,6 +8,8 @@ title: "mt2.world.entities"
 
 Read a bounded native world-object inventory with exact handles and building classification.
 
+Introduced in Lua API **1.2.0**. Requires Framework **0.3.0** or newer.
+
 ```lua
 mt2.world.entities(limit?: integer): MT2WorldEntity[]
 ```

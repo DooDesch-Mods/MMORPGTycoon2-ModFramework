@@ -831,5 +831,59 @@
     "native_evidence": [
       "Multiplayer commit 8a13602: src/game/marketing_authority/native_port.cpp"
     ]
+  },
+  {
+    "name": "management.service",
+    "kind": "query",
+    "returns": "MT2ManagementService",
+    "parameters": [
+      {
+        "name": "building",
+        "type": "MT2Handle",
+        "description": "Building that owns the requested service."
+      },
+      {
+        "name": "handle",
+        "type": "MT2Handle",
+        "description": "Current world epoch and exact UID string."
+      }
+    ],
+    "summary": "Read one building service with its current price and synchronization settings.",
+    "since": "1.3.0",
+    "minimum_framework_version": "0.4.0",
+    "errors": [
+      "The world, handle or native owner expired, or the requested object is absent.",
+      "The native roster, type or snapshot changed during the checked read."
+    ],
+    "native_evidence": [
+      "Framework gameplay adapter ownership, native registry and bounded snapshot readers"
+    ]
+  },
+  {
+    "name": "management.set_fees",
+    "kind": "action",
+    "returns": "MT2ManagementFeeChange",
+    "parameters": [
+      {
+        "name": "purchase",
+        "type": "integer",
+        "description": "Nonnegative native int32 purchase price."
+      },
+      {
+        "name": "subscription",
+        "type": "integer",
+        "description": "Nonnegative native int32 subscription price."
+      }
+    ],
+    "summary": "Queue both game fees in one checked game-thread action.",
+    "since": "1.3.0",
+    "minimum_framework_version": "0.4.0",
+    "errors": [
+      "Invalid prices or an unavailable native owner reject the request before execution.",
+      "A partial native failure is unknown and is never retried or rolled back automatically."
+    ],
+    "native_evidence": [
+      "Framework gameplay adapter ownership, native registry and bounded snapshot readers"
+    ]
   }
 ]

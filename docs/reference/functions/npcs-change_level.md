@@ -8,6 +8,8 @@ title: "mt2.npcs.change_level"
 
 Execute the original Raise Level or Lower Level command and verify the current level and preserved properties.
 
+Introduced in Lua API **1.2.0**. Requires Framework **0.3.0** or newer.
+
 ```lua
 mt2.npcs.change_level(handle: MT2ActorHandle, delta: integer): MT2Action
 ```

@@ -8,6 +8,8 @@ title: "mt2.actors.regions"
 
 List saved root Region IDs and native level bounds.
 
+Introduced in Lua API **1.2.0**. Requires Framework **0.3.0** or newer.
+
 ```lua
 mt2.actors.regions(): MT2ActorRegion[]
 ```

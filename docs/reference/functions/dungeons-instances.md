@@ -8,6 +8,8 @@ title: "mt2.dungeons.instances"
 
 List current saved Instance indices and started flags with reciprocal scene validation.
 
+Introduced in Lua API **1.2.0**. Requires Framework **0.3.0** or newer.
+
 ```lua
 mt2.dungeons.instances(handle: MT2Handle): MT2DungeonInstance[]
 ```

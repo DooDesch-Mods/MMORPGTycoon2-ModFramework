@@ -8,6 +8,8 @@ title: "mt2.actors.remove"
 
 Remove an NPC or a Monster outside a generating Zone through original SelectionManager DestroyProp. Confirm UID/manager/spatial/selection absence, full quest and visitor cascade, native actor/quest inverse records, and unchanged zero-cost ledger.
 
+Introduced in Lua API **1.2.0**. Requires Framework **0.3.0** or newer.
+
 ```lua
 mt2.actors.remove(handle: MT2ActorHandle): MT2Action
 ```

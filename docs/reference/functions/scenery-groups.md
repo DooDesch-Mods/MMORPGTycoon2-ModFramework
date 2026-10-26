@@ -8,6 +8,8 @@ title: "mt2.scenery.groups"
 
 Read root-world Groups with exact Group and member handles, native ten-float poses, Region IDs and relative member poses.
 
+Introduced in Lua API **1.2.0**. Requires Framework **0.3.0** or newer.
+
 ```lua
 mt2.scenery.groups(): MT2SceneryGroup[]
 ```

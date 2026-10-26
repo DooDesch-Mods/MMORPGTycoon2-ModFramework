@@ -8,6 +8,8 @@ title: "mt2.dungeons.gizmos"
 
 List Gizmo handles, identity, transforms, trigger/state, contents and door edges in one scene.
 
+Introduced in Lua API **1.2.0**. Requires Framework **0.3.0** or newer.
+
 ```lua
 mt2.dungeons.gizmos(handle: MT2Handle, instance?: integer): MT2DungeonGizmo[]
 ```

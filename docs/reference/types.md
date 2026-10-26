@@ -1570,3 +1570,26 @@ Handles carry a world epoch and an exact string UID. Never convert the UID to a 
 | `retired_monsters` | `MT2ActorHandle[]` |
 | `created_monsters` | `MT2ActorHandle[]` |
 | `undo_confirmed` | `boolean` |
+
+## MT2ManagementFeeChange
+
+| Field | Type |
+| --- | --- |
+| `before` | `MT2ManagementFees` |
+| `after` | `MT2ManagementFees` |
+
+## MT2TerrainSamplePoint
+
+| Field | Type |
+| --- | --- |
+| `column` | `integer` |
+| `row` | `integer` |
+
+## MT2TerrainSample
+
+| Field | Type |
+| --- | --- |
+| `column` | `integer` |
+| `row` | `integer` |
+| `index` | `integer` |
+| `height` | `number` |

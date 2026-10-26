@@ -8,6 +8,8 @@ title: "mt2.monsters.create_zone"
 
 Construct a private native Zone brush, paint and finish it with a private current-selection receiver. Native island/Region clipping applies. Verify final clipped geometry, generated Monsters and counters, complete native Undo, release points, unchanged survivors/quests/visitors/ledger, and owned receiver cleanup.
 
+Introduced in Lua API **1.2.0**. Requires Framework **0.3.0** or newer.
+
 ```lua
 mt2.monsters.create_zone(character: MT2CharacterHandle, region: integer, level: integer, stamps: MT2MonsterZoneStamp[]): MT2Action
 ```

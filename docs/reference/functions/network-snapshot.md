@@ -8,6 +8,8 @@ title: "mt2.network.snapshot"
 
 Read committed server nodes, pipes, waypoints and reciprocal connections
 
+Introduced in Lua API **1.2.0**. Requires Framework **0.3.0** or newer.
+
 ```lua
 mt2.network.snapshot(): MT2ServerNetwork
 ```

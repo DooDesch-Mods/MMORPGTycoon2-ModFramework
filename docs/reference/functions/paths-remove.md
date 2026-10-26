@@ -8,6 +8,8 @@ title: "mt2.paths.remove"
 
 Remove any current mixed Path, including Wall or Pass, through original native Destroy command and edit transaction. Confirms Path removal, native orphan policy for endpoint types0/1, retained other Intersections, remote/selection retirement and exact Make/Cash inverse UID set. Returns refund, removed node count and owned history receipt.
 
+Introduced in Lua API **1.2.0**. Requires Framework **0.3.0** or newer.
+
 ```lua
 mt2.paths.remove(handle: MT2Handle): MT2Action
 ```

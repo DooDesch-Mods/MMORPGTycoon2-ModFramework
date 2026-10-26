@@ -8,6 +8,8 @@ title: "mt2.ui.window"
 
 Register a window once and draw its contents on render.
 
+Introduced in Lua API **1.0.0**.
+
 ```lua
 mt2.ui.window(title: string, draw: fun()): integer
 ```

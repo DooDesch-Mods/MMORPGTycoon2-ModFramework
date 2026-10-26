@@ -8,6 +8,8 @@ title: "mt2.modular.add_entrance"
 
 Add a native modular entrance at the world position. Commit a complete original Layout/Plan/pose inverse to native Undo.
 
+Introduced in Lua API **1.2.0**. Requires Framework **0.3.0** or newer.
+
 ```lua
 mt2.modular.add_entrance(building: MT2Handle, position: number[]): MT2Action
 ```

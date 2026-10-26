@@ -8,6 +8,8 @@ title: "mt2.actors.get"
 
 Read a current root-world actor's identity, transform, character and level; NPCs include online/tint/command state.
 
+Introduced in Lua API **1.2.0**. Requires Framework **0.3.0** or newer.
+
 ```lua
 mt2.actors.get(handle: MT2ActorHandle): MT2Actor
 ```

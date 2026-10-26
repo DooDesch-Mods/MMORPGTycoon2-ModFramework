@@ -2,6 +2,7 @@
 #include "internal/mt2mp/game/native_engine.h"
 #include "level_census.h"
 #include "paint_model.h"
+#include "sample_grid.h"
 #include <windows.h>
 #include <array>
 #include <cmath>
@@ -15,7 +16,7 @@ namespace mt2fw::mt2::gameplay::regions {
 namespace {
 void need(bool value,const std::string& cause){if(!value)throw std::runtime_error(cause);}
 struct Text {const char* data;uint64_t size;uint64_t capacity=0,reserved=0;};
-struct Region {uintptr_t object;int32_t id;};
+struct Region {uintptr_t object;int32_t id;bool operator==(const Region&)const=default;};
 void ap(Context& c,uintptr_t object,uint64_t rva){need(object&&c.read<uintptr_t>(object)==c.image+rva,"Region native object class differs");}
 void require_root_view(Context& c){
     auto map=c.singleton(0x13df8c0);ap(c,map,0x1742860);ap(c,map+0x1c0,0x174ad20);auto manager=c.singleton(0x13df440);ap(c,manager,0x1702b00);
@@ -107,6 +108,16 @@ DWORD apply_styles(uintptr_t image,uintptr_t region,const Text* values,StyleCall
 #include "paint.inc"
 }
 std::optional<Json> query(Context& c,const std::string& operation,const Json& args){
+    if(operation=="regions.at"){
+        const auto point=input(Json::array({args.at("x"),0,args.at("z")}),3);const auto before=index(c);
+        const auto map=c.singleton(0x13df8c0);c.verify_original(0x508540);c.verify_original(0x32a990);uintptr_t found=0;
+        const auto exception=region_at(c.image,map,point.data(),found);
+        need(!exception,"Region coordinate lookup failed SEH="+std::to_string(exception));
+        need(index(c)==before,"Region roster changed during coordinate lookup");if(!found)return Json();
+        const auto row=std::find_if(before.begin(),before.end(),[&](const Region& region){return region.object==found;});
+        need(row!=before.end(),"Region coordinate lookup returned an object outside the saved root roster");
+        return Json{{"epoch",c.epoch},{"id",row->id}};
+    }
     if(operation=="regions.list"){
         auto offset=integer(args.value("offset",Json(0)),"offset"),limit=integer(args.value("limit",Json(100)),"limit");
         need(offset>=0&&offset<=4096&&limit>0&&limit<=128,"Region page requires offset 0..4096 and limit 1..128");auto rows=index(c);Json out=Json::array();
@@ -115,6 +126,7 @@ std::optional<Json> query(Context& c,const std::string& operation,const Json& ar
     }
     if(operation=="regions.get")return state(c,select(c,args.at("handle")));
     if(operation=="terrain.heights")return height_page(c,args);
+    if(operation=="terrain.sample"||operation=="terrain.samples")return height_samples(c,args,operation=="terrain.sample");
     if(operation=="terrain.contours")return terrain_contour_page(c,args);
     if(operation=="regions.styles")return style_names(c);
     if(operation=="regions.presets"){

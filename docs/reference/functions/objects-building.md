@@ -8,6 +8,8 @@ title: "mt2.objects.building"
 
 Read building type, variant, quaternion rotation and scale.
 
+Introduced in Lua API **1.1.0**.
+
 ```lua
 mt2.objects.building(handle: MT2Handle): MT2Building
 ```

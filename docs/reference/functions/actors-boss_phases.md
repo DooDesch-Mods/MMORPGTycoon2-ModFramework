@@ -8,6 +8,8 @@ title: "mt2.actors.boss_phases"
 
 Read native phase order, health, VFX/color and owner ability-slot membership.
 
+Introduced in Lua API **1.2.0**. Requires Framework **0.3.0** or newer.
+
 ```lua
 mt2.actors.boss_phases(handle: MT2CharacterHandle): MT2BossPhase[]
 ```

@@ -17,6 +17,13 @@ int main(int argc,char** argv) {
             if(op=="gameplay.operations")return Json::parse(
 #include "../adapters/mt2/gameplay/operations.inc"
             );
+            if(op=="gameplay.query"){
+                const auto operation=args.at("operation").get<std::string>();
+                if(operation=="regions.at")return {{"epoch",1},{"id",2}};
+                if(operation=="terrain.heights")return {{"width",3},{"height",2},{"origin",{0,0,0}},{"cell_size",4}};
+                if(operation=="terrain.samples"){Json result=Json::array();for(const auto& point:args.at("arguments").at("points")){
+                    auto row=point;row["index"]=point.at("row").get<int32_t>()*3+point.at("column").get<int32_t>();row["height"]=2.5;result.push_back(row);}return result;}
+            }
             if(op=="objects.list")return Json::array({object});
             if(op=="objects.get"||op=="objects.selected"||op=="objects.resolve")return object;
             if(op=="objects.persist")return "fixture-reference";

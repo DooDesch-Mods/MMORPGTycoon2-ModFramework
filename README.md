@@ -6,6 +6,10 @@
 
 Build mods for **MMORPG Tycoon 2**. Start with Lua and a text editor, extend with C++, or bring your own static GLB scenery into the game.
 
+**Framework 0.4.0 / Lua API 1.3.0** adds Region lookup, terrain samples and
+targeted game-object queries. Build an inspector or a new world tool with the
+[new query recipes](docs/recipes/world-queries.md) and Terrain Reader example.
+
 **[Create your first mod](https://doodesch-mods.github.io/MMORPGTycoon2-ModFramework/quickstart.html)** · [Explore the API](https://doodesch-mods.github.io/MMORPGTycoon2-ModFramework/reference/index.html) · [Use an AI agent](https://doodesch-mods.github.io/MMORPGTycoon2-ModFramework/agents/start.html)
 
 [Feature coverage](#what-can-i-build-today) | [Roadmap](#roadmap) | [Build and contribute](#for-contributors)
@@ -13,7 +17,7 @@ Build mods for **MMORPG Tycoon 2**. Start with Lua and a text editor, extend wit
 <!-- roadmap:start -->
 ## What can I build today?
 
-Included in [Framework 0.3.2](https://github.com/DooDesch-Mods/MMORPGTycoon2-ModFramework/releases/tag/v0.3.2). New gameplay tools are experimental. World-changing Lua gameplay operations currently run in singleplayer.
+Included in [Framework 0.4.0](https://github.com/DooDesch-Mods/MMORPGTycoon2-ModFramework/releases/tag/v0.4.0). New gameplay tools are experimental. World-changing Lua gameplay operations currently run in singleplayer.
 
 <picture>
   <source media="(max-width: 600px)" srcset="https://raw.githubusercontent.com/DooDesch-Mods/MMORPGTycoon2-ModFramework/main/assets/brand/coverage-mobile.svg">
@@ -25,7 +29,7 @@ Percentages count the listed areas equally. They describe feature coverage, not 
 <details>
 <summary>Feature details - what is included</summary>
 
-| Feature | 0.3.2 | What is covered |
+| Feature | 0.4.0 | What is covered |
 | --- | --- | --- |
 | Lua mods and reload | ✅ Available | Use a text editor; reload scripts without restarting. A rejected replacement keeps the previous mod running. [Start here](docs/quickstart.md). |
 | Native C++ plugins | ✅ Available | Build with the native SDK. Plugin updates require a game restart. [SDK guide](docs/reference/native.md). |

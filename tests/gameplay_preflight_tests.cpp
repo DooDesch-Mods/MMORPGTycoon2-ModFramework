@@ -23,6 +23,11 @@ int main(){try{
         args["forged_native_address"]=1234;bool rejected=false;
         try{validate_operation(name,operation.at("kind").get_ref<const std::string&>().c_str(),args);}catch(const std::exception& error){rejected=std::string(error.what()).find("unknown field")!=std::string::npos;}
         require(rejected,"Gameplay accepts undeclared argument fields");
+        if(operation.at("kind")=="query"){
+            Context absent;args.erase("forged_native_address");bool refused=false;
+            try{query(absent,name,args);}catch(const std::exception& error){refused=std::string(error.what()).find("GAMEPLAY_THREAD")!=std::string::npos;}
+            require(refused,"Gameplay query bypassed its native world/thread boundary");
+        }
         if(operation.at("kind")=="action"){
             Context absent;bool attempted=false,confirmed=false;Json result;std::string cause;
             args.erase("forged_native_address");

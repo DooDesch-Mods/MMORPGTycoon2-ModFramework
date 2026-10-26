@@ -48,8 +48,7 @@ contract["functions"].append({**common,
     "errors": ["The game adapter is unavailable or the mod lacks world.read."],
     "gameplay_kind": "discovery", "host_operations": ["gameplay.operations"],
     "lifecycle": "An active game-thread callback; a loaded world is not required."})
-contract["framework_version"] = "0.3.0"
-contract["api_version"] = "1.2.0"
+# Keep the authored product/API versions when refreshing gameplay descriptors.
 contract["experimental_contracts"]["gameplay"] = {"version": 1, "path": "api/experimental/gameplay.json"}
 source.write_text(json.dumps(contract, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
 print(json.dumps({"gameplay_operations": len(rows), "public_functions": len(contract["functions"])}))

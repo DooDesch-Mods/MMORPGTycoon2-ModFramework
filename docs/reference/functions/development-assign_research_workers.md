@@ -8,6 +8,8 @@ title: "mt2.development.assign_research_workers"
 
 Allocate workers to the current native project
 
+Introduced in Lua API **1.2.0**. Requires Framework **0.3.0** or newer.
+
 ```lua
 mt2.development.assign_research_workers(count: integer): MT2Action
 ```

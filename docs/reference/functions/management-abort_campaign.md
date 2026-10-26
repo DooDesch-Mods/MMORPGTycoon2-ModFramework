@@ -8,6 +8,8 @@ title: "mt2.management.abort_campaign"
 
 Abort the current native advertising campaign
 
+Introduced in Lua API **1.2.0**. Requires Framework **0.3.0** or newer.
+
 ```lua
 mt2.management.abort_campaign(type: integer): MT2Action
 ```

@@ -8,6 +8,8 @@ title: "mt2.regions.set_styles"
 
 Apply all four terrain styles through the original native EditManager transaction.
 
+Introduced in Lua API **1.2.0**. Requires Framework **0.3.0** or newer.
+
 ```lua
 mt2.regions.set_styles(handle: MT2RegionHandle, styles: string[]): MT2Action
 ```

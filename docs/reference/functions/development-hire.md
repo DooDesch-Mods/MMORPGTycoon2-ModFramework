@@ -8,6 +8,8 @@ title: "mt2.development.hire"
 
 Pay the original 500 hiring charge and employ one native developer
 
+Introduced in Lua API **1.2.0**. Requires Framework **0.3.0** or newer.
+
 ```lua
 mt2.development.hire(): MT2Action
 ```

@@ -8,6 +8,8 @@ title: "mt2.development.staff"
 
 Read all fifty native developer slots, employment and job/membership state
 
+Introduced in Lua API **1.2.0**. Requires Framework **0.3.0** or newer.
+
 ```lua
 mt2.development.staff(): MT2DeveloperPool
 ```

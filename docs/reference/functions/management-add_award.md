@@ -8,6 +8,8 @@ title: "mt2.management.add_award"
 
 Construct and add a native marketing award for the current game day
 
+Introduced in Lua API **1.2.0**. Requires Framework **0.3.0** or newer.
+
 ```lua
 mt2.management.add_award(name: string, source: string, impressions: integer, conversions: integer, good: boolean): MT2Action
 ```

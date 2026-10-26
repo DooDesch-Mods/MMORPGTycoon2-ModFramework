@@ -433,6 +433,12 @@ end
 mt2.management.add_award = function(name, source, impressions, conversions, good)
     return call('gameplay.action', {operation='management.add_award', arguments={["name"]=name, ["source"]=source, ["impressions"]=impressions, ["conversions"]=conversions, ["good"]=good}})
 end
+mt2.management.service = function(building, handle)
+    return call('gameplay.query', {operation='management.service', arguments={["building"]=building, ["handle"]=handle}})
+end
+mt2.management.set_fees = function(purchase, subscription)
+    return call('gameplay.action', {operation='management.set_fees', arguments={["purchase"]=purchase, ["subscription"]=subscription}})
+end
 mt2.modular.get_layout = function(building)
     return call('gameplay.query', {operation='modular.get_layout', arguments={["building"]=building}})
 end
@@ -482,7 +488,8 @@ mt2.paths.remove = function(handle)
     return call('gameplay.action', {operation='paths.remove', arguments={["handle"]=handle}})
 end
 mt2.paths.undo = function(receipt)
-    return call('gameplay.action', {operation='paths.undo', arguments={["receipt"]=receipt}})
+    return call('gameplay.action', {operation='paths.undo', arguments={["re)MT2gameplay"
++ R"MT2gameplay(ceipt"]=receipt}})
 end
 mt2.paths.redo = function(receipt)
     return call('gameplay.action', {operation='paths.redo', arguments={["receipt"]=receipt}})
@@ -490,8 +497,7 @@ end
 mt2.regions.set_type = function(handle, type, position)
     return call('gameplay.action', {operation='regions.set_type', arguments={["handle"]=handle, ["type"]=type, ["position"]=position}})
 end
-mt2.regions.list = functi)MT2gameplay"
-+ R"MT2gameplay(on(offset, limit)
+mt2.regions.list = function(offset, limit)
     if offset == nil then offset = 0 end
     if limit == nil then limit = 100 end
     return call('gameplay.query', {operation='regions.list', arguments={["offset"]=offset, ["limit"]=limit}})
@@ -556,13 +562,22 @@ mt2.terrain.contours = function(handle, style, path, offset, limit)
     if limit == nil then limit = 256 end
     return call('gameplay.query', {operation='terrain.contours', arguments={["handle"]=handle, ["style"]=style, ["path"]=path, ["offset"]=offset, ["limit"]=limit}})
 end
-mt2.terrain.paint = function(handle, style, stamps, label)
+mt2.terrain.paint = function)MT2gameplay"
++ R"MT2gameplay((handle, style, stamps, label)
     if label == nil then label = "Paint terrain" end
     return call('gameplay.action', {operation='terrain.paint', arguments={["handle"]=handle, ["style"]=style, ["stamps"]=stamps, ["label"]=label}})
 end
+mt2.regions.at = function(x, z)
+    return call('gameplay.query', {operation='regions.at', arguments={["x"]=x, ["z"]=z}})
+end
+mt2.terrain.sample = function(handle, column, row)
+    return call('gameplay.query', {operation='terrain.sample', arguments={["handle"]=handle, ["column"]=column, ["row"]=row}})
+end
+mt2.terrain.samples = function(handle, points)
+    return call('gameplay.query', {operation='terrain.samples', arguments={["handle"]=handle, ["points"]=points}})
+end
 mt2.scenery.stroke = function(kind, region, finish_position, stamps, type, variant, random_variant, replace, bounds)
-    if random_variant ==)MT2gameplay"
-+ R"MT2gameplay( nil then random_variant = false end
+    if random_variant == nil then random_variant = false end
     if replace == nil then replace = false end
     return call('gameplay.action', {operation='scenery.stroke', arguments={["kind"]=kind, ["region"]=region, ["finish_position"]=finish_position, ["stamps"]=stamps, ["type"]=type, ["variant"]=variant, ["random_variant"]=random_variant, ["replace"]=replace, ["bounds"]=bounds}})
 end
@@ -625,7 +640,8 @@ mt2.development.fire = function()
     return call('gameplay.action', {operation='development.fire', arguments={}})
 end
 mt2.development.set_state = function(handle, value)
-    return call('gameplay.action', {operation='development.set_state', arguments={["handle"]=handle, ["value"]=value}})
+    return call('gameplay.action', {operation='developme)MT2gameplay"
++ R"MT2gameplay(nt.set_state', arguments={["handle"]=handle, ["value"]=value}})
 end
 mt2.development.set_active = function(handle, value)
     return call('gameplay.action', {operation='development.set_active', arguments={["handle"]=handle, ["value"]=value}})
@@ -643,8 +659,7 @@ mt2.projects.set_workers = function(count)
     return call('gameplay.action', {operation='projects.set_workers', arguments={["count"]=count}})
 end
 mt2.development.assign_research_workers = function(count)
-    return call('gameplay.ac)MT2gameplay"
-+ R"MT2gameplay(tion', {operation='development.assign_research_workers', arguments={["count"]=count}})
+    return call('gameplay.action', {operation='development.assign_research_workers', arguments={["count"]=count}})
 end
 mt2.network.place_node = function(key, position)
     return call('gameplay.action', {operation='network.place_node', arguments={["key"]=key, ["position"]=position}})
@@ -654,6 +669,15 @@ mt2.network.place_pipe = function(start, end_, position)
 end
 mt2.network.remove = function(handle)
     return call('gameplay.action', {operation='network.remove', arguments={["handle"]=handle}})
+end
+mt2.network.node = function(handle)
+    return call('gameplay.query', {operation='network.node', arguments={["handle"]=handle}})
+end
+mt2.network.pipe = function(handle)
+    return call('gameplay.query', {operation='network.pipe', arguments={["handle"]=handle}})
+end
+mt2.projects.get = function(source)
+    return call('gameplay.query', {operation='projects.get', arguments={["source"]=source}})
 end
 mt2.experimental.operations = function()
     return call('gameplay.operations')

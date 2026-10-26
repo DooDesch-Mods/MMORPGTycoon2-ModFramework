@@ -8,6 +8,8 @@ title: "mt2.dungeons.list"
 
 List current root DungeonExterior handles and exact Dungeon UID strings.
 
+Introduced in Lua API **1.2.0**. Requires Framework **0.3.0** or newer.
+
 ```lua
 mt2.dungeons.list(): table
 ```

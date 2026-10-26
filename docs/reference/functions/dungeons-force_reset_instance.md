@@ -8,6 +8,8 @@ title: "mt2.dungeons.force_reset_instance"
 
 Run native Instance ForceReset and confirm the same pool member is retained unstarted.
 
+Introduced in Lua API **1.2.0**. Requires Framework **0.3.0** or newer.
+
 ```lua
 mt2.dungeons.force_reset_instance(handle: MT2Handle, instance: integer): MT2Action
 ```

@@ -8,6 +8,8 @@ title: "mt2.config.get"
 
 Read a defined setting.
 
+Introduced in Lua API **1.0.0**.
+
 ```lua
 mt2.config.get(key: string): boolean|string|number
 ```

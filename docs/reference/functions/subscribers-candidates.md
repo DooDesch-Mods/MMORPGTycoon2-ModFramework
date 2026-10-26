@@ -8,6 +8,8 @@ title: "mt2.subscribers.candidates"
 
 Read the existing bounded native subscriber-candidate scan, preserving whether it completed.
 
+Introduced in Lua API **1.2.0**. Requires Framework **0.3.0** or newer.
+
 ```lua
 mt2.subscribers.candidates(): MT2SubscriberCandidates
 ```

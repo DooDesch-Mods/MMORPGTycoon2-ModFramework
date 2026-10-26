@@ -8,6 +8,8 @@ title: "mt2.management.enable_release_custom"
 
 Enable the current native custom release text
 
+Introduced in Lua API **1.2.0**. Requires Framework **0.3.0** or newer.
+
 ```lua
 mt2.management.enable_release_custom(): MT2Action
 ```

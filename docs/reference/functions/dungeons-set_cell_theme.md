@@ -8,6 +8,8 @@ title: "mt2.dungeons.set_cell_theme"
 
 Apply a native Theme to one open cell through the native edit and Undo transaction.
 
+Introduced in Lua API **1.2.0**. Requires Framework **0.3.0** or newer.
+
 ```lua
 mt2.dungeons.set_cell_theme(handle: MT2Handle, cell: integer, theme: string): MT2Action
 ```

@@ -8,6 +8,8 @@ title: "mt2.actors.remove_phase_ability"
 
 Remove an element through native phase ownership between original change events.
 
+Introduced in Lua API **1.2.0**. Requires Framework **0.3.0** or newer.
+
 ```lua
 mt2.actors.remove_phase_ability(handle: MT2CharacterHandle, phase: integer, element: integer): MT2Action
 ```

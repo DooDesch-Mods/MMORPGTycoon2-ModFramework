@@ -8,6 +8,8 @@ title: "mt2.terrain.change_height"
 
 Use the original height brush once and confirm the complete grid, 100 cash payment, restored cursor and unchanged Undo history.
 
+Introduced in Lua API **1.2.0**. Requires Framework **0.3.0** or newer.
+
 ```lua
 mt2.terrain.change_height(handle: MT2RegionHandle, position: number[], up: boolean, radius?: number): MT2Action
 ```

@@ -8,6 +8,8 @@ title: "mt2.actions.status"
 
 Read accepted, confirmed, rejected or unknown status.
 
+Introduced in Lua API **1.0.0**.
+
 ```lua
 mt2.actions.status(id: string): MT2Action
 ```

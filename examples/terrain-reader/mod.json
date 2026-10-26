@@ -1,0 +1,10 @@
+{
+  "id": "examples.terrain-reader",
+  "name": "Terrain Reader",
+  "version": "1.0.0",
+  "api_version": "1.3.0",
+  "type": "lua",
+  "entry": "main.lua",
+  "capabilities": ["ui", "world.read", "camera"],
+  "multiplayer": "local"
+}

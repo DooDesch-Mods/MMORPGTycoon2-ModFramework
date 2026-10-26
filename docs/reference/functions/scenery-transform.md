@@ -8,6 +8,8 @@ title: "mt2.scenery.transform"
 
 Move, rotate or scale multiple free Scenery in one original native Begin/Open/DoMove-per-target/Close/End transaction. Returns target results in input order. Confirms exact inverse UID/prior-pose order, destination Region, unchanged other Scenery and unchanged Groups. Requires the root world to be the actual active scene and owned destination Regions; normal native tool effects apply.
 
+Introduced in Lua API **1.2.0**. Requires Framework **0.3.0** or newer.
+
 ```lua
 mt2.scenery.transform(targets: MT2SceneryTransform[]): MT2Action
 ```

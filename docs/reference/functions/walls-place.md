@@ -8,6 +8,8 @@ title: "mt2.walls.place"
 
 Execute a bounded explicit native Wall plan through isolated original Wall/Path/model construction, native Purchase and Finish, then owned cleanup. Native ghost Length supplies the price quote. Supports explicit current node and split-Path handles, including preview split targets. Confirms reciprocal mixed topology, created Path family/scene, retained original Undo and unchanged unrelated Paths. Returns created Paths, native length, cost and owned history receipt.
 
+Introduced in Lua API **1.2.0**. Requires Framework **0.3.0** or newer.
+
 ```lua
 mt2.walls.place(plan: MT2WallPlan): MT2Action
 ```

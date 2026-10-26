@@ -8,6 +8,8 @@ title: "mt2.patches.status"
 
 Read published patch order, diagnostics and current time-write authority.
 
+Introduced in Lua API **1.0.0**. Requires Framework **0.2.0** or newer.
+
 ```lua
 mt2.patches.status(): MT2PatchStatus
 ```

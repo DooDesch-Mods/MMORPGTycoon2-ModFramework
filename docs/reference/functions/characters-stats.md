@@ -8,6 +8,8 @@ title: "mt2.characters.stats"
 
 Read the two native attribute sets, speed and boss phase health.
 
+Introduced in Lua API **1.2.0**. Requires Framework **0.3.0** or newer.
+
 ```lua
 mt2.characters.stats(handle: MT2CharacterHandle): MT2CharacterStats
 ```

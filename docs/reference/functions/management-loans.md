@@ -8,6 +8,8 @@ title: "mt2.management.loans"
 
 Read current loans and eligible loan offers
 
+Introduced in Lua API **1.2.0**. Requires Framework **0.3.0** or newer.
+
 ```lua
 mt2.management.loans(): MT2ManagementLoans
 ```

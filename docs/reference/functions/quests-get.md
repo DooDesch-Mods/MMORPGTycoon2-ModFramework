@@ -8,6 +8,8 @@ title: "mt2.quests.get"
 
 Read a quest only while its exact current owner, slot and sequence still match.
 
+Introduced in Lua API **1.2.0**. Requires Framework **0.3.0** or newer.
+
 ```lua
 mt2.quests.get(handle: MT2NpcQuestHandle): MT2NpcQuest
 ```

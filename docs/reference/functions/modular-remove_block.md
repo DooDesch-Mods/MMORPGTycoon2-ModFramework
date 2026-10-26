@@ -8,6 +8,8 @@ title: "mt2.modular.remove_block"
 
 Remove a native modular block at the world position. Commit a complete original Layout/Plan/pose inverse to native Undo.
 
+Introduced in Lua API **1.2.0**. Requires Framework **0.3.0** or newer.
+
 ```lua
 mt2.modular.remove_block(building: MT2Handle, position: number[]): MT2Action
 ```

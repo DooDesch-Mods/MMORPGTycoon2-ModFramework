@@ -8,6 +8,8 @@ title: "mt2.dungeons.layout"
 
 Read authored layout cells, open flags, Theme keys, packed cell colors and palette.
 
+Introduced in Lua API **1.2.0**. Requires Framework **0.3.0** or newer.
+
 ```lua
 mt2.dungeons.layout(handle: MT2Handle): MT2DungeonLayout
 ```

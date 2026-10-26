@@ -8,6 +8,8 @@ title: "mt2.log.debug"
 
 Write a mod-labelled debug log entry.
 
+Introduced in Lua API **1.0.0**.
+
 ```lua
 mt2.log.debug(message: any): boolean
 ```

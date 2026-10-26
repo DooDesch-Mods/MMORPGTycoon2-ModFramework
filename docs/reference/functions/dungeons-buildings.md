@@ -8,6 +8,8 @@ title: "mt2.dungeons.buildings"
 
 List Building handles, types, variants and positions in one Dungeon scene.
 
+Introduced in Lua API **1.2.0**. Requires Framework **0.3.0** or newer.
+
 ```lua
 mt2.dungeons.buildings(handle: MT2Handle, instance?: integer): MT2DungeonBuilding[]
 ```

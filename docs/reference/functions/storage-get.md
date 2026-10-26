@@ -8,6 +8,8 @@ title: "mt2.storage.get"
 
 Read mod-owned profile or world data.
 
+Introduced in Lua API **1.0.0**.
+
 ```lua
 mt2.storage.get(key: string, default?: any, scope?: 'profile'|'world'): any
 ```
