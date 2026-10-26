@@ -11,6 +11,7 @@
 
 ### Fixed
 
+- Close the game without a crash when Lua mods are installed.
 - Keep matching Framework and Lua API versions when regenerating the SDK.
 - Avoid unnecessary native rebuilds when generated API files have not changed.
 

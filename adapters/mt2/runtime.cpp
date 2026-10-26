@@ -827,7 +827,8 @@ void finish_shutdown(){
         bool retained=false;for(auto& plugin:runtime->plugins())retained|=plugin->native_retained;
         if(retained){auto disabled=MH_DisableHook(MH_ALL_HOOKS);if(disabled!=MH_OK&&disabled!=MH_ERROR_NOT_INITIALIZED){report(std::string("Retained native shutdown disable failed: ")+MH_StatusToString(disabled));retain_process_storage();return;}
             runtime->log("framework","info","Native originals and owner state retained until process exit");retain_process_storage();return;}
-        runtime->set_patch_authority({});native_patches.reset();runtime.reset();native_services.reset();native_routes.reset();native_ownership.reset();}}
+        // Runtime destruction retires plugins again, so its native services must still exist.
+        runtime->set_patch_authority({});runtime.reset();native_patches.reset();native_services.reset();native_routes.reset();native_ownership.reset();}}
     catch(const std::exception& error){report(std::string("Framework shutdown failed: ")+error.what());return;}
     auto result=MH_DisableHook(MH_ALL_HOOKS);if(result!=MH_OK&&result!=MH_ERROR_NOT_INITIALIZED)OutputDebugStringA(MH_StatusToString(result));
 }
