@@ -30,8 +30,12 @@ public:
     bool detach_patch_runtime(){std::lock_guard lock(gate_);patch_runtime_=nullptr;return patch_inflight_==0;}
     void catalog(const std::string& name,uint64_t rva,bool shared=false);
     bool verify_body(uint64_t rva,size_t bytes,const std::string& sha256,std::string& cause);
+    // Private lab only: exclusive reservation for the saved Building observer.
+    bool reserve_building_observer(Runtime&,void* detour,std::string& cause);
+    bool reserve_npc_observer(Runtime&,void* detour,std::string& cause);
     bool publish_shared(const std::string& name,void* detour,void* trampoline,std::string& cause);
     bool publish_framework_hook(void* target,void* detour,void* trampoline,std::string& cause);
+    bool prove_framework_hook(const std::string& name,void* detour,void* trampoline,std::string& cause);
     MT2FW_MT2_Result query(const MT2FW_Host*,uint32_t,MT2FW_MT2_RoutesV1*,uint32_t);
     void* create(const MT2FW_MT2_CreateCall&,CreateOriginal);
     void remove(const MT2FW_MT2_RemoveCall&,RemoveOriginal);
@@ -48,7 +52,7 @@ private:
     struct Authority {uint64_t token=0;Owner* owner=nullptr;MT2FW_MT2_RemoveAuthority callback=nullptr;void* user=nullptr;bool active=false;};
     // current retains only this entry's patch. Receipts compose acknowledged
     // neighbours without changing this owner's generation or pristine bytes.
-    struct Target {uint64_t rva;bool shared;uint32_t state=MT2FW_MT2_ROUTE_PRISTINE;uint64_t generation=0;Owner* owner=nullptr;void* detour=nullptr;void* trampoline=nullptr;Bytes pristine{},current{};std::string cause;bool created=false,retained=false;uint32_t patch_size=0;uint64_t patch_generation=0;};
+    struct Target {uint64_t rva;bool shared;uint32_t state=MT2FW_MT2_ROUTE_PRISTINE;uint64_t generation=0;Owner* owner=nullptr;void* detour=nullptr;void* trampoline=nullptr;Bytes pristine{},current{};std::string cause;bool created=false,retained=false;void* building_observer=nullptr;void* npc_observer=nullptr;uint32_t patch_size=0;uint64_t patch_generation=0;};
     struct Continuation {void* manager;void* array;RemoveOriginal original;bool attempted=false,returned=false,duplicate=false;std::exception_ptr exception;};
     std::function<Plugin*(const MT2FW_Host*)> lookup_;
     Backend backend_;

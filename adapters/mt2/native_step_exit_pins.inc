@@ -1,0 +1,9 @@
+    presentation_rng::verify(0x4a2f90,3856,"8ceafdf7d836b0ac1b72fc58bf2fd8c68cc9c5f225d2a1376a5e06b580a750e8");
+    presentation_rng::verify(0x4a0690,304,"a2c60c3d0fc4fb84f03d49755d238057ad417bcdef3298441dc4b01904c58495");
+    presentation_rng::verify(0x4a0ba0,1472,"fa38d9f2457813b78a8058d1df618f32755bd19c90c1831e6992f2ab3bcf7967");
+    presentation_rng::verify(0x49f860,2880,"e776684e244b6811ee8d974518e4faaebbe9dff3f7b7fb77b8b9daadb4581e19");
+    presentation_rng::verify(0x473710,1376,"ea56e3e38112156dcad62cf6fe82db40fcc57e62fe6e93bf6f42b023ad6d3995");
+    presentation_rng::verify(0x47ecb0,336,"3b114e42517304cc283e0a878ffcaf817b9708a9a69efbf290bc8e8165a83216");
+    presentation_rng::verify(0x3351a0,2208,"7a3d48ca1db11aab565ccdcc226f697b70c1c14bf4defe6ab53901b1e6d2cfda");
+    presentation_rng::verify(0x4a0490,224,"8af224a97700c5d3f352daf7d23ad6f88aaa98daec9fbb2013424e59dbf6611a");
+    presentation_rng::verify(0x526ce0,112,"82d0a5a46e233f07dfe6924a98cfef8c7c1ae2a4d850fe2e65363655205fc142");

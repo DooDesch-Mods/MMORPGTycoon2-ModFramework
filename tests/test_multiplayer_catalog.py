@@ -29,11 +29,20 @@ class MultiplayerCatalogTests(unittest.TestCase):
         self.assertEqual(matches[0]['groups'][0]['phase'], 'typed_action_runtime::start, bound Mainthread, once per process')
 
 
+    def test_ordered_original_observers_have_exclusive_named_routes(self):
+        for rva, name in [(0x53a240, 'mp.ordered-tutorial-undo-clear.53a240'),
+                          (0x559ee0, 'mp.ordered-clearance-make-scenery.559ee0')]:
+            matches = [row for row in self.targets if row['rva'] == rva]
+            self.assertEqual(len(matches), 1)
+            self.assertEqual(matches[0]['name'], name)
+            self.assertIs(matches[0]['shared'], False)
+
+
     def test_current_catalog_preserves_public_021_routes(self):
         prior = json.loads((ROOT / 'tests/fixtures/multiplayer-catalog-v0.2.1.json').read_text(encoding='utf-8'))['targets']
         previous = {row['name'] for row in prior}
         self.assertEqual([row for row in self.targets if row['name'] in previous], prior)
-        self.assertEqual(len(self.targets), 283)
+        self.assertEqual(len(self.targets), 287)
         self.assertEqual(sum(row['shared'] for row in self.targets), 11)
 
 

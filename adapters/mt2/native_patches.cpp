@@ -132,6 +132,34 @@ bool NativePatches::authorize(const std::string& operation,std::string& reason){
     if(reply.role==MT2FW_MT2_SESSION_CLIENT)return authority_result(reply.role,"Trusted Multiplayer provider reports Client; patch mutation denied",reason);
     return authority_result(MT2FW_MT2_SESSION_UNKNOWN,"Trusted Multiplayer provider reports unknown session authority",reason);
 }
+bool NativePatches::inspect_step_provider(Plugin& bridge,uint64_t token,uint64_t& epoch,uint32_t& role,std::string& cause){
+    std::lock_guard lock(gate_);epoch=0;role=MT2FW_MT2_SESSION_UNKNOWN;
+    auto reject=[&](const std::string& why){cause=why;return false;};
+    if(!on_thread())return reject("Step session provider read is outside the bound game thread");
+    if(runtime_.native_plugin(&bridge.host)!=&bridge||bridge.manifest.id!=bridge_id||bridge.manifest.type!="native")return reject("Step bridge owner is not the exact active supported native plugin");
+    unsigned present=0;for(auto& plugin:runtime_.plugins())if(plugin->manifest.id==bridge_id&&plugin->manifest.type=="native"&&
+        (plugin->active||plugin->native_loaded||plugin->native_module||plugin->native_pins||plugin->native_retained||plugin->native_retirement_failed||plugin->native_shutdown_pending))++present;
+    if(present!=1)return reject("Step session provider has conflicting present bridge owners");
+    if(!token||!provider_.owner||provider_.token!=token||!provider_.active||!provider_.owner->active||provider_.owner->plugin!=&bridge)
+        return reject("Step session provider token is stale or owned by another plugin");
+    if(provider_.owner->inflight)return reject("Step session provider is already in flight");
+    std::string proof;bool proven=false;
+    try{proven=world_proof_&&world_proof_(epoch,proof);}catch(const std::exception& e){return reject(std::string("Step world proof failed: ")+e.what());}catch(...){return reject("Step world proof raised an unknown exception");}
+    const bool loaded=proven&&epoch!=0;if(!loaded)epoch=0;
+    auto provider=provider_;++provider.owner->inflight;
+    MT2FW_MT2_SessionQuery query{sizeof(query),0,epoch,thread_()};MT2FW_MT2_SessionReply reply{sizeof(reply),MT2FW_MT2_SESSION_UNKNOWN,0};
+    MT2FW_MT2_Result result=MT2FW_MT2_FAILED;std::string failure;
+    try{result=provider.callback(provider.user,&query,&reply);}catch(const std::exception& e){failure=e.what();}catch(...){failure="unknown native exception";}
+    --provider.owner->inflight;
+    if(!failure.empty())return reject("Step session provider failed: "+failure);
+    if(result!=MT2FW_MT2_OK)return reject("Step session provider returned error="+std::to_string(result));
+    uint64_t after=0;std::string after_proof;bool still=false;
+    try{still=world_proof_(after,after_proof);}catch(const std::exception& e){return reject(std::string("Step post-provider world proof failed: ")+e.what());}catch(...){return reject("Step post-provider world proof raised an unknown exception");}
+    if(!provider_.active||provider_.token!=provider.token||!provider.owner->active||!bridge.active||!bridge.native_loaded||reply.size!=sizeof(reply)||reply.epoch!=epoch||(loaded?(!still||after!=epoch):(still&&after!=0)))
+        return reject("Step session acknowledgement is stale or native world changed: "+after_proof);
+    if(reply.role!=MT2FW_MT2_SESSION_HOST&&reply.role!=MT2FW_MT2_SESSION_CLIENT&&reply.role!=MT2FW_MT2_SESSION_STANDALONE)return reject("Step provider reports unknown role");
+    role=reply.role;cause=loaded?"Actual session role and current native epoch acknowledged":"Actual pre-load session role acknowledged without loaded-world authority";return true;
+}
 Json NativePatches::status()const{
     std::lock_guard lock(gate_);return {{"role",last_role_==MT2FW_MT2_SESSION_HOST?"host":last_role_==MT2FW_MT2_SESSION_STANDALONE?"standalone":last_role_==MT2FW_MT2_SESSION_CLIENT?"client":"unknown"},{"reason",last_reason_},{"provider_owner",provider_.owner?provider_.owner->plugin->manifest.id:""},{"provider_active",provider_.active},{"bound_thread",std::to_string(game_thread_)}};
 }

@@ -1,16 +1,22 @@
 """Check actual Lua exports, bridge operations and complete examples with the controlled native host."""
 from pathlib import Path
 from datetime import datetime,timezone
-import argparse,json,re,subprocess,sys
+import argparse,hashlib,json,re,subprocess,sys
 ROOT=Path(__file__).resolve().parents[1]
 sys.path.insert(0,str(ROOT/'tools'))
 from mt2fw import packages
 def main():
-    parser=argparse.ArgumentParser(description=__doc__);parser.add_argument('--probe',type=Path,default=ROOT/'build/bin/Release/mt2fw_docs_probe.exe');args=parser.parse_args()
-    evidence=ROOT/'artifacts/contracts'/datetime.now(timezone.utc).strftime('%Y%m%dT%H%M%S%fZ');evidence.mkdir(parents=True)
+    parser=argparse.ArgumentParser(description=__doc__);parser.add_argument('--probe',type=Path,default=ROOT/'build/bin/Release/mt2fw_docs_probe.exe');parser.add_argument('--evidence-root',type=Path,default=ROOT/'artifacts/contracts');args=parser.parse_args()
+    evidence=args.evidence_root/datetime.now(timezone.utc).strftime('%Y%m%dT%H%M%S%fZ');evidence.mkdir(parents=True)
     contract=packages.read_json(ROOT/'api/contract.json')
     patch_contract=packages.read_json(ROOT/'api/experimental/patches.json')
     native_patch_header=(ROOT/'adapters/mt2/sdk/native_patches.h').read_text(encoding='utf-8')
+    step_contract=packages.read_json(ROOT/'api/experimental/steps.json')
+    step_path=ROOT/step_contract['header'];step_header=step_path.read_text(encoding='utf-8')
+    if '#define MT2FW_MT2_STEP_DRAFT_VERSION '+str(step_contract['version'])+'u' not in step_header or hashlib.sha256(step_path.read_bytes()).hexdigest()!=step_contract['header_sha256']:
+        raise RuntimeError('Step SDK header differs from its exact versioned machine contract')
+    step_service=step_header.split('typedef struct MT2FW_MT2_StepServiceDraftV1 {',1)[1].split('} MT2FW_MT2_StepServiceDraftV1;',1)[0]
+    if set(re.findall(r'\*(\w+)\)\(',step_service))!=set(step_contract['functions']):raise RuntimeError('Step service methods differ from the machine contract')
     if '#define MT2FW_MT2_PATCHES_VERSION '+str(patch_contract['version'])+'u' not in native_patch_header:
         raise RuntimeError('Native patch protocol version differs from its machine contract')
     bridge=(ROOT/'src/core/lua_mod.cpp').read_text(encoding='utf-8')

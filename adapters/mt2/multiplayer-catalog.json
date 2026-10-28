@@ -3104,6 +3104,18 @@
       ]
     },
     {
+      "name": "mp.npc-array-load-identity.c0f0f0",
+      "rva": 12644592,
+      "shared": false,
+      "groups": [
+        {
+          "feature": "Private NPC array saved identity observer",
+          "phase": "private diagnostics initialization, empty plugin and route-owner set",
+          "site": "adapters/mt2/determinism_npc_receipt.inc::install"
+        }
+      ]
+    },
+    {
       "name": "mp.bug-lifecycle-and-saved-identity.c2e810",
       "rva": 12773392,
       "shared": false,
@@ -3328,6 +3340,42 @@
           "feature": "Building uptime authority",
           "phase": "typed_action_runtime::start, bound Mainthread, once per process",
           "site": "src/game/building_uptime_native.inc::enable"
+        }
+      ]
+    },
+    {
+      "name": "mp.ordered-tutorial-undo-clear.53a240",
+      "rva": 5481024,
+      "shared": false,
+      "groups": [
+        {
+          "feature": "Ordered tutorial message completion",
+          "phase": "initialize, after native exact-image binding, before global enable",
+          "site": "src/game/tutorial_replication/native.cpp::install"
+        }
+      ]
+    },
+    {
+      "name": "mp.ordered-clearance-make-scenery.559ee0",
+      "rva": 5611232,
+      "shared": false,
+      "groups": [
+        {
+          "feature": "Ordered clearance original MakeScenery observation",
+          "phase": "typed_action_runtime::start, bound Mainthread, once per process",
+          "site": "src/game/ordered_clearance_capture.inc::install_make_observer"
+        }
+      ]
+    },
+    {
+      "name": "mp.terrain-settlement.map-data",
+      "rva": 3326432,
+      "shared": false,
+      "groups": [
+        {
+          "feature": "Terrain settlement Map publication",
+          "phase": "Terrain settlement installation, after exact native body proof",
+          "site": "src/game/terrain_settlement.inc::install"
         }
       ]
     }

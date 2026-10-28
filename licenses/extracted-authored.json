@@ -97,6 +97,510 @@
       "destination": "adapters/mt2/internal/mt2mp/core/logger.h",
       "sha256": "32eb1f59f3e2dd3adbe269117c63cdce77a18c825539d85c8975859a1749ff54",
       "license": "MIT"
+    },
+    {
+      "source": "adapters/mt2/desktop_terminal.inc",
+      "destination": "adapters/mt2/desktop_terminal.inc",
+      "sha256": "d0dc556088f7d026b142ae5596333a099e4f7639fb373d974456e22b4b0a6375",
+      "license": "MIT",
+      "origin": "DooDesch-authored Framework ordered Step implementation"
+    },
+    {
+      "source": "adapters/mt2/determinism_bootstrap_boundary.inc",
+      "destination": "adapters/mt2/determinism_bootstrap_boundary.inc",
+      "sha256": "a8af7c62c651611869fed4a239dad4b8e9dfedc37911e47b2ceb7b0005e96472",
+      "license": "MIT",
+      "origin": "DooDesch-authored Framework ordered Step implementation"
+    },
+    {
+      "source": "adapters/mt2/determinism_building_receipt.h",
+      "destination": "adapters/mt2/determinism_building_receipt.h",
+      "sha256": "10dd0cefb74b0d9e777a698943e42f386a7c8cccd0bb649a725499719bd0d857",
+      "license": "MIT",
+      "origin": "DooDesch-authored Framework ordered Step implementation"
+    },
+    {
+      "source": "adapters/mt2/determinism_building_receipt.inc",
+      "destination": "adapters/mt2/determinism_building_receipt.inc",
+      "sha256": "02f14c9f0c2da8d65bfc9bfb71053b93b575cb2d283b186ea0f2517e85743b5a",
+      "license": "MIT",
+      "origin": "DooDesch-authored Framework ordered Step implementation"
+    },
+    {
+      "source": "adapters/mt2/determinism_gate.h",
+      "destination": "adapters/mt2/determinism_gate.h",
+      "sha256": "c4edab34738e5908bfa260c6ecf2e633819519c977237a890f82d494db3b76ce",
+      "license": "MIT",
+      "origin": "DooDesch-authored Framework ordered Step implementation"
+    },
+    {
+      "source": "adapters/mt2/determinism_loading_dispatch.inc",
+      "destination": "adapters/mt2/determinism_loading_dispatch.inc",
+      "sha256": "8ccd7091bb15efae2323007fbe15f414277998910382dc8441b3622566e3d840",
+      "license": "MIT",
+      "origin": "DooDesch-authored Framework ordered Step implementation"
+    },
+    {
+      "source": "adapters/mt2/determinism_motion_probe.inc",
+      "destination": "adapters/mt2/determinism_motion_probe.inc",
+      "sha256": "cfbec8cbabebc7b8e7702d2651096b3755d1a40daaa3ced3f6a4f24d633fb67d",
+      "license": "MIT",
+      "origin": "DooDesch-authored Framework ordered Step implementation"
+    },
+    {
+      "source": "adapters/mt2/determinism_native.inc",
+      "destination": "adapters/mt2/determinism_native.inc",
+      "sha256": "2b56316fa731aebc3bf5dbe71036d3dc9f824f14b8c0f5915f4949c25889c19b",
+      "license": "MIT",
+      "origin": "DooDesch-authored Framework ordered Step implementation"
+    },
+    {
+      "source": "adapters/mt2/determinism_npc_receipt.h",
+      "destination": "adapters/mt2/determinism_npc_receipt.h",
+      "sha256": "dda3fa009d3e3dc0118944d36aaab20ccd2a8bbebaee1e465162b9d385de839c",
+      "license": "MIT",
+      "origin": "DooDesch-authored Framework ordered Step implementation"
+    },
+    {
+      "source": "adapters/mt2/determinism_npc_receipt.inc",
+      "destination": "adapters/mt2/determinism_npc_receipt.inc",
+      "sha256": "10045f654fc83678310258c43c9b3193c502acbe9a490db304a78af2b9bd12bb",
+      "license": "MIT",
+      "origin": "DooDesch-authored Framework ordered Step implementation"
+    },
+    {
+      "source": "adapters/mt2/determinism_ordered_finish.inc",
+      "destination": "adapters/mt2/determinism_ordered_finish.inc",
+      "sha256": "7c37f3f29aca4732eb16bd1ff4ae4fd025d10d4ab4030e76c6c37fc1fc9962eb",
+      "license": "MIT",
+      "origin": "DooDesch-authored Framework ordered Step implementation"
+    },
+    {
+      "source": "adapters/mt2/determinism_ordered_run.inc",
+      "destination": "adapters/mt2/determinism_ordered_run.inc",
+      "sha256": "decbf6b1da4ac1d17a771dfa7f52418e41006fbb0c3f83499b75f3f89b135b38",
+      "license": "MIT",
+      "origin": "DooDesch-authored Framework ordered Step implementation"
+    },
+    {
+      "source": "adapters/mt2/determinism_presentation_probe.inc",
+      "destination": "adapters/mt2/determinism_presentation_probe.inc",
+      "sha256": "113f0eaac53446389f3789cd3efcfb82b195907a3544edd7f48cf629aafc7953",
+      "license": "MIT",
+      "origin": "DooDesch-authored Framework ordered Step implementation"
+    },
+    {
+      "source": "adapters/mt2/determinism_presentation_rng.h",
+      "destination": "adapters/mt2/determinism_presentation_rng.h",
+      "sha256": "4f208a7da69369015f77b174e60db634abfd6ae512ed2ede2fd59e7f42de88d7",
+      "license": "MIT",
+      "origin": "DooDesch-authored Framework ordered Step implementation"
+    },
+    {
+      "source": "adapters/mt2/determinism_presentation_rng.inc",
+      "destination": "adapters/mt2/determinism_presentation_rng.inc",
+      "sha256": "0f4609b782a1dae834f5dea89a7b0135ea246cba2e07b02091b0586c88555452",
+      "license": "MIT",
+      "origin": "DooDesch-authored Framework ordered Step implementation"
+    },
+    {
+      "source": "adapters/mt2/determinism_reveal_boundary.inc",
+      "destination": "adapters/mt2/determinism_reveal_boundary.inc",
+      "sha256": "5a3364768a3d77e650013d5f5eabb0a2c43e0e37f82b0b2b043b0f7dbb25e36a",
+      "license": "MIT",
+      "origin": "DooDesch-authored Framework ordered Step implementation"
+    },
+    {
+      "source": "adapters/mt2/determinism_rng_trace.inc",
+      "destination": "adapters/mt2/determinism_rng_trace.inc",
+      "sha256": "5c1d3210058de96c4887e02446457f7e0c6595301b5e999ad27eca58af78e3a6",
+      "license": "MIT",
+      "origin": "DooDesch-authored Framework ordered Step implementation"
+    },
+    {
+      "source": "adapters/mt2/determinism_rng_vector_trace.inc",
+      "destination": "adapters/mt2/determinism_rng_vector_trace.inc",
+      "sha256": "511057ea742141036491098848ec2b2dd9b865410f0fdfbc4799c4c6593a26af",
+      "license": "MIT",
+      "origin": "DooDesch-authored Framework ordered Step implementation"
+    },
+    {
+      "source": "adapters/mt2/determinism_task_boundary.inc",
+      "destination": "adapters/mt2/determinism_task_boundary.inc",
+      "sha256": "cc56cee516e67c968a211d1b6d4f8e32709251738edd0e52e784023113d57cc7",
+      "license": "MIT",
+      "origin": "DooDesch-authored Framework ordered Step implementation"
+    },
+    {
+      "source": "adapters/mt2/determinism_terrain_probe.inc",
+      "destination": "adapters/mt2/determinism_terrain_probe.inc",
+      "sha256": "d23179ab3430ca49fd4fbba5be61e34ffc45887823433d52db312290c99e95a0",
+      "license": "MIT",
+      "origin": "DooDesch-authored Framework ordered Step implementation"
+    },
+    {
+      "source": "adapters/mt2/determinism_timer_step.inc",
+      "destination": "adapters/mt2/determinism_timer_step.inc",
+      "sha256": "41a2537a05783c8f8423d9f9e10b85739e86c33b9f6e0a21bac2379f537fc10c",
+      "license": "MIT",
+      "origin": "DooDesch-authored Framework ordered Step implementation"
+    },
+    {
+      "source": "adapters/mt2/determinism_wait_render.h",
+      "destination": "adapters/mt2/determinism_wait_render.h",
+      "sha256": "cc254041ebd2ae32b9208c30e4485302e0c086d2a973c8c186c1ae9915f455b6",
+      "license": "MIT",
+      "origin": "DooDesch-authored Framework ordered Step implementation"
+    },
+    {
+      "source": "adapters/mt2/determinism_wait_render.inc",
+      "destination": "adapters/mt2/determinism_wait_render.inc",
+      "sha256": "b4ed364556d38a47e59bc26829f033dd63de06e4461f4ce7dff3d8634490c01b",
+      "license": "MIT",
+      "origin": "DooDesch-authored Framework ordered Step implementation"
+    },
+    {
+      "source": "adapters/mt2/determinism_work_witness.h",
+      "destination": "adapters/mt2/determinism_work_witness.h",
+      "sha256": "198b4bcfb27d8fddb5fc221916ee392ec279944c909d17877c5a8fa9dd196d91",
+      "license": "MIT",
+      "origin": "DooDesch-authored Framework ordered Step implementation"
+    },
+    {
+      "source": "adapters/mt2/developer_staff/passive_read.h",
+      "destination": "adapters/mt2/developer_staff/passive_read.h",
+      "sha256": "76d77da9a66a708899f0033150bc0cde310e9ea239f71e2df082bd51c6883acb",
+      "license": "MIT",
+      "origin": "DooDesch-authored Framework ordered Step implementation"
+    },
+    {
+      "source": "adapters/mt2/native_async_save.inc",
+      "destination": "adapters/mt2/native_async_save.inc",
+      "sha256": "9a4bad8e8faaf88ef8a4537ed8b5b304fcac69938921c8e525a643fefb1b58ff",
+      "license": "MIT",
+      "origin": "DooDesch-authored Framework ordered Step implementation"
+    },
+    {
+      "source": "adapters/mt2/native_blocking_save_scope.h",
+      "destination": "adapters/mt2/native_blocking_save_scope.h",
+      "sha256": "abcd2125d39df376eeb43abc7b2498e877c500b8c83f809f7b23230481f1feb3",
+      "license": "MIT",
+      "origin": "DooDesch-authored Framework ordered Step implementation"
+    },
+    {
+      "source": "adapters/mt2/native_quit_save.inc",
+      "destination": "adapters/mt2/native_quit_save.inc",
+      "sha256": "e577d940110cbae0fcd50e32f1ea0afa7ea77ff3c2a00e5e755849239e0ee3fb",
+      "license": "MIT",
+      "origin": "DooDesch-authored Framework ordered Step implementation"
+    },
+    {
+      "source": "adapters/mt2/native_region_rng.h",
+      "destination": "adapters/mt2/native_region_rng.h",
+      "sha256": "ee97fd2a08f08135ed5a3d8849430804d061692d54a356edc7d3f3ca3a07c36f",
+      "license": "MIT",
+      "origin": "DooDesch-authored Framework ordered Step implementation"
+    },
+    {
+      "source": "adapters/mt2/native_region_rng.inc",
+      "destination": "adapters/mt2/native_region_rng.inc",
+      "sha256": "f5d63b749a4a184ac57b1c0ccee47c6327eaa9aa01bf925e74d0a8ed1983e6c0",
+      "license": "MIT",
+      "origin": "DooDesch-authored Framework ordered Step implementation"
+    },
+    {
+      "source": "adapters/mt2/native_save_cache_completion.inc",
+      "destination": "adapters/mt2/native_save_cache_completion.inc",
+      "sha256": "63617d56375aee47900dce3f31e271b3f66955dc51d93ab6100ce69cf5f8c497",
+      "license": "MIT",
+      "origin": "DooDesch-authored Framework ordered Step implementation"
+    },
+    {
+      "source": "adapters/mt2/native_save_completion.inc",
+      "destination": "adapters/mt2/native_save_completion.inc",
+      "sha256": "23b47d36bc44b9401d59f7004a752b9dbb3dafb9cad8570ee004191829a452a4",
+      "license": "MIT",
+      "origin": "DooDesch-authored Framework ordered Step implementation"
+    },
+    {
+      "source": "adapters/mt2/native_snapshot_prepare.inc",
+      "destination": "adapters/mt2/native_snapshot_prepare.inc",
+      "sha256": "2f55b6cfe8b44664bf8ac30f6f02ced505390b2ebb1187bbd3c6abbc91121a55",
+      "license": "MIT",
+      "origin": "DooDesch-authored Framework ordered Step implementation"
+    },
+    {
+      "source": "adapters/mt2/native_snapshot_queue_diagnostic.inc",
+      "destination": "adapters/mt2/native_snapshot_queue_diagnostic.inc",
+      "sha256": "4e442c051ad0b1df005b2c373d0ea5604bdff872a684eb97ebeb7ce7becc1d99",
+      "license": "MIT",
+      "origin": "DooDesch-authored Framework ordered Step implementation"
+    },
+    {
+      "source": "adapters/mt2/native_step_adapter.cpp",
+      "destination": "adapters/mt2/native_step_adapter.cpp",
+      "sha256": "cdc2c8568badf6da45c213acac51b04e0ab9f564647be0a574f1b2b5d5b6c1c3",
+      "license": "MIT",
+      "origin": "DooDesch-authored Framework ordered Step implementation"
+    },
+    {
+      "source": "adapters/mt2/native_step_adapter.h",
+      "destination": "adapters/mt2/native_step_adapter.h",
+      "sha256": "47112ff753068d5450143cb1766750a9ee536a9443e773b3aebba568cab51e16",
+      "license": "MIT",
+      "origin": "DooDesch-authored Framework ordered Step implementation"
+    },
+    {
+      "source": "adapters/mt2/native_step_checkpoint.h",
+      "destination": "adapters/mt2/native_step_checkpoint.h",
+      "sha256": "1ac1d7e2e2f1becbe5d6f2cb4677c78b170fb9b96d424accd0585f22c545d639",
+      "license": "MIT",
+      "origin": "DooDesch-authored Framework ordered Step implementation"
+    },
+    {
+      "source": "adapters/mt2/native_step_checkpoint.inc",
+      "destination": "adapters/mt2/native_step_checkpoint.inc",
+      "sha256": "471da329d89091695db175ddef6e95f4bc2ed9ec1c22dc0ced5a3184903e55b3",
+      "license": "MIT",
+      "origin": "DooDesch-authored Framework ordered Step implementation"
+    },
+    {
+      "source": "adapters/mt2/native_step_clock_pause.inc",
+      "destination": "adapters/mt2/native_step_clock_pause.inc",
+      "sha256": "971d68c9acba812142a432f9004b04c232228e551f6d31ed1e8c9977cc30d0fd",
+      "license": "MIT",
+      "origin": "DooDesch-authored Framework ordered Step implementation"
+    },
+    {
+      "source": "adapters/mt2/native_step_command_hold.inc",
+      "destination": "adapters/mt2/native_step_command_hold.inc",
+      "sha256": "e9369d66c09f284746f45053f0bb457527ae85d5c065d922f65d75b753153677",
+      "license": "MIT",
+      "origin": "DooDesch-authored Framework ordered Step implementation"
+    },
+    {
+      "source": "adapters/mt2/native_step_driver.cpp",
+      "destination": "adapters/mt2/native_step_driver.cpp",
+      "sha256": "41277dcf3bd141f57590f96e88b519cc296d5db6b89cf91a5253c7a7ae4de789",
+      "license": "MIT",
+      "origin": "DooDesch-authored Framework ordered Step implementation"
+    },
+    {
+      "source": "adapters/mt2/native_step_driver.h",
+      "destination": "adapters/mt2/native_step_driver.h",
+      "sha256": "d3315dc7676e9cae334d18db40510d30b5b1944548dee867ddb867f19cabf33e",
+      "license": "MIT",
+      "origin": "DooDesch-authored Framework ordered Step implementation"
+    },
+    {
+      "source": "adapters/mt2/native_step_exit.inc",
+      "destination": "adapters/mt2/native_step_exit.inc",
+      "sha256": "75dab877c557d904899c72d336dd1f40f6641d9a88fb9f7a931aead1230006e5",
+      "license": "MIT",
+      "origin": "DooDesch-authored Framework ordered Step implementation"
+    },
+    {
+      "source": "adapters/mt2/native_step_exit_pins.inc",
+      "destination": "adapters/mt2/native_step_exit_pins.inc",
+      "sha256": "24711d03961144a344039680f050f4c3091a3f3115178f214ec86bdaa18ef495",
+      "license": "MIT",
+      "origin": "DooDesch-authored Framework ordered Step implementation"
+    },
+    {
+      "source": "adapters/mt2/native_step_pins.h",
+      "destination": "adapters/mt2/native_step_pins.h",
+      "sha256": "bb9c699aa756023bb15ceb21083065ed376cbacc41686208334cc0b623068dfb",
+      "license": "MIT",
+      "origin": "DooDesch-authored Framework ordered Step implementation"
+    },
+    {
+      "source": "adapters/mt2/native_step_presentation_metrics.inc",
+      "destination": "adapters/mt2/native_step_presentation_metrics.inc",
+      "sha256": "2283703e289f490ba8a24d765b3bf6bad5099374ddd2dc3501a058f8806623e3",
+      "license": "MIT",
+      "origin": "DooDesch-authored Framework ordered Step implementation"
+    },
+    {
+      "source": "adapters/mt2/native_step_proof.cpp",
+      "destination": "adapters/mt2/native_step_proof.cpp",
+      "sha256": "cd9da35f9bd98c1e0c3d7ed9b52e4633415bf3eadcaac924ebb1868dc149e3d7",
+      "license": "MIT",
+      "origin": "DooDesch-authored Framework ordered Step implementation"
+    },
+    {
+      "source": "adapters/mt2/native_step_proof.h",
+      "destination": "adapters/mt2/native_step_proof.h",
+      "sha256": "8d0ff5a50c7fb0c2fdc7815dafb1bda45b631b7aa6adac921249489b8dcf3a13",
+      "license": "MIT",
+      "origin": "DooDesch-authored Framework ordered Step implementation"
+    },
+    {
+      "source": "adapters/mt2/native_step_rng_diagnostic.inc",
+      "destination": "adapters/mt2/native_step_rng_diagnostic.inc",
+      "sha256": "dd06d9287eb882dac2e2ffa2ab4c17aa6056b53a13cc05fc0a01704e0944a1de",
+      "license": "MIT",
+      "origin": "DooDesch-authored Framework ordered Step implementation"
+    },
+    {
+      "source": "adapters/mt2/native_step_runtime.inc",
+      "destination": "adapters/mt2/native_step_runtime.inc",
+      "sha256": "801353bfb2f83ee60ccbdd6fec0ec7cf5c2185c53c9a2f625a3b98622e128060",
+      "license": "MIT",
+      "origin": "DooDesch-authored Framework ordered Step implementation"
+    },
+    {
+      "source": "adapters/mt2/native_step_windows.cpp",
+      "destination": "adapters/mt2/native_step_windows.cpp",
+      "sha256": "f34f32d83c0210eb1552ac90a060bdcf324ac3d44d50787899b5d9c61a5a2d53",
+      "license": "MIT",
+      "origin": "DooDesch-authored Framework ordered Step implementation"
+    },
+    {
+      "source": "adapters/mt2/native_step_windows.h",
+      "destination": "adapters/mt2/native_step_windows.h",
+      "sha256": "ac069c6e1d2629826af0299bd2fa0a43ff380be5359001ed3e76a8daf8bb2951",
+      "license": "MIT",
+      "origin": "DooDesch-authored Framework ordered Step implementation"
+    },
+    {
+      "source": "adapters/mt2/native_steps.cpp",
+      "destination": "adapters/mt2/native_steps.cpp",
+      "sha256": "9f94e93fd259e5d9c2a88a096ce7ceb0e1cc8efec2baffeae183d84f99f398ce",
+      "license": "MIT",
+      "origin": "DooDesch-authored Framework ordered Step implementation"
+    },
+    {
+      "source": "adapters/mt2/native_steps.h",
+      "destination": "adapters/mt2/native_steps.h",
+      "sha256": "ecbf76e97ea505d615fc4df9c902c6033c172ee0d3fd0022722ee5aec16de704",
+      "license": "MIT",
+      "origin": "DooDesch-authored Framework ordered Step implementation"
+    },
+    {
+      "source": "adapters/mt2/npc_census.h",
+      "destination": "adapters/mt2/npc_census.h",
+      "sha256": "f11d91cf724c7aa71acad467319421a7cf45499f0f24a2bfacd729d0d94946a1",
+      "license": "MIT",
+      "origin": "DooDesch-authored Framework ordered Step implementation"
+    },
+    {
+      "source": "adapters/mt2/npc_quest_records.h",
+      "destination": "adapters/mt2/npc_quest_records.h",
+      "sha256": "b184c1d974d39c4790ef27e2f45114e58d0008b5eb923566ffde61e4a90471e6",
+      "license": "MIT",
+      "origin": "DooDesch-authored Framework ordered Step implementation"
+    },
+    {
+      "source": "adapters/mt2/npc_quest_state.h",
+      "destination": "adapters/mt2/npc_quest_state.h",
+      "sha256": "2dd0cd276f58a7dc540b45be077dccb696ae778e90aafed047af04540645600c",
+      "license": "MIT",
+      "origin": "DooDesch-authored Framework ordered Step implementation"
+    },
+    {
+      "source": "adapters/mt2/npc_quest_targets.h",
+      "destination": "adapters/mt2/npc_quest_targets.h",
+      "sha256": "1404bf8adf03c559d6040e54b62b431ff92c653b5f9125a4163cc3c3a7985aa0",
+      "license": "MIT",
+      "origin": "DooDesch-authored Framework ordered Step implementation"
+    },
+    {
+      "source": "adapters/mt2/npc_saved_identity.h",
+      "destination": "adapters/mt2/npc_saved_identity.h",
+      "sha256": "34187163f8f296e151bca658ecfe6a64bbbd9025c8a1b9fa7fedd228ba2d7b4f",
+      "license": "MIT",
+      "origin": "DooDesch-authored Framework ordered Step implementation"
+    },
+    {
+      "source": "adapters/mt2/region_saved_identity.h",
+      "destination": "adapters/mt2/region_saved_identity.h",
+      "sha256": "011ba46738a40c8d54045e5b3a9a99665678b97d5a88c90697ebef0300c495c3",
+      "license": "MIT",
+      "origin": "DooDesch-authored Framework ordered Step implementation"
+    },
+    {
+      "source": "adapters/mt2/sdk/native_steps_draft.h",
+      "destination": "adapters/mt2/sdk/native_steps_draft.h",
+      "sha256": "b9d190d068f178e5af964640c7a3db4401a3684d8ad1446cc71c677c9af93312",
+      "license": "MIT",
+      "origin": "DooDesch-authored Framework ordered Step implementation"
+    },
+    {
+      "source": "adapters/mt2/snapshot_building_key.h",
+      "destination": "adapters/mt2/snapshot_building_key.h",
+      "sha256": "585e1a15c4399c8bc99affbb8eb26bbd213ff3b6985226a616da5d4fcc09f284",
+      "license": "MIT",
+      "origin": "DooDesch-authored Framework ordered Step implementation"
+    },
+    {
+      "source": "adapters/mt2/snapshot_npc_key.h",
+      "destination": "adapters/mt2/snapshot_npc_key.h",
+      "sha256": "42dc0d538f576165f4f516da3c79a5bb264c73b8053ca610483834af8cdffef4",
+      "license": "MIT",
+      "origin": "DooDesch-authored Framework ordered Step implementation"
+    },
+    {
+      "source": "adapters/mt2/snapshot_zone_key.h",
+      "destination": "adapters/mt2/snapshot_zone_key.h",
+      "sha256": "cc9229cf5e1bb49125514e8650e17c1c371df5e73a9c90b9487723271f34453c",
+      "license": "MIT",
+      "origin": "DooDesch-authored Framework ordered Step implementation"
+    },
+    {
+      "source": "adapters/mt2/subscriber_activity.h",
+      "destination": "adapters/mt2/subscriber_activity.h",
+      "sha256": "ab9655836c4b890814777ac677cc887e1a690bfad2c38d9376b12934e304fc91",
+      "license": "MIT",
+      "origin": "DooDesch-authored Framework ordered Step implementation"
+    },
+    {
+      "source": "adapters/mt2/subscriber_motion.h",
+      "destination": "adapters/mt2/subscriber_motion.h",
+      "sha256": "b4fc1aca244b63424a202a0b84e9db72e08f29fdc3f6b57ddf567ccada7dbb0e",
+      "license": "MIT",
+      "origin": "DooDesch-authored Framework ordered Step implementation"
+    },
+    {
+      "source": "adapters/mt2/subscriber_needs.h",
+      "destination": "adapters/mt2/subscriber_needs.h",
+      "sha256": "89a4d6e9a02afa7c6ce862a537c15cf72e8d984e35de118defc9bfe651180129",
+      "license": "MIT",
+      "origin": "DooDesch-authored Framework ordered Step implementation"
+    },
+    {
+      "source": "adapters/mt2/subscriber_passive_motion.h",
+      "destination": "adapters/mt2/subscriber_passive_motion.h",
+      "sha256": "07026d9580f8d4950db4de25f3a9ff9b9c7cc0d7560c78e1536db5a2335fbe3b",
+      "license": "MIT",
+      "origin": "DooDesch-authored Framework ordered Step implementation"
+    },
+    {
+      "source": "adapters/mt2/terminal_panel_draw.h",
+      "destination": "adapters/mt2/terminal_panel_draw.h",
+      "sha256": "59c1dd8dd1061c38025ba818e815f4d2a0a9f35411cd6227a58a09329bbd523a",
+      "license": "MIT",
+      "origin": "DooDesch-authored Framework ordered Step implementation"
+    },
+    {
+      "source": "adapters/mt2/terminal_panel_input.h",
+      "destination": "adapters/mt2/terminal_panel_input.h",
+      "sha256": "1b2d3732407a36b165703e3addef983ded073717a0010e4bdb0c382839902019",
+      "license": "MIT",
+      "origin": "DooDesch-authored Framework ordered Step implementation"
+    },
+    {
+      "source": "adapters/mt2/terminal_panel_pins.inc",
+      "destination": "adapters/mt2/terminal_panel_pins.inc",
+      "sha256": "91ce02ad6628a4f94b0bd58badd62153952920a7f52db115723e967e0c75a43d",
+      "license": "MIT",
+      "origin": "DooDesch-authored Framework ordered Step implementation"
+    },
+    {
+      "source": "adapters/mt2/tutorial_passive_read.h",
+      "destination": "adapters/mt2/tutorial_passive_read.h",
+      "sha256": "9431b218f42fac746abecf499bd932db348422a2724709b0e143aeb55ab2b202",
+      "license": "MIT",
+      "origin": "DooDesch-authored Framework ordered Step implementation"
     }
   ]
 }

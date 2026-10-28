@@ -263,6 +263,7 @@ catalog.catalog("mp.management-gm-policy.b1e0b0",0xb1e0b0,false);
 catalog.catalog("mp.bug-lifecycle-and-saved-identity.baded0",0xbaded0,false);
 catalog.catalog("mp.native-opened-file-provenance.bd7a80",0xbd7a80,false);
 catalog.catalog("mp.root-building-load-identity.c0ab50",0xc0ab50,false);
+catalog.catalog("mp.npc-array-load-identity.c0f0f0",0xc0f0f0,false);
 catalog.catalog("mp.bug-lifecycle-and-saved-identity.c2e810",0xc2e810,false);
 catalog.catalog("mp.monster-property-save-load.da79e0",0xda79e0,false);
 catalog.catalog("mp.monster-property-save-load.da7a10",0xda7a10,false);
@@ -282,3 +283,7 @@ catalog.catalog("mp.quest-target-property-save-load.e3c0f0",0xe3c0f0,false);
 catalog.catalog("mp.quest-target-property-save-load.e3c6e0",0xe3c6e0,false);
 catalog.catalog("mp.native-free-ownership.1264b60",0x1264b60,false);
 catalog.catalog("mp.building-uptime-add.859e30",0x859e30,false);
+catalog.catalog("mp.ordered-tutorial-undo-clear.53a240",0x53a240,false);
+catalog.catalog("mp.ordered-clearance-make-scenery.559ee0",0x559ee0,false);
+
+catalog.catalog("mp.terrain-settlement.map-data",0x32c1e0,false);

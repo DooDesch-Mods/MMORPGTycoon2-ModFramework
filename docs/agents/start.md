@@ -4,7 +4,7 @@ title: Build a mod with an agent
 
 # Build a mod with an agent
 
-Use the same public contract and complete examples as a human modder. This source targets Framework **0.4.0** and Lua API **1.3.0**; native C ABI stays at **1**. New API 1.3 functions require Framework 0.4.0 or later. The [compatibility page](../compatibility.md) identifies the supported game build.
+Use the same public contract and complete examples as a human modder. This source targets Framework **0.5.0** and Lua API **1.3.0**; native C ABI stays at **1**. New API 1.3 functions require Framework 0.4.0 or later. The [compatibility page](../compatibility.md) identifies the supported game build.
 
 ## Context to give your agent
 
@@ -25,6 +25,11 @@ avoid repeated network scans each frame. A paired fee action has no automatic
 rollback; a partial native failure remains unknown.
 
 Experimental typed patches require Framework 0.2.0 or newer. Read the [patch guide](../experimental/patches.md) and [patch target contract](../public/api/experimental/patches.json) before using them. Never infer Host authority from a manifest or a missing session flag.
+
+Framework 0.5.0 adds the [native Step draft 9 guide](../experimental/steps.md)
+and [machine contract](../public/api/experimental/steps.json). Its authority is
+restricted to the supported native Multiplayer owner. Do not infer new Lua
+functions or permissions from this native contract; the public Lua API remains 1.3.0.
 
 ## Author and validate
 

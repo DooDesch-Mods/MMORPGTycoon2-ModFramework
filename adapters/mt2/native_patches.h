@@ -15,6 +15,7 @@ public:
     bool retire(Plugin&);
     bool busy() const;
     bool authorize(const std::string&,std::string&);
+    bool inspect_step_provider(Plugin&,uint64_t token,uint64_t& epoch,uint32_t& role,std::string& cause);
     Json status() const;
 private:
     struct Owner {

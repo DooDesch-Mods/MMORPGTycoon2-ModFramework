@@ -156,7 +156,7 @@ bool NativeRoutes::compose(const Target& target,Bytes& expected,std::string& cau
         if(&peer==omitted||!peer.patch_size||!overlaps(target.rva,32,peer.rva,peer.patch_size))continue;
         bool state=peer.state==MT2FW_MT2_ROUTE_ENABLED||(&peer==retiring&&peer.state==MT2FW_MT2_ROUTE_UNKNOWN);
         if(!state||peer.patch_size>32||!peer.generation||peer.patch_generation!=peer.generation||!peer.detour||!peer.trampoline||
-           (!peer.shared&&(!peer.created||!peer.owner||peer.owner->service!=this||!peer.owner->plugin))){
+           (!peer.shared&&!(((peer.rva==0xc0ab50&&peer.building_observer==peer.detour)||(peer.rva==0xc0f0f0&&peer.npc_observer==peer.detour))&&!peer.owner)&&(!peer.created||!peer.owner||peer.owner->service!=this||!peer.owner->plugin))){
             cause="Adjacent native route has no acknowledged owned generation: "+name;return false;
         }
         for(uint32_t i=0;i<peer.patch_size;++i){auto address=peer.rva+i;if(address<target.rva||address-target.rva>=32)continue;
@@ -210,7 +210,27 @@ void NativeRoutes::receipt(const Target& target,MT2FW_MT2_RouteReceipt& output){
     Bytes current{};std::string cause;bool composed=compose(target,current,cause,nullptr,&target);
     if(!composed){output.state=MT2FW_MT2_ROUTE_UNKNOWN;current=target.current;}
     std::memcpy(output.pristine,target.pristine.data(),32);std::memcpy(output.current,current.data(),32);
-    copy(output.owner,target.owner?target.owner->plugin->manifest.id:target.shared?"framework":"");copy(output.game_sha256,game_sha);copy(output.cause,target.cause.empty()?cause:target.cause);
+    copy(output.owner,target.owner?target.owner->plugin->manifest.id:target.shared?"framework":target.building_observer?"framework:building-observer":target.npc_observer?"framework:npc-observer":"");copy(output.game_sha256,game_sha);copy(output.cause,target.cause.empty()?cause:target.cause);
+}
+bool NativeRoutes::reserve_building_observer(Runtime& runtime,void* detour,std::string& cause){
+    std::lock_guard lock(gate_);
+    if(!detour||!runtime.plugins().empty()||!owners_.empty()){cause="Private Building observer requires an empty plugin and route-owner set";return false;}
+    auto found=targets_.find("mp.root-building-load-identity.c0ab50");
+    if(found==targets_.end()||found->second.rva!=0xc0ab50||found->second.shared){cause="Private Building observer exact exclusive catalog entry missing";return false;}
+    auto& target=found->second;
+    if(target.building_observer||target.owner||target.created||target.detour||target.trampoline||target.patch_size||target.generation||target.state!=MT2FW_MT2_ROUTE_PRISTINE){cause="Private Building observer target already has an owner or attempted route";return false;}
+    if(!validate(target,cause))return false;
+    target.building_observer=detour;cause.clear();return true;
+}
+bool NativeRoutes::reserve_npc_observer(Runtime& runtime,void* detour,std::string& cause){
+    std::lock_guard lock(gate_);
+    if(!detour||!runtime.plugins().empty()||!owners_.empty()){cause="Private NPC observer requires an empty plugin and route-owner set";return false;}
+    auto found=targets_.find("mp.npc-array-load-identity.c0f0f0");
+    if(found==targets_.end()||found->second.rva!=0xc0f0f0||found->second.shared){cause="Private NPC observer exact exclusive catalog entry missing";return false;}
+    auto& target=found->second;
+    if(target.npc_observer||target.owner||target.created||target.detour||target.trampoline||target.patch_size||target.generation||target.state!=MT2FW_MT2_ROUTE_PRISTINE){cause="Private NPC observer target already has an owner or attempted route";return false;}
+    if(!validate(target,cause))return false;
+    target.npc_observer=detour;cause.clear();return true;
 }
 bool NativeRoutes::publish_shared(const std::string& name,void* detour,void* trampoline,std::string& cause){
     std::lock_guard lock(gate_);auto found=targets_.find(name);
@@ -223,15 +243,46 @@ bool NativeRoutes::publish_shared(const std::string& name,void* detour,void* tra
 }
 bool NativeRoutes::publish_framework_hook(void* target,void* detour,void* trampoline,std::string& cause){
     std::lock_guard lock(gate_);for(auto& [name,value]:targets_)if(image_+value.rva==reinterpret_cast<uintptr_t>(target)){
+        if(value.building_observer){
+            if(value.rva!=0xc0ab50||name!="mp.root-building-load-identity.c0ab50"||value.shared||value.owner||value.created||
+               value.building_observer!=detour||!trampoline||value.generation||value.state!=MT2FW_MT2_ROUTE_PRISTINE){
+                cause="Private Building observer publication does not match its exclusive reservation";return false;
+            }
+            Bytes current{};value.detour=detour;value.trampoline=trampoline;++value.generation;
+            if(backend_.prove&&backend_.prove(target,detour,cause)&&backend_.read(image_+value.rva,current.data(),32,cause)&&accept_enabled(value,current,cause))return true;
+            if(cause.empty())cause="Private Building observer backend proof unavailable";
+            value.state=MT2FW_MT2_ROUTE_UNKNOWN;value.cause="Private Building observer acknowledgement failed: "+cause;return false;
+        }
+        if(value.npc_observer){
+            if(value.rva!=0xc0f0f0||name!="mp.npc-array-load-identity.c0f0f0"||value.shared||value.owner||value.created||
+               value.npc_observer!=detour||!trampoline||value.generation||value.state!=MT2FW_MT2_ROUTE_PRISTINE){
+                cause="Private NPC observer publication does not match its exclusive reservation";return false;
+            }
+            Bytes current{};value.detour=detour;value.trampoline=trampoline;++value.generation;
+            if(backend_.prove&&backend_.prove(target,detour,cause)&&backend_.read(image_+value.rva,current.data(),32,cause)&&accept_enabled(value,current,cause))return true;
+            if(cause.empty())cause="Private NPC observer backend proof unavailable";
+            value.state=MT2FW_MT2_ROUTE_UNKNOWN;value.cause="Private NPC observer acknowledgement failed: "+cause;return false;
+        }
         if(!value.shared){cause="Framework hook collides with named Multiplayer target: "+name;return false;}
         return publish_shared(name,detour,trampoline,cause);
     }return true;
+}
+bool NativeRoutes::prove_framework_hook(const std::string& name,void* detour,void* trampoline,std::string& cause){
+    std::lock_guard lock(gate_);auto found=targets_.find(name);
+    if(found==targets_.end()){cause="Framework route is not catalogued: "+name;return false;}
+    auto& target=found->second;
+    if(!target.shared||target.owner||target.created||target.state!=MT2FW_MT2_ROUTE_ENABLED||!target.patch_size||!target.generation||
+       !detour||!trampoline||target.detour!=detour||target.trampoline!=trampoline){
+        cause="Framework route ownership or trampoline differs: "+name;return false;
+    }
+    if(!validate(target,cause))return false;
+    cause.clear();return true;
 }
 MT2FW_MT2_Result MT2FW_CALL NativeRoutes::hook_prepare(void* context,const char* name,void* detour,MT2FW_MT2_RouteReceipt* output){
     auto value=owner(context);if(!value)return MT2FW_MT2_UNAVAILABLE;if(!name||!detour||!output_ok(output))return MT2FW_MT2_INVALID;
     auto& service=*value->service;std::lock_guard lock(service.gate_);auto found=service.targets_.find(name);
     if(found==service.targets_.end()||found->second.shared)return MT2FW_MT2_UNAVAILABLE;auto& target=found->second;
-    if(target.owner){service.receipt(target,*output);return MT2FW_MT2_BUSY;}
+    if(target.owner||target.building_observer||target.npc_observer){service.receipt(target,*output);return MT2FW_MT2_BUSY;}
     std::string cause;if(!service.validate(target,cause)){target.cause=cause;service.receipt(target,*output);return MT2FW_MT2_FAILED;}
     target.owner=value;target.detour=detour;target.state=MT2FW_MT2_ROUTE_UNKNOWN;++target.generation;
     if(target.retained)value->plugin->native_retained=true;

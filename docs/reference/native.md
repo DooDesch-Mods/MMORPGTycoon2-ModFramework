@@ -8,6 +8,8 @@ title: "Native C ABI"
 
 The supported native boundary is `include/mt2fw/plugin.h`, shown below without a manually duplicated declaration list. No STL objects or exceptions may cross this ABI. Plugins remain loaded until process exit.
 
+The separate [experimental Step SDK](../experimental/steps.md) coordinates native multiplayer sessions and requires exact draft 9 admission. It does not change the stable plugin ABI or grant general Lua write authority.
+
 Host strings are copied during a request. Callback JSON is borrowed until return. The host and PluginInfo strings remain valid through Shutdown. A size query never executes a mutation; request a sufficiently sized buffer once, then perform the call once.
 
 ```c

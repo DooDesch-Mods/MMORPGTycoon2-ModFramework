@@ -10,8 +10,9 @@ import venv
 ROOT = Path(__file__).resolve().parents[1]
 parser = argparse.ArgumentParser(description=__doc__)
 parser.add_argument('--bootstrap', action='store_true', help='Install pinned build dependencies into the local venv')
+parser.add_argument('--environment', type=Path, help='Reuse an existing workspace-local build environment without reinstalling dependencies')
 args = parser.parse_args()
-environment = ROOT / 'build/helper-env'
+environment = args.environment.resolve() if args.environment else ROOT / 'build/helper-env'
 python = environment / 'Scripts/python.exe'
 logs = ROOT / 'artifacts/helper-build' / datetime.now(timezone.utc).strftime('%Y%m%dT%H%M%S%fZ')
 logs.mkdir(parents=True)

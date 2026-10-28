@@ -3,6 +3,8 @@
 #include "crypto.h"
 #include "native_input.h"
 #include "native_app_state.h"
+#include "terminal_panel_input.h"
+#include <SDL3/SDL_video.h>
 #include <SDL3/SDL_events.h>
 #include <windows.h>
 #include <array>
@@ -22,6 +24,7 @@ DWORD thread = 0;
 fs::path profile;
 Details details;
 std::function<void()> language;
+VerifyBody verify_terminal_body;
 void* mode = nullptr;
 void* panel = nullptr;
 void* current_desktop = nullptr;
@@ -594,9 +597,11 @@ void menu_select(void* receiver, const void* key) {
 }
 }
 
-void configure(Runtime& owner, const fs::path& root, Details open_details, std::function<void()> change_language) {
+void configure(Runtime& owner, const fs::path& root, Details open_details, std::function<void()> change_language, VerifyBody verify_body) {
     require(runtime == nullptr, "Desktop UI is already configured");
+    require(bool(verify_body), "Desktop UI requires its native body ownership verifier");
     runtime = &owner; profile = root; details = std::move(open_details); language = std::move(change_language);
+    verify_terminal_body = std::move(verify_body);
     image = reinterpret_cast<uintptr_t>(GetModuleHandleW(nullptr));
 }
 std::vector<Hook> hooks() {
@@ -1025,4 +1030,5 @@ Json native_window(const Json& args) {
     }
     events["clicked"] = std::move(window.clicked); window.clicked = Json::array(); return events;
 }
+#include "desktop_terminal.inc"
 }
