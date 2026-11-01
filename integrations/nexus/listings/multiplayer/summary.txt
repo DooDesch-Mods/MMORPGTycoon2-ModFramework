@@ -1,0 +1,1 @@
+An early Steam co-op beta for MMORPG Tycoon 2. Beta 25 improves rejoining and shared-world selection. Requires MT2 Mod Framework Runtime 0.5.0 and Vortex. Some gameplay is still unavailable or being tested.

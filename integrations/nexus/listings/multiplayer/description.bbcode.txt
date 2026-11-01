@@ -1,0 +1,27 @@
+[size=6][b]MMORPG Tycoon 2 Multiplayer[/b][/size]
+Build your MMO world together.
+
+🛟 [b]Need help or found a bug?[/b] Get support at [url=https://support.doodesch.de/multiplayer]support.doodesch.de/multiplayer[/url].
+
+[size=4][b]Early Beta 25[/b][/size]
+Rejoin after restarting the game and continue building. Beta 25 fixes simulation drift after rejoining and restores world selection after players join.
+
+The new simulation is still in testing. [b]Groups, modular buildings, dungeons and management actions are not yet available.[/b] Other gameplay scenarios and performance remain under test. Start with a small world and keep backups of your saves.
+
+[size=4][b]Start playing[/b][/size]
+Both players need [b]Beta 25[/b], [b]MT2 Mod Framework Runtime 0.5.0[/b] and the [b]MMORPG Tycoon 2 Vortex Extension[/b]. Install the Runtime, not the developer SDK.
+
+[list=1]
+[*]Close the game and install the Framework Runtime and Vortex Extension.
+[*]Add the Multiplayer ZIP to Vortex for MMORPG Tycoon 2.
+[*]Enable the mod, deploy, then start through Steam.
+[*]Open the Multiplayer desktop icon, or use Mods... > Multiplayer > Open.
+[*]Host a lobby and create or load a small world, or join your friend's lobby. Wait until both players are ready before building.
+[/list]
+
+[size=4][b]Feedback[/b][/size]
+Use [b]Report a problem[/b] in the Multiplayer window and keep the report number when contacting support.
+
+The earlier Beta 23 used a different synchronization system. Its feature list does not describe Beta 25. [url=https://github.com/DooDesch-Mods/MMORPGTycoon2-Multiplayer/releases/tag/v0.1.0-beta.23]Earlier releases[/url] remain available.
+
+[url=https://github.com/DooDesch-Mods/MMORPGTycoon2-Multiplayer/releases/tag/v0.1.0-beta.25]Source and current release notes[/url]

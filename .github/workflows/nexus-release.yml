@@ -21,6 +21,10 @@ on:
         description: Send the release announcement to Discord (once per product/version)
         type: boolean
         default: false
+      update_listing:
+        description: Update the prepared summary and description for this exact release
+        type: boolean
+        default: false
       discord_message_id:
         description: Existing Discord message ID to reconcile after an interrupted acknowledgement
         type: string
@@ -124,6 +128,11 @@ jobs:
           if [[ -n "$DISCORD_MESSAGE_ID" ]]; then options+=(--message-id "$DISCORD_MESSAGE_ID"); fi
           if [[ "$UPDATE_ANNOUNCEMENT" == true ]]; then options+=(--update-announcement); fi
           python tools/release_delivery.py --directory "artifacts/nexus/${{ matrix.product }}" "${options[@]}"
+      - name: Update prepared Nexus listing
+        if: inputs.update_listing && inputs.publish && (steps.prepare.outputs.status == 'already-present' || steps.upload.outcome == 'success')
+        env:
+          NEXUSMODS_API_KEY: ${{ secrets.NEXUSMODS_API_KEY }}
+        run: python tools/nexus_listing.py --directory "artifacts/nexus/${{ matrix.product }}"
       - name: Retain release receipts
         if: always()
         uses: actions/upload-artifact@v4
