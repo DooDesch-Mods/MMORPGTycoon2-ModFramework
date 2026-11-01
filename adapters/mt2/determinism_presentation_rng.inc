@@ -13,6 +13,14 @@ constexpr std::array<const char*,16> digital_names={"dottedDirection","dottedLen
 std::array<core::Counters,2> counts;
 thread_local core::Local local;
 thread_local core::Local respawn_local;
+thread_local core::Local building_widget_local;
+thread_local core::BuildingWidgetQuery building_widget_scope;
+core::Counters building_widget_count;
+using BuildingWidgetOwner=bool(*)(const void*,std::string&);
+BuildingWidgetOwner building_widget_owner=nullptr;
+using GetPadEntrance=void*(*)(void*,const void*,int,int);
+GetPadEntrance original_get_pad_entrance=nullptr;
+bool building_widget_installed=false;
 thread_local core::RespawnQuery respawn_query;
 core::Counters respawn_count;
 using FindRespawn=void*(*)(void*);
@@ -61,6 +69,24 @@ bool character_jump_installed=false;
 
 std::mutex failure_mutex;
 std::string failure;
+std::mutex building_widget_failure_mutex;
+std::string building_widget_failure;
+
+bool admit_building_widget(const void* building,uintptr_t caller){
+    if(!armed.load(std::memory_order_acquire)||caller!=image+0x409a54||!building_widget_owner)return false;
+    try{std::string cause;const bool admitted=building_widget_owner(building,cause);
+        if(!admitted&&!cause.empty()){std::lock_guard lock(building_widget_failure_mutex);if(building_widget_failure.empty())building_widget_failure=cause;}
+        return admitted;
+    }catch(const std::exception& problem){std::lock_guard lock(building_widget_failure_mutex);if(building_widget_failure.empty())building_widget_failure=problem.what();return false;}
+    catch(...){std::lock_guard lock(building_widget_failure_mutex);if(building_widget_failure.empty())building_widget_failure="Building widget owner raised unknown exception";return false;}
+}
+__declspec(noinline) void* get_pad_entrance(void* output,const void* building,int pad,int entrance){
+    const auto caller=reinterpret_cast<uintptr_t>(_ReturnAddress());
+    const auto previous=building_widget_scope;
+    building_widget_scope.active=admit_building_widget(building,caller);
+    __try{return original_get_pad_entrance(output,building,pad,entrance);}
+    __finally{building_widget_scope=previous;}
+}
 
 void verify(uintptr_t offset,size_t size,const char* expected){
     std::string bytes(size,'\0');SIZE_T copied=0;
@@ -80,6 +106,15 @@ void verify_digital(){
 }
 core::Selection select_digital(uintptr_t helper,uintptr_t caller,void* source){
     const auto caller_rva=caller>=image?caller-image:0;
+    if(building_widget_installed&&armed.load(std::memory_order_acquire)&&building_widget_scope.matches(helper,caller_rva)){
+        try{
+            if(read<uintptr_t>(image+0x164b250)!=image+0x1c4e7a0)
+                throw std::runtime_error("Building widget RNG Default object differs");
+        }catch(const std::exception& problem){std::lock_guard lock(building_widget_failure_mutex);if(building_widget_failure.empty())building_widget_failure=problem.what();throw;}
+        return core::select_building_widget(true,generation.load(std::memory_order_acquire),building_widget_scope,
+            helper,caller_rva,source,reinterpret_cast<void*>(image+0x1c4e7a0),building_widget_local,building_widget_count,
+            [](void* target,uint64_t seed){original_seed(target,seed);});
+    }
     if(respawn_installed&&armed.load(std::memory_order_acquire)&&respawn_query.matches(helper,caller_rva)){
         try{
             if(read<uintptr_t>(image+0x164b250)!=image+0x1c4e7a0)
@@ -183,6 +218,16 @@ void install(const Json& config){
     original_seed=reinterpret_cast<Seed>(image+0x9fc090);
     hook(reinterpret_cast<void*>(image+0x9fc430),reinterpret_cast<void*>(&get_float),reinterpret_cast<void**>(&original_float));
     if(config.value("rng_trace",false)){
+        if(building_widget_owner){
+            verify(0x409800,720,"10bcc771eb3058afaf77564a8eb864aada002300cec8266a5b0aba99b53ce92f");
+            verify(0x408ac0,1216,"a0f051e1e28377b7f2b8d4e0c4fba5c17851a17ecb0eadca33edc8a14281f28e");
+            verify(0xda660,208,"2c2b0119f0986fd7fecdbbe621d6075696ffd2a0b185bf614a87b0702abfcdf8");
+            verify(0x47ce20,16,"bbda1b5c6a1bf4cdfc61c7f519f5df3ae7a710e548db36c0d3ac1e8d3d70f995");
+            native_routes->catalog("framework.rng.building-widget-query",0x408ac0,true);
+            native_services->reserve("framework.rng.building-widget-query");
+            hook(reinterpret_cast<void*>(image+0x408ac0),reinterpret_cast<void*>(&get_pad_entrance),reinterpret_cast<void**>(&original_get_pad_entrance));
+            building_widget_installed=true;
+        }
         verify(0x24e790,208,"2f485cb1039a25e9dd20e8fd9b970b0a25dc6d2a1d0747608de50a784655bbfa");
         verify(0x5c3d80,368,"462f80355467d9fb90a4d2c9c6278fc83f7aa8645ea5a2741d1cbf79960ef614");
         verify(0x5c4210,992,"8fb0187211bf62aa9985c6e9d4de015e0f64a068c04cb107daf4d40009905bf4");
@@ -212,7 +257,7 @@ void install(const Json& config){
         verify(0x3a0350,6816,"e994c1ef7cf8ff10fe463e8def99af65798238dce88481dbd3dc82838c828b79");
         character_jump_installed=true;
     }
-    if(digital_enabled||respawn_installed||puppet_installed||scenery_pattern_installed||character_jump_installed)rng_trace::select_source=&select_digital;
+    if(digital_enabled||respawn_installed||puppet_installed||scenery_pattern_installed||character_jump_installed||building_widget_installed)rng_trace::select_source=&select_digital;
     installed=true;
 }
 void arm(){
@@ -225,6 +270,11 @@ void arm(){
     armed.store(true,std::memory_order_release);
 }
 void cancel(){armed.store(false,std::memory_order_release);}
+void check_building_widget(){
+    {std::lock_guard lock(building_widget_failure_mutex);if(!building_widget_failure.empty())throw std::runtime_error(building_widget_failure);}
+    if(building_widget_count.attempted.load()!=building_widget_count.completed.load())
+        throw std::runtime_error("Building widget RNG call has no confirmed completion; no replay");
+}
 void check(){
     {std::lock_guard lock(failure_mutex);if(!failure.empty())throw std::runtime_error(failure);}
     if(respawn_count.attempted.load()!=respawn_count.completed.load())
@@ -235,6 +285,7 @@ void check(){
         throw std::runtime_error("Scenery pattern RNG call has no confirmed completion; no replay");
     if(character_jump_count.attempted.load()!=character_jump_count.completed.load())
         throw std::runtime_error("Character jump RNG call has no confirmed completion; no replay");
+    check_building_widget();
     for(const auto& c:digital_counts)if(c.attempted.load()!=c.completed.load())
         throw std::runtime_error("Digital RNG call has no confirmed completion; no replay");
     for(const auto& c:counts)if(c.attempted.load()!=c.completed.load())
@@ -261,6 +312,9 @@ Json status(){
     rows.push_back({{"site","characterJump"},{"matched",character_jump_count.matched.load()},
         {"nondefault",character_jump_count.nondefault.load()},{"initialized",character_jump_count.initialized.load()},
         {"attempted",character_jump_count.attempted.load()},{"completed",character_jump_count.completed.load()}});
+    rows.push_back({{"site","buildingWidgetEntrance"},{"matched",building_widget_count.matched.load()},
+        {"nondefault",building_widget_count.nondefault.load()},{"initialized",building_widget_count.initialized.load()},
+        {"attempted",building_widget_count.attempted.load()},{"completed",building_widget_count.completed.load()}});
     std::string cause;{std::lock_guard lock(failure_mutex);cause=failure;}
     return {{"installed",installed},{"armed",armed.load()},{"generation",generation.load()},{"error",cause},
         {"digital_enabled",digital_enabled},{"respawn_query_installed",respawn_installed},{"blueprint_puppet_installed",puppet_installed},{"scenery_pattern_installed",scenery_pattern_installed},{"character_jump_installed",character_jump_installed},{"scope","two exact Character jump animation calls; exact Scenery pattern Perlin constructor; exact Blueprint Puppet constructor; exact NPC validity respawn query; two shader constructors; optional sixteen exact visual line/dot/block/camera-target calls in eight functions"},{"sites",rows}};

@@ -34,6 +34,7 @@ template<class T>void write(uintptr_t address,const T& value){
         "Step lifecycle native write/readback failed");
 }
 uint64_t rva(uintptr_t value){require(value>=image&&value-image<0x2000000,"Step native address lies outside pinned image");return value-image;}
+bool building_widget_owner(const void*,std::string&);
 // These helpers install accepted caller-filtered presentation routing. Tracing
 // is never started by the production lifecycle.
 #include "determinism_rng_trace.inc"
@@ -57,6 +58,34 @@ void retain_scope(const mt2::PreparedSaveScope&);
 #include "determinism_task_boundary.inc"
 #include "determinism_bootstrap_boundary.inc"
 #include "native_region_rng.inc"
+
+uint32_t building_widget_lookup(uintptr_t entry,uint64_t uid,uintptr_t& object)noexcept{
+    __try{object=reinterpret_cast<uintptr_t(*)(uint64_t)>(entry)(uid);return 0;}
+    __except(EXCEPTION_EXECUTE_HANDLER){return GetExceptionCode();}
+}
+bool building_widget_owner(const void* building,std::string& error)try{
+    error.clear();
+    if(!thread||GetCurrentThreadId()!=thread||!configured||!driver||!driver->frozen()||!lifecycle.bootstrap_held)return false;
+    const auto receipt=native_steps->snapshot();
+    if(receipt.phase!=MT2FW_MT2_STEP_HELD&&receipt.phase!=MT2FW_MT2_STEP_ENTERED)return false;
+    require(receipt.lease&&receipt.session&&receipt.thread==thread&&receipt.session==bootstrap.identity.session&&
+        receipt.world_epoch==bootstrap.world_epoch&&receipt.generation==bootstrap.identity.generation&&
+        lifecycle.generation==bootstrap.identity.generation&&owner==bootstrap.game,
+        "Building widget ordered lease/session/world identity differs");
+    require(owner&&read<uintptr_t>(image+0x13df8f0)==owner&&read<uintptr_t>(owner+0x28)==bootstrap.mode&&
+        read<uintptr_t>(bootstrap.mode+0x58)==bootstrap.state&&read<uintptr_t>(bootstrap.state+0x160)==bootstrap.world&&
+        read<uintptr_t>(bootstrap.world+0x158)==bootstrap.map,"Building widget ordered current World chain differs");
+    const auto pointer=reinterpret_cast<uintptr_t>(building);if(!pointer||read<uintptr_t>(pointer)!=image+0x16d93c0)return false;
+    const auto manager=read<uintptr_t>(image+0x13df440);require(manager,"Building widget current Shard manager absent");
+    const auto root=read<uintptr_t>(manager+0x60);require(root,"Building widget current root Shard absent");
+    const auto uid=read<uint64_t>(pointer+0x18);if(!uid||read<uintptr_t>(pointer+0x170)!=root)return false;
+    uintptr_t found=0;const auto exception=building_widget_lookup(image+0x47ce20,uid,found);
+    require(!exception,"Building widget native UID lookup failed SEH="+std::to_string(exception));
+    if(found!=pointer)return false;
+    require(read<uint64_t>(found+0x18)==uid,"Building widget native full UID changed");
+    return true;
+}catch(const std::exception& problem){error=problem.what();return false;}
+catch(...){error="Building widget owner proof raised unknown exception";return false;}
 
 uintptr_t tasks(){
     require(thread==GetCurrentThreadId()&&owner&&read<uintptr_t>(image+0x13df8f0)==owner&&read<uintptr_t>(owner)==image+0x1743740,
@@ -363,7 +392,7 @@ void go(void* game){
     if(!driver||!driver->frozen()){original_go(game);return;}
     try{
         require(!outer_entered&&thread==GetCurrentThreadId(),"Step common outer frame reentered or changed thread");
-        outer_entered=true;owner=reinterpret_cast<uintptr_t>(game);tasks();
+        outer_entered=true;owner=reinterpret_cast<uintptr_t>(game);tasks();presentation_rng::check_building_widget();
         if(exit_requested){exit_frame(game);outer_entered=false;return;}
         const auto receipt=native_steps->snapshot();
         if(receipt.phase==MT2FW_MT2_STEP_FAILED){outer_entered=false;terminal_hold(game);return;}
@@ -411,6 +440,7 @@ void install(const fs::path& game){
     native_routes->catalog("framework.step.go",0x956730,true);native_routes->catalog("framework.step.timer",0xa36300,true);
     native_services->reserve("framework.step.go");native_services->reserve("framework.step.timer");
     const Json config={{"defer_loading_plans",true},{"task_barrier",true},{"bootstrap_boundary",true},{"presentation_rng",true},{"digital_rng",true},{"rng_trace",true}};
+    presentation_rng::building_widget_owner=&building_widget_owner;
     loading_dispatch::install(config);task_boundary::install(config);bootstrap_boundary::install(config);presentation_rng::install(config);rng_trace::install(config);
     region_rng_load::install();
     verify_exit_bodies();

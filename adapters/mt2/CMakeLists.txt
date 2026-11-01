@@ -201,3 +201,5 @@ target_include_directories(mt2fw_tick_clock_phase_tests PRIVATE .)
 target_compile_options(mt2fw_tick_clock_phase_tests PRIVATE /W4 /WX /utf-8 /UNDEBUG)
 add_test(NAME framework_tick_clock_phase COMMAND mt2fw_tick_clock_phase_tests)
 set_tests_properties(framework_tick_clock_phase PROPERTIES TIMEOUT 10)
+
+add_subdirectory("${FRAMEWORK}/tests/building-widget-rng" "${CMAKE_CURRENT_BINARY_DIR}/building-widget-rng")

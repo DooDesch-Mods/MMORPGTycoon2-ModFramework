@@ -54,9 +54,11 @@ __declspec(noinline) uint64_t get_vector2_box(void* source,const void* box){
 using Vector3Box=void*(*)(void*,void*,const void*);
 Vector3Box original_vector3_box=nullptr;
 __declspec(noinline) void* get_vector3_box(void* output,void* source,const void* box){
-    const auto ticket=begin(0x9fcf20,reinterpret_cast<uintptr_t>(_ReturnAddress()),source);
-    const auto result=original_vector3_box(output,source,box);
-    finish_buffer(ticket,output,12);return result;
+    const auto caller=reinterpret_cast<uintptr_t>(_ReturnAddress());
+    const auto selected=select_source?select_source(0x9fcf20,caller,source):Selection{source};
+    const auto ticket=begin(0x9fcf20,caller,selected.source);
+    const auto result=original_vector3_box(output,selected.source,box);
+    finish_buffer(ticket,output,12);if(selected.count)++selected.count->completed;return result;
 }
 using Color=void*(*)(void*,void*,float,float);
 Color original_color=nullptr;

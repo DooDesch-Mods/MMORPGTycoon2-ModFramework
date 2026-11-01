@@ -18,6 +18,26 @@ struct Counters {
     std::atomic<uint64_t> matched{0},nondefault{0},initialized{0},attempted{0},completed{0};
 };
 struct Selection { void* source;Counters* count=nullptr; };
+struct BuildingWidgetQuery {
+    bool active=false;
+    bool matches(uintptr_t helper,uintptr_t caller)const noexcept {
+        return active&&helper==0x9fcf20&&caller==0xda6f2;
+    }
+};
+template<class Initialize>
+Selection select_building_widget(bool armed,uint64_t generation,const BuildingWidgetQuery& query,
+    uintptr_t helper,uintptr_t caller,void* source,void* expected,Local& local,
+    Counters& count,Initialize&& initialize){
+    if(!armed||!query.matches(helper,caller))return {source};
+    ++count.matched;
+    if(source!=expected){++count.nondefault;return {source};}
+    if(!generation)throw std::runtime_error("Building widget RNG generation is zero");
+    if(local.generation!=generation){
+        initialize(&local.random,uint64_t{0x4d543242574944});
+        local.generation=generation;++count.initialized;
+    }
+    ++count.attempted;return {&local.random,&count};
+}
 // The NPC validity query tests only whether a respawn exists. Keep its native
 // selection algorithm, but give its exact RNG call a presentation source.
 struct RespawnQuery {
