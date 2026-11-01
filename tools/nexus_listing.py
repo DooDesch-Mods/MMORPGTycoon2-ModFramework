@@ -16,7 +16,9 @@ PRESERVED = ('name', 'author', 'uploader', 'game_id', 'game_scoped_id',
 
 
 def description(value):
-    return html.unescape(value or '').replace('\r\n', '\n').strip()
+    text = html.unescape(value or '').replace('\r\n', '\n')
+    # Nexus stores each BBCode newline with an additional HTML line-break marker.
+    return re.sub(r'\n<br\s*/?>', '\n', text, flags=re.I).strip()
 
 
 def update_listing(directory, request=request_json):

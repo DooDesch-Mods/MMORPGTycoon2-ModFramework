@@ -44,7 +44,7 @@ class NexusListingTests(unittest.TestCase):
         if method == 'PATCH':
             self.assertEqual(set(body), {'summary', 'description'})
             if not self.ignore_patch:
-                self.mod['description'] = body['description']
+                self.mod['description'] = body['description'].replace('\n', '\n<br />')
                 self.current_summary = body['summary']
             if self.change_title:
                 self.mod['name'] = 'Unexpected title'
@@ -57,14 +57,14 @@ class NexusListingTests(unittest.TestCase):
         receipt = listing.update_listing(self.directory, self.request)
         self.assertEqual(receipt['status'], 'confirmed')
         self.assertTrue(receipt['changed'])
-        self.assertEqual(self.mod['description'], self.body)
+        self.assertEqual(listing.description(self.mod['description']), self.body)
         self.assertEqual(self.current_summary, self.summary)
         self.assertEqual(sum(method == 'PATCH' for _, method, _ in self.calls), 1)
         self.assertEqual(self.mod['name'], 'Keep this title')
         self.assertEqual(self.mod['gallery_images'], [{'url': 'existing-image'}])
 
     def test_matching_listing_does_not_repeat_a_write(self):
-        self.mod['description'] = self.body
+        self.mod['description'] = self.body.replace('\n', '\n<br />')
         self.current_summary = self.summary
         receipt = listing.update_listing(self.directory, self.request)
         self.assertFalse(receipt['changed'])
