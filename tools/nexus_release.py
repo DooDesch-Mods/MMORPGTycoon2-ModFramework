@@ -157,7 +157,7 @@ def fetch_release(tag, product, directory, optional=False):
     selected = targets()[product]
     repository = selected.get('source_repository', REPOSITORY)
     call = gh if repository == REPOSITORY else lambda *args: gh_repository(repository, *args)
-    metadata = json.loads(call('release', 'view', tag, '--json', 'tagName,isDraft,assets,url,targetCommitish'))
+    metadata = json.loads(call('release', 'view', tag, '--json', 'tagName,isDraft,assets,url,targetCommitish,body'))
     if metadata['isDraft'] or metadata['tagName'] != tag:
         raise ValueError('Expected a published GitHub release')
     matches = [row for row in metadata['assets'] if fnmatch.fnmatchcase(row['name'], selected['asset_pattern'])]
@@ -188,10 +188,21 @@ def fetch_release(tag, product, directory, optional=False):
             manifest = json.loads(archive.read('package.json'))
             mod = json.loads(archive.read('mod.json'))
         plan['source_commit'] = multiplayer_source_commit(manifest, mod, repository, tag, metadata.get('targetCommitish'), call)
-        notes_request = urllib.request.Request(f'https://raw.githubusercontent.com/{repository}/{tag}/CHANGELOG.md',
-                                               headers={'User-Agent': 'MT2-release-validation'})
-        with urllib.request.urlopen(notes_request, timeout=30) as response:
-            plan['notes_source'] = response.read().decode('utf-8')
+        notes_source = selected.get('notes_source')
+        if notes_source not in (None, 'github_release'):
+            raise ValueError('Unsupported Multiplayer release notes source: ' + str(notes_source))
+        if notes_source == 'github_release':
+            notes = metadata.get('body')
+            if not isinstance(notes, str) or not notes.strip() or len(notes) > 10000:
+                raise ValueError('Published GitHub release notes must contain 1 to 10000 characters')
+            plan['release_notes'] = notes.strip()
+            plan['notes_origin'] = metadata['url']
+            plan['notes_sha256'] = hashlib.sha256(notes.strip().encode('utf-8')).hexdigest()
+        else:
+            notes_request = urllib.request.Request(f'https://raw.githubusercontent.com/{repository}/{tag}/CHANGELOG.md',
+                                                   headers={'User-Agent': 'MT2-release-validation'})
+            with urllib.request.urlopen(notes_request, timeout=30) as response:
+                plan['notes_source'] = response.read().decode('utf-8')
         plan['source_repository'] = repository
         plan['receipt_tag'] = selected['receipt_tag']
         receipt_release = json.loads(gh('release', 'view', plan['receipt_tag'], '--json', 'tagName,isDraft'))
@@ -257,8 +268,10 @@ def prepare(args):
     else:
         plan.update({'status': check_destination(target, plan['version']), 'file_id': target['file_id'],
                      'mod_uid': target['mod_uid'], 'nexus_url': f"https://www.nexusmods.com/{target['domain']}/mods/{target['page_id']}"})
-        notes_source = plan.pop('notes_source', None)
-        notes = section(notes_source if notes_source is not None else (ROOT / 'CHANGELOG.md').read_text(encoding='utf-8'), args.product, plan['version'])
+        notes = plan.pop('release_notes', None)
+        if notes is None:
+            notes_source = plan.pop('notes_source', None)
+            notes = section(notes_source if notes_source is not None else (ROOT / 'CHANGELOG.md').read_text(encoding='utf-8'), args.product, plan['version'])
         plan.update(notes=notes, notes_plain=plain(notes), notes_bbcode=bbcode(notes))
         if 'file_description' in target:
             description = target['file_description']

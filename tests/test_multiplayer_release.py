@@ -58,6 +58,7 @@ class MultiplayerReleaseTests(unittest.TestCase):
     def test_explicit_target_uses_source_repo_and_exact_checksum(self):
         output = self.root / 'download'
         metadata = {'tagName': 'v' + self.version, 'isDraft': False, 'targetCommitish': self.commit,
+            'body': 'Rejoin your friend and continue building. Both players need the same beta.',
             'url': 'https://github.com/DooDesch-Mods/MMORPGTycoon2-Multiplayer/releases/tag/v' + self.version,
             'assets': [{'name': self.archive.name, 'size': self.archive.stat().st_size},
                        {'name': self.archive.name + '.sha256'}]}
@@ -78,6 +79,18 @@ class MultiplayerReleaseTests(unittest.TestCase):
             plan = nexus.fetch_release('v' + self.version, 'multiplayer', output)
             self.assertEqual(plan['receipt_tag'], 'v0.2.0')
             self.assertEqual(plan['source_repository'], 'DooDesch-Mods/MMORPGTycoon2-Multiplayer')
+            self.assertEqual(plan['release_notes'], metadata['body'])
+            self.assertEqual(plan['notes_origin'], metadata['url'])
+            self.assertEqual(plan['notes_sha256'], hashlib.sha256(metadata['body'].encode()).hexdigest())
+            with patch.object(nexus.urllib.request, 'urlopen', side_effect=AssertionError('Do not require an older tagged changelog')):
+                nexus.fetch_release('v' + self.version, 'multiplayer', output)
+            metadata['body'] = ''
+            with self.assertRaisesRegex(ValueError, 'Published GitHub release notes'):
+                nexus.fetch_release('v' + self.version, 'multiplayer', output)
+            metadata['body'] = 'x' * 10001
+            with self.assertRaisesRegex(ValueError, 'Published GitHub release notes'):
+                nexus.fetch_release('v' + self.version, 'multiplayer', output)
+            metadata['body'] = '- A published change.'
             metadata['targetCommitish'] = 'b' * 40
             with self.assertRaisesRegex(ValueError, 'source commit differs'):
                 nexus.fetch_release('v' + self.version, 'multiplayer', output)

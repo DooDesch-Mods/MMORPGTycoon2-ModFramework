@@ -122,5 +122,25 @@ class NexusReleaseTests(unittest.TestCase):
             with self.assertRaisesRegex(ValueError, 'at most 255'):
                 nexus.prepare(SimpleNamespace(product='multiplayer', tag=plan['tag'], directory='unused', optional=False))
 
+    def test_published_release_notes_do_not_require_a_tagged_changelog_section(self):
+        target = nexus.targets()['multiplayer']
+        notes = 'Rejoin your friend and continue building.\n\nBoth players need Beta 25.'
+        plan = {'product': 'multiplayer', 'tag': 'v0.1.0-beta.25', 'version': '0.1.0-beta.25',
+                'filename': 'release.zip', 'sha256': 'a' * 64, 'release_notes': notes,
+                'notes_origin': 'https://github.com/DooDesch-Mods/MMORPGTycoon2-Multiplayer/releases/tag/v0.1.0-beta.25'}
+        root = nexus.ROOT / 'artifacts/nexus-tests'
+        root.mkdir(parents=True, exist_ok=True)
+        environment = {'NEXUS_FILE_ID': target['file_id'], 'NEXUS_MOD_ID': target['mod_uid']}
+        with tempfile.TemporaryDirectory(dir=root) as directory:
+            with patch.dict(os.environ, environment), patch.object(nexus, 'fetch_release', return_value=plan), \
+                 patch.object(nexus, 'check_destination', return_value='ready'), patch.object(nexus, 'outputs'), \
+                 patch.object(nexus, 'section', side_effect=AssertionError('Tagged changelog is not the configured source')), \
+                 patch('builtins.print'):
+                nexus.prepare(SimpleNamespace(product='multiplayer', tag=plan['tag'], directory=directory, optional=False))
+            saved = json.loads((Path(directory) / 'plan.json').read_text(encoding='utf-8'))
+            self.assertEqual(saved['notes'], notes)
+            self.assertEqual(saved['notes_plain'], notes)
+            self.assertEqual(saved['notes_origin'], plan['notes_origin'])
+
 
 if __name__ == '__main__':unittest.main()
