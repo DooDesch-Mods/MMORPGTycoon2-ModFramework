@@ -47,6 +47,7 @@ def prepare():
     llms=llms.replace('- [API reference]', '- [Lua apps and dashboards](recipes/lua-apps.md): complete central launcher, native window, document and snapshot examples.\n- [API reference]')
     llms=llms.replace('- [Native C ABI]', '- [Native Step SDK](experimental/steps.md): experimental draft 9, restricted native multiplayer lifecycle and Save coordination.\n- [Step machine contract](api/experimental/steps.json): exact header, version, methods and ownership.\n- [Native C ABI]')
     llms=llms.replace('## Machine contracts', '- [Experimental gameplay](experimental/gameplay.md): direct Lua game operations, exact handles and confirmed action results.\n\n## Machine contracts')
+    llms=llms.replace('- [Native C ABI]', '- [Step recovery extension](experimental/step-recovery.md): optional exact-version native interruption and fresh capture extension included in Framework 0.5.0; availability does not establish game or Multiplayer compatibility.\n- [Recovery machine contract](api/experimental/step-recovery.json): frozen processes, single-use operations and retirement boundaries.\n- [Native C ABI]')
     llms+='- [Gameplay contract](api/experimental/gameplay.json): experimental protocol 1; native requirements and parameters for each game operation.\n'
     (ROOT/'docs/public/llms.txt').write_text(llms,encoding='utf-8')
     (ROOT/'docs/public/media/LICENSE.txt').write_text('Framework UI and original branding: Copyright (c) 2026 DooDesch, MIT.\nOriginal game artwork shown in real MMORPG Tycoon 2 captures retains its respective rights and is not licensed under the framework MIT license.\nNo original game files or private reference icon are redistributed here. See media.json for individual capture cases.\n',encoding='utf-8')
@@ -73,6 +74,9 @@ class OfflineHTML(HTMLParser):
     def handle_decl(self,data):self.parts.append('<!'+data+'>')
 
 def export_docs(pages,site,offline,markdown):
+    # Agent discovery comes from the current contract, including reused HTML builds.
+    shutil.copy2(ROOT/'docs/public/llms.txt',site/'llms.txt')
+    shutil.copytree(ROOT/'docs/public/api',site/'api',dirs_exist_ok=True)
     # GitHub source links include public/; VitePress copies that directory's contents to the site root.
     for path in site.rglob('*.html'):
         text=path.read_text(encoding='utf-8').replace('href="./public/media/','href="/media/')

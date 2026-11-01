@@ -64,6 +64,7 @@ public:
     std::vector<region_rng::Row> region_rng_rows()const;
     bool frozen()const{return frozen_.has_value();}
     bool failed()const{return !failure_.empty();}
+    void recovery_local(const MT2FW_Host*,const MT2FW_MT2_StepSpec&,MT2FW_MT2_StepProofFn,void*);
     const std::string& failure()const{return failure_;}
 private:
     Backend native_;
@@ -81,6 +82,7 @@ private:
     template<class T>T read(uintptr_t at)const{T value{};native_.read(at,&value,sizeof(value));return value;}
     template<class T>void write(uintptr_t at,T value){native_.write(at,&value,sizeof(value));if(read<T>(at)!=value)throw std::runtime_error("Step native write readback differs");}
     StepNativeObservation loaded(const MT2FW_Host*,bool entered=false);
+    StepNativeObservation validate_loaded(StepNativeObservation,bool entered);
     void current_game(uintptr_t)const;
     uintptr_t scheduler(uintptr_t)const;
     void held(uintptr_t)const;

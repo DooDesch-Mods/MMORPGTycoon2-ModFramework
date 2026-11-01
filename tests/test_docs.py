@@ -7,6 +7,19 @@ import generate_docs
 import build_docs
 from mt2fw import packages
 class DocumentationContractTests(unittest.TestCase):
+    def test_recovery_contract_matches_its_optional_sdk(self):
+        import hashlib,re
+        contract=generate_docs.read(ROOT/'api/experimental/step-recovery.json')
+        header=ROOT/contract['header']
+        self.assertEqual(hashlib.sha256(header.read_bytes()).hexdigest(),contract['header_sha256'])
+        text=header.read_text(encoding='utf-8')
+        self.assertIn('#define MT2FW_MT2_STEP_RECOVERY_DRAFT_VERSION 1u',text)
+        service=text.split('typedef struct MT2FW_MT2_StepRecoveryDraftV1 {',1)[1].split('} MT2FW_MT2_StepRecoveryDraftV1;',1)[0]
+        self.assertEqual(set(re.findall(r'\*(\w+)\)\(',service)),set(contract['functions']))
+        self.assertEqual(contract['base_step_draft'],9)
+        self.assertEqual(contract['layouts_windows_x64']['receipt_bytes'],720)
+        build_docs.prepare()
+        self.assertIn('api/experimental/step-recovery.json',(ROOT/'docs/public/llms.txt').read_text(encoding='utf-8'))
     def test_function_page_exposes_its_api_and_framework_requirements(self):
         contract=generate_docs.read(ROOT/'api/contract.json')
         page=generate_docs.outputs(contract)['docs/reference/functions/terrain-sample.md']

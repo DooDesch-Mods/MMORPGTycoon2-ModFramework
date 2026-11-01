@@ -13,7 +13,8 @@ void preflight_exit(){
     require(!loading_dispatch::uncertain&&!loading_dispatch::pending&&!bootstrap_boundary::uncertain&&
         !bootstrap_boundary::reveal::uncertain&&!bootstrap_boundary::branch_changed&&
         finished==0&&((snapshot==0&&cursor==0)||
-            (snapshot==1&&cursor==1&&loading_dispatch::save_completion::consumed_snapshot(held_tasks))),
+            (snapshot==1&&cursor==1&&loading_dispatch::save_completion::consumed_snapshot(held_tasks))||
+            loading_dispatch::completed_callbacks::matches(held_tasks)),
         "Step exit preflight requires zero finished/deferred tasks and an empty or acknowledged consumed callback snapshot; actual="+
         std::to_string(finished)+"/"+std::to_string(snapshot)+"/"+std::to_string(cursor)+"/"+std::to_string(loading_dispatch::pending));
     require(task_boundary::all_done(reinterpret_cast<void*>(held_tasks)),"Step exit preflight AllTasksAreDone returned false; required=true");
@@ -93,6 +94,7 @@ void reset_driver(){
     bootstrap_boundary::reveal::restore();
     driver->reset_after_world_exit();
     region_rng_load::reset();snapshot_prepare::reset();
+    recovery_runtime_reset();
     presentation_rng::check();presentation_rng::cancel();
     // All old task ownership has ended through original Deinit/Flush/Finish.
     // Reset only local admission receipts; never edit a native queue or RNG.

@@ -1,5 +1,6 @@
 #pragma once
 #include "native_steps.h"
+#include "native_step_recovery.h"
 #include "native_patches.h"
 #include <algorithm>
 #include <cstring>
@@ -14,11 +15,15 @@ public:
         std::function<void()> preflight_exit;
         std::function<void(const MT2FW_MT2_SnapshotRequest&,MT2FW_MT2_SnapshotCaptureFn,void*)> snapshot;
         std::function<void(uint32_t,const std::string&)> exit_save;
+        std::function<void(const MT2FW_Host*,const MT2FW_MT2_StepSpec&,MT2FW_MT2_StepProofFn,void*)> recovery_local;
+        NativeStepRecovery::Driver recovery;
     };
     NativeStepAdapter(Runtime& runtime,NativePatches& patches,NativeStepKernel::Thread thread,NativeStepKernel::Thread bound,std::function<bool()> lab)
         :runtime_(runtime),patches_(patches),thread_(std::move(thread)),bound_(std::move(bound)),lab_(std::move(lab)){}
     bool configure(Driver);
     MT2FW_MT2_Result query(const MT2FW_Host*,uint32_t,MT2FW_MT2_StepServiceDraftV1*,uint32_t);
+    MT2FW_MT2_Result query_recovery(const MT2FW_Host*,uint32_t,MT2FW_MT2_StepRecoveryDraftV1*,uint32_t);
+    const MT2FW_MT2_RecoveryReceipt* recovery_snapshot()const{return recovery_&&recovery_->active()?&recovery_->receipt():nullptr;}
     bool retire(Plugin&);
     bool retained()const{return kernel_&&kernel_->held();}
     MT2FW_MT2_StepReceipt boundary(){return kernel_?kernel_->boundary():MT2FW_MT2_StepReceipt{sizeof(MT2FW_MT2_StepReceipt)};}
@@ -40,10 +45,13 @@ private:
     Plugin* plugin_=nullptr;
     const MT2FW_Host* host_=nullptr;
     std::unique_ptr<NativeStepKernel> kernel_;
+    std::unique_ptr<NativeStepRecovery> recovery_;
+    MT2FW_MT2_RecoverySpec recovery_callbacks_{};
     MT2FW_MT2_StepServiceDraftV1 api_{};
     MT2FW_MT2_StepSpec callbacks_{};
     bool callbacks_retired_=true;
     bool proof_inflight_=false,service_inflight_=false,boundary_inflight_=false,snapshot_inflight_=false,save_inflight_=false;
+    unsigned recovery_callbacks_inflight_=0;
     uint64_t framework_epoch_=0,native_epoch_=0;
     std::string last_reason_;
     bool exit_preflight_ready_=false;
@@ -52,6 +60,11 @@ private:
     std::string exit_preflight_cause_;
     bool reject(const std::string&,const char* level="warn");
     bool current()const;
+    template<class F>MT2FW_MT2_Result recovery_pinned(F&& call){
+        ++recovery_callbacks_inflight_;
+        struct Clear{unsigned& count;~Clear(){--count;}}clear{recovery_callbacks_inflight_};
+        return pinned(MT2FW_MT2_FAILED,std::forward<F>(call));
+    }
     template<class Result,class F>Result pinned(Result fallback,F&& fn){
         auto& plugin=*plugin_;++plugin.native_pins;
         Result result=fallback;std::exception_ptr callback_error,release_error;
@@ -72,6 +85,7 @@ private:
     MT2FW_MT2_Result snapshot(const MT2FW_MT2_SnapshotRequest*,MT2FW_MT2_SnapshotCaptureFn,void*,MT2FW_MT2_StepReceipt*);
     MT2FW_MT2_Result bind(const MT2FW_MT2_StepSpec*,MT2FW_MT2_StepReceipt*);
     static MT2FW_MT2_Result MT2FW_CALL service(void*,const MT2FW_MT2_StepReceipt*);
+    static MT2FW_MT2_Result MT2FW_CALL recovery_proof(void*,const MT2FW_MT2_StepProofQuery*,MT2FW_MT2_StepProofReply*);
     static MT2FW_MT2_Result MT2FW_CALL proof_call(void*,const MT2FW_MT2_StepProofQuery*,MT2FW_MT2_StepProofReply*);
     static MT2FW_MT2_StepDisposition MT2FW_CALL boundary_call(void*,const MT2FW_MT2_StepBoundary*,MT2FW_MT2_StepNext,void*);
 };

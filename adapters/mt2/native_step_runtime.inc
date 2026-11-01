@@ -50,8 +50,10 @@ bool resume();bool pump();bool pending();bool started();void retire();
 void retain_scope(const mt2::PreparedSaveScope&);
 }
 #define MT2FW_ORDERED_ASYNC_SAVE
+#define MT2FW_ORDERED_RECOVERY
 #include "determinism_loading_dispatch.inc"
 #undef MT2FW_ORDERED_ASYNC_SAVE
+#undef MT2FW_ORDERED_RECOVERY
 #include "determinism_task_boundary.inc"
 #include "determinism_bootstrap_boundary.inc"
 #include "native_region_rng.inc"
@@ -250,7 +252,10 @@ bool native_swap(SDL_Window* target){
     if(result)next_present=GetTickCount64()+16;
     return result;
 }
+void recovery_runtime_reset();
 #include "native_step_exit.inc"
+#include "native_step_recovery_runtime.inc"
+void recovery_runtime_reset(){recovery_runtime::reset();}
 template<class T>void resolve(T& out,const char* name){out=reinterpret_cast<T>(SDL_GL_GetProcAddress(name));require(out!=nullptr,std::string("Step presentation entrypoint absent: ")+name);}
 void initialize_pixels(){
     auto& a=pixels.gl;if(a.ready())return;
@@ -320,6 +325,7 @@ void configure(){
         {original_go,timer_step::original_update,reinterpret_cast<void*>(&go),reinterpret_cast<void*>(&timer)},before_step);
     snapshot_prepare::install();clock_pause::install();async_save::install();
     const auto native_finish=backend.finish_all;
+    recovery_runtime::native_finish=native_finish;
     backend.finish_all=[native_finish](void* tasks){loading_dispatch::finish_complete_step(tasks,native_finish);};
     snapshot_prepare::finish_all=backend.finish_all;
     snapshot_prepare::all_done=backend.all_done;
@@ -331,7 +337,9 @@ void configure(){
         catch(...){control.entered=false;timer_step::frame.active=false;held_tasks=tasks();throw;}
         control.entered=false;timer_step::frame.active=false;held_tasks=tasks();resume_tasks=true;held();
         ++control.completed;control.phase=Control::Phase::Held;lifecycle.workers_held=1;
-    },exit_proof,reset_driver,preflight_exit,snapshot_prepare::operation,exit_save}),"Step adapter rejected common native driver");configured=true;
+    },exit_proof,reset_driver,preflight_exit,snapshot_prepare::operation,exit_save,
+    [](const auto* host,const auto& spec,auto proof,void* user){driver->recovery_local(host,spec,proof,user);},
+    {recovery_runtime::local,recovery_runtime::prepare,recovery_runtime::capture,recovery_runtime::pump,recovery_runtime::retire}}),"Step adapter rejected common native driver");configured=true;
 }
 #include "native_step_rng_diagnostic.inc"
 #include "native_step_checkpoint.inc"
@@ -345,6 +353,11 @@ void go(void* game){
         const auto receipt=native_steps->snapshot();
         if(receipt.phase==MT2FW_MT2_STEP_FAILED){outer_entered=false;terminal_hold(game);return;}
         if(receipt.phase==MT2FW_MT2_STEP_RETIRING){present();outer_entered=false;return;}
+        // A fully activated world first observes transport at its held boundary.
+        // The normal source may require live membership and must run afterward.
+        if(lifecycle.bootstrap_held&&receipt.phase==MT2FW_MT2_STEP_HELD){
+            native_steps->boundary();checkpoint(native_steps->snapshot());present();outer_entered=false;return;
+        }
         auto observed=driver->observation();
         if(!lifecycle.seed_attempted){seed(observed);native_steps->maintenance();outer_entered=false;present();return;}
         require(lifecycle.seed_returned==1,"Step seed attempt lacks acknowledgement; no replay");

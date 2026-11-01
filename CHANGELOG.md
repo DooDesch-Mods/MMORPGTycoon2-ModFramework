@@ -4,14 +4,14 @@
 
 ### Added
 
-- Add native support for multiplayer mods to coordinate world updates, shared saves and leaving a session.
-- Include the experimental Step SDK, its native guide and a machine-readable contract in the developer download. Existing Lua mods keep all 254 API functions.
+- Add native support for Multiplayer startup, world updates, shared saves and session exit.
+- Include the experimental native recovery interface and matching Step and Recovery SDK headers, guides and machine contracts. Existing Lua mods keep all 254 API functions.
 
 ### Fixed
 
 - Keep the shared simulation paused when completing Road, Wall or Pass tools.
 - Allow a fresh Leave after a failed save without replaying the failed save or clearing its error.
-- Keep SDK headers, native route metadata and compatibility checks in agreement.
+- Retain the native hold at a connection interruption boundary.
 
 ## 0.4.0
 

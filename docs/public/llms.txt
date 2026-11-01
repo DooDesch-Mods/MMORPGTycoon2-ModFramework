@@ -14,6 +14,8 @@ Use the version matching the installed framework. World mutations need confirmed
 - [Experimental patches](experimental/patches.md): named targets, ordering and typed changes.
 - [Native Step SDK](experimental/steps.md): experimental draft 9, restricted native multiplayer lifecycle and Save coordination.
 - [Step machine contract](api/experimental/steps.json): exact header, version, methods and ownership.
+- [Step recovery extension](experimental/step-recovery.md): optional exact-version native interruption and fresh capture extension included in Framework 0.5.0; availability does not establish game or Multiplayer compatibility.
+- [Recovery machine contract](api/experimental/step-recovery.json): frozen processes, single-use operations and retirement boundaries.
 - [Native C ABI](reference/native.md): authoritative header and ownership.
 - [Compatibility](compatibility.md): supported executable and current limits.
 

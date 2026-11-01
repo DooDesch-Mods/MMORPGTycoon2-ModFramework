@@ -37,7 +37,13 @@ public:
     bool held()const{return receipt_.phase!=MT2FW_MT2_STEP_PASSIVE;}
     // Only the native lifecycle driver may clear a retained failed/retired hold.
     bool reset_after_world_exit();
+    void recovery_boundary(std::function<bool()> observer){recovery_boundary_=std::move(observer);}
+    void validate_recovery_boundary(bool service=false)const;
+    void recovery_service(const std::function<void()>&);
+    MT2FW_MT2_Result read_local(uint64_t lease,MT2FW_MT2_StepReceipt* out){return read(lease,out);}
 private:
+    std::function<bool()> recovery_boundary_;
+    bool recovery_service_=false;
     const MT2FW_Host* owner_;
     Inspect inspect_;
     Advance advance_;

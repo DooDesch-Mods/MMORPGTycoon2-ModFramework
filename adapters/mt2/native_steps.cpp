@@ -138,12 +138,35 @@ MT2FW_MT2_StepReceipt NativeStepKernel::boundary(){
     if(entered_||servicing_){fail("Native step boundary reentered");return receipt_;}
     if(receipt_.phase!=MT2FW_MT2_STEP_HELD||retiring_||!bound_)return receipt_;
     try{
-        current(true);entered_=true;++receipt_.callbacks_inflight;
+        // Framework admission precedes the ordinary live membership proof.
+        if(recovery_boundary_){validate_recovery_boundary();if(recovery_boundary_())return receipt_;}
+        auto current_or_recovery=[&]{
+            try{current(true);return true;}
+            catch(...){
+                // Transport may change after the first cohort observation.
+                // Only the still-idle outer hold can enter guarded recovery.
+                if(recovery_boundary_){validate_recovery_boundary();if(recovery_boundary_())return false;}
+                throw;
+            }
+        };
+        if(!current_or_recovery())return receipt_;
+        entered_=true;++receipt_.callbacks_inflight;
         const auto service=spec_.service(spec_.user,&receipt_);
+        if(service==MT2FW_MT2_BUSY){
+            // BUSY from the held service means it yielded before command work.
+            // It never authorizes another service call or an original Step.
+            --receipt_.callbacks_inflight;entered_=false;
+            validate_recovery_boundary();
+            require(recovery_boundary_&&recovery_boundary_(),"Native step held service yielded without an actual recovery interruption");
+            return receipt_;
+        }
         if(service!=MT2FW_MT2_OK)throw std::runtime_error("Native step held service failed result="+std::to_string(service));
         require(!retiring_&&(receipt_.phase==MT2FW_MT2_STEP_HELD||(exiting_&&receipt_.phase==MT2FW_MT2_STEP_RETIRING)),"Native step retired or failed during held service");
         if(exiting_){receipt_.phase=MT2FW_MT2_STEP_RETIRING;--receipt_.callbacks_inflight;entered_=false;return receipt_;}
-        current(true);require(next_invocation_!=std::numeric_limits<uint64_t>::max(),"Native step invocation space exhausted");
+        --receipt_.callbacks_inflight;entered_=false;
+        if(!current_or_recovery())return receipt_;
+        entered_=true;++receipt_.callbacks_inflight;
+        require(next_invocation_!=std::numeric_limits<uint64_t>::max(),"Native step invocation space exhausted");
         invocation_=next_invocation_++;next_attempted_=false;
         receipt_.invocation=invocation_;
         receipt_.tick=next_tick_;
@@ -226,8 +249,21 @@ void NativeStepKernel::validate_save_request(){
 void NativeStepKernel::validate_native_exit_request()const{
     require(bound_&&!invocation_&&thread_()==bound_thread_&&!retiring_&&receipt_.callbacks_inflight==1&&receipt_.workers_held==1&&
         ((entered_&&!servicing_&&receipt_.phase==MT2FW_MT2_STEP_HELD)||
-         (!entered_&&servicing_&&receipt_.phase==MT2FW_MT2_STEP_FAILED)),
+         (!entered_&&servicing_&&(receipt_.phase==MT2FW_MT2_STEP_FAILED||
+            (recovery_service_&&receipt_.phase==MT2FW_MT2_STEP_HELD)))),
         "Step native exit requires its quiescent held service before Next");
+}
+void NativeStepKernel::validate_recovery_boundary(bool service)const{
+    require(bound_&&!retiring_&&!exiting_&&thread_()==bound_thread_&&!entered_&&!invocation_&&
+        receipt_.phase==MT2FW_MT2_STEP_HELD&&receipt_.workers_held==1&&
+        receipt_.completed_tick<std::numeric_limits<uint64_t>::max()&&next_tick_==receipt_.completed_tick+1&&
+        (service?(servicing_&&recovery_service_&&receipt_.callbacks_inflight==1):(!servicing_&&receipt_.callbacks_inflight==0)),
+        "Recovery boundary has an active invocation, unknown result, wrong thread or incomplete local tick");
+}
+void NativeStepKernel::recovery_service(const std::function<void()>& call){
+    validate_recovery_boundary();servicing_=recovery_service_=true;++receipt_.callbacks_inflight;
+    try{call();}catch(...){--receipt_.callbacks_inflight;servicing_=recovery_service_=false;throw;}
+    --receipt_.callbacks_inflight;servicing_=recovery_service_=false;
 }
 void NativeStepKernel::native_exit_requested(){
     validate_native_exit_request();

@@ -31,6 +31,13 @@ and [machine contract](../public/api/experimental/steps.json). Its authority is
 restricted to the supported native Multiplayer owner. Do not infer new Lua
 functions or permissions from this native contract; the public Lua API remains 1.3.0.
 
+The optional [Step recovery extension](../experimental/step-recovery.md) is
+included in Framework 0.5.0 and has a separate exact-version export and
+[machine contract](../public/api/experimental/step-recovery.json). Query draft 1
+with exact sizes; interface availability does not prove game or Multiplayer
+compatibility. Do not weaken normal membership proof to emulate recovery. It adds
+no Lua calls.
+
 ## Author and validate
 
 ```powershell

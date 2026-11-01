@@ -1,6 +1,6 @@
 // Quit retains its native intent before _BeginQuit changes windows or mode.
 struct QuitSave {
-    enum class Route {None,Managed,Terminal,Reload};
+    enum class Route {None,Managed,Terminal,Reload,Recovery};
     Route route=Route::None;
     uint64_t lease=0,session=0,world=0;uintptr_t mode=0;
     bool required=false,ready=false,consumed=false;

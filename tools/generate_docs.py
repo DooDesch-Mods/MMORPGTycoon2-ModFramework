@@ -162,6 +162,7 @@ def outputs(c):
     if '#define MT2FW_ABI_VERSION '+str(c['abi_version'])+'u' not in header:raise ValueError('C ABI version differs from contract')
     body='The supported native boundary is `include/mt2fw/plugin.h`, shown below without a manually duplicated declaration list. No STL objects or exceptions may cross this ABI. Plugins remain loaded until process exit.\n\n'
     body+='The separate [experimental Step SDK](../experimental/steps.md) coordinates native multiplayer sessions and requires exact draft 9 admission. It does not change the stable plugin ABI or grant general Lua write authority.\n\n'
+    body+='The optional [Step recovery extension](../experimental/step-recovery.md) is included in Framework 0.5.0 and requires its separate exact-version export. Its availability does not establish game or Multiplayer compatibility.\n\n'
     body+='Host strings are copied during a request. Callback JSON is borrowed until return. The host and PluginInfo strings remain valid through Shutdown. A size query never executes a mutation; request a sufficiently sized buffer once, then perform the call once.\n\n```c\n'+header.rstrip()+'\n```\n\n'
     body+='## Host JSON operations\n\nLua wrappers use the following operations. `ui.begin` and `ui.end` are native host operations; Lua authors use `mt2.ui.window`. Events use the ABI subscribe/unsubscribe pointers.\n\n'+''.join('- `'+op+'`\n' for op in sorted({op for f in c['functions'] for op in f['host_operations']}))
     result['docs/reference/native.md']=page('Native C ABI',body)

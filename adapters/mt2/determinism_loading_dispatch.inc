@@ -12,9 +12,34 @@ int32_t pending=0;
 std::string first_error;
 constexpr uintptr_t Plan=0x17037f0,PumpUnlockReturn=0x526be2,PumpFinishReturn=0x526c55;
 void require(bool value,const std::string& cause){if(!value)throw std::runtime_error(cause);}
+#ifdef MT2FW_ORDERED_RECOVERY
+struct RecoveryDrain {
+    inline static thread_local const RecoveryDrain* current=nullptr;
+    const MT2FW_MT2_RecoveryReceipt& certificate;
+    uintptr_t game,tasks;
+    RecoveryDrain(const MT2FW_MT2_RecoveryReceipt& receipt,uintptr_t g,uintptr_t t):certificate(receipt),game(g),tasks(t){
+        require(!current&&native_steps->recovery_snapshot()==&receipt&&receipt.prepare_attempted==1&&
+            receipt.phase==MT2FW_MT2_RECOVERY_PREPARING&&receipt.interruption&&receipt.generation&&receipt.lease&&
+            thread==GetCurrentThreadId()&&g==owner&&t&&control.phase==mt2::determinism::Gate::Phase::Held&&
+            !control.entered&&!timer_step::frame.active&&!held_tasks,"Recovery drain lacks its independently consumed no-Go certificate");
+        current=this;
+    }
+    ~RecoveryDrain(){current=nullptr;}
+    RecoveryDrain(const RecoveryDrain&)=delete;RecoveryDrain& operator=(const RecoveryDrain&)=delete;
+};
+bool recovery_draining(){
+    const auto* scope=RecoveryDrain::current;if(!scope)return false;
+    require(native_steps->recovery_snapshot()==&scope->certificate&&scope->certificate.phase==MT2FW_MT2_RECOVERY_PREPARING&&
+        scope->certificate.prepare_attempted==1&&scope->game==owner&&scope->tasks==read<uintptr_t>(image+0x13df340)&&
+        thread==GetCurrentThreadId()&&!control.entered&&!timer_step::frame.active,"Recovery drain owner escaped its no-Go preparation");
+    return true;
+}
+#else
+bool recovery_draining(){return false;}
+#endif
 uintptr_t manager(){
     require(thread==GetCurrentThreadId(),"Loading dispatch game thread changed");
-    require(control.entered&&timer_step::frame.active,"Loading dispatch lacks admitted outer frame");
+    require((control.entered&&timer_step::frame.active)||recovery_draining(),"Loading dispatch lacks admitted outer frame or exact Recovery drain");
     timer_step::current_game();
     const auto tasks=read<uintptr_t>(image+0x13df340);
     require(tasks&&read<uintptr_t>(owner+0x68)==tasks&&read<uintptr_t>(tasks)==image+0x16fdaf0,"Loading dispatch Task owner/address point changed");
@@ -31,6 +56,11 @@ bool plan(uintptr_t task){
 }
 #include "determinism_ordered_finish.inc"
 #include "determinism_ordered_run.inc"
+#ifdef MT2FW_ORDERED_RECOVERY
+#include "native_completed_callbacks.inc"
+#else
+namespace completed_callbacks {void clear(){} void record(uintptr_t){} bool matches(uintptr_t){return false;}}
+#endif
 bool step_drain=false;
 struct StepDrain {
     bool active=false;
@@ -66,18 +96,23 @@ uint64_t path_children(uintptr_t tasks){
     return total;
 }
 template<class Finish>void finish_complete_step(void* receiver,const Finish& finish){
+    completed_callbacks::clear();
     const auto before=finish_returned;
     ordered_run::begin(reinterpret_cast<uintptr_t>(receiver));
     finish(receiver);
     ordered_run::end(reinterpret_cast<uintptr_t>(receiver));
-    if(!step_drain||finish_returned==before)return;
     const auto tasks=reinterpret_cast<uintptr_t>(receiver);
-    const auto children=path_children(tasks);if(!children)return;
-    path_children_observed+=children;++path_child_attempted;
-    // Original ToonPlan completion can enqueue native Pathfinder work. Its
-    // pinned no-op Finish cannot create another callback generation.
-    finish(receiver);++path_child_returned;
-    require(path_children(tasks)==0,"Native Pathfinder child settlement left additional work; no further drain");
+    if(step_drain&&finish_returned!=before){
+        const auto children=path_children(tasks);
+        if(children){
+            path_children_observed+=children;++path_child_attempted;
+            // Original ToonPlan completion can enqueue native Pathfinder work.
+            // Its pinned no-op Finish cannot create another callback generation.
+            finish(receiver);++path_child_returned;
+            require(path_children(tasks)==0,"Native Pathfinder child settlement left additional work; no further drain");
+        }
+    }
+    completed_callbacks::record(tasks);
 }
 
 void partition(uintptr_t tasks){
@@ -108,6 +143,7 @@ void partition(uintptr_t tasks){
 #include "native_save_completion.inc"
 #include "native_save_cache_completion.inc"
 void before_unlock(void* mutex){
+    completed_callbacks::clear();
     if(save_cache::current){save_cache::before_unlock(mutex);return;}
 #ifdef MT2FW_ORDERED_ASYNC_SAVE
     if(async_save::before_unlock(mutex))return;
@@ -129,6 +165,9 @@ void before_unlock(void* mutex){
     }
     const auto tasks=manager();
     require(reinterpret_cast<uintptr_t>(mutex)==tasks+0xf0,"Loading dispatch mutex owner differs");
+    // Recovery consumes original deferred work locally; normal peer ordering
+    // and its temporary native queue views are not used in this scope.
+    if(recovery_draining()){require(!pending&&!uncertain,"Recovery drain has old deferred/uncertain callback ownership");return;}
     // Early Dispatch may see only the workers that happened to finish first.
     // Keep ToonPlan ownership in the native finished queue until the existing
     // post-Update full drain. Other callbacks and ProcGL retain their order.
@@ -160,7 +199,7 @@ void finish_call(void* task,uintptr_t caller){
     if(!enabled||!control.active()){original_finish(task);return;}
     try{
         manager();require(caller==image+PumpFinishReturn,"Loading dispatch ToonPlan Finish caller differs");
-        require(control.phase==mt2::determinism::Gate::Phase::Stepping&&step_drain,"ToonPlan Finish lacks complete-step drain admission");
+        require((control.phase==mt2::determinism::Gate::Phase::Stepping&&step_drain)||recovery_draining(),"ToonPlan Finish lacks complete-step or exact Recovery drain admission");
         const auto observation=motion_probe::finish_before(reinterpret_cast<uintptr_t>(task));
         ++finish_entered;original_finish(task);++finish_returned;
         motion_probe::finish_after(observation,reinterpret_cast<uintptr_t>(task));

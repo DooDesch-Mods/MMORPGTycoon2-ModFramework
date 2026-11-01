@@ -56,6 +56,11 @@ accepted request or a returned callback alone is not proof of a confirmed world
 change. Keep the original cause and inspect the retained result before deciding
 what to do next.
 
+At an idle outer boundary, Framework can prove an actual recovery interruption
+while retaining the native hold. In the held service, `MT2FW_MT2_BUSY` is a
+yield before command or native work on a typed interruption. It does not permit
+replaying ordinary service work or borrowing `Next`.
+
 ## Keep Save completion separate from publication
 
 A native writer can finish before companion files or peer acknowledgements are

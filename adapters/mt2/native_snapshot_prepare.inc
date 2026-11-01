@@ -14,6 +14,7 @@ uint64_t last_order=0,flush_attempts=0,flush_returns=0,captures=0;
 bool capture_returned=false,client_cache_attempted=false,client_cache_returned=false;
 uintptr_t prepared_mode=0,prepared_tasks=0;
 bool installed=false;
+struct RecoveryOwner {uint64_t lease=0,interruption=0,generation=0;char nonce[37]{};} recovery_owner;
 
 bool empty_hash(const Request& request){return std::all_of(std::begin(request.witness_sha256),std::end(request.witness_sha256),[](auto b){return b==0;});}
 void shape(const Request& request){
@@ -50,8 +51,9 @@ void empty_tasks(){
     const auto count=read<int32_t>(held_tasks+0xd8),capacity=read<int32_t>(held_tasks+0xdc);
     if(count<0||capacity<count||capacity>1000000)reject_queue("Snapshot native callback snapshot bounds differ actual="+
         std::to_string(count)+" capacity="+std::to_string(capacity));
-    if(count!=0&&!loading_dispatch::save_completion::consumed_snapshot(held_tasks))reject_queue(
-        "Snapshot callback snapshot lacks completed original Save receipt actual="+std::to_string(count)+" required=0 or exact consumed writer");
+    if(count!=0&&!loading_dispatch::save_completion::consumed_snapshot(held_tasks)&&
+        !loading_dispatch::completed_callbacks::matches(held_tasks))reject_queue(
+        "Snapshot callback snapshot lacks completed native drain or original Save receipt actual="+std::to_string(count)+" required=0 or exact completed drain/writer");
     require(!loading_dispatch::pending&&!loading_dispatch::uncertain,"Snapshot has deferred or uncertain task callbacks");
 }
 void same(const Request& request){
@@ -74,6 +76,7 @@ void before_step(){
             "Snapshot armed Go differs from its exact borrowed boundary");}
     loading_dispatch::save_completion::clear_consumed();
 }
+void prepare_native(const std::function<void(void*)>& finish=finish_all);
 void after_go(){
     if(phase!=Phase::Armed)return;
     // The normal Go and its existing task drain have returned. Native Save's
@@ -83,6 +86,9 @@ void after_go(){
     const auto current=native_steps->snapshot();
     require(current.tick==certificate.tick&&current.invocation==certificate.invocation&&current.lease==certificate.lease,
         "Snapshot preparation original tick differs");
+    prepare_native();
+}
+void prepare_native(const std::function<void(void*)>& finish){
     const auto active=mode();const auto native_clock=clock();
     const auto shards=read<uintptr_t>(active+0x30);
     require(shards&&read<uintptr_t>(shards)==image+0x1702b00,"Snapshot ShardManager original owner differs");
@@ -90,18 +96,30 @@ void after_go(){
     require(read<uint8_t>(tasks_now+0xf8)==0&&finish_all&&all_done,"Snapshot preparation scheduler is not released");
     const auto context=SDL_GL_GetCurrentContext();const auto window=SDL_GL_GetCurrentWindow();
     require(context&&window,"Snapshot preparation has no original GL context/window");
+    loading_dispatch::completed_callbacks::clear();
     phase=Phase::Failed;++flush_attempts;
     loading_dispatch::StepDrain drain;
     original_flush(reinterpret_cast<void*>(shards));++flush_returns;
     set_pause(reinterpret_cast<void*>(native_clock),0.0f);
-    finish_all(reinterpret_cast<void*>(tasks_now));
+    finish(reinterpret_cast<void*>(tasks_now));
     require(all_done(reinterpret_cast<void*>(tasks_now))&&read<int32_t>(tasks_now+0xc0)==0,
         "Snapshot original preparation left unfinished task work; no repeated drain");
     require(SDL_GL_GetCurrentContext()==context&&SDL_GL_GetCurrentWindow()==window,"Snapshot preparation changed original GL ownership");
     require(mode()==active&&clock()==native_clock&&read<uint32_t>(native_clock+0x5c)==0,"Snapshot original preparation owner/Clock readback differs");
+    loading_dispatch::completed_callbacks::record(tasks_now);
     prepared_mode=active;prepared_tasks=tasks_now;phase=Phase::Prepared;
 }
 void capture_owner(){
+    if(recovery_owner.lease){
+        const auto* recovery=native_steps->recovery_snapshot();
+        require(recovery&&recovery->phase==MT2FW_MT2_RECOVERY_CONSUMED&&recovery->capture_attempted==1&&
+            recovery->lease==recovery_owner.lease&&recovery->interruption==recovery_owner.interruption&&
+            recovery->generation==recovery_owner.generation&&std::memcmp(recovery->recovery_nonce,recovery_owner.nonce,37)==0&&
+            certificate.lease==recovery->lease&&certificate.session==recovery->session&&certificate.world_epoch==recovery->world_epoch&&
+            certificate.tick==recovery->completed_tick&&std::memcmp(certificate.nonce,recovery->recovery_nonce,37)==0&&
+            std::memcmp(certificate.witness_sha256,recovery->witness_sha256,32)==0,
+            "Recovery Save scope lacks its exact independently consumed certificate");
+    }
     const auto* prepared=mt2::PreparedSaveScope::current;
     require(prepared&&phase==Phase::Consumed&&prepared->mode==prepared_mode&&prepared->tasks==prepared_tasks&&
         prepared->thread==thread&&thread==GetCurrentThreadId(),"Snapshot capture lacks its single-use native owner");
@@ -144,6 +162,7 @@ bool preserve_resume(void* receiver,uintptr_t caller){
     if(!async_save::resume())empty_tasks();++prepared.resumes;return true;
 }
 void operation(const Request& request,MT2FW_MT2_SnapshotCaptureFn callback,void* user){
+    require(!recovery_owner.lease,"Ordinary snapshot operation cannot use a Recovery certificate");
     shape(request);
     if(request.operation==MT2FW_MT2_SNAPSHOT_ARM){
         require(!callback&&!user&&(phase==Phase::Idle||phase==Phase::Released)&&request.order>last_order&&request.invocation&&
@@ -211,8 +230,8 @@ void operation(const Request& request,MT2FW_MT2_SnapshotCaptureFn callback,void*
 }
 void reset(){
     require(!mt2::PreparedSaveScope::current,"Snapshot reset during native capture");
-    loading_dispatch::save_completion::clear_consumed();
-    async_save::retire();phase=Phase::Idle;certificate={};last_order=0;capture_returned=false;client_cache_attempted=client_cache_returned=false;prepared_mode=prepared_tasks=0;
+    loading_dispatch::save_completion::clear_consumed();loading_dispatch::completed_callbacks::clear();
+    async_save::retire();phase=Phase::Idle;certificate={};recovery_owner={};last_order=0;capture_returned=false;client_cache_attempted=client_cache_returned=false;prepared_mode=prepared_tasks=0;
 }
 void install(){
     if(installed)return;

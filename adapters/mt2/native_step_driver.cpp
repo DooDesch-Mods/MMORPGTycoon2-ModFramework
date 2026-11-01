@@ -66,6 +66,9 @@ StepNativeObservation NativeStepDriver::loaded(const MT2FW_Host* owner,bool ente
     require(!failed(),"Step driver retains an unknown result: "+failure_);
     require(native_.thread()==frozen_->thread,"Step native game thread changed");native_.prove_routes();
     auto actual=source_(owner);
+    return validate_loaded(std::move(actual),entered);
+}
+StepNativeObservation NativeStepDriver::validate_loaded(StepNativeObservation actual,bool entered){
     if(native_.bootstrap)require(native_.bootstrap(actual),"Step Framework bootstrap receipt is not ready");
     require(actual.identity==*frozen_,"Step NativeOpen/session/snapshot identity changed: "+actual.cause);
     require(actual.phase==StepNativeObservation::Phase::Loaded&&actual.world_epoch&&actual.resume_workers.has_value()&&
@@ -97,6 +100,15 @@ StepNativeObservation NativeStepDriver::loaded(const MT2FW_Host* owner,bool ente
     }else held(task);
     if(resume_workers_)require(resume_workers_==actual.resume_workers,"Step bootstrap prior scheduler state changed");
     return actual;
+}
+void NativeStepDriver::recovery_local(const MT2FW_Host* owner,const MT2FW_MT2_StepSpec& spec,MT2FW_MT2_StepProofFn proof,void* user){
+    require(frozen_&&owner==frozen_->owner&&!active_&&!failed()&&!receipt_&&proof&&native_.thread()==frozen_->thread,
+        "Recovery local proof lacks a known idle native driver/thread/owner");
+    require(spec.session==frozen_->session&&spec.session_provider_token==frozen_->provider_token&&
+        spec.frozen_peer_mask==frozen_->peer_mask,"Recovery cannot replace the original Step session or cohort");
+    native_.prove_routes();auto proxy=spec;proxy.proof=proof;proxy.proof_user=user;
+    auto actual=read_step_proof(owner,proxy,native_.thread());
+    validate_loaded(std::move(actual),false);
 }
 NativeStepKernel::Proof NativeStepDriver::inspect(const MT2FW_Host* owner,const MT2FW_MT2_StepSpec& spec){
     NativeStepKernel::Proof proof;

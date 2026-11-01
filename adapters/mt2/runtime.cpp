@@ -979,6 +979,11 @@ extern "C" __declspec(dllexport) MT2FW_MT2_Result MT2FW_CALL MT2FW_MT2_QueryStep
     catch(const std::exception& error){report(std::string("Native step discovery failed: ")+error.what());return MT2FW_MT2_FAILED;}
     catch(...){report("Native step discovery failed: unknown native exception");return MT2FW_MT2_FAILED;}
 }
+extern "C" __declspec(dllexport) MT2FW_MT2_Result MT2FW_CALL MT2FW_MT2_QueryStepRecoveryDraft(const MT2FW_Host* owner,uint32_t version,MT2FW_MT2_StepRecoveryDraftV1* output,uint32_t capacity){
+    try{std::lock_guard lock(gate);if(!running||!native_steps)return MT2FW_MT2_UNAVAILABLE;return native_steps->query_recovery(owner,version,output,capacity);}
+    catch(const std::exception& error){report(std::string("Native recovery discovery failed: ")+error.what());return MT2FW_MT2_FAILED;}
+    catch(...){report("Native recovery discovery failed: unknown native exception");return MT2FW_MT2_FAILED;}
+}
 extern "C" __declspec(dllexport) bool MT2FW_InitInstalled(const MT2FW_Bootstrap* receipt) {
     if(runtime||retained_storage){report("Framework runtime is already initialized or retained; restart required");return false;}
     try {

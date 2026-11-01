@@ -17,6 +17,12 @@ def main():
         raise RuntimeError('Step SDK header differs from its exact versioned machine contract')
     step_service=step_header.split('typedef struct MT2FW_MT2_StepServiceDraftV1 {',1)[1].split('} MT2FW_MT2_StepServiceDraftV1;',1)[0]
     if set(re.findall(r'\*(\w+)\)\(',step_service))!=set(step_contract['functions']):raise RuntimeError('Step service methods differ from the machine contract')
+    recovery_contract=packages.read_json(ROOT/'api/experimental/step-recovery.json')
+    recovery_path=ROOT/recovery_contract['header'];recovery_header=recovery_path.read_text(encoding='utf-8')
+    if '#define MT2FW_MT2_STEP_RECOVERY_DRAFT_VERSION '+str(recovery_contract['version'])+'u' not in recovery_header or hashlib.sha256(recovery_path.read_bytes()).hexdigest()!=recovery_contract['header_sha256']:
+        raise RuntimeError('Recovery SDK header differs from its exact versioned machine contract')
+    recovery_service=recovery_header.split('typedef struct MT2FW_MT2_StepRecoveryDraftV1 {',1)[1].split('} MT2FW_MT2_StepRecoveryDraftV1;',1)[0]
+    if set(re.findall(r'\*(\w+)\)\(',recovery_service))!=set(recovery_contract['functions']):raise RuntimeError('Recovery service methods differ from the machine contract')
     if '#define MT2FW_MT2_PATCHES_VERSION '+str(patch_contract['version'])+'u' not in native_patch_header:
         raise RuntimeError('Native patch protocol version differs from its machine contract')
     bridge=(ROOT/'src/core/lua_mod.cpp').read_text(encoding='utf-8')

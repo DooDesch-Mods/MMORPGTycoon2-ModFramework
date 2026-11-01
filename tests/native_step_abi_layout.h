@@ -1,6 +1,7 @@
 #pragma once
 #include <stddef.h>
 #include "native_steps_draft.h"
+#include "native_step_recovery_draft.h"
 #ifdef __cplusplus
 #define MT2FW_ABI_ASSERT static_assert
 #else
@@ -13,3 +14,8 @@ MT2FW_ABI_ASSERT(sizeof(MT2FW_MT2_StepServiceDraftV1) == 72, "Step service draft
 MT2FW_ABI_ASSERT(offsetof(MT2FW_MT2_StepServiceDraftV1, exit_save) == 64, "Step exit-save slot differs");
 MT2FW_ABI_ASSERT(sizeof(MT2FW_MT2_StepSpec) == 152, "Step specification layout differs");
 MT2FW_ABI_ASSERT(sizeof(MT2FW_MT2_QueryStepServiceDraftFn) == sizeof(void*), "Step query function pointer differs");
+MT2FW_ABI_ASSERT(sizeof(MT2FW_MT2_RecoveryReceipt) == 720, "Recovery receipt layout differs");
+MT2FW_ABI_ASSERT(sizeof(MT2FW_MT2_RecoverySpec) == 136, "Recovery spec layout differs");
+MT2FW_ABI_ASSERT(sizeof(MT2FW_MT2_RecoveryRequest) == 216, "Recovery request layout differs");
+MT2FW_ABI_ASSERT(sizeof(MT2FW_MT2_RecoveryPublication) == 88, "Recovery publication layout differs");
+MT2FW_ABI_ASSERT(sizeof(MT2FW_MT2_StepRecoveryDraftV1) == 40, "Recovery query table layout differs");

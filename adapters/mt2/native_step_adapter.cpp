@@ -52,7 +52,7 @@ MT2FW_MT2_Result NativeStepAdapter::query(const MT2FW_Host* host,uint32_t versio
         [](void* p,const MT2FW_MT2_StepSpec* s,MT2FW_MT2_StepReceipt* r){if(!p)return MT2FW_MT2_INVALID;auto& a=*static_cast<NativeStepAdapter*>(p);return a.guard([&]{return a.bind(s,r);},r);},
         [](void* p,const MT2FW_MT2_StepActivation* s,MT2FW_MT2_StepReceipt* r){if(!p)return MT2FW_MT2_INVALID;auto& a=*static_cast<NativeStepAdapter*>(p);return a.guard([&]{if(!a.current())return MT2FW_MT2_UNAVAILABLE;return a.api_.activate(a.api_.context,s,r);},r);},
         [](void* p,uint64_t lease,MT2FW_MT2_StepReceipt* r){if(!p)return MT2FW_MT2_INVALID;auto& a=*static_cast<NativeStepAdapter*>(p);return a.guard([&]{return a.api_.read(a.api_.context,lease,r);},r);},
-        [](void* p,uint64_t lease,MT2FW_MT2_StepReceipt* r){if(!p)return MT2FW_MT2_INVALID;auto& a=*static_cast<NativeStepAdapter*>(p);return a.guard([&]{if(a.save_inflight_)return MT2FW_MT2_BUSY;auto result=a.api_.unbind(a.api_.context,lease,r);if(result==MT2FW_MT2_OK)a.callbacks_retired_=true;return result;},r);},
+        [](void* p,uint64_t lease,MT2FW_MT2_StepReceipt* r){if(!p)return MT2FW_MT2_INVALID;auto& a=*static_cast<NativeStepAdapter*>(p);return a.guard([&]{if(a.save_inflight_||a.recovery_callbacks_inflight_)return MT2FW_MT2_BUSY;auto result=a.api_.unbind(a.api_.context,lease,r);if(result==MT2FW_MT2_OK){a.callbacks_retired_=true;if(a.recovery_)a.recovery_->detach();}return result;},r);},
         [](void* p,uint64_t lease,MT2FW_MT2_StepReceipt* r){
             if(!p||!r||r->size!=sizeof(*r))return MT2FW_MT2_INVALID;
             auto& a=*static_cast<NativeStepAdapter*>(p);
@@ -194,17 +194,17 @@ MT2FW_MT2_StepDisposition MT2FW_CALL NativeStepAdapter::boundary_call(void* cont
     return adapter.pinned(MT2FW_MT2_STEP_STOP_UNKNOWN,[&]{return adapter.callbacks_.boundary(adapter.callbacks_.user,frame,next,continuation);});
 }
 bool NativeStepAdapter::retire(Plugin& plugin){
-    if(plugin_==&plugin&&(proof_inflight_||save_inflight_))return false;
+    if(plugin_==&plugin&&(proof_inflight_||save_inflight_||recovery_callbacks_inflight_))return false;
     if(plugin_!=&plugin||!kernel_||callbacks_retired_)return true;
     auto receipt=kernel_->snapshot();const auto result=api_.unbind(api_.context,receipt.lease,&receipt);
     if(result==MT2FW_MT2_BUSY)return false;
     if(result!=MT2FW_MT2_OK){reject(std::string("Native step retirement failed: ")+receipt.cause);return false;}
-    callbacks_retired_=true;return true;
+    callbacks_retired_=true;if(recovery_)recovery_->detach();return true;
 }
 bool NativeStepAdapter::reset_after_world_exit(){
     if(!kernel_||!callbacks_retired_||proof_inflight_||save_inflight_||!driver_.exited||!driver_.reset)return false;
     if(!kernel_->reset_after_world_exit())return false;
-    try{driver_.reset();callbacks_={};framework_epoch_=native_epoch_=0;return true;}
+    try{driver_.reset();callbacks_={};recovery_callbacks_={};recovery_.reset();framework_epoch_=native_epoch_=0;return true;}
     catch(const std::exception& error){kernel_->failed(std::string("Step world-exit reset failed: ")+error.what());throw;}
     catch(...){kernel_->failed("Step world-exit reset raised an unknown exception");throw;}
 }

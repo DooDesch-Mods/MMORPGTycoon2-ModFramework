@@ -6,8 +6,9 @@
 
 Build mods for **MMORPG Tycoon 2**. Start with Lua and a text editor, extend with C++, or bring your own static GLB scenery into the game.
 
-**Framework 0.5.0** adds the native Step SDK for multiplayer mods to coordinate
-world updates, shared saves and session exit. Lua API **1.3.0** retains all
+**Framework 0.5.0** adds native Step and optional recovery interfaces for the
+matching Multiplayer owner to coordinate startup, world updates, shared saves
+and session exit. Lua API **1.3.0** retains all
 **254 functions**. Start with the [query recipes](docs/recipes/world-queries.md),
 or read the [experimental Step guide](docs/experimental/steps.md) for the native extension.
 
@@ -79,13 +80,13 @@ In Mods, change settings, check dependencies and errors, or reload a Lua mod. Se
 
 Download the separate **MT2Framework-SDK** from [GitHub Releases](https://github.com/DooDesch-Mods/MMORPGTycoon2-ModFramework/releases). It includes the matching Runtime, portable helper, CLI, GLB importer, templates, editor types and offline documentation. Start with **Hello MT2** and the [first mod guide](docs/quickstart.md). Lua needs only a text editor - no compiler or Python installation.
 
-Lua API **1.2.0** opens more of the game to modders: build character editors, Dungeon tools, quest utilities, terrain brushes and management mods. The new gameplay operations are experimental, and their world-changing actions currently run in singleplayer. Start with the [gameplay guide](docs/experimental/gameplay.md) and the [Gameplay API Explorer](examples/gameplay).
+Lua API **1.3.0** opens more of the game to modders: build character editors, Dungeon tools, quest utilities, terrain brushes and management mods. The gameplay operations are experimental, and their world-changing actions currently run in singleplayer. Start with the [gameplay guide](docs/experimental/gameplay.md) and the [Gameplay API Explorer](examples/gameplay).
 
 Give your mod a central Mods entry, native game windows, searchable lists and world dashboards. Use the [complete Lua app examples](docs/recipes/lua-apps.md), or the same [native windows and previews](docs/experimental/native-document-ui.md) from C++. The UI protocol remains experimental.
 
 ## For contributors
 
-Framework **0.3.2** provides Lua API **1.2.0** and the experimental gameplay contract. Use the matching Runtime and SDK. The [gameplay guide](docs/experimental/gameplay.md) covers action results and lifetime rules; the [machine contract](api/experimental/gameplay.json) describes each operation and its result type.
+Framework **0.5.0** provides Lua API **1.3.0** and the experimental gameplay contract. Use the matching Runtime and SDK. The [gameplay guide](docs/experimental/gameplay.md) covers action results and lifetime rules; the [machine contract](api/experimental/gameplay.json) describes each operation and its result type.
 
 All required native source dependencies are inside this repository. Build with Visual Studio 2022 C++, CMake and Python:
 

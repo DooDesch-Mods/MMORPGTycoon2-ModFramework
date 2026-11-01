@@ -160,6 +160,20 @@ bool NativePatches::inspect_step_provider(Plugin& bridge,uint64_t token,uint64_t
     if(reply.role!=MT2FW_MT2_SESSION_HOST&&reply.role!=MT2FW_MT2_SESSION_CLIENT&&reply.role!=MT2FW_MT2_SESSION_STANDALONE)return reject("Step provider reports unknown role");
     role=reply.role;cause=loaded?"Actual session role and current native epoch acknowledged":"Actual pre-load session role acknowledged without loaded-world authority";return true;
 }
+bool NativePatches::inspect_step_provider_owner(Plugin& bridge,uint64_t token,uint64_t& epoch,std::string& cause){
+    std::lock_guard lock(gate_);epoch=0;
+    auto reject=[&](const std::string& why){cause=why;return false;};
+    if(!on_thread()||runtime_.native_plugin(&bridge.host)!=&bridge||bridge.manifest.id!=bridge_id||bridge.manifest.type!="native")
+        return reject("Recovery provider requires the exact active native owner and bound thread");
+    unsigned present=0;for(auto& plugin:runtime_.plugins())if(plugin->manifest.id==bridge_id&&plugin->manifest.type=="native"&&
+        (plugin->active||plugin->native_loaded||plugin->native_module||plugin->native_pins||plugin->native_retained||plugin->native_retirement_failed||plugin->native_shutdown_pending))++present;
+    if(present!=1||!token||!provider_.active||provider_.token!=token||!provider_.owner||!provider_.owner->active||
+        provider_.owner->plugin!=&bridge||provider_.owner->inflight)return reject("Recovery provider registration is retired, conflicting or in flight");
+    try{if(!world_proof_||!world_proof_(epoch,cause)||!epoch)return reject("Recovery current native world proof failed: "+cause);}
+    catch(const std::exception& e){return reject(std::string("Recovery current native world proof raised: ")+e.what());}
+    catch(...){return reject("Recovery current native world proof raised an unknown exception");}
+    return true;
+}
 Json NativePatches::status()const{
     std::lock_guard lock(gate_);return {{"role",last_role_==MT2FW_MT2_SESSION_HOST?"host":last_role_==MT2FW_MT2_SESSION_STANDALONE?"standalone":last_role_==MT2FW_MT2_SESSION_CLIENT?"client":"unknown"},{"reason",last_reason_},{"provider_owner",provider_.owner?provider_.owner->plugin->manifest.id:""},{"provider_active",provider_.active},{"bound_thread",std::to_string(game_thread_)}};
 }
