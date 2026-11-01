@@ -82,6 +82,12 @@ class MultiplayerReleaseTests(unittest.TestCase):
             self.assertEqual(plan['release_notes'], metadata['body'])
             self.assertEqual(plan['notes_origin'], metadata['url'])
             self.assertEqual(plan['notes_sha256'], hashlib.sha256(metadata['body'].encode()).hexdigest())
+            release_text = metadata['body']
+            metadata['body'] = nexus.MULTIPLAYER_SUPPORT + '\n\n' + release_text
+            transformed = nexus.fetch_release('v' + self.version, 'multiplayer', output)
+            self.assertEqual(transformed['release_notes'], release_text)
+            self.assertEqual(transformed['notes_source_sha256'], hashlib.sha256(metadata['body'].encode()).hexdigest())
+            self.assertEqual(transformed['notes_sha256'], hashlib.sha256(release_text.encode()).hexdigest())
             with patch.object(nexus.urllib.request, 'urlopen', side_effect=AssertionError('Do not require an older tagged changelog')):
                 nexus.fetch_release('v' + self.version, 'multiplayer', output)
             metadata['body'] = ''

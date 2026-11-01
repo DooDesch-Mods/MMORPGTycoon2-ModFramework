@@ -20,6 +20,7 @@ from package_runtime import verify_runtime
 from release_notes import section, plain, bbcode
 REPOSITORY = 'DooDesch-Mods/MMORPGTycoon2-ModFramework'
 API = 'https://api.nexusmods.com/v3'
+MULTIPLAYER_SUPPORT = '> 🛟 **Need help or found a bug?** Get support at [support.doodesch.de/multiplayer](https://support.doodesch.de/multiplayer).'
 
 
 def targets():
@@ -195,9 +196,18 @@ def fetch_release(tag, product, directory, optional=False):
             notes = metadata.get('body')
             if not isinstance(notes, str) or not notes.strip() or len(notes) > 10000:
                 raise ValueError('Published GitHub release notes must contain 1 to 10000 characters')
-            plan['release_notes'] = notes.strip()
+            notes = notes.strip()
+            plan['notes_source_sha256'] = hashlib.sha256(notes.encode('utf-8')).hexdigest()
+            # Keep the standard support callout on the listing; version changelogs contain the release text.
+            if notes.startswith(MULTIPLAYER_SUPPORT + '\n\n'):
+                notes = notes[len(MULTIPLAYER_SUPPORT):].strip()
+                plan['notes_transform'] = 'omit standard listing support callout from version changelog'
+                print('info: omit the standard listing support callout from the Multiplayer version changelog', file=sys.stderr)
+            if not notes:
+                raise ValueError('Published GitHub release notes contain no release text')
+            plan['release_notes'] = notes
             plan['notes_origin'] = metadata['url']
-            plan['notes_sha256'] = hashlib.sha256(notes.strip().encode('utf-8')).hexdigest()
+            plan['notes_sha256'] = hashlib.sha256(notes.encode('utf-8')).hexdigest()
         else:
             notes_request = urllib.request.Request(f'https://raw.githubusercontent.com/{repository}/{tag}/CHANGELOG.md',
                                                    headers={'User-Agent': 'MT2-release-validation'})
