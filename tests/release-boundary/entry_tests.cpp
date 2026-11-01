@@ -13,7 +13,7 @@
 #include <vector>
 
 namespace {
-int checks=0,original_calls=0,desktop_calls=0,after_hook=0,passive_calls=0,release_calls=0;
+int checks=0,original_calls=0,desktop_calls=0,after_hook=0,passive_calls=0,release_calls=0,step_calls=0;
 bool desktop_consumed=false;
 std::vector<std::string> order,errors;
 void* original_receiver=nullptr;
@@ -51,21 +51,24 @@ auto native_ownership=&probe;
 namespace mt2::desktop {
 bool command(void*,const void*){++desktop_calls;order.push_back("desktop");return desktop_consumed;}
 }
+namespace step_runtime {
+void command_call(void* receiver,const void* command){++step_calls;original_ingame_command(receiver,command);}
+}
 #include "release_mode_entry.inc"
 __declspec(noinline) void invoke(void* receiver,const void* command){ingame_command(receiver,command);++after_hook;}
-void reset(){original_calls=desktop_calls=after_hook=passive_calls=release_calls=0;order.clear();errors.clear();probe={};desktop_consumed=false;running=true;runtime=&runtime_value;native_ownership=&probe;}
+void reset(){original_calls=desktop_calls=after_hook=passive_calls=release_calls=step_calls=0;order.clear();errors.clear();probe={};desktop_consumed=false;running=true;runtime=&runtime_value;native_ownership=&probe;}
 }
 int main(){try{
     int receiver=1;struct NativeString {const char* data;size_t size;} command{"LevelUp",7};
     reset();invoke(&receiver,&command);
-    check(original_calls==1&&after_hook==1&&desktop_calls==1&&passive_calls==1&&release_calls==1,"Forward keeps one original call and both pre-effect services");
+    check(original_calls==1&&step_calls==1&&after_hook==1&&desktop_calls==1&&passive_calls==1&&release_calls==1,"Forward keeps one Step dispatch, original call and both pre-effect services");
     check(order==std::vector<std::string>{"passive","release","desktop","original"},"passive observation remains before authority desktop and original");
     check(original_receiver==&receiver&&original_command==&command&&probe.call.receiver==&receiver&&probe.call.native_command==&command,"physical original arguments are never replaced");
     check(probe.observed_text=="LevelUp"&&probe.release_text=="LevelUp"&&probe.call.thread==GetCurrentThreadId(),"borrowed copied text and actual boundary thread preserved");
     if(probe.return_frame!=2)throw std::runtime_error("Immediate native return is not caller above physical entry; unwind frame="+std::to_string(probe.return_frame));
     ++checks;
     reset();probe.disposition=MT2FW_MT2_RELEASE_SUPPRESS;invoke(&receiver,&command);
-    check(!original_calls&&!desktop_calls&&after_hook==1&&passive_calls==1&&release_calls==1,"Suppress skips original but retains passive observation");
+    check(!original_calls&&!step_calls&&!desktop_calls&&after_hook==1&&passive_calls==1&&release_calls==1,"Suppress skips Step dispatch and original but retains passive observation");
     reset();probe.disposition=MT2FW_MT2_RELEASE_FAILED;invoke(&receiver,&command);
     check(!original_calls&&!desktop_calls&&passive_calls==1,"Failed private decision never falls through");
     reset();probe.disposition=99;invoke(&receiver,&command);
