@@ -1,4 +1,10 @@
 import { defineConfig } from 'vitepress'
+import { readFileSync } from 'node:fs'
+
+// Embed the small favicon so document changes cannot cancel its background request.
+const favicon = 'data:image/svg+xml,' + encodeURIComponent(
+  readFileSync(new URL('../public/brand/icon-small.svg', import.meta.url), 'utf8'),
+)
 
 export default defineConfig({
   title: 'MT2 Mod Framework',
@@ -11,7 +17,7 @@ export default defineConfig({
   lastUpdated: false,
   head: [
     ['meta', { name: 'theme-color', content: '#0b1723' }],
-    ['link', { rel: 'icon', type: 'image/svg+xml', href: '/brand/icon-small.svg' }],
+    ['link', { rel: 'icon', type: 'image/svg+xml', href: favicon }],
     ['script', { src: '/search-index.js', defer: '' }],
     ['script', { src: '/docs-ui.js', defer: '' }],
   ],
