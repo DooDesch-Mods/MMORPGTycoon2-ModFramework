@@ -1,6 +1,7 @@
 #include "bootstrap.h"
 #include "determinism_gate.h"
 #include "determinism_work_witness.h"
+#include "native_tick_clock_phase.h"
 #include "native_step_checkpoint.h"
 #include "determinism_building_receipt.h"
 #include "determinism_npc_receipt.h"

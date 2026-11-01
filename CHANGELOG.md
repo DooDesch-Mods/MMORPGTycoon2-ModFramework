@@ -12,6 +12,7 @@
 - Keep the shared simulation paused when completing Road, Wall or Pass tools.
 - Allow a fresh Leave after a failed save without replaying the failed save or clearing its error.
 - Retain the native hold at a connection interruption boundary.
+- Keep simulation clocks aligned after a Multiplayer world reload.
 
 ## 0.4.0
 

@@ -166,6 +166,21 @@ void certify(const mt2::StepNativeObservation& observed){
     held();presentation_rng::check();
     require(observed.game==bootstrap.game&&observed.mode==bootstrap.mode&&observed.state==bootstrap.state&&observed.world==bootstrap.world&&observed.map==bootstrap.map,
         "Step NativeOpen world differs from native bootstrap pointers");
+    auto phase_guard=[&](){
+        require(bootstrap.game&&!lifecycle.bootstrap_held&&observed.phase==mt2::StepNativeObservation::Phase::Loaded&&observed.world_epoch&&
+            observed.game==bootstrap.game&&observed.game==owner&&observed.mode==bootstrap.mode&&observed.state==bootstrap.state&&observed.world==bootstrap.world&&observed.map==bootstrap.map&&
+            control.phase==Control::Phase::Held&&!control.completed&&!control.entered&&!timer_step::frame.active,
+            "TickClock initialization lacks the fresh held zero-step world");
+        held();bootstrap_boundary::require_loaded();
+    };
+    const auto phase=mt2::tick_clock_phase::initialize(image,owner,
+        [](uintptr_t p){return read<uint64_t>(p);},[](uintptr_t p){return read<uint32_t>(p);},[](uintptr_t p){return read<uint8_t>(p);},
+        [](uintptr_t p,uint32_t value){write<uint32_t>(p,value);},phase_guard);
+    Json clock_phase=Json::array(),before_phase=Json::array();
+    for(size_t i=0;i<phase.after.size();++i){const auto& a=phase.before[i];const auto& b=phase.after[i];
+        before_phase.push_back({{"budget_bits",a.budget},{"next_index",a.cursor}});
+        clock_phase.push_back({{"count",b.count},{"period_bits",b.period},{"rate_bits",b.rate},{"budget_bits",b.budget},{"next_index",b.cursor}});}
+    runtime->log("steps","info","Fresh-world TickClock phase initialized before="+before_phase.dump()+" after="+clock_phase.dump());
     native::SimulationState sim;std::string cause;
     require(native::read_simulation_state(sim,cause),"Step bootstrap simulation read failed: "+cause);
     const auto random=read<std::array<uint64_t,4>>(rng());const auto extra=read<int32_t>(rng()+0x20);
@@ -191,7 +206,7 @@ void certify(const mt2::StepNativeObservation& observed){
     // This is an explicit observed-state certificate, not a full-world hash.
     // No pointers, frame counts, clock measurements or local generation enter it.
     const auto region_random=region_rng_load::seal();
-    const Json canonical={{"schema","mt2-step-bootstrap-v4-region-rng"},{"region_rng",region_random},{"bootstrap_coverage",MT2FW_MT2_STEP_COVERAGE_INITIAL_DEVELOPERS},{"snapshot_sha256",observed.identity.snapshot_sha256},
+    const Json canonical={{"schema","mt2-step-bootstrap-v5-tick-clock-phase"},{"region_rng",region_random},{"tick_clock_manager_paused",false},{"tick_clock_phase",clock_phase},{"bootstrap_coverage",MT2FW_MT2_STEP_COVERAGE_INITIAL_DEVELOPERS},{"snapshot_sha256",observed.identity.snapshot_sha256},
         {"snapshot_bytes",observed.identity.snapshot_bytes},{"seed",*observed.identity.agreed_seed},{"seeded_words",seeded_words},
         {"default_rng",random},{"default_rng_extra",extra},{"clock",work.clock().at("comparable")},
         {"developers",developers},{"cash",sim.cash},{"logged_in_subscribers",sim.logged_in_subscribers},{"subscribers",subscribers},{"pending_plan_owners",pending}};

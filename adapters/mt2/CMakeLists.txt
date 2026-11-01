@@ -195,3 +195,9 @@ target_compile_options(mt2fw_native_step_recovery_adapter_tests PRIVATE /W4 /WX 
 target_compile_definitions(mt2fw_native_step_recovery_adapter_tests PRIVATE _SILENCE_CXX20_U8PATH_DEPRECATION_WARNING)
 add_test(NAME framework_native_step_recovery_adapter COMMAND mt2fw_native_step_recovery_adapter_tests)
 set_tests_properties(framework_native_step_recovery_adapter PROPERTIES TIMEOUT 10)
+
+add_executable(mt2fw_tick_clock_phase_tests ../../tests/native_tick_clock_phase_tests.cpp)
+target_include_directories(mt2fw_tick_clock_phase_tests PRIVATE .)
+target_compile_options(mt2fw_tick_clock_phase_tests PRIVATE /W4 /WX /utf-8 /UNDEBUG)
+add_test(NAME framework_tick_clock_phase COMMAND mt2fw_tick_clock_phase_tests)
+set_tests_properties(framework_tick_clock_phase PROPERTIES TIMEOUT 10)
