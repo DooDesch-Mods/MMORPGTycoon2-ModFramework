@@ -67,7 +67,7 @@ def changelog_status(existing, version, expected):
     raise ValueError(f'Nexus changelog {version} already contains different text; additive API must not append a duplicate')
 
 
-def sync_changelog(plan, directory, request=request_json):
+def sync_changelog(plan, directory, request=request_json, allow_write=True):
     key = os.environ.get('NEXUSMODS_API_KEY', '').strip()
     if not key:
         raise ValueError('NEXUSMODS_API_KEY is missing')
@@ -76,6 +76,8 @@ def sync_changelog(plan, directory, request=request_json):
     headers = {'apikey': key}
     status = changelog_status(request(url, headers=headers), plan['version'], plan['notes_plain'])
     if status == 'missing':
+        if not allow_write:
+            raise RuntimeError('Existing Nexus changelog readback is missing; recovery permits no changelog writes')
         request(API + f"/mods/{target['mod_uid']}/changelogs", 'POST',
                 {'version': plan['version'], 'changelog': plan['notes_plain']}, headers)
         status = changelog_status(request(url, headers=headers), plan['version'], plan['notes_plain'])
@@ -107,7 +109,7 @@ def delivered_changelog(plan, request=request_json):
 
 def sync_delivered_changelog(plan, directory, request=request_json):
     delivered = delivered_changelog(plan, request)
-    sync_changelog(delivered, directory, request)
+    sync_changelog(delivered, directory, request, allow_write=False)
     receipt = {'status': 'existing-nexus-verified', 'product': plan['product'], 'version': plan['version'],
                'notes_match_current_github': normalized_notes(delivered['notes']) == normalized_notes(plan['notes']),
                'nexus_notes': delivered['notes'], 'nexus_notes_origin': delivered['notes_origin'],

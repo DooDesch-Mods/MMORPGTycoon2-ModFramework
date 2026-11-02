@@ -238,6 +238,13 @@ class MultiplayerReleaseTests(unittest.TestCase):
         self.assertEqual(sent[0]['embeds'][0]['description'], 'Corrected GitHub copy')
         with self.assertRaisesRegex(ValueError, 'existing Multiplayer'):
             delivery.delivered_changelog({**plan, 'status': 'ready'}, request)
+        calls.clear()
+        def missing_readback(url, method='GET', **kwargs):
+            calls.append(method)
+            return {plan['version']: ['Original delivered change.']} if len(calls) == 1 else {}
+        with patch.dict(os.environ, {'NEXUSMODS_API_KEY': 'fixture'}), self.assertRaisesRegex(RuntimeError, 'permits no changelog writes'):
+            delivery.sync_delivered_changelog(plan, self.root, missing_readback)
+        self.assertEqual(calls, ['GET', 'GET'])
 
     def test_future_file_description_is_not_pinned_to_an_old_runtime(self):
         description = nexus.targets()['multiplayer']['file_description']
