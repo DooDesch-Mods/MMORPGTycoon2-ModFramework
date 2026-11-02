@@ -70,6 +70,26 @@ class NexusListingTests(unittest.TestCase):
         self.assertFalse(receipt['changed'])
         self.assertFalse(any(method == 'PATCH' for _, method, _ in self.calls))
 
+    def test_summary_readbacks_do_not_share_a_cached_legacy_url(self):
+        headers_seen = []
+        cache = {}
+        def request(url, method='GET', body=None, headers=None):
+            if '/v1/' in url:
+                headers_seen.append(headers)
+                if url in cache:
+                    return copy.deepcopy(cache[url])
+            result = self.request(url, method, body, headers)
+            if '/v1/' in url:
+                cache[url] = copy.deepcopy(result)
+            return result
+        receipt = listing.update_listing(self.directory, request)
+        self.assertEqual(receipt['status'], 'confirmed')
+        urls = [url for url, method, _ in self.calls if '/v1/' in url]
+        self.assertEqual(len(urls), 2)
+        self.assertNotEqual(urls[0], urls[1])
+        self.assertTrue(all('?mt2fw_read=' in url for url in urls))
+        self.assertTrue(all(headers['Cache-Control'] == 'no-cache, no-store' for headers in headers_seen))
+
     def test_wrong_release_or_mod_blocks_before_write(self):
         self.plan['sha256'] = 'b' * 64
         self.write_plan()

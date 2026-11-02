@@ -7,6 +7,7 @@ import json
 import os
 import re
 import sys
+import uuid
 
 from nexus_release import API, ROOT, targets
 from release_delivery import request_json
@@ -42,11 +43,15 @@ def update_listing(directory, request=request_json):
         raise ValueError('Prepared Nexus listing needs a summary of 1 to 350 characters and a description')
     url = API + '/mods/' + target['mod_uid']
     summary_url = f"https://api.nexusmods.com/v1/games/{target['domain']}/mods/{target['page_id']}.json"
+    def read_summary():
+        # Legacy mod responses can stay cached across a successful v3 metadata write.
+        return request(summary_url + '?mt2fw_read=' + uuid.uuid4().hex,
+                       headers={**headers, 'Cache-Control': 'no-cache, no-store'})
     before = request(url, headers=headers)['data']
     if (str(before['id']) != target['mod_uid'] or str(before['game_id']) != str(target['game_id'])
             or str(before['game_scoped_id']) != str(target['page_id']) or before['version'] != plan['version']):
         raise ValueError('Nexus listing identity/version differs from the release plan')
-    before_summary = request(summary_url, headers=headers)
+    before_summary = read_summary()
     if before_summary.get('version') != plan['version'] or str(before_summary.get('mod_id')) != str(target['page_id']):
         raise ValueError('Nexus summary identity/version differs from the release plan')
     current_summary = re.sub(r'\s+', ' ', before_summary.get('summary') or '').strip()
@@ -54,7 +59,7 @@ def update_listing(directory, request=request_json):
     if changed:
         request(url, 'PATCH', {'summary': summary, 'description': body}, headers)
     after = request(url, headers=headers)['data']
-    after_summary = request(summary_url, headers=headers)
+    after_summary = read_summary()
     if (description(after.get('description')) != description(body)
             or re.sub(r'\s+', ' ', after_summary.get('summary') or '').strip() != summary):
         raise RuntimeError('Nexus listing acknowledgement differs from the prepared text; inspect before retrying')
