@@ -1,5 +1,17 @@
 # Changelog
 
+## 0.5.4
+
+### Fixed
+
+- Prevent multiplayer sessions from stopping during an autosave.
+- Fix a multiplayer hang when the game cancels character tasks.
+- Close the Client's autosave notice and restore editing after its shared autosave finishes.
+
+### Added
+
+- Let native mods check the loaded Framework version before starting.
+
 ## 0.5.3
 
 ### Added

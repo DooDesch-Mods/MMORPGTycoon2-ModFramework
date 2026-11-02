@@ -216,7 +216,10 @@ typedef struct MT2FW_MT2_StepActivation {
    ARM borrows the current boundary before Next. SEAL, CAPTURE and RELEASE
    require the held service at exactly the prepared completed tick. */
 enum { MT2FW_MT2_SNAPSHOT_ARM=1, MT2FW_MT2_SNAPSHOT_SEAL=2,
-       MT2FW_MT2_SNAPSHOT_CAPTURE=3, MT2FW_MT2_SNAPSHOT_RELEASE=4, MT2FW_MT2_SNAPSHOT_PUMP=5, MT2FW_MT2_SNAPSHOT_CLIENT_CACHE=6 };
+       MT2FW_MT2_SNAPSHOT_CAPTURE=3, MT2FW_MT2_SNAPSHOT_RELEASE=4, MT2FW_MT2_SNAPSHOT_PUMP=5, MT2FW_MT2_SNAPSHOT_CLIENT_CACHE=6,
+       /* Framework 0.5.4: explicit original Host periodic Save purpose.
+          Request layout and remaining snapshot operations are unchanged. */
+       MT2FW_MT2_SNAPSHOT_ARM_PERIODIC=7 };
 typedef struct MT2FW_MT2_SnapshotRequest {
     uint32_t size,operation;
     uint64_t lease,session,world_epoch,tick,invocation,order;

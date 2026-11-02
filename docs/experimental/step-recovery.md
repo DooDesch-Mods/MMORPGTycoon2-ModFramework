@@ -41,6 +41,18 @@ attempt/return flags; those flags are not an interruption certificate.
 A failed Step, uncommitted original effect or unknown native owner cannot enter
 recovery. Recovery never clears FAILED and never lends Next for that lease.
 
+Framework 0.5.4 separates healthy observation from actual recovery adoption.
+A healthy watch may observe the exact current ordinary snapshot through
+preparation, sealing, its owned async writer and acknowledged release. It checks
+the native hold, provider, world, thread and callback ownership before and after
+the transport observer. It does not pump, retire, replace or adopt that writer.
+The observer must leave the snapshot certificate and writer ownership unchanged.
+
+An observed interruption runs strict adoption checks again before granting an
+interruption ID or calling the separate recovery service. A pending ordinary
+snapshot, an unretired ordinary writer or an unknown owner still blocks recovery.
+Healthy observation does not make an existing Save a recovery certificate.
+
 ## Capture one fresh Host snapshot
 
 Explicit operations run only in the separate Recovery service, on the retained

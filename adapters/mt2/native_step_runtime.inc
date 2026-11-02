@@ -97,19 +97,25 @@ void held(){
     require(held_tasks&&tasks()==held_tasks&&read<uint8_t>(held_tasks+0xf8)==1&&read<int32_t>(held_tasks+0xa8)==0&&read<int32_t>(held_tasks+0x90)==0,
         "Step lifecycle scheduler is not paused/drained");
 }
+namespace client_periodic_ui {
+void arm(const MT2FW_MT2_SnapshotRequest&);void seal(const MT2FW_MT2_SnapshotRequest&);
+void released(const MT2FW_MT2_SnapshotRequest&);void reset();
+}
 #include "native_snapshot_prepare.inc"
 #include "native_step_clock_pause.inc"
 #include "native_async_save.inc"
 void begin_prepared_async(void* mode,const void* filename,bool absolute){async_save::begin(mode,filename,absolute);}
 void returned_prepared_async(){async_save::entry_returned();}
 void validate_save_mode(void* receiver){require(snapshot_prepare::mode()==reinterpret_cast<uintptr_t>(receiver),"Native Save request Mode is not the current bound world");}
-void complete_client_periodic(void* receiver){
+#include "native_client_periodic_ui.inc"
+void delegate_client_periodic(void* receiver,uintptr_t caller){
     const auto receipt=native_steps->snapshot();
     require(receipt.actual_role==MT2FW_MT2_SESSION_CLIENT&&receipt.thread==GetCurrentThreadId()&&
         receipt.lease&&receipt.session&&receipt.world_epoch&&
         (receipt.phase==MT2FW_MT2_STEP_HELD||receipt.phase==MT2FW_MT2_STEP_ENTERED),
         "Client periodic completion lacks its accepted native execution owner");
     validate_save_mode(receiver);tasks();
+    client_periodic_ui::retain(receiver,caller);
     // Pinned PeriodicAutosave resets this timer after its asynchronous request.
     // The shared Host owns rotation and serialization; neither runs locally.
     write<uint32_t>(reinterpret_cast<uintptr_t>(receiver)+0xc8,0);
@@ -283,7 +289,7 @@ Json presentation_status(){
     return {{"scope","process-lifetime ordered native and retained SDL swaps; terminal excluded"},
         {"native",native_swaps.status()},{"retained",retained_swaps.status()},
         {"cadence",swap_cadence.status(SwapCadence::now_ns())},
-        {"retained_pacing_skips",retained_pacing_skips},{"command_hold",command_hold::status()}};
+        {"retained_pacing_skips",retained_pacing_skips},{"command_hold",command_hold::status()},{"client_periodic_ui",client_periodic_ui::status()}};
 }
 bool native_swap(SDL_Window* target){
     if(!installed||!control.entered||target!=window||thread!=GetCurrentThreadId())return original_swap(target);
@@ -367,7 +373,7 @@ void configure(){
     configuration_attempted=true;
     auto backend=mt2::make_native_step_backend(image,executable,*native_routes,
         {original_go,timer_step::original_update,reinterpret_cast<void*>(&go),reinterpret_cast<void*>(&timer)},before_step);
-    snapshot_prepare::install();clock_pause::install();async_save::install();
+    snapshot_prepare::install();clock_pause::install();async_save::install();client_periodic_ui::install();
     const auto native_finish=backend.finish_all;
     recovery_runtime::native_finish=native_finish;
     backend.finish_all=[native_finish](void* tasks){loading_dispatch::finish_complete_step(tasks,native_finish);};

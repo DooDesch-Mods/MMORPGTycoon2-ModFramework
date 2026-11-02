@@ -4,7 +4,7 @@ title: Build a mod with an agent
 
 # Build a mod with an agent
 
-Use the same public contract and complete examples as a human modder. This source targets Framework **0.5.3** and Lua API **1.3.0**; native C ABI stays at **1**. New API 1.3 functions require Framework 0.4.0 or later. The [compatibility page](../compatibility.md) identifies the supported game build.
+Use the same public contract and complete examples as a human modder. This source targets Framework **0.5.4** and Lua API **1.3.0**; native C ABI stays at **1**. New API 1.3 functions require Framework 0.4.0 or later. The [compatibility page](../compatibility.md) identifies the supported game build.
 
 ## Context to give your agent
 
@@ -63,3 +63,8 @@ To add a setting, define it with `mt2.config.define` and read it inside your win
 Check the generated manifest, run `check`, pack outside the source folder, and retain output and package hash. Then load the mod in an owned profile, edit the greeting, reload and inspect the visible result. Ask the human for genuinely missing intent, not for routine reversible authoring choices.
 
 Framework contributors should also read repository `AGENTS.md` and [contributor build guide](../contributing/build.md). Human newcomer timing and multiplayer bridge acceptance remain separate release gates.
+
+For a native mod that needs a Runtime fix, follow the
+[loaded Runtime version check](../compatibility.md#runtime-versions-for-native-mods).
+Framework 0.5.4 adds a Windows DLL version resource; it does not change the Host
+layout, Lua API or exact experimental draft versions.

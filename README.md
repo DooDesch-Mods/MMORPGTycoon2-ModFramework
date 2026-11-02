@@ -6,10 +6,9 @@
 
 Build mods for **MMORPG Tycoon 2**. Start with Lua and a text editor, extend with C++, or bring your own static GLB scenery into the game.
 
-**Framework 0.5.3** adds the native GameMaster window support required by the
-next Multiplayer beta. It retains the character-update routes for consistent
-movement, turning and attribute recovery across different camera views. Lua API
-**1.3.0** keeps all **254 functions**. Start with the
+**Framework 0.5.4** fixes multiplayer stalls during autosaves and cancelled
+character tasks. Native mods can now check the loaded Framework's Windows
+version information. Lua API **1.3.0** keeps all **254 functions**. Start with the
 [query recipes](docs/recipes/world-queries.md), or read the
 [experimental Step guide](docs/experimental/steps.md) for the native extension.
 
@@ -20,7 +19,7 @@ movement, turning and attribute recovery across different camera views. Lua API
 <!-- roadmap:start -->
 ## What can I build today?
 
-Included in [Framework 0.5.3](https://github.com/DooDesch-Mods/MMORPGTycoon2-ModFramework/releases/tag/v0.5.3). New gameplay tools are experimental. World-changing Lua gameplay operations currently run in singleplayer.
+Included in [Framework 0.5.4](https://github.com/DooDesch-Mods/MMORPGTycoon2-ModFramework/releases/tag/v0.5.4). New gameplay tools are experimental. World-changing Lua gameplay operations currently run in singleplayer.
 
 <picture>
   <source media="(max-width: 600px)" srcset="https://raw.githubusercontent.com/DooDesch-Mods/MMORPGTycoon2-ModFramework/main/assets/brand/coverage-mobile.svg">
@@ -32,7 +31,7 @@ Percentages count the listed areas equally. They describe feature coverage, not 
 <details>
 <summary>Feature details - what is included</summary>
 
-| Feature | 0.5.3 | What is covered |
+| Feature | 0.5.4 | What is covered |
 | --- | --- | --- |
 | Lua mods and reload | ✅ Available | Use a text editor; reload scripts without restarting. A rejected replacement keeps the previous mod running. [Start here](docs/quickstart.md). |
 | Native C++ plugins | ✅ Available | Build with the native SDK. Plugin updates require a game restart. [SDK guide](docs/reference/native.md). |
@@ -87,7 +86,7 @@ Give your mod a central Mods entry, native game windows, searchable lists and wo
 
 ## For contributors
 
-Framework **0.5.3** provides Lua API **1.3.0** and the experimental gameplay contract. Use the matching Runtime and SDK. The [gameplay guide](docs/experimental/gameplay.md) covers action results and lifetime rules; the [machine contract](api/experimental/gameplay.json) describes each operation and its result type.
+Framework **0.5.4** provides Lua API **1.3.0** and the experimental gameplay contract. Use the matching Runtime and SDK. The [gameplay guide](docs/experimental/gameplay.md) covers action results and lifetime rules; the [machine contract](api/experimental/gameplay.json) describes each operation and its result type.
 
 All required native source dependencies are inside this repository. Build with Visual Studio 2022 C++, CMake and Python:
 

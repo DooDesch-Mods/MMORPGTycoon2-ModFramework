@@ -164,11 +164,13 @@ bool preserve_resume(void* receiver,uintptr_t caller){
 void operation(const Request& request,MT2FW_MT2_SnapshotCaptureFn callback,void* user){
     require(!recovery_owner.lease,"Ordinary snapshot operation cannot use a Recovery certificate");
     shape(request);
-    if(request.operation==MT2FW_MT2_SNAPSHOT_ARM){
+    if(request.operation==MT2FW_MT2_SNAPSHOT_ARM||request.operation==MT2FW_MT2_SNAPSHOT_ARM_PERIODIC){
         require(!callback&&!user&&(phase==Phase::Idle||phase==Phase::Released)&&request.order>last_order&&request.invocation&&
             !request.ack_mask&&empty_hash(request),"Snapshot ARM is stale, repeated, or carries premature agreement");
         require(!control.entered&&!timer_step::frame.active&&control.phase==Control::Phase::Held,"Snapshot ARM requires held ordered command");
-        mode();clock();empty_tasks();certificate=request;last_order=request.order;capture_returned=false;client_cache_attempted=client_cache_returned=false;phase=Phase::Armed;return;
+        mode();clock();empty_tasks();
+        client_periodic_ui::arm(request);
+        certificate=request;last_order=request.order;capture_returned=false;client_cache_attempted=client_cache_returned=false;phase=Phase::Armed;return;
     }
     if(request.operation==MT2FW_MT2_SNAPSHOT_PUMP){
         require(!callback&&!user&&phase==Phase::Consumed&&request.lease==certificate.lease&&request.session==certificate.session&&
@@ -187,6 +189,7 @@ void operation(const Request& request,MT2FW_MT2_SnapshotCaptureFn callback,void*
     same(request);
     if(request.operation==MT2FW_MT2_SNAPSHOT_SEAL){
         require(!callback&&!user&&phase==Phase::Prepared&&!request.ack_mask&&!empty_hash(request),"Snapshot SEAL lacks one completed preparation and local witness");
+        client_periodic_ui::seal(request);
         std::copy(std::begin(request.witness_sha256),std::end(request.witness_sha256),std::begin(certificate.witness_sha256));phase=Phase::Sealed;return;
     }
     require(request.ack_mask==certificate.peer_mask&&std::equal(std::begin(certificate.witness_sha256),std::end(certificate.witness_sha256),request.witness_sha256),
@@ -209,7 +212,7 @@ void operation(const Request& request,MT2FW_MT2_SnapshotCaptureFn callback,void*
         const auto role=native_steps->snapshot().actual_role;
         require(!callback&&!user&&((role==MT2FW_MT2_SESSION_HOST&&phase==Phase::Consumed&&capture_returned)||
             (role==MT2FW_MT2_SESSION_CLIENT&&phase==Phase::Sealed&&(!client_cache_attempted||client_cache_returned))),"Snapshot release lacks completed Host capture or sealed Client");
-        async_save::retire();phase=Phase::Released;return;
+        async_save::retire();phase=Phase::Released;client_periodic_ui::released(request);return;
     }
     require(request.operation==MT2FW_MT2_SNAPSHOT_CAPTURE&&callback&&phase==Phase::Sealed&&
         native_steps->snapshot().actual_role==MT2FW_MT2_SESSION_HOST,"Snapshot capture requires unconsumed Host certificate");
@@ -232,6 +235,7 @@ void reset(){
     require(!mt2::PreparedSaveScope::current,"Snapshot reset during native capture");
     loading_dispatch::save_completion::clear_consumed();loading_dispatch::completed_callbacks::clear();
     async_save::retire();phase=Phase::Idle;certificate={};recovery_owner={};last_order=0;capture_returned=false;client_cache_attempted=client_cache_returned=false;prepared_mode=prepared_tasks=0;
+    client_periodic_ui::reset();
 }
 void install(){
     if(installed)return;

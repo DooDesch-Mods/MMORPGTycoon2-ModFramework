@@ -10,12 +10,18 @@ struct RecoveryFixture:Fixture {
     MT2FW_MT2_RecoveryReceipt result{sizeof(result)};
     MT2FW_MT2_RecoveryRequest request{};
     MT2FW_MT2_RecoveryCohort observed{};
-    std::function<void()> service_action;
+    std::function<void()> service_action,observe_action;
     int observations=0,local_proofs=0,prepares=0,captures=0,pumps=0,publications=0,retires=0;
     bool bad_local=false,throw_prepare=false,throw_capture=false,pump_done=true,bad_publication=false;
+    bool ordinary_pending=false;
+    int watch_begins=0,watch_ends=0,adoptions=0,recovery_services=0;
     unsigned char covered=27;
     RecoveryFixture(unsigned mask=3,unsigned local=1):recovery(kernel,{
-        [this](const auto&,const auto&){++local_proofs;if(bad_local)throw std::runtime_error("actual local native hold unavailable");},
+        [this](const auto&,const auto&,auto purpose){++local_proofs;
+            if(bad_local)throw std::runtime_error("actual local native hold unavailable");
+            if(purpose==NativeStepRecovery::LocalProof::WatchBegin)++watch_begins;
+            else if(purpose==NativeStepRecovery::LocalProof::WatchEnd)++watch_ends;
+            else{++adoptions;if(ordinary_pending)throw std::runtime_error("ordinary snapshot still pending");}},
         [this](auto&){++prepares;if(throw_prepare)throw std::runtime_error("original recovery flush failed");},
         [this](const auto&,auto callback,void* user){++captures;char cause[256]{};
             if(throw_capture)throw std::runtime_error("original Save unknown");
@@ -27,10 +33,11 @@ struct RecoveryFixture:Fixture {
         for(unsigned i=0;i<4;++i)if(mask&(1u<<i)){watch.original.physical_ids[i]=100+i;watch.original.process_nonces[i]=1000+i;}
         observed=watch.original;
         watch.observe=[](void* p,const auto*,auto* out){auto& f=*static_cast<RecoveryFixture*>(p);++f.observations;
+            if(f.observe_action)f.observe_action();
             out->observed=f.observed;out->disposition=std::memcmp(&f.observed,&f.watch.original,sizeof(f.observed))?
                 MT2FW_MT2_COHORT_INTERRUPTED:MT2FW_MT2_COHORT_HEALTHY;return MT2FW_MT2_OK;};
         watch.local_proof=spec.proof;
-        watch.service=[](void* p,const auto*){auto& f=*static_cast<RecoveryFixture*>(p);if(f.service_action)f.service_action();return MT2FW_MT2_OK;};
+        watch.service=[](void* p,const auto*){auto& f=*static_cast<RecoveryFixture*>(p);++f.recovery_services;if(f.service_action)f.service_action();return MT2FW_MT2_OK;};
         watch.witness=[](void* p,const auto*,unsigned char* out,char*,uint32_t){out[0]=static_cast<RecoveryFixture*>(p)->covered;return MT2FW_MT2_OK;};
         watch.publication=[](void* p,const auto*,const auto*,char* cause,uint32_t){auto& f=*static_cast<RecoveryFixture*>(p);++f.publications;
             if(f.bad_publication){std::memcpy(cause,"companion readback failed",sizeof("companion readback failed"));return MT2FW_MT2_FAILED;}return MT2FW_MT2_OK;};
@@ -53,6 +60,18 @@ struct RecoveryFixture:Fixture {
     void publish(){run(MT2FW_MT2_RECOVERY_PUMP);request.publication={sizeof(request.publication),0,100,200,{1},{2}};run(MT2FW_MT2_RECOVERY_PUBLISH);}
 };
 int main(){try{
+    {RecoveryFixture f;f.arm();f.ordinary_pending=true;f.mode=1;f.kernel.boundary();
+        check(f.watch_begins==1&&f.watch_ends==1&&!f.adoptions&&!f.recovery_services&&f.services==1&&f.originals==0&&f.ordinary_pending&&
+            f.kernel.snapshot().phase==MT2FW_MT2_STEP_HELD,"healthy ordinary snapshot entered adoption or lost its normal held service");
+        f.ordinary_pending=false;f.interrupt();f.capture();
+        check(f.adoptions>0&&f.prepares==1&&f.captures==1,"released ordinary snapshot prevented later strict recovery");}
+    {RecoveryFixture f;f.arm();f.ordinary_pending=true;f.interrupt();
+        check(f.watch_begins==1&&f.watch_ends==1&&f.adoptions==1&&!f.result.interruption&&!f.recovery_services&&!f.prepares&&f.ordinary_pending&&
+            f.kernel.snapshot().phase==MT2FW_MT2_STEP_FAILED&&std::strstr(f.result.cause,"ordinary snapshot still pending"),
+            "actual interruption adopted pending ordinary work or reached recovery service");}
+    {RecoveryFixture f;f.arm();f.observe_action=[&]{f.bad_local=true;};f.kernel.boundary();
+        check(f.observations==1&&!f.services&&!f.adoptions&&!f.recovery_services&&f.kernel.snapshot().phase==MT2FW_MT2_STEP_FAILED,
+            "observer owner change bypassed the second common local proof");}
     {RecoveryFixture f;f.arm();f.kernel.boundary();check(f.originals==1&&f.services==1&&f.observations==1,"healthy recovery changed the normal Step flow");
         f.interrupt();check(f.kernel.snapshot().phase==MT2FW_MT2_STEP_HELD&&f.result.interruption&&f.result.completed_tick==1&&f.result.next_tick==2&&
             f.kernel.snapshot().original_attempted==1&&f.kernel.snapshot().original_returned==1,"fresh interruption confused previous original flags");

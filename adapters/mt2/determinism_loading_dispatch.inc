@@ -62,6 +62,10 @@ bool plan(uintptr_t task){
 namespace completed_callbacks {void clear(){} void record(uintptr_t){} bool matches(uintptr_t){return false;}}
 #endif
 bool step_drain=false;
+bool cancelled_completion(uintptr_t task){
+    return control.phase==mt2::determinism::Gate::Phase::Stepping&&!step_drain&&
+        plan(task)&&read<uint8_t>(task+0xc)==1;
+}
 struct StepDrain {
     bool active=false;
     StepDrain(){
@@ -125,7 +129,9 @@ void partition(uintptr_t tasks){
     for(int32_t i=0;i<count;++i){
         const auto task=read<uintptr_t>(source+size_t(i)*8);
         require(unique.insert(task).second,"Loading dispatch duplicate task ownership");
-        (plan(task)?held:kept).push_back(task);
+        // Original CancelTasks pumps until its cancelled task completes. That
+        // callback must return before the enclosing Update can reach StepDrain.
+        (plan(task)&&!cancelled_completion(task)?held:kept).push_back(task);
     }
     // The original holds +f0 and has just copied +c0 into +d8. The former
     // finished-array allocation can hold every copied pointer without growth.
@@ -199,7 +205,8 @@ void finish_call(void* task,uintptr_t caller){
     if(!enabled||!control.active()){original_finish(task);return;}
     try{
         manager();require(caller==image+PumpFinishReturn,"Loading dispatch ToonPlan Finish caller differs");
-        require((control.phase==mt2::determinism::Gate::Phase::Stepping&&step_drain)||recovery_draining(),"ToonPlan Finish lacks complete-step or exact Recovery drain admission");
+        require((control.phase==mt2::determinism::Gate::Phase::Stepping&&step_drain)||recovery_draining()||
+            cancelled_completion(reinterpret_cast<uintptr_t>(task)),"ToonPlan Finish lacks complete-step, cancelled-completion or exact Recovery drain admission");
         const auto observation=motion_probe::finish_before(reinterpret_cast<uintptr_t>(task));
         ++finish_entered;original_finish(task);++finish_returned;
         motion_probe::finish_after(observation,reinterpret_cast<uintptr_t>(task));
@@ -224,7 +231,7 @@ Json status(){return {{"enabled",enabled},{"step_drain",step_drain},{"ordered_ru
 void install(const Json& config){
     enabled=config.value("defer_loading_plans",false);ordered_finish::install(config);if(!enabled)return;
     require(config.value("task_barrier",false)&&config.value("bootstrap_boundary",false),"Loading dispatch requires task and bootstrap boundaries");
-    for(const auto& [offset,size,sha]:std::array<std::tuple<uintptr_t,size_t,const char*>,21>{{
+    for(const auto& [offset,size,sha]:std::array<std::tuple<uintptr_t,size_t,const char*>,22>{{
         {0x5258b0,48,"1c49f7b3d7e3ee4431d6f520a961ad718b724641fe4854d512890a90cc5935d9"},
         {0x8819e0,64,"fa3d71ce6e9e7f4de3aa5f0e35cf27540a6bda368fcc202e6b9057e7c6abe7d2"},
         {0x881b30,672,"f0dea32c427373cf7bfc89c1d1dea5183fddd2f452b03d038427559489202303"},
@@ -233,6 +240,7 @@ void install(const Json& config){
         {0x526f30,656,"398f2860081c8e99bee70e184aebae5eed5934776697197f7fad5a7d017d9191"},
         {0x529240,80,"88d91bffc505162b97c21c5195590f24730fcae9b9d9f1b3631ec968dd94ee58"},
         {0x5271c0,688,"1130ccf782f91dd0ffcc784111c3909076aa704da106a103b23167c00879c50b"},
+        {0x3034f0,2960,"1ffdfb4f9a2b1583318ce4915e3176897b7309b6a73cf3cbe3448def04b21398"},
         {0xa0b190,32,"4a8e56e13d3367d83f43f02ba400f0650c0d18efdb30f7fde2443d1077fbc0da"},
         {0xa0b1b0,16,"7d304000253004e308040d0ce0e08923cca0c770f023accc196425ce1488ba26"},
         {0xa0b1c0,48,"8bac6f9fd573e2a125dc12da69cdf43bedbab7d789c9db0da6cbe35e51a86633"},

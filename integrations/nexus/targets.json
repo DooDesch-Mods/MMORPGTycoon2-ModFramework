@@ -4,7 +4,8 @@
     "silent_releases": [
       "v0.5.1",
       "v0.5.2",
-      "v0.5.3"
+      "v0.5.3",
+      "v0.5.4"
     ],
     "domain": "mmorpgtycoon2",
     "game_id": 4452,

@@ -7,13 +7,13 @@ MT2FW_MT2_Result NativeStepAdapter::query_recovery(const MT2FW_Host* owner,uint3
         !driver_.recovery.prepare||!driver_.recovery.capture||!driver_.recovery.pump||!driver_.recovery.retire)return MT2FW_MT2_UNAVAILABLE;
     if(!recovery_){
         auto driver=driver_.recovery;
-        driver.local=[this](const MT2FW_MT2_RecoverySpec& spec,const MT2FW_MT2_StepReceipt& step){
+        driver.local=[this](const MT2FW_MT2_RecoverySpec& spec,const MT2FW_MT2_StepReceipt& step,NativeStepRecovery::LocalProof purpose){
             uint64_t epoch=0;std::string cause;
             if(!current()||callbacks_retired_||lab_()||proof_inflight_||snapshot_inflight_||save_inflight_||boundary_inflight_||
                 !patches_.inspect_step_provider_owner(*plugin_,spec.session_provider_token,epoch,cause)||epoch!=framework_epoch_)
                 throw std::runtime_error("Recovery local provider/native world owner differs: "+cause);
             if(step.world_epoch!=native_epoch_)throw std::runtime_error("Recovery NativeOpen epoch changed");
-            driver_.recovery_local(host_,callbacks_,recovery_proof,this);driver_.recovery.local(spec,step);
+            driver_.recovery_local(host_,callbacks_,recovery_proof,this);driver_.recovery.local(spec,step,purpose);
             if(!current()||callbacks_retired_||!patches_.inspect_step_provider_owner(*plugin_,spec.session_provider_token,epoch,cause)||epoch!=framework_epoch_)
                 throw std::runtime_error("Recovery native owner retired during local proof: "+cause);
         };

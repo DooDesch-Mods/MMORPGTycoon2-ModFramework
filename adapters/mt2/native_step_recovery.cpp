@@ -47,19 +47,20 @@ MT2FW_MT2_Result NativeStepRecovery::bind(const MT2FW_MT2_RecoverySpec* input,ui
     receipt_.original=input->original;receipt_.local_process=input->original.process_nonces[input->local_slot-1];
     bound_=true;copy(out);return MT2FW_MT2_OK;
 }
-void NativeStepRecovery::local(){
+void NativeStepRecovery::local(LocalProof purpose){
     const auto step=kernel_.snapshot();
     need(bound_&&step.lease==receipt_.lease&&step.session==receipt_.session&&step.thread==receipt_.thread&&
         step.phase==MT2FW_MT2_STEP_HELD&&step.workers_held==1&&step.bootstrap_held==1&&step.generation&&step.world_epoch&&
         (interrupted()?(step.completed_tick==receipt_.completed_tick&&step.generation==receipt_.generation&&step.world_epoch==receipt_.world_epoch):true),
         "Recovery local hold lacks its exact healthy retained Step identity");
     kernel_.validate_recovery_boundary(servicing_);
-    driver_.local(spec_,step);
+    driver_.local(spec_,step,purpose);
 }
 bool NativeStepRecovery::boundary(){
     if(!bound_)return false;
     try{
-        need(!observing_&&!servicing_&&!operating_,"Recovery boundary reentered");local();
+        need(!observing_&&!servicing_&&!operating_,"Recovery boundary reentered");
+        local(interrupted()?LocalProof::Adoption:LocalProof::WatchBegin);
         if(!interrupted()){
             const auto step=kernel_.snapshot();
             need(step.completed_tick!=std::numeric_limits<uint64_t>::max(),"Recovery completed tick exhausted");
@@ -69,7 +70,7 @@ bool NativeStepRecovery::boundary(){
             observing_=true;MT2FW_MT2_Result result;
             try{result=spec_.observe(spec_.user,&receipt_,&observed);}catch(...){observing_=false;throw;}
             observing_=false;cause_ok(result,observed.cause,sizeof(observed.cause),"Recovery transport observation");
-            need(observed.size==sizeof(observed),"Recovery observation size differs");local();
+            need(observed.size==sizeof(observed),"Recovery observation size differs");local(LocalProof::WatchEnd);
             need(kernel_.snapshot().completed_tick==receipt_.completed_tick,"Recovery observer changed the completed tick");
             for(unsigned i=0;i<4;++i){
                 need(bool(observed.observed.physical_ids[i])==bool(observed.observed.process_nonces[i]),"Recovery observed partial process identity");
@@ -83,6 +84,8 @@ bool NativeStepRecovery::boundary(){
             const bool healthy=same(observed.observed,receipt_.original);
             need(observed.disposition==uint32_t(healthy?MT2FW_MT2_COHORT_HEALTHY:MT2FW_MT2_COHORT_INTERRUPTED),"Recovery disposition contradicts actual process cohort");
             if(healthy)return false;
+            // Healthy observation never grants adoption of ordinary Save work.
+            local();
             need(next_interruption_!=std::numeric_limits<uint64_t>::max(),"Recovery interruption nonce exhausted");
             receipt_.observed=observed.observed;receipt_.interruption=next_interruption_++;
             receipt_.phase=MT2FW_MT2_RECOVERY_INTERRUPTED;

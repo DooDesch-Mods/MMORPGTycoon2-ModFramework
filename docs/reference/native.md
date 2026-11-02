@@ -12,6 +12,8 @@ The separate [experimental Step SDK](../experimental/steps.md) coordinates nativ
 
 The optional [Step recovery extension](../experimental/step-recovery.md) is included in Framework 0.5.0 and requires its separate exact-version export. Its availability does not establish game or Multiplayer compatibility.
 
+For Runtime-specific requirements, read the [loaded DLL version resource](../compatibility.md#runtime-versions-for-native-mods), available from Framework 0.5.4. Runtime versions are separate from the stable ABI and exact experimental draft versions.
+
 Host strings are copied during a request. Callback JSON is borrowed until return. The host and PluginInfo strings remain valid through Shutdown. A size query never executes a mutation; request a sufficiently sized buffer once, then perform the call once.
 
 ```c

@@ -48,7 +48,8 @@ void initial_tasks(){
             "Recovery initial retained queue contains other/duplicate callbacks");
     }
 }
-void local(const MT2FW_MT2_RecoverySpec&,const MT2FW_MT2_StepReceipt& step){
+#include "native_step_recovery_watch.inc"
+void local(const MT2FW_MT2_RecoverySpec& spec,const MT2FW_MT2_StepReceipt& step,LocalProof purpose){
     require(driver&&driver->frozen()&&!driver->failed()&&failure.empty()&&outer_entered&&thread==GetCurrentThreadId()&&
         bootstrap.game==owner&&step.world_epoch==bootstrap.world_epoch&&step.generation==lifecycle.generation&&
         control.phase==Control::Phase::Held&&!control.entered&&!timer_step::frame.active&&!quit_attempted&&!exit_requested,
@@ -69,19 +70,20 @@ void local(const MT2FW_MT2_RecoverySpec&,const MT2FW_MT2_StepReceipt& step){
             "Recovery local bootstrap is not the exact initial load-only hold");
         bootstrap_boundary::require_loaded();initial=true;
     }
+    if(purpose!=LocalProof::Adoption){healthy_watch(spec,step,purpose,initial);return;}
+    adoption_ready();
     if(capture_consumed&&async_save::retained){
         const auto& held=async_save::held_owner();
         require(held.certificate.lease==certificate.lease&&std::memcmp(held.certificate.nonce,certificate.recovery_nonce,37)==0,
             "Recovery writer is not owned by its exact consumed certificate");
     }else{
-        require(!async_save::pending()&&read<int32_t>(bootstrap.mode+0x30c)==0,"Recovery local hold has an unknown native Save writer");
+        require(!async_save::retained&&!async_save::published.load(std::memory_order_acquire)&&read<int32_t>(bootstrap.mode+0x30c)==0,
+            "Recovery local hold has an unknown native Save writer");
         // Pending native work at a healthy hold belongs to the next Step.
         // Only an actual recovery preparation establishes a Save-ready queue.
         if(initial)initial_tasks();else if(attempted)snapshot_prepare::empty_tasks();
     }
     if(attempted)no_go();
-    else require(snapshot_prepare::phase==snapshot_prepare::Phase::Idle||snapshot_prepare::phase==snapshot_prepare::Phase::Released,
-        "Recovery cannot adopt an old pending snapshot operation");
 }
 void prepare(MT2FW_MT2_RecoveryReceipt& value){
     require(!attempted&&value.prepare_attempted==1&&value.local_slot==1&&
@@ -182,5 +184,5 @@ void retire(const MT2FW_MT2_RecoveryReceipt& value){
     quit_save.required=read<int32_t>(bootstrap.mode+0x2c4)!=0;quit_save.ready=true;quit_save.nonce=value.recovery_nonce;
     if(quit_save.required)quit_save.directory=async_save::text_at(bootstrap.mode+0x2e0);
 }
-void reset(){certificate={sizeof(certificate)};attempted=prepared=capture_consumed=capture_completed=false;go_entered=go_returned=timer_entered=timer_returned=0;}
+void reset(){watch_reset();certificate={sizeof(certificate)};attempted=prepared=capture_consumed=capture_completed=false;go_entered=go_returned=timer_entered=timer_returned=0;}
 }

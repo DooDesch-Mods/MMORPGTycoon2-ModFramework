@@ -28,6 +28,7 @@
 #include "native_extensions.h"
 #include "initial_save_path.h"
 #include "native_blocking_save_scope.h"
+#include "native_client_periodic_state.h"
 #include "diagnostic_click.h"
 #include "diagnostic_click_readback.h"
 #include "mt2fw/save_metadata.h"
@@ -61,7 +62,7 @@ Json load_status();
 void capture_wait_frame(SDL_Window*);
 namespace task_boundary {void after_update(void*);}
 }
-namespace step_runtime {Json rng_diagnostic(const Json&);bool terminal_presenting();void terminal_swap_result(bool);bool native_swap(SDL_Window*);Json presentation_status();void configure();void after_update(void*);void capture(SDL_Window*);void go(void*);void command_call(void*,const void*);void validate_save_mode(void*);void complete_client_periodic(void*);void begin_prepared_async(void*,const void*,bool);void returned_prepared_async();int quit_save_route(void*,uint32_t,const std::string&,bool,uintptr_t);}
+namespace step_runtime {Json rng_diagnostic(const Json&);bool terminal_presenting();void terminal_swap_result(bool);bool native_swap(SDL_Window*);Json presentation_status();void configure();void after_update(void*);void capture(SDL_Window*);void go(void*);void command_call(void*,const void*);void validate_save_mode(void*);void delegate_client_periodic(void*,uintptr_t);void begin_prepared_async(void*,const void*,bool);void returned_prepared_async();int quit_save_route(void*,uint32_t,const std::string&,bool,uintptr_t);}
 std::unique_ptr<Runtime> runtime;
 std::unique_ptr<mt2fw::mt2::NativeServices> native_services;
 std::shared_ptr<mt2fw::mt2::NativeRoutes> native_routes;
@@ -281,7 +282,7 @@ __declspec(noinline) void periodic_save(void* mode){
             if(caller<image||caller-image>=0x2000000)throw std::runtime_error("Periodic Save caller is outside its pinned executable");
             if(!native_steps->save_request(mode,MT2FW_MT2_SAVE_PERIODIC,"periodic",8,false,caller-image))
                 throw std::runtime_error("Periodic Save request did not retain its owner");
-            if(native_steps->snapshot().actual_role==MT2FW_MT2_SESSION_CLIENT)step_runtime::complete_client_periodic(mode);
+            if(native_steps->snapshot().actual_role==MT2FW_MT2_SESSION_CLIENT)step_runtime::delegate_client_periodic(mode,caller);
             return;
         }
     }catch(const std::exception& error){if(native_steps)native_steps->failed(error.what());

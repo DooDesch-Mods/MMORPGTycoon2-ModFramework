@@ -205,6 +205,58 @@ target_compile_options(mt2fw_native_step_recovery_adapter_tests PRIVATE /W4 /WX 
 target_compile_definitions(mt2fw_native_step_recovery_adapter_tests PRIVATE _SILENCE_CXX20_U8PATH_DEPRECATION_WARNING)
 add_test(NAME framework_native_step_recovery_adapter COMMAND mt2fw_native_step_recovery_adapter_tests)
 set_tests_properties(framework_native_step_recovery_adapter PROPERTIES TIMEOUT 10)
+add_executable(mt2fw_native_step_recovery_watch_tests ../../tests/native_step_recovery_watch_tests.cpp)
+target_link_libraries(mt2fw_native_step_recovery_watch_tests PRIVATE mt2fw_native_steps)
+target_compile_options(mt2fw_native_step_recovery_watch_tests PRIVATE /W4 /WX /utf-8)
+add_test(NAME framework_native_step_recovery_watch COMMAND mt2fw_native_step_recovery_watch_tests)
+set_tests_properties(framework_native_step_recovery_watch PROPERTIES TIMEOUT 10)
+
+add_executable(mt2fw_runtime_version_tests ../../tests/runtime_version_tests.cpp)
+target_compile_definitions(mt2fw_runtime_version_tests PRIVATE WIN32_LEAN_AND_MEAN NOMINMAX UNICODE _UNICODE
+  MT2FW_VERSION_MAJOR=${PROJECT_VERSION_MAJOR} MT2FW_VERSION_MINOR=${PROJECT_VERSION_MINOR}
+  MT2FW_VERSION_PATCH=${PROJECT_VERSION_PATCH})
+target_compile_options(mt2fw_runtime_version_tests PRIVATE /W4 /WX /utf-8)
+target_link_libraries(mt2fw_runtime_version_tests PRIVATE version)
+add_dependencies(mt2fw_runtime_version_tests MT2Framework)
+add_test(NAME framework_runtime_version COMMAND mt2fw_runtime_version_tests "$<TARGET_FILE:MT2Framework>")
+set_tests_properties(framework_runtime_version PROPERTIES TIMEOUT 10)
+
+find_package(Python3 REQUIRED COMPONENTS Interpreter)
+set(DISPATCH_TEST_BODY "${CMAKE_CURRENT_BINARY_DIR}/loading-dispatch/loading-body.inc")
+add_custom_command(OUTPUT "${DISPATCH_TEST_BODY}"
+  COMMAND "${Python3_EXECUTABLE}" -X utf8 "${FRAMEWORK}/tests/loading-dispatch/extract.py"
+    "${CMAKE_CURRENT_SOURCE_DIR}" "${DISPATCH_TEST_BODY}"
+  DEPENDS "${FRAMEWORK}/tests/loading-dispatch/extract.py"
+    determinism_loading_dispatch.inc determinism_ordered_finish.inc VERBATIM)
+add_executable(mt2fw_loading_dispatch_tests ../../tests/loading-dispatch/loading_dispatch_tests.cpp "${DISPATCH_TEST_BODY}")
+target_include_directories(mt2fw_loading_dispatch_tests PRIVATE "${MT2FW_VENDOR}" "${CMAKE_CURRENT_BINARY_DIR}/loading-dispatch")
+target_compile_options(mt2fw_loading_dispatch_tests PRIVATE /W4 /WX /utf-8)
+add_test(NAME framework_loading_dispatch COMMAND mt2fw_loading_dispatch_tests)
+set_tests_properties(framework_loading_dispatch PROPERTIES TIMEOUT 10)
+
+add_executable(mt2fw_client_periodic_state_tests ../../tests/native_client_periodic_state_tests.cpp)
+target_include_directories(mt2fw_client_periodic_state_tests PRIVATE . "${FRAMEWORK}/include")
+target_compile_options(mt2fw_client_periodic_state_tests PRIVATE /W4 /WX /utf-8)
+add_test(NAME framework_client_periodic_state COMMAND mt2fw_client_periodic_state_tests)
+set_tests_properties(framework_client_periodic_state PROPERTIES TIMEOUT 10)
+
+set(PERIODIC_UI_TEST_BODY "${CMAKE_CURRENT_BINARY_DIR}/client-periodic-ui/client-periodic-ui.inc")
+add_custom_command(OUTPUT "${PERIODIC_UI_TEST_BODY}"
+  COMMAND "${Python3_EXECUTABLE}" -X utf8 "${FRAMEWORK}/tests/client-periodic-ui/extract.py"
+    "${CMAKE_CURRENT_SOURCE_DIR}/native_client_periodic_ui.inc" "${PERIODIC_UI_TEST_BODY}"
+  DEPENDS "${FRAMEWORK}/tests/client-periodic-ui/extract.py" native_client_periodic_ui.inc VERBATIM)
+add_executable(mt2fw_client_periodic_ui_tests ../../tests/client-periodic-ui/native_ui_tests.cpp "${PERIODIC_UI_TEST_BODY}")
+target_include_directories(mt2fw_client_periodic_ui_tests PRIVATE . "${FRAMEWORK}/include" "${MT2FW_VENDOR}" "${CMAKE_CURRENT_BINARY_DIR}/client-periodic-ui")
+target_compile_options(mt2fw_client_periodic_ui_tests PRIVATE /W4 /WX /utf-8)
+add_test(NAME framework_client_periodic_ui COMMAND mt2fw_client_periodic_ui_tests)
+set_tests_properties(framework_client_periodic_ui PROPERTIES TIMEOUT 10)
+
+add_executable(mt2fw_native_snapshot_purpose_tests ../../tests/native_snapshot_purpose_tests.cpp)
+target_link_libraries(mt2fw_native_snapshot_purpose_tests PRIVATE mt2fw_native_steps)
+target_compile_options(mt2fw_native_snapshot_purpose_tests PRIVATE /W4 /WX /utf-8)
+target_compile_definitions(mt2fw_native_snapshot_purpose_tests PRIVATE _SILENCE_CXX20_U8PATH_DEPRECATION_WARNING)
+add_test(NAME framework_native_snapshot_purpose COMMAND mt2fw_native_snapshot_purpose_tests)
+set_tests_properties(framework_native_snapshot_purpose PROPERTIES TIMEOUT 10)
 
 add_executable(mt2fw_tick_clock_phase_tests ../../tests/native_tick_clock_phase_tests.cpp)
 target_include_directories(mt2fw_tick_clock_phase_tests PRIVATE .)

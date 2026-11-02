@@ -47,6 +47,44 @@ This is a native adapter capability, not a new Lua function or Routes protocol.
 Use the matching Runtime and SDK; the stable plugin ABI and existing Lua APIs
 remain unchanged.
 
+## Save and task completion in Framework 0.5.4
+
+A healthy [Recovery watch](step-recovery.md) can observe an ordinary Save without
+adopting it. A real interruption still requires strict recovery admission before
+its separate service can run.
+
+During an admitted original simulation step, cancelled ToonPlan tasks can finish
+through the original native Pump before the later full-step drain. The original
+cancellation loop needs those completions to return. Live plans retain their
+existing deferral and full-step ordering. Cancelled callbacks keep their original
+effects, including the native special delivery branch, completion and orphan
+cleanup; they are not replaced with no-ops.
+
+Native mods can check the loaded Runtime's standard Windows
+[version resource](../compatibility.md#runtime-versions-for-native-mods).
+The stable ABI, Lua API and experimental draft versions remain unchanged.
+
+Framework 0.5.4 also adds `MT2FW_MT2_SNAPSHOT_ARM_PERIODIC` with value **7**.
+Its request layout is identical to `ARM`; existing operation values 1 through 6
+remain unchanged. Existing consumers can continue using `ARM`. A consumer of the
+new operation must require Runtime 0.5.4 or later; Step draft 9 availability alone
+does not establish support for this additional operation.
+
+Use `ARM_PERIODIC` only for an explicitly identified original Host periodic Save.
+The matching Multiplayer protocol carries and validates that purpose separately
+from a normal snapshot or reload. Framework retains it on the exact snapshot
+certificate. A Client's native autosave notice binds only to a fresh periodic
+certificate at or after its accepted local request, then completes once through
+original `NotifyDoneSaving` after that certificate's successful shared release.
+Normal `ARM`, an older capture, failed publication or a different nonce cannot
+complete that notice. Framework does not create a Client writer or decrement its
+zero local Save count.
+
+The Client completion path requires Multiplayer Early Beta 27 or later, which
+sends the explicit periodic purpose and forwards an automatic Client request to
+the Host. Earlier Multiplayer builds use normal `ARM` and do not acquire this
+Client completion path merely by updating the Runtime.
+
 ## Start with the matching header
 
 The source header is

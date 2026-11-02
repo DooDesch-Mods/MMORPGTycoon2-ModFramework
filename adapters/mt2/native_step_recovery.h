@@ -5,8 +5,9 @@
 namespace mt2fw::mt2 {
 class NativeStepRecovery {
 public:
+    enum class LocalProof { WatchBegin, WatchEnd, Adoption };
     struct Driver {
-        std::function<void(const MT2FW_MT2_RecoverySpec&,const MT2FW_MT2_StepReceipt&)> local;
+        std::function<void(const MT2FW_MT2_RecoverySpec&,const MT2FW_MT2_StepReceipt&,LocalProof)> local;
         std::function<void(MT2FW_MT2_RecoveryReceipt&)> prepare;
         std::function<void(const MT2FW_MT2_RecoveryReceipt&,MT2FW_MT2_SnapshotCaptureFn,void*)> capture;
         std::function<bool(const MT2FW_MT2_RecoveryReceipt&)> pump;
@@ -28,7 +29,7 @@ private:
     MT2FW_MT2_RecoveryReceipt receipt_{sizeof(receipt_)};
     bool bound_=false,observing_=false,servicing_=false,operating_=false;
     uint64_t next_interruption_=1;
-    void local();
+    void local(LocalProof purpose=LocalProof::Adoption);
     void witness(unsigned char*);
     void fail(const std::string&);
     void copy(MT2FW_MT2_RecoveryReceipt*)const;

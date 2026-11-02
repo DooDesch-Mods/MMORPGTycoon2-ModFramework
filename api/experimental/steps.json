@@ -7,28 +7,81 @@
   "stable_native_abi": 1,
   "documentation": "experimental/steps.html",
   "header": "adapters/mt2/sdk/native_steps_draft.h",
-  "header_sha256": "b9d190d068f178e5af964640c7a3db4401a3684d8ad1446cc71c677c9af93312",
+  "header_sha256": "4d20374b12f4e93a89fe36a37da174a7e6dcb62b9ca3899f5e3293916d40f9c4",
   "export": "MT2FW_MT2_QueryStepServiceDraft",
   "service_type": "MT2FW_MT2_StepServiceDraftV1",
   "owner": "Exact active doodesch.multiplayer native plugin and its registered session provider",
   "thread": "Bound game thread; callbacks must not block",
-  "layouts_windows_x64": {"service_bytes":72,"spec_bytes":152,"exit_save_offset":64},
-  "functions": {
-    "bind": {"effect":"Retain the supplied callbacks and arm initialization; do not load a world or advance a tick", "requires":"Exact draft, sized structs, owner, provider, session and fixed dt"},
-    "activate": {"effect":"Activate a held session after verified bootstrap and peer agreement", "requires":"Current lease, world epoch, snapshot identity and initial witness"},
-    "read": {"effect":"Copy the retained local receipt without a native call or replay", "requires":"Current lease and a sufficiently sized output"},
-    "unbind": {"effect":"Retire callbacks when no invocation still owns them", "requires":"Keep callback and user storage alive while BUSY"},
-    "preflight_exit": {"effect":"Read admission for an explicit local exit; does not itself quit", "requires":"Current held or failed service, owner, lease and bound thread"},
-    "snapshot": {"effect":"Prepare, seal, capture, pump, publish and release an ordered snapshot through distinct operations", "requires":"Exact held boundary, certificate, completed native writer and required peer/file acknowledgements"},
-    "exit_save": {"effect":"Retain a healthy Quit Save intent or an explicit terminal/reload retirement scope; does not call original Quit", "requires":"Exact lease, phase, owner and matching publication/retirement acknowledgement"}
+  "layouts_windows_x64": {
+    "service_bytes": 72,
+    "spec_bytes": 152,
+    "exit_save_offset": 64,
+    "snapshot_request_bytes": 128,
+    "snapshot_nonce_offset": 56,
+    "snapshot_witness_offset": 96
   },
-  "phases": ["passive","armed","loading","held","entered","failed","retiring"],
-  "outcomes": ["not_attempted","confirmed","unknown"],
+  "functions": {
+    "bind": {
+      "effect": "Retain the supplied callbacks and arm initialization; do not load a world or advance a tick",
+      "requires": "Exact draft, sized structs, owner, provider, session and fixed dt"
+    },
+    "activate": {
+      "effect": "Activate a held session after verified bootstrap and peer agreement",
+      "requires": "Current lease, world epoch, snapshot identity and initial witness"
+    },
+    "read": {
+      "effect": "Copy the retained local receipt without a native call or replay",
+      "requires": "Current lease and a sufficiently sized output"
+    },
+    "unbind": {
+      "effect": "Retire callbacks when no invocation still owns them",
+      "requires": "Keep callback and user storage alive while BUSY"
+    },
+    "preflight_exit": {
+      "effect": "Read admission for an explicit local exit; does not itself quit",
+      "requires": "Current held or failed service, owner, lease and bound thread"
+    },
+    "snapshot": {
+      "effect": "Prepare, seal, capture, pump, publish and release an ordered snapshot through distinct operations",
+      "requires": "Exact held boundary, certificate, completed native writer and required peer/file acknowledgements"
+    },
+    "exit_save": {
+      "effect": "Retain a healthy Quit Save intent or an explicit terminal/reload retirement scope; does not call original Quit",
+      "requires": "Exact lease, phase, owner and matching publication/retirement acknowledgement"
+    }
+  },
+  "phases": [
+    "passive",
+    "armed",
+    "loading",
+    "held",
+    "entered",
+    "failed",
+    "retiring"
+  ],
+  "outcomes": [
+    "not_attempted",
+    "confirmed",
+    "unknown"
+  ],
   "rules": [
     "Next is borrowed for one invocation and one native attempt; never retain or retry it after failure or timeout",
     "A missing provider or stale acknowledgement grants no world-write authority",
     "A failed service can maintain local UI and perform admitted retirement without advancing simulation or clearing the original failure",
     "Native async Save completion and companion/peer publication are separate acknowledgements",
-    "This native extension adds no Lua functions or local-mod write permissions"
-  ]
+    "This native extension adds no Lua functions or local-mod write permissions",
+    "ARM_PERIODIC 7 preserves the exact original Host periodic Save purpose; only its confirmed released certificate may complete a retained Client periodic UI request"
+  ],
+  "snapshot_operations": {
+    "ARM": 1,
+    "SEAL": 2,
+    "CAPTURE": 3,
+    "RELEASE": 4,
+    "PUMP": 5,
+    "CLIENT_CACHE": 6,
+    "ARM_PERIODIC": 7
+  },
+  "operation_minimum_framework_version": {
+    "ARM_PERIODIC": "0.5.4"
+  }
 }

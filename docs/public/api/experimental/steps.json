@@ -7,7 +7,7 @@
   "stable_native_abi": 1,
   "documentation": "https://doodesch-mods.github.io/MMORPGTycoon2-ModFramework/experimental/steps.html",
   "header": "adapters/mt2/sdk/native_steps_draft.h",
-  "header_sha256": "b9d190d068f178e5af964640c7a3db4401a3684d8ad1446cc71c677c9af93312",
+  "header_sha256": "4d20374b12f4e93a89fe36a37da174a7e6dcb62b9ca3899f5e3293916d40f9c4",
   "export": "MT2FW_MT2_QueryStepServiceDraft",
   "service_type": "MT2FW_MT2_StepServiceDraftV1",
   "owner": "Exact active doodesch.multiplayer native plugin and its registered session provider",
@@ -15,7 +15,10 @@
   "layouts_windows_x64": {
     "service_bytes": 72,
     "spec_bytes": 152,
-    "exit_save_offset": 64
+    "exit_save_offset": 64,
+    "snapshot_request_bytes": 128,
+    "snapshot_nonce_offset": 56,
+    "snapshot_witness_offset": 96
   },
   "functions": {
     "bind": {
@@ -66,6 +69,19 @@
     "A missing provider or stale acknowledgement grants no world-write authority",
     "A failed service can maintain local UI and perform admitted retirement without advancing simulation or clearing the original failure",
     "Native async Save completion and companion/peer publication are separate acknowledgements",
-    "This native extension adds no Lua functions or local-mod write permissions"
-  ]
+    "This native extension adds no Lua functions or local-mod write permissions",
+    "ARM_PERIODIC 7 preserves the exact original Host periodic Save purpose; only its confirmed released certificate may complete a retained Client periodic UI request"
+  ],
+  "snapshot_operations": {
+    "ARM": 1,
+    "SEAL": 2,
+    "CAPTURE": 3,
+    "RELEASE": 4,
+    "PUMP": 5,
+    "CLIENT_CACHE": 6,
+    "ARM_PERIODIC": 7
+  },
+  "operation_minimum_framework_version": {
+    "ARM_PERIODIC": "0.5.4"
+  }
 }

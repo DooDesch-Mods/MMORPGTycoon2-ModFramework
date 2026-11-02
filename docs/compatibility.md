@@ -4,7 +4,7 @@ title: Compatibility and status
 
 # Compatibility and status
 
-Framework **0.5.3** provides Lua API **1.3.0** and native ABI **1**. It supports only Windows x64 with Steam and the exact verified MT2 executable:
+Framework **0.5.4** provides Lua API **1.3.0** and native ABI **1**. It supports only Windows x64 with Steam and the exact verified MT2 executable:
 
 ```text
 bbab2dc68babcc644d0a1679548bf1e334b6c52aea669c3f61f6cb9d45c1aaf6
@@ -13,6 +13,24 @@ bbab2dc68babcc644d0a1679548bf1e334b6c52aea669c3f61f6cb9d45c1aaf6
 Unsupported game builds leave the adapter and mods disabled and report the cause. A signature match alone never establishes compatibility. The installer preserves unknown loaders and original game archives.
 
 The runtime does not resolve internal game functions through the executable's symbol table. The adapter uses addresses and byte checks for the verified build. Symbols have helped with reverse engineering, so removing them makes future adapter work harder. A changed executable, including one with only its symbol table removed, still needs compatibility checks and an adapter update before support is enabled.
+
+## Runtime versions for native mods
+
+From Framework 0.5.4, the loaded `MT2Framework.dll` includes standard Windows
+`VERSIONINFO`. Both fixed FileVersion and ProductVersion are `0.5.4.0`; their
+display strings are `0.5.4`. The resource type is `VFT_DLL`, and
+`OriginalFilename` is `MT2Framework.dll`. String values use table `040904b0`
+with English/Unicode translation `0409`/`1200`.
+
+For a native mod that needs a specific Runtime fix, read this resource from the
+actually loaded Framework module and compare the numeric version. Do not infer
+the loaded version from a package manifest or another DLL on disk. A missing or
+unreadable resource does not satisfy a Runtime minimum. Releases before 0.5.4
+do not provide this resource.
+
+The Runtime version, Lua API version, native ABI version and exact experimental
+draft versions are separate requirements. This resource adds no Host fields or
+new Lua functions.
 
 ## Accepted behavior
 

@@ -145,7 +145,7 @@ class NexusReleaseTests(unittest.TestCase):
     def test_silent_release_policy_blocks_automatic_announcement_output(self):
         root = nexus.ROOT / 'artifacts/nexus-tests'
         root.mkdir(parents=True, exist_ok=True)
-        for product, version in [('framework', '0.5.1'), ('framework', '0.5.2'), ('framework', '0.5.3'), ('multiplayer', '0.1.0-beta.26')]:
+        for product, version in [('framework', '0.5.1'), ('framework', '0.5.2'), ('framework', '0.5.3'), ('framework', '0.5.4'), ('multiplayer', '0.1.0-beta.26')]:
             with self.subTest(product=product), tempfile.TemporaryDirectory(dir=root) as directory:
                 target = nexus.targets()[product]
                 plan = {'product': product, 'tag': 'v' + version, 'version': version,

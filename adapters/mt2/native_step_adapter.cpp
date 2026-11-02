@@ -90,14 +90,14 @@ MT2FW_MT2_Result NativeStepAdapter::snapshot(const MT2FW_MT2_SnapshotRequest* re
         if(!current()||callbacks_retired_||proof_inflight_||snapshot_inflight_||!driver_.snapshot||!kernel_)
             throw std::runtime_error("Snapshot bridge lacks its current non-reentrant owner");
         if(!request||request->size!=sizeof(*request)||request->reserved||request->peer_mask!=callbacks_.frozen_peer_mask||
-           request->operation<MT2FW_MT2_SNAPSHOT_ARM||request->operation>MT2FW_MT2_SNAPSHOT_CLIENT_CACHE)
+           request->operation<MT2FW_MT2_SNAPSHOT_ARM||request->operation>MT2FW_MT2_SNAPSHOT_ARM_PERIODIC)
             throw std::runtime_error("Snapshot bridge request shape or frozen peer mask differs");
         const auto result=api_.read(api_.context,request->lease,out);
         if(result!=MT2FW_MT2_OK)return result;
         if(out->session!=request->session||out->world_epoch!=request->world_epoch||out->thread!=bound_()||
            (out->phase!=MT2FW_MT2_STEP_HELD&&!(request->operation==MT2FW_MT2_SNAPSHOT_PUMP&&out->phase==MT2FW_MT2_STEP_FAILED))||out->workers_held!=1||out->callbacks_inflight!=1)
             throw std::runtime_error("Snapshot bridge current session/world/held receipt differs");
-        const bool arm=request->operation==MT2FW_MT2_SNAPSHOT_ARM;
+        const bool arm=request->operation==MT2FW_MT2_SNAPSHOT_ARM||request->operation==MT2FW_MT2_SNAPSHOT_ARM_PERIODIC;
         if(arm?(!boundary_inflight_||service_inflight_||out->tick!=request->tick||!request->invocation||
                 out->invocation!=request->invocation||out->original_attempted||out->original_returned):
                (!service_inflight_||boundary_inflight_||request->invocation||out->completed_tick!=request->tick))
