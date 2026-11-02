@@ -25,7 +25,7 @@ class NexusListingTests(unittest.TestCase):
         self.summary = (source / 'summary.txt').read_text(encoding='utf-8').strip()
         self.body = (source / 'description.bbcode.txt').read_text(encoding='utf-8').strip()
         self.mod = {'id': '19121194401820', 'game_id': '4452', 'game_scoped_id': '28',
-                    'version': '0.1.0-beta.25', 'name': 'Keep this title', 'author': 'Keep these credits',
+                    'version': self.plan['version'], 'name': 'Keep this title', 'author': 'Keep these credits',
                     'gallery_images': [{'url': 'existing-image'}], 'description': 'Previous description'}
         self.current_summary = 'Previous summary'
         self.calls = []

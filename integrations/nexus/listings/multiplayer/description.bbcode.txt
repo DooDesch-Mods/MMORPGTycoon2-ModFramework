@@ -3,13 +3,15 @@ Build your MMO world together.
 
 🛟 [b]Need help or found a bug?[/b] Get support at [url=https://support.doodesch.de/multiplayer]support.doodesch.de/multiplayer[/url].
 
-[size=4][b]Early Beta 25[/b][/size]
-Rejoin after restarting the game and continue building. Beta 25 fixes simulation drift after rejoining and restores world selection after players join.
+[size=4][b]Early Beta 26[/b][/size]
+Move selections, copy scenery and buildings, and group scenery together. Undo and Redo work with these shared edits, so you can change your plans together.
 
-The new simulation is still in testing. [b]Groups, modular buildings, dungeons and management actions are not yet available.[/b] Other gameplay scenarios and performance remain under test. Start with a small world and keep backups of your saves.
+Beta 26 also fixes desyncs when only one player opens building info and reduces stalls during Group edits.
+
+[b]This is an early beta. Expect bugs, desyncs and unfinished features.[/b] Modular construction, dungeons and general management actions are not yet available in the new shared simulation. Start with a small world and keep backups of your saves.
 
 [size=4][b]Start playing[/b][/size]
-Both players need [b]Beta 25[/b], [b]MT2 Mod Framework Runtime 0.5.0[/b] and the [b]MMORPG Tycoon 2 Vortex Extension[/b]. Install the Runtime, not the developer SDK.
+Both players need [b]Beta 26[/b], [url=https://www.nexusmods.com/mmorpgtycoon2/mods/25][b]MT2 Mod Framework Runtime 0.5.1[/b][/url] and the [url=https://www.nexusmods.com/site/mods/2465][b]MMORPG Tycoon 2 Vortex Extension[/b][/url]. Install the Runtime, not the developer SDK.
 
 [list=1]
 [*]Close the game and install the Framework Runtime and Vortex Extension.
@@ -22,6 +24,6 @@ Both players need [b]Beta 25[/b], [b]MT2 Mod Framework Runtime 0.5.0[/b] and the
 [size=4][b]Feedback[/b][/size]
 Use [b]Report a problem[/b] in the Multiplayer window and keep the report number when contacting support.
 
-The earlier Beta 23 used a different synchronization system. Its feature list does not describe Beta 25. [url=https://github.com/DooDesch-Mods/MMORPGTycoon2-Multiplayer/releases/tag/v0.1.0-beta.23]Earlier releases[/url] remain available.
+The earlier Beta 23 used a different synchronization system. Its feature list does not describe Beta 26. [url=https://github.com/DooDesch-Mods/MMORPGTycoon2-Multiplayer/releases/tag/v0.1.0-beta.23]Earlier releases[/url] remain available.
 
-[url=https://github.com/DooDesch-Mods/MMORPGTycoon2-Multiplayer/releases/tag/v0.1.0-beta.25]Source and current release notes[/url]
+[url=https://github.com/DooDesch-Mods/MMORPGTycoon2-Multiplayer/releases/tag/v0.1.0-beta.26]Source and current release notes[/url]
