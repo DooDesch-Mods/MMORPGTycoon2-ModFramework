@@ -108,6 +108,9 @@ class NexusListingTests(unittest.TestCase):
         with self.assertRaisesRegex(RuntimeError, 'acknowledgement differs'):
             listing.update_listing(self.directory, self.request)
         self.assertFalse((self.directory / 'listing.json').exists())
+        readback = json.loads((self.directory / 'listing-readback.json').read_text())
+        self.assertEqual(readback['matches'], {'description': False, 'summary': False})
+        self.assertEqual(readback['after_summary'], 'Previous summary')
 
     def test_unrelated_field_change_is_reported(self):
         self.change_title = True

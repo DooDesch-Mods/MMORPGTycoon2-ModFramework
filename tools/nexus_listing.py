@@ -60,9 +60,18 @@ def update_listing(directory, request=request_json):
         request(url, 'PATCH', {'summary': summary, 'description': body}, headers)
     after = request(url, headers=headers)['data']
     after_summary = read_summary()
-    if (description(after.get('description')) != description(body)
-            or re.sub(r'\s+', ' ', after_summary.get('summary') or '').strip() != summary):
-        raise RuntimeError('Nexus listing acknowledgement differs from the prepared text; inspect before retrying')
+    matches = {
+        'description': description(after.get('description')) == description(body),
+        'summary': re.sub(r'\s+', ' ', after_summary.get('summary') or '').strip() == summary,
+    }
+    readback = {'matches': matches, 'before_summary': before_summary.get('summary'),
+                'after_summary': after_summary.get('summary'), 'expected_summary': summary,
+                'before_description': before.get('description'), 'after_description': after.get('description'),
+                'expected_description': body}
+    (directory / 'listing-readback.json').write_text(json.dumps(readback, indent=2) + '\n', encoding='utf-8')
+    if not all(matches.values()):
+        failed = ', '.join(field for field, matched in matches.items() if not matched)
+        raise RuntimeError('Nexus listing acknowledgement differs from the prepared text: ' + failed + '; inspect before retrying')
     for field in ('id', 'version', *PRESERVED):
         if after.get(field) != before.get(field):
             raise RuntimeError('Nexus listing changed an unrelated field: ' + field)
