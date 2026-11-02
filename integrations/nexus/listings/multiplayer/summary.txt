@@ -1,1 +1,1 @@
-Build your MMO world with a friend through Steam. Move selections, copy scenery and buildings, and group scenery together with Undo and Redo. Early Beta - expect bugs and desyncs. Requires MT2 Mod Framework Runtime 0.5.1 and Vortex.
+Build your MMO world with a friend through Steam. Share supported staff, advertising, release planning and Inn service changes. Early Beta - expect bugs and desyncs. Requires MT2 Mod Framework Runtime 0.5.5; install through Vortex.
