@@ -54,6 +54,19 @@ int main(){try{
     check(MH_DisableHook(page+gate)==MH_OK&&MH_RemoveHook(page+gate)==MH_OK,"retire internal site with outer entry active");
     truth_table();check(std::memcmp(page+gate,original_gate,sizeof(original_gate))==0,"internal pristine block fully restored");
     check(MH_DisableHook(page)==MH_OK&&MH_RemoveHook(page)==MH_OK,"retire outer entry");truth_table();
+    const unsigned char gm_entry[]={0x57,0x56,0x53,0x48,0x83,0xec,0x40,0x48,0x89,0xce,0x48,0x89,0xd1,0x48,0x89,0xd3,
+        0xe8,0xcb,0x32,0x28,0,0x48,0x83,0x78,0x08,0x04,0x74,0x74,0x48,0x89};
+    auto gm=page+0xb00;std::memcpy(gm,gm_entry,sizeof(gm_entry));void* gm_original=nullptr;
+    check(FlushInstructionCache(GetCurrentProcess(),gm,sizeof(gm_entry))!=0,"flush isolated GM entry");
+    check(MH_CreateHook(gm,page+0xc00,&gm_original)==MH_OK,"prepare original GM entry without executing game body");
+    auto gm_trampoline=static_cast<unsigned char*>(gm_original);
+    check(std::memcmp(gm_trampoline,gm_entry,7)==0,"GM trampoline preserves three pushes and complete stack allocation");
+    check(std::memcmp(gm_trampoline+7,jump_prefix,sizeof(jump_prefix))==0,"GM entry uses flag-preserving jumpback");
+    std::memcpy(&resume,gm_trampoline+13,sizeof(resume));check(resume==gm+7,"GM trampoline resumes after seven-byte prologue");
+    check(MH_EnableHook(gm)==MH_OK,"enable isolated GM entry route");
+    check(std::memcmp(gm+5,gm_entry+5,sizeof(gm_entry)-5)==0,"GM entry patch retains unchanged body tail");
+    check(MH_DisableHook(gm)==MH_OK&&MH_RemoveHook(gm)==MH_OK,"retire isolated GM entry route");
+    check(std::memcmp(gm,gm_entry,sizeof(gm_entry))==0,"GM pristine entry fully restored");
     check(MH_Uninitialize()==MH_OK,"retire isolated MinHook registry");
     check(VirtualFree(page,0,MEM_RELEASE)!=0,"release isolated executable fixture");
     std::cout<<checks<<" internal branch relocation checks passed\n";return 0;

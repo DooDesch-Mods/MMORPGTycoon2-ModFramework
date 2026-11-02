@@ -4,7 +4,7 @@ title: Compatibility and status
 
 # Compatibility and status
 
-Framework **0.5.2** provides Lua API **1.3.0** and native ABI **1**. It supports only Windows x64 with Steam and the exact verified MT2 executable:
+Framework **0.5.3** provides Lua API **1.3.0** and native ABI **1**. It supports only Windows x64 with Steam and the exact verified MT2 executable:
 
 ```text
 bbab2dc68babcc644d0a1679548bf1e334b6c52aea669c3f61f6cb9d45c1aaf6

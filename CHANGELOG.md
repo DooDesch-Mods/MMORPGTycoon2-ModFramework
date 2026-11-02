@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.5.3
+
+### Added
+
+- Add the native GameMaster window hook required for hiring and firing GameMasters in the next Multiplayer beta.
+
 ## 0.5.2
 
 ### Added

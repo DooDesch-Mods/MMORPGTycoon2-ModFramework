@@ -2577,6 +2577,29 @@
       ]
     },
     {
+      "name": "mp.management-gm-window-command.6ea5a0",
+      "rva": 7251360,
+      "shared": false,
+      "groups": [
+        {
+          "feature": "GameMaster management window command",
+          "phase": "typed_action_runtime::start, bound Mainthread, once per process",
+          "site": "Original GM window UICommand entry; full body and entry pin required before native hook admission."
+        }
+      ],
+      "code_guard": {
+        "offset": 0,
+        "length": 30,
+        "bytes": "5756534883ec404889ce4889d14889d3e8cb322800488378080474744889",
+        "sha256": "b9603a09cc83e4cc8ea5cdc1eee6636938ff11936d7d372918dc687dce9c6f9f"
+      },
+      "body_guard": {
+        "rva": 7251360,
+        "length": 624,
+        "sha256": "e0ea25a0b830cd94eb7f01163ffc4993ade480f97c4e91d7f78650dad7c73355"
+      }
+    },
+    {
       "name": "mp.gizmo-ui-command.6f4930",
       "rva": 7293232,
       "shared": false,

@@ -34,6 +34,19 @@ proof. A failed or unknown hook operation must not be replayed automatically.
 These routes add no Lua functions or authority. Use the Runtime required by the
 Multiplayer release; Lua API 1.3.0 and stable native ABI 1 remain unchanged.
 
+## GameMaster window route in Framework 0.5.3
+
+Framework 0.5.3 adds the exclusive
+`mp.management-gm-window-command.6ea5a0` entry route for the original GameMaster
+window command. The matching Multiplayer plugin uses it for its original
+Hire/Fire controls. The native catalog includes the exact entry and complete
+function-body pins. Verify the pristine body before preparing its first hook,
+then retain the authenticated entry, trampoline and owner for its full lifetime.
+
+This is a native adapter capability, not a new Lua function or Routes protocol.
+Use the matching Runtime and SDK; the stable plugin ABI and existing Lua APIs
+remain unchanged.
+
 ## Start with the matching header
 
 The source header is

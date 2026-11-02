@@ -214,6 +214,7 @@ catalog.catalog("mp.developer-uicommand.6c7b70",0x6c7b70,false);
 catalog.catalog("mp.dungeon-light-config.6d40b0",0x6d40b0,false);
 catalog.catalog("mp.dungeon-sound-ui.6d4ff0",0x6d4ff0,false);
 catalog.catalog("mp.design-rules.6d61a0",0x6d61a0,false);
+catalog.catalog("mp.management-gm-window-command.6ea5a0",0x6ea5a0,false);
 catalog.catalog("mp.gizmo-ui-command.6f4930",0x6f4930,false);
 catalog.catalog("mp.management-logo-editor-command.735800",0x735800,false);
 catalog.catalog("startmenu.elements",0x73c200,true);

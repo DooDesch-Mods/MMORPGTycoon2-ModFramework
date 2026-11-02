@@ -3,7 +3,8 @@
     "name": "MT2 Mod Framework",
     "silent_releases": [
       "v0.5.1",
-      "v0.5.2"
+      "v0.5.2",
+      "v0.5.3"
     ],
     "domain": "mmorpgtycoon2",
     "game_id": 4452,

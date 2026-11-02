@@ -42,7 +42,7 @@ class MultiplayerCatalogTests(unittest.TestCase):
         prior = json.loads((ROOT / 'tests/fixtures/multiplayer-catalog-v0.2.1.json').read_text(encoding='utf-8'))['targets']
         previous = {row['name'] for row in prior}
         self.assertEqual([row for row in self.targets if row['name'] in previous], prior)
-        self.assertEqual(len(self.targets), 290)
+        self.assertEqual(len(self.targets), 291)
         self.assertEqual(sum(row['shared'] for row in self.targets), 11)
 
     def test_toon_camera_gate_is_one_exact_exclusive_internal_site(self):
@@ -85,6 +85,17 @@ class MultiplayerCatalogTests(unittest.TestCase):
         self.assertEqual(row['body_guard']['rva'], 0x3a0350)
         self.assertEqual(row['body_guard']['length'], 6816)
         self.assertEqual(row['body_guard']['sha256'], 'e994c1ef7cf8ff10fe463e8def99af65798238dce88481dbd3dc82838c828b79')
+
+    def test_gm_window_command_is_an_exclusive_pinned_entry(self):
+        matches = [row for row in self.targets if row['rva'] == 0x6ea5a0]
+        self.assertEqual(len(matches), 1)
+        row = matches[0]
+        self.assertEqual(row['name'], 'mp.management-gm-window-command.6ea5a0')
+        self.assertIs(row['shared'], False)
+        self.assertEqual(row['body_guard']['length'], 624)
+        self.assertEqual(row['body_guard']['sha256'], 'e0ea25a0b830cd94eb7f01163ffc4993ade480f97c4e91d7f78650dad7c73355')
+        self.assertEqual(row['code_guard']['length'], 30)
+        self.assertEqual(row['code_guard']['bytes'], '5756534883ec404889ce4889d14889d3e8cb322800488378080474744889')
 
 
 if __name__ == '__main__':
