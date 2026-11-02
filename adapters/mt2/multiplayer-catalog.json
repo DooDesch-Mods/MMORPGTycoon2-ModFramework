@@ -1050,6 +1050,32 @@
       ]
     },
     {
+      "name": "mp.npc-camera-gate.3c8db7",
+      "rva": 3968439,
+      "shared": false,
+      "groups": [
+        {
+          "feature": "Ordered NPC camera-independent scheduling",
+          "phase": "typed_action_runtime::start, bound Mainthread, once per process",
+          "site": "Internal original CMP/JNE after EvaluateDistance; scoped Multiplayer receiver selects the original full path using current TLS ownership. Existing NPC entry hook, original type guard, native backlog/deadline logic and native full update remain owned by the Multiplayer consumer."
+        }
+      ],
+      "code_guard": {
+        "offset": 0,
+        "length": 9,
+        "bytes": "8038000f85b8000000",
+        "sha256": "9be443f68b129ad7fd04163b47b7251aec1fe8de1182aa9e153cd9e85b51818c",
+        "game_sha256": "bbab2dc68babcc644d0a1679548bf1e334b6c52aea669c3f61f6cb9d45c1aaf6",
+        "fallthrough_rva": 3968448,
+        "branch_rva": 3968632
+      },
+      "body_guard": {
+        "rva": 3968336,
+        "length": 816,
+        "sha256": "7c523b7c20db0d6c39ec594be62865fd48ef1b6891e4956ac692e4c2b019ca12"
+      }
+    },
+    {
       "name": "mp.interventions.npc-tick.3c95c0",
       "rva": 3970496,
       "shared": false,

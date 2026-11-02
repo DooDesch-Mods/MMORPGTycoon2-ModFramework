@@ -42,8 +42,26 @@ class MultiplayerCatalogTests(unittest.TestCase):
         prior = json.loads((ROOT / 'tests/fixtures/multiplayer-catalog-v0.2.1.json').read_text(encoding='utf-8'))['targets']
         previous = {row['name'] for row in prior}
         self.assertEqual([row for row in self.targets if row['name'] in previous], prior)
-        self.assertEqual(len(self.targets), 291)
+        self.assertEqual(len(self.targets), 292)
         self.assertEqual(sum(row['shared'] for row in self.targets), 11)
+
+    def test_npc_camera_gate_preserves_one_exact_exclusive_original_branch(self):
+        matches = [row for row in self.targets if row['rva'] == 0x3c8db7]
+        self.assertEqual(len(matches), 1)
+        row = matches[0]
+        self.assertEqual(row['name'], 'mp.npc-camera-gate.3c8db7')
+        self.assertIs(row['shared'], False)
+        self.assertEqual(row['code_guard'], {
+            'offset': 0, 'length': 9, 'bytes': '8038000f85b8000000',
+            'sha256': '9be443f68b129ad7fd04163b47b7251aec1fe8de1182aa9e153cd9e85b51818c',
+            'game_sha256': 'bbab2dc68babcc644d0a1679548bf1e334b6c52aea669c3f61f6cb9d45c1aaf6',
+            'fallthrough_rva': 0x3c8dc0, 'branch_rva': 0x3c8e78})
+        self.assertEqual(row['body_guard'], {
+            'rva': 0x3c8d50, 'length': 816,
+            'sha256': '7c523b7c20db0d6c39ec594be62865fd48ef1b6891e4956ac692e4c2b019ca12'})
+        entry = [row for row in self.targets if row['rva'] == 0x3c8d50]
+        self.assertEqual(len(entry), 1)
+        self.assertEqual(entry[0]['name'], 'mp.interventions.npc-entity-update.3c8d50')
 
     def test_toon_camera_gate_is_one_exact_exclusive_internal_site(self):
         matches = [row for row in self.targets if row['rva'] == 0x3ea462]

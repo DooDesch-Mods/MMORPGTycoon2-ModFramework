@@ -4,7 +4,7 @@ title: Compatibility and status
 
 # Compatibility and status
 
-Framework **0.5.4** provides Lua API **1.3.0** and native ABI **1**. It supports only Windows x64 with Steam and the exact verified MT2 executable:
+Framework **0.5.5** provides Lua API **1.3.0** and native ABI **1**. It supports only Windows x64 with Steam and the exact verified MT2 executable:
 
 ```text
 bbab2dc68babcc644d0a1679548bf1e334b6c52aea669c3f61f6cb9d45c1aaf6
@@ -17,8 +17,8 @@ The runtime does not resolve internal game functions through the executable's sy
 ## Runtime versions for native mods
 
 From Framework 0.5.4, the loaded `MT2Framework.dll` includes standard Windows
-`VERSIONINFO`. Both fixed FileVersion and ProductVersion are `0.5.4.0`; their
-display strings are `0.5.4`. The resource type is `VFT_DLL`, and
+`VERSIONINFO`. Both fixed FileVersion and ProductVersion are `0.5.5.0`; their
+display strings are `0.5.5`. The resource type is `VFT_DLL`, and
 `OriginalFilename` is `MT2Framework.dll`. String values use table `040904b0`
 with English/Unicode translation `0409`/`1200`.
 
@@ -64,3 +64,7 @@ Stable API changes stay compatible within the documented API major version. Chec
 ## Modded-session identification
 
 From 0.2.3, the Framework identifies itself and its version in the original game log before loading mods. Each loading mod is listed by ID, version and type, followed by its activation status. These startup messages help identify external code in bug and crash reports. They do not upload data or log player input, save contents or account identifiers. The exact supported game-build check remains in place.
+
+## Multiplayer Early Beta 27
+
+Multiplayer Early Beta 27 requires Framework Runtime **0.5.5 or later** for its NPC synchronization fix. Framework 0.5.4 does not include the required native route. Both players need matching Multiplayer and Runtime versions.

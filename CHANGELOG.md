@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.5.5
+
+### Added
+
+- Support Multiplayer Early Beta 27's NPC synchronization fix when players use different camera views.
+
 ## 0.5.4
 
 ### Fixed

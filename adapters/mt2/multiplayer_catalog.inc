@@ -84,6 +84,7 @@ catalog.catalog("mp.monster-entity-update.3c0750",0x3c0750,false);
 catalog.catalog("mp.npc-online-state.3c4800",0x3c4800,false);
 catalog.catalog("mp.npc-level-command.3c4c10",0x3c4c10,false);
 catalog.catalog("mp.interventions.npc-entity-update.3c8d50",0x3c8d50,false);
+catalog.catalog("mp.npc-camera-gate.3c8db7",0x3c8db7,false);
 catalog.catalog("mp.interventions.npc-tick.3c95c0",0x3c95c0,false);
 catalog.catalog("mp.control.toon-player-controlled.3e4d30",0x3e4d30,false);
 catalog.catalog("mp.toon-time-normalization.3ea3a0",0x3ea3a0,false);
