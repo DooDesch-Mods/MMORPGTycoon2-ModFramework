@@ -2,7 +2,7 @@
 
 > 🛟 **Need help or found a bug?** Get support at [support.doodesch.de/modframework](https://support.doodesch.de/modframework).
 
-The **Publish Nexus files** workflow updates the existing Nexus files using the official [Nexus upload action](https://github.com/Nexus-Mods/upload-action). Framework and Vortex releases run when their GitHub release is published, including a prerelease. Multiplayer uses an explicit manual target. Every target supports validation before upload.
+The **Publish Nexus files** workflow updates the existing Nexus files using the official [Nexus upload action](https://github.com/Nexus-Mods/upload-action). Framework and Vortex releases run when their GitHub release is published, including a prerelease. Multiplayer checks its latest published beta every five minutes. GitHub may delay scheduled runs. Every target supports manual validation before upload.
 
 | Product | Nexus page | Unique Mod ID for the API | Persistent File ID |
 | --- | --- | --- | --- |
@@ -23,7 +23,9 @@ The organization secrets `NEXUSMODS_API_KEY` and `DISCORD_RELEASE_WEBHOOK` are a
 - `NEXUS_MULTIPLAYER_MOD_ID=19121194401820`
 - `NEXUS_MULTIPLAYER_FILE_ID=8177136`
 
-Multiplayer is an explicit manual target. Select `multiplayer` and its published beta tag to validate the public Multiplayer repository's native plugin ZIP and per-ZIP checksum. Its matching changelog comes from that exact source tag. It is excluded from `all`, so Framework releases cannot publish a Multiplayer version accidentally. Discord intent and acknowledgement assets stay on the configured Framework cohort release (`v0.2.0`); the announcement links to the Multiplayer release. This reuses the existing publisher's organization credentials without transferring credentials or repository ownership.
+Multiplayer remains excluded from `all`, so Framework release events cannot select it accidentally. The scheduled check selects only the latest published `vMAJOR.MINOR.PATCH-beta.N` prerelease, starting with `v0.1.0-beta.27`, and skips silent tags. It validates the exact native plugin ZIP, per-ZIP checksum, tagged source manifest and published GitHub release notes before Nexus upload and Discord delivery. The file description refers to that release's Runtime requirement instead of pinning an older Runtime. Prepared listing updates remain an explicit manual operation with exact cohort guards; future betas never apply Beta 27's listing metadata.
+
+Discord intent and acknowledgement assets stay on the configured Framework receipt release (`v0.2.0`); the announcement links to the Multiplayer release. A confirmed receipt with the same product, tag, version and GitHub asset digest closes the scheduled check. An uncertain or different receipt fails for inspection instead of replaying a send. This uses the existing publisher's organization credentials. The Multiplayer workflow's `GITHUB_TOKEN` cannot start a cross-repository release event, so the central scheduled check deliberately reads the published release instead.
 
 The workflow rejects variables that differ from the tracked destinations. Keys are only passed to API/action steps, never stored in source or receipts.
 
@@ -52,3 +54,5 @@ The release embed follows the Schedule I format: a small product icon, bold chan
 Multiplayer `0.1.0-beta.N` announcements use the title `MMORPG Tycoon 2 Multiplayer - Early Beta N`. The download and release URL retain the exact SemVer version. To correct an existing announcement, provide its **discord_message_id** and enable **update_announcement**. The workflow verifies its exact current or legacy product title and exact release URL before editing it, then reads back the same message. It never sends a replacement post during this operation.
 
 If the tagged changelog itself needs a wording correction, first edit that version's existing Nexus changelog in Nexus file management. Then supply the corrected Markdown in **corrected_notes** with the existing message ID and **update_announcement** enabled. This input is accepted only for a version already present on Nexus. The workflow requires its Nexus changelog to match before editing Discord. Package identity and upload checks stay unchanged; no new file or post is created.
+
+For an already delivered Multiplayer version whose GitHub notes changed afterward, **use_delivered_changelog** with **publish** and **announce** verifies its actual existing Nexus changelog without replacing or appending text. Discord uses the current published GitHub notes from the same verified package, tag and source commit. A retained `changelog-drift.json` records the existing Nexus text, both hashes and origins, and whether they match. It does not claim that Nexus contains the corrected GitHub notes. This explicit recovery requires an existing Multiplayer Nexus version and preserves the normal Discord intent, acknowledgement and duplicate guards. It cannot be combined with corrected notes or an announcement edit. The default changelog mismatch guard remains unchanged.

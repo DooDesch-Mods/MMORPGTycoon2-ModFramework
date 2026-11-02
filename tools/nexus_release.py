@@ -13,6 +13,7 @@ import urllib.error
 import urllib.request
 import zipfile
 import uuid
+import tempfile
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0,str(ROOT/'tools'))
@@ -266,6 +267,41 @@ def outputs(values):
                 stream.write(f'{name}<<{delimiter}\n{value}\n{delimiter}\n')
 
 
+def poll_multiplayer():
+    target = targets()['multiplayer']
+    repository = target['source_repository']
+    releases = json.loads(gh_repository(repository, 'api', f'repos/{repository}/releases?per_page=100'))
+    candidates = [row for row in releases if not row['draft'] and row['prerelease']
+                  and re.fullmatch(r'v\d+\.\d+\.\d+-beta\.[1-9]\d*', row['tag_name'])
+                  and version_key(row['tag_name'][1:]) >= version_key('0.1.0-beta.27')
+                  and row['tag_name'] not in target.get('silent_releases', [])]
+    if not candidates:
+        outputs({'active': 'false'})
+        print('info: no published Multiplayer beta is eligible for automatic delivery')
+        return
+    release = max(candidates, key=lambda row: version_key(row['tag_name'][1:]))
+    tag = release['tag_name']
+    filename = f'release-delivery-multiplayer-{tag[1:]}.json'
+    receipts = json.loads(gh('release', 'view', target['receipt_tag'], '--json', 'assets'))['assets']
+    if any(row['name'] == filename for row in receipts):
+        with tempfile.TemporaryDirectory() as temporary:
+            gh('release', 'download', target['receipt_tag'], '--dir', temporary, '--pattern', filename)
+            receipt = json.loads((Path(temporary) / filename).read_text(encoding='utf-8'))
+        archives = [row for row in release['assets'] if fnmatch.fnmatchcase(row['name'], target['asset_pattern'])]
+        if (receipt.get('status') == 'confirmed' and receipt.get('product') == 'multiplayer'
+                and receipt.get('tag') == tag and receipt.get('version') == tag[1:]
+                and receipt.get('source_commit') == release.get('target_commitish')
+                and len(archives) == 1 and archives[0].get('digest') == 'sha256:' + receipt.get('sha256', '')):
+            outputs({'active': 'false'})
+            print('info: latest published Multiplayer beta delivery is already confirmed: ' + tag)
+            return
+        # Pending intents require a human reconciliation, never an automatic replay.
+        raise ValueError('Latest Multiplayer delivery receipt is unconfirmed or differs; inspect the existing receipt before retrying')
+    outputs({'active': 'true', 'release_tag': tag, 'matrix': json.dumps({'include': [{
+        'product': 'multiplayer', 'file_variable': target['file_variable'], 'mod_variable': target['mod_variable']} ]})})
+    print('info: automatic Multiplayer delivery selected: ' + tag)
+
+
 def prepare(args):
     target = targets()[args.product]
     silent = target.get('silent_releases', [])
@@ -323,6 +359,7 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     commands = parser.add_subparsers(dest='command', required=True)
     plan = commands.add_parser('matrix');plan.add_argument('--target', choices=['all', 'framework', 'vortex', 'multiplayer'], default='all')
+    commands.add_parser('poll-multiplayer')
     command = commands.add_parser('prepare')
     command.add_argument('--product', choices=['framework', 'vortex', 'multiplayer'], required=True)
     command.add_argument('--tag', required=True);command.add_argument('--directory', required=True)
@@ -333,6 +370,8 @@ def main():
     if args.command == 'matrix':
         selected = [{'product': key, 'file_variable': value['file_variable'], 'mod_variable': value['mod_variable']} for key, value in targets().items() if args.target == key or args.target == 'all' and not value.get('manual_only', False)]
         value = json.dumps({'include': selected}, separators=(',', ':'));outputs({'matrix': value});print(value)
+    elif args.command == 'poll-multiplayer':
+        poll_multiplayer()
     elif args.command == 'prepare':
         prepare(args)
     else:

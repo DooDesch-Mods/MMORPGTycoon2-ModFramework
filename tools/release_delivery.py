@@ -1,6 +1,7 @@
 """Complete Nexus changelogs and acknowledged Discord release announcements."""
 import argparse
 import html
+import hashlib
 import json
 import os
 from pathlib import Path
@@ -85,6 +86,38 @@ def sync_changelog(plan, directory, request=request_json):
     print(f"Nexus changelog {plan['product']} {plan['version']}: {status}")
 
 
+def delivered_changelog(plan, request=request_json):
+    if plan['product'] != 'multiplayer' or plan['status'] != 'already-present':
+        raise ValueError('Delivered changelog recovery requires an existing Multiplayer Nexus version')
+    key = os.environ.get('NEXUSMODS_API_KEY', '').strip()
+    if not key:
+        raise ValueError('NEXUSMODS_API_KEY is missing')
+    target = targets()[plan['product']]
+    url = f"https://api.nexusmods.com/v1/games/{target['domain']}/mods/{target['page_id']}/changelogs.json"
+    rows = request(url, headers={'apikey': key}).get(plan['version'], [])
+    if not rows or not isinstance(rows, list) or any(not isinstance(row, str) for row in rows):
+        raise ValueError('Delivered Nexus version has no readable changelog; announcement was not sent')
+    notes = html.unescape('\n'.join(rows)).strip()
+    if not notes or len(notes) > 10000:
+        raise ValueError('Delivered Nexus changelog must contain 1 to 10000 characters')
+    print('warn: recovery verifies the existing Nexus changelog; announcement uses current published GitHub notes')
+    return {**plan, 'notes': notes, 'notes_plain': notes, 'notes_bbcode': bbcode(notes),
+            'notes_origin': url, 'notes_recovery': 'existing delivered Nexus changelog'}
+
+
+def sync_delivered_changelog(plan, directory, request=request_json):
+    delivered = delivered_changelog(plan, request)
+    sync_changelog(delivered, directory, request)
+    receipt = {'status': 'existing-nexus-verified', 'product': plan['product'], 'version': plan['version'],
+               'notes_match_current_github': normalized_notes(delivered['notes']) == normalized_notes(plan['notes']),
+               'nexus_notes': delivered['notes'], 'nexus_notes_origin': delivered['notes_origin'],
+               'nexus_notes_sha256': hashlib.sha256(delivered['notes'].encode('utf-8')).hexdigest(),
+               'github_notes_origin': plan['notes_origin'],
+               'github_notes_sha256': hashlib.sha256(plan['notes'].encode('utf-8')).hexdigest(),
+               'announcement_notes_source': 'current published GitHub release', 'nexus_write': False}
+    (directory / 'changelog-drift.json').write_text(json.dumps(receipt, indent=2) + '\n', encoding='utf-8')
+
+
 def discord_payload(plan):
     target = targets()[plan['product']]
     notes = re.sub(r'^#{1,6}\s+(.+)$', r'**\1**', plan['notes'], flags=re.M)
@@ -137,6 +170,8 @@ def announce(plan, directory, request=request_json, message_id=None, update=Fals
     filename = f"release-delivery-{plan['product']}-{plan['version']}.json"
     previous = remote_receipt(plan, filename, directory)
     identity = {name: plan[name] for name in ('product', 'version', 'tag', 'sha256')}
+    if 'source_commit' in plan:
+        identity['source_commit'] = plan['source_commit']
     expected = canonical_embeds(discord_payload(plan)['embeds'])
     path = directory / filename
     if previous:
@@ -197,6 +232,7 @@ def main():
     parser.add_argument('--announce', action='store_true')
     parser.add_argument('--message-id', help='Read and reconcile this existing Discord message; never send a replacement')
     parser.add_argument('--update-announcement', action='store_true', help='Update the identified existing release post and read it back')
+    parser.add_argument('--use-delivered-changelog', action='store_true', help='Verify existing Multiplayer Nexus notes without writes; announce current GitHub notes and retain any drift')
     args = parser.parse_args()
     if args.update_announcement and not (args.announce and args.message_id):
         raise ValueError('Updating a Discord post requires --announce and its existing --message-id')
@@ -204,8 +240,14 @@ def main():
     if plan['status'] not in ('ready', 'already-present'):
         raise ValueError('Release has no deployable product')
     plan = corrected_plan(plan, os.environ.get('CORRECTED_NOTES', ''), args.update_announcement, args.message_id)
+    if args.use_delivered_changelog:
+        if not args.announce or args.update_announcement or os.environ.get('CORRECTED_NOTES', '').strip():
+            raise ValueError('Delivered changelog recovery requires a new announcement without corrected notes')
     (args.directory / 'plan.json').write_text(json.dumps(plan, indent=2) + '\n', encoding='utf-8')
-    sync_changelog(plan, args.directory)
+    if args.use_delivered_changelog:
+        sync_delivered_changelog(plan, args.directory)
+    else:
+        sync_changelog(plan, args.directory)
     if args.announce:
         if args.message_id and not re.fullmatch(r'\d+', args.message_id):
             raise ValueError('Invalid Discord message ID')

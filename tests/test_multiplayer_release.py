@@ -4,6 +4,7 @@ import hashlib
 import base64
 import io
 import json
+import os
 import shutil
 import subprocess
 import sys
@@ -155,6 +156,93 @@ class MultiplayerReleaseTests(unittest.TestCase):
         embed = delivery.discord_payload(plan)['embeds'][0]
         self.assertEqual(embed['url'], plan['release_url'])
         self.assertIn('MMORPGTycoon2-Multiplayer', embed['thumbnail']['url'])
+
+    def test_poll_selects_latest_published_beta_without_other_targets(self):
+        releases = [{'tag_name': 'v0.1.0-beta.' + number, 'draft': draft, 'prerelease': True}
+                    for number, draft in [('27', False), ('28', False), ('29', True)]]
+        releases.append({'tag_name': 'v0.2.0', 'draft': False, 'prerelease': False})
+        with patch.object(nexus, 'gh_repository', return_value=json.dumps(releases)), \
+             patch.object(nexus, 'gh', return_value=json.dumps({'assets': []})), patch.object(nexus, 'outputs') as output:
+            nexus.poll_multiplayer()
+        values = output.call_args.args[0]
+        self.assertEqual(values['release_tag'], 'v0.1.0-beta.28')
+        self.assertEqual(values['active'], 'true')
+        self.assertEqual([row['product'] for row in json.loads(values['matrix'])['include']], ['multiplayer'])
+        releases.append({'tag_name': 'v0.2.0-beta.1', 'draft': False, 'prerelease': True})
+        with patch.object(nexus, 'gh_repository', return_value=json.dumps(releases)), \
+             patch.object(nexus, 'gh', return_value=json.dumps({'assets': []})), patch.object(nexus, 'outputs') as output:
+            nexus.poll_multiplayer()
+        self.assertEqual(output.call_args.args[0]['release_tag'], 'v0.2.0-beta.1')
+
+    def test_poll_skips_only_confirmed_matching_delivery_and_blocks_uncertain_send(self):
+        tag = 'v0.1.0-beta.27'
+        release = {'tag_name': tag, 'draft': False, 'prerelease': True, 'target_commitish': self.commit, 'assets': [{
+            'name': 'MMORPGTycoon2-Multiplayer-' + tag + '-windows-x64.zip', 'digest': 'sha256:' + 'a' * 64}]}
+        name = 'release-delivery-multiplayer-0.1.0-beta.27.json'
+        receipt = {'status': 'confirmed', 'product': 'multiplayer', 'tag': tag, 'version': tag[1:], 'sha256': 'a' * 64,
+                   'source_commit': self.commit}
+        def central(*args):
+            if args[:2] == ('release', 'view'):
+                return json.dumps({'assets': [{'name': name}]})
+            (Path(args[args.index('--dir') + 1]) / name).write_text(json.dumps(receipt))
+            return ''
+        with patch.object(nexus, 'gh_repository', return_value=json.dumps([release])), \
+             patch.object(nexus, 'gh', side_effect=central), patch.object(nexus, 'outputs') as output, \
+             patch.object(nexus.tempfile, 'tempdir', str(self.root)):
+            nexus.poll_multiplayer()
+            self.assertEqual(output.call_args.args[0], {'active': 'false'})
+            receipt['status'] = 'pending'
+            with self.assertRaisesRegex(ValueError, 'unconfirmed or differs'):
+                nexus.poll_multiplayer()
+            receipt['status'] = 'confirmed'
+            receipt['sha256'] = 'b' * 64
+            with self.assertRaisesRegex(ValueError, 'unconfirmed or differs'):
+                nexus.poll_multiplayer()
+
+    def test_poll_does_not_backfill_old_or_silent_releases(self):
+        releases = [{'tag_name': 'v0.1.0-beta.' + number, 'draft': False, 'prerelease': True}
+                    for number in ['25', '26']]
+        with patch.object(nexus, 'gh_repository', return_value=json.dumps(releases)), \
+             patch.object(nexus, 'gh') as central, patch.object(nexus, 'outputs') as output:
+            nexus.poll_multiplayer()
+        central.assert_not_called()
+        self.assertEqual(output.call_args.args[0], {'active': 'false'})
+
+    def test_delivered_changelog_recovery_reads_existing_text_without_writes(self):
+        plan = {'product': 'multiplayer', 'status': 'already-present', 'version': '0.1.0-beta.27',
+                'notes': 'Corrected GitHub copy', 'tag': 'v0.1.0-beta.27', 'sha256': 'a' * 64,
+                'notes_origin': 'https://github.com/DooDesch-Mods/MMORPGTycoon2-Multiplayer/releases/tag/v0.1.0-beta.27',
+                'release_url': 'https://github.com/DooDesch-Mods/MMORPGTycoon2-Multiplayer/releases/tag/v0.1.0-beta.27',
+                'nexus_url': 'https://www.nexusmods.com/mmorpgtycoon2/mods/28'}
+        calls = []
+        def request(url, method='GET', **kwargs):
+            calls.append(method)
+            return {plan['version']: ['- Original delivered change.', '', 'Both players need the matching Runtime.']}
+        with patch.dict(os.environ, {'NEXUSMODS_API_KEY': 'fixture'}):
+            delivery.sync_delivered_changelog(plan, self.root, request)
+        self.assertEqual(calls, ['GET', 'GET'])
+        drift = json.loads((self.root / 'changelog-drift.json').read_text())
+        self.assertIn('Original delivered change.', drift['nexus_notes'])
+        self.assertFalse(drift['notes_match_current_github'])
+        self.assertFalse(drift['nexus_write'])
+        self.assertEqual(drift['github_notes_sha256'], hashlib.sha256(plan['notes'].encode()).hexdigest())
+        self.assertEqual(plan['notes'], 'Corrected GitHub copy')
+        sent = []
+        def discord(url, method='GET', body=None, **kwargs):
+            self.assertEqual(method, 'POST')
+            sent.append(body)
+            return {'id': '123', 'channel_id': '456', 'embeds': body['embeds']}
+        with patch.dict(os.environ, {'DISCORD_RELEASE_WEBHOOK': 'https://discord.com/api/webhooks/1/fixture'}), \
+             patch.object(delivery, 'remote_receipt', return_value=None), patch.object(delivery, 'gh'):
+            delivery.announce(plan, self.root, discord)
+        self.assertEqual(sent[0]['embeds'][0]['description'], 'Corrected GitHub copy')
+        with self.assertRaisesRegex(ValueError, 'existing Multiplayer'):
+            delivery.delivered_changelog({**plan, 'status': 'ready'}, request)
+
+    def test_future_file_description_is_not_pinned_to_an_old_runtime(self):
+        description = nexus.targets()['multiplayer']['file_description']
+        self.assertNotRegex(description, r'\d+\.\d+\.\d+')
+        self.assertLessEqual(len(description), 255)
 
 
 if __name__ == '__main__':
