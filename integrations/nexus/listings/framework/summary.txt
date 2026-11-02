@@ -1,0 +1,1 @@
+Run community mods for MMORPG Tycoon 2. Install the Runtime through Vortex, then add the mods you want to play. Includes an in-game Mods menu. Modders can get the SDK, Lua examples and docs on GitHub.

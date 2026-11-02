@@ -4,7 +4,7 @@ title: Compatibility and status
 
 # Compatibility and status
 
-This is a public development preview: framework **0.2.3**, Lua API **1.0.0**, native ABI **1**. It supports only Windows x64 with Steam and the exact verified MT2 executable:
+Framework **0.5.1** provides Lua API **1.3.0** and native ABI **1**. It supports only Windows x64 with Steam and the exact verified MT2 executable:
 
 ```text
 bbab2dc68babcc644d0a1679548bf1e334b6c52aea669c3f61f6cb9d45c1aaf6
@@ -27,8 +27,7 @@ The empty-core p95 measured 0.3478 ms over 2048 samples in the retained paused f
 - Selected objects expose verified public handle/position information, not arbitrary native properties.
 - Root-world building references can persist; unsupported targets are rejected.
 - Native plugins are not unloaded during a session. Native memory faults can terminate the game.
-- Human newcomer timing is pending. Automated onboarding does not establish a human ten-minute claim.
-- Multiplayer bridge F with two separate Steam accounts is pending. Shared writes and multiplayer compatibility are not advertised.
+- Multiplayer is an Early Beta. Use the matching Runtime and Multiplayer versions and check the [Multiplayer feature overview](https://github.com/DooDesch-Mods/MMORPGTycoon2-Multiplayer#what-works-in-co-op) for the supported co-op scenarios. General Lua gameplay writes remain singleplayer-only.
 
 ## Experimental patches in 0.2.0
 

@@ -268,6 +268,9 @@ def outputs(values):
 
 def prepare(args):
     target = targets()[args.product]
+    silent = target.get('silent_releases', [])
+    if not isinstance(silent, list) or any(not isinstance(tag, str) for tag in silent):
+        raise ValueError('silent_releases must list exact release tags')
     for variable, expected in [('NEXUS_FILE_ID', target['file_id']), ('NEXUS_MOD_ID', target['mod_uid'])]:
         if os.environ.get(variable) != expected:
             raise ValueError(variable + ' is missing or differs from integrations/nexus/targets.json')
@@ -276,6 +279,7 @@ def prepare(args):
     if plan is None:
         plan = {'product': args.product, 'tag': args.tag, 'status': 'not-in-release'}
     else:
+        plan['allow_announcement'] = args.tag not in silent
         plan.update({'status': check_destination(target, plan['version']), 'file_id': target['file_id'],
                      'mod_uid': target['mod_uid'], 'nexus_url': f"https://www.nexusmods.com/{target['domain']}/mods/{target['page_id']}"})
         notes = plan.pop('release_notes', None)
@@ -290,7 +294,7 @@ def prepare(args):
             plan['file_description'] = description
     directory.mkdir(parents=True, exist_ok=True)
     (directory / 'plan.json').write_text(json.dumps(plan, indent=2) + '\n', encoding='utf-8')
-    result = {'status': plan['status']}
+    result = {'status': plan['status'], 'allow_announcement': 'true' if plan.get('allow_announcement', False) else 'false'}
     if 'version' in plan:
         result.update({name: plan[name] for name in ('filename', 'version', 'file_id', 'mod_uid')})
         result.update({'display_name': target['name'], 'description': plan.get('file_description', plan['notes_bbcode'])})

@@ -1,6 +1,7 @@
 {
   "framework": {
     "name": "MT2 Mod Framework",
+    "silent_releases": ["v0.5.1"],
     "domain": "mmorpgtycoon2",
     "game_id": 4452,
     "page_id": 25,
@@ -13,6 +14,7 @@
   },
   "multiplayer": {
     "name": "MMORPG Tycoon 2 Multiplayer - Early Beta",
+    "silent_releases": ["v0.1.0-beta.26"],
     "domain": "mmorpgtycoon2",
     "game_id": 4452,
     "page_id": 28,
@@ -25,7 +27,7 @@
     "notes_source": "github_release",
     "receipt_tag": "v0.2.0",
     "manual_only": true,
-    "file_description": "Build an MMO world with a friend through Steam. Requires MT2 Mod Framework Runtime 0.5.0 and the MMORPG Tycoon 2 Vortex Extension on both computers. Close both games before updating. Early Beta - expect bugs and desyncs.",
+    "file_description": "Build an MMO world with a friend through Steam. Requires MT2 Mod Framework Runtime 0.5.1 and the MMORPG Tycoon 2 Vortex Extension on both computers. Close both games before updating. Early Beta - expect bugs and desyncs.",
     "icon_url": "https://raw.githubusercontent.com/DooDesch-Mods/MMORPGTycoon2-Multiplayer/main/assets/ui/desktop_multiplayer/multiplayer.png",
     "footer": "MMORPG Tycoon 2 - MMORPGTycoon2-Multiplayer"
   },

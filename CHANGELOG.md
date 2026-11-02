@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.5.1
+
+### Fixed
+
+- Keep building selection from changing the shared simulation's random state in Multiplayer.
+
 ## 0.5.0
 
 ### Added

@@ -142,5 +142,24 @@ class NexusReleaseTests(unittest.TestCase):
             self.assertEqual(saved['notes_plain'], notes)
             self.assertEqual(saved['notes_origin'], plan['notes_origin'])
 
+    def test_silent_release_policy_blocks_automatic_announcement_output(self):
+        root = nexus.ROOT / 'artifacts/nexus-tests'
+        root.mkdir(parents=True, exist_ok=True)
+        for product, version in [('framework', '0.5.1'), ('multiplayer', '0.1.0-beta.26')]:
+            with self.subTest(product=product), tempfile.TemporaryDirectory(dir=root) as directory:
+                target = nexus.targets()[product]
+                plan = {'product': product, 'tag': 'v' + version, 'version': version,
+                        'filename': 'release.zip', 'sha256': 'a' * 64, 'release_notes': '- A published fix.'}
+                environment = {'NEXUS_FILE_ID': target['file_id'], 'NEXUS_MOD_ID': target['mod_uid']}
+                with patch.dict(os.environ, environment), patch.object(nexus, 'fetch_release', return_value=plan), \
+                     patch.object(nexus, 'check_destination', return_value='ready'), patch.object(nexus, 'outputs') as outputs, \
+                     patch('builtins.print'):
+                    nexus.prepare(SimpleNamespace(product=product, tag=plan['tag'], directory=directory, optional=False))
+                self.assertEqual(outputs.call_args.args[0]['allow_announcement'], 'false')
+                saved = json.loads((Path(directory) / 'plan.json').read_text())
+                self.assertFalse(saved['allow_announcement'])
+                self.assertEqual(saved['notes'], '- A published fix.')
+                self.assertEqual(saved['sha256'], 'a' * 64)
+
 
 if __name__ == '__main__':unittest.main()
