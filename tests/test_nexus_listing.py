@@ -49,8 +49,11 @@ class NexusListingTests(unittest.TestCase):
             if self.change_title:
                 self.mod['name'] = 'Unexpected title'
             return None
-        if '/v1/' in url:
-            return {'mod_id': 28, 'version': self.mod['version'], 'summary': self.current_summary}
+        if url == listing.SUMMARY_API:
+            self.assertEqual(method, 'POST')
+            self.assertEqual(body['variables'], {'modId': '28', 'gameId': '4452'})
+            return {'data': {'mod': {'uid': self.mod['id'], 'modId': 28, 'gameId': 4452,
+                                     'version': self.mod['version'], 'summary': self.current_summary}}}
         return {'data': copy.deepcopy(self.mod)}
 
     def test_updates_only_prepared_text_and_confirms_readback(self):
@@ -70,25 +73,30 @@ class NexusListingTests(unittest.TestCase):
         self.assertFalse(receipt['changed'])
         self.assertFalse(any(method == 'PATCH' for _, method, _ in self.calls))
 
-    def test_summary_readbacks_do_not_share_a_cached_legacy_url(self):
+    def test_summary_uses_current_graphql_instead_of_stale_legacy_url(self):
         headers_seen = []
-        cache = {}
         def request(url, method='GET', body=None, headers=None):
-            if '/v1/' in url:
+            self.assertNotIn('/v1/', url)
+            if url == listing.SUMMARY_API:
                 headers_seen.append(headers)
-                if url in cache:
-                    return copy.deepcopy(cache[url])
-            result = self.request(url, method, body, headers)
-            if '/v1/' in url:
-                cache[url] = copy.deepcopy(result)
-            return result
+            return self.request(url, method, body, headers)
         receipt = listing.update_listing(self.directory, request)
         self.assertEqual(receipt['status'], 'confirmed')
-        urls = [url for url, method, _ in self.calls if '/v1/' in url]
-        self.assertEqual(len(urls), 2)
-        self.assertNotEqual(urls[0], urls[1])
-        self.assertTrue(all('?mt2fw_read=' in url for url in urls))
+        self.assertEqual(sum(url == listing.SUMMARY_API for url, _, _ in self.calls), 2)
+        self.assertEqual(receipt['summary_source'], listing.SUMMARY_API)
         self.assertTrue(all(headers['Cache-Control'] == 'no-cache, no-store' for headers in headers_seen))
+
+    def test_graphql_errors_or_wrong_identity_block_before_write(self):
+        for changed in [{'errors': [{'message': 'Unavailable'}]}, *[
+            {'data': {'mod': {'uid': '19121194401820', 'modId': 28, 'gameId': 4452,
+                              'version': self.plan['version'], field: value}}}
+            for field, value in [('uid', '19121194401817'), ('modId', 25), ('gameId', 2295), ('version', '0.1.0-beta.26')]]]:
+            with self.subTest(changed=changed):
+                def request(url, method='GET', body=None, headers=None):
+                    return changed if url == listing.SUMMARY_API else self.request(url, method, body, headers)
+                with self.assertRaises((ValueError, RuntimeError)):
+                    listing.update_listing(self.directory, request)
+                self.assertFalse(any(method == 'PATCH' for _, method, _ in self.calls))
 
     def test_wrong_release_or_mod_blocks_before_write(self):
         self.plan['sha256'] = 'b' * 64
