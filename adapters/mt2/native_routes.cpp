@@ -386,8 +386,15 @@ MT2FW_MT2_Result MT2FW_CALL NativeRoutes::code_verify(void* context,const char* 
     std::array<unsigned char,4096> pristine{},actual{};std::string cause;
     if(!service.backend_.pristine(target.rva,offset,pristine.data(),length,cause)||std::memcmp(pristine.data(),expected,length)||!service.backend_.read(service.image_+target.rva+offset,actual.data(),length,cause)){
         target.cause="Pristine native code guard differs: "+cause;service.receipt(target,*output);return MT2FW_MT2_FAILED;}
-    Bytes route{};if(!service.compose(target,route,cause)){target.cause=cause;service.receipt(target,*output);return MT2FW_MT2_FAILED;}
-    for(uint32_t i=0;i<length;++i){auto position=offset+i;auto current=position<32?route[position]:pristine[i];if(actual[i]!=current){target.cause="Native body or owned route guard differs";service.receipt(target,*output);return MT2FW_MT2_FAILED;}}
+    // A named body can contain both its entry hook and an owned internal site.
+    // Authenticate every contributing receipt before projecting its live bytes.
+    const auto begin=target.rva+offset;
+    for(auto& [peer_name,peer]:service.targets_)if(overlaps(begin,length,peer.rva,32)){
+        if(peer.state==MT2FW_MT2_ROUTE_UNKNOWN){target.cause="Native route outcome unknown: "+peer_name;service.receipt(target,*output);return MT2FW_MT2_FAILED;}
+        Bytes route{};if(!service.validate(peer,cause)||!service.compose(peer,route,cause)){target.cause=cause;service.receipt(target,*output);return MT2FW_MT2_FAILED;}
+        for(size_t i=0;i<route.size();++i)if(peer.rva+i>=begin&&peer.rva+i-begin<length)pristine[size_t(peer.rva+i-begin)]=route[i];
+    }
+    if(std::memcmp(actual.data(),pristine.data(),length)){target.cause="Native body or owned route guard differs";service.receipt(target,*output);return MT2FW_MT2_FAILED;}
     target.cause.clear();service.receipt(target,*output);return MT2FW_MT2_OK;
 }
 bool NativeRoutes::retire(Plugin& plugin){

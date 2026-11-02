@@ -22,7 +22,7 @@ const reportPath = resolve(argument('--report', resolve(repository, 'artifacts/d
 const captureArgument = argument('--captures', undefined)
 const captureDirectory = captureArgument ? resolve(captureArgument) : undefined
 const executablePath = process.env.CHROMIUM_EXECUTABLE || chromium.executablePath()
-const pages = ['index.html', 'quickstart.html', 'reference/index.html', 'reference/functions/ui-window.html', 'reference/native.html', 'guides/scenery.html', 'agents/start.html', 'experimental/patches.html', 'reference/functions/patches-add.html', 'recipes/lua-apps.html', 'reference/functions/ui-native.html', 'reference/functions/ui-document.html', 'reference/functions/world-simulation.html']
+const pages = ['index.html', 'quickstart.html', 'reference/index.html', 'reference/functions/ui-window.html', 'reference/native.html', 'guides/scenery.html', 'agents/start.html', 'experimental/patches.html', 'experimental/steps.html', 'reference/functions/patches-add.html', 'recipes/lua-apps.html', 'reference/functions/ui-native.html', 'reference/functions/ui-document.html', 'reference/functions/world-simulation.html']
 const mimeTypes = { '.html': 'text/html; charset=utf-8', '.js': 'text/javascript; charset=utf-8', '.css': 'text/css; charset=utf-8', '.json': 'application/json', '.svg': 'image/svg+xml', '.png': 'image/png', '.jpg': 'image/jpeg', '.woff2': 'font/woff2' }
 const started = performance.now()
 const report = { status: 'running', checks: [], errors: [], blockedRequests: [], navigationWait: 'Idle callback, animation frame and network idle before leaving a document.' }
@@ -82,6 +82,25 @@ async function settlePage() {
   await page.evaluate(() => new Promise(done => {
     requestIdleCallback(() => requestAnimationFrame(() => requestAnimationFrame(done)))
   }))
+  // A low-priority link prefetch can remain queued after networkidle. Wait for
+  // its real completion before navigation aborts the previous document's work.
+  await page.evaluate(async () => {
+    await Promise.all([...document.querySelectorAll('link[rel="prefetch"]')].map(link => {
+      if (performance.getEntriesByName(link.href).some(entry => entry.responseEnd > 0)) return
+      return new Promise((resolve, reject) => {
+        const cleanup = () => {
+          clearTimeout(timer)
+          link.removeEventListener('load', loaded)
+          link.removeEventListener('error', failed)
+        }
+        const loaded = () => { cleanup(); resolve() }
+        const failed = () => { cleanup(); reject(new Error(`Documentation prefetch failed: ${link.href}`)) }
+        const timer = setTimeout(() => { cleanup(); reject(new Error(`Documentation prefetch did not complete within 30 seconds: ${link.href}`)) }, 30000)
+        link.addEventListener('load', loaded, { once: true })
+        link.addEventListener('error', failed, { once: true })
+      })
+    }))
+  })
   await page.waitForLoadState('networkidle')
 }
 

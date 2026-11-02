@@ -902,6 +902,38 @@
       ]
     },
     {
+      "name": "mp.toon-attribute-cadence-gate.3a0942",
+      "rva": 3803458,
+      "shared": false,
+      "groups": [
+        {
+          "feature": "Ordered Toon camera-independent attribute cadence",
+          "phase": "typed_action_runtime::start, bound Mainthread, once per process",
+          "site": "Internal JNE after AbilitySet::Update; scoped receiver uses original far/deadline/two-second path without changing camera fields or replaying Character update."
+        }
+      ],
+      "code_guard": {
+        "offset": 0,
+        "length": 6,
+        "bytes": "0f85380b0000",
+        "sha256": "1fe27c6c24055f3c49bfecde8d164be1a9e255e06eb789c11dd31479f49cefce",
+        "game_sha256": "bbab2dc68babcc644d0a1679548bf1e334b6c52aea669c3f61f6cb9d45c1aaf6",
+        "fallthrough_rva": 3803464,
+        "branch_rva": 3806336
+      },
+      "window_guard": {
+        "rva": 3803458,
+        "length": 30,
+        "bytes": "0f85380b0000f30f1083ec070000f30f108bf0070000f30f10b3b0020000",
+        "sha256": "daf271c95120774c9f0da8cf3696e87a1ce61f7053aa60371753fe406104e14b"
+      },
+      "body_guard": {
+        "rva": 3801936,
+        "length": 6816,
+        "sha256": "e994c1ef7cf8ff10fe463e8def99af65798238dce88481dbd3dc82838c828b79"
+      }
+    },
+    {
       "name": "mp.toon-visual-equip.3a1df0",
       "rva": 3808752,
       "shared": false,
@@ -936,6 +968,38 @@
           "site": "Forward original when Controller inactive or Host; active Client validates current fixed Lounge slot/full UID/FindUID/current world and suppresses original ticket/travel decisions"
         }
       ]
+    },
+    {
+      "name": "mp.toon-travel-rotation-gate.3b7b37",
+      "rva": 3898167,
+      "shared": false,
+      "groups": [
+        {
+          "feature": "Ordered Toon camera-independent travel rotation",
+          "phase": "typed_action_runtime::start, bound Mainthread, once per process",
+          "site": "Internal JZ consumes original in-view flags; scoped MP receiver selects original rotation fallthrough without writing camera fields."
+        }
+      ],
+      "code_guard": {
+        "offset": 0,
+        "length": 6,
+        "bytes": "0f8403060000",
+        "sha256": "b62858ba74fc0d1c1d5e372ccff7ec03d7da56e1d853ff3f99d25568bed1be21",
+        "game_sha256": "bbab2dc68babcc644d0a1679548bf1e334b6c52aea669c3f61f6cb9d45c1aaf6",
+        "fallthrough_rva": 3898173,
+        "branch_rva": 3899712
+      },
+      "body_guard": {
+        "rva": 3897520,
+        "length": 5120,
+        "sha256": "5227570ec1fc062edf107ffbb456d83234e4fba1e5a70e270e2e107fc2d58500"
+      },
+      "window_guard": {
+        "rva": 3898167,
+        "length": 30,
+        "bytes": "0f8403060000488b03f30f1164245c4889d9f30f115c2458f30f11542454",
+        "sha256": "d41c365582b8c40f01a4e3e08ceed68d9bb1090aafe2f06af4740f327a3fd8fc"
+      }
     },
     {
       "name": "mp.monster-entity-update.3c0750",
@@ -1020,6 +1084,27 @@
           "site": "src/game/toon_time_fence/native.cpp:118"
         }
       ]
+    },
+    {
+      "name": "mp.toon-camera-schedule-gate.3ea462",
+      "rva": 4105314,
+      "shared": false,
+      "groups": [
+        {
+          "feature": "Ordered Toon camera scheduling gate",
+          "phase": "typed_action_runtime::start, bound Mainthread, once per process",
+          "site": "Internal camera-only cadence override; original force/backlog/deadline branches bypass this site."
+        }
+      ],
+      "code_guard": {
+        "offset": 0,
+        "length": 30,
+        "bytes": "80bbc0010000000f847303000080bb08080000000f84660300000f1f4000",
+        "sha256": "3d45300ee4bf4b417a337091479e37bfd119ac92bc240759c02710e2b7d0d99f",
+        "game_sha256": "bbab2dc68babcc644d0a1679548bf1e334b6c52aea669c3f61f6cb9d45c1aaf6",
+        "deferred_rva": 4106210,
+        "full_rva": 4105344
+      }
     },
     {
       "name": "mp.interventions.toon-command.3eb9f0",

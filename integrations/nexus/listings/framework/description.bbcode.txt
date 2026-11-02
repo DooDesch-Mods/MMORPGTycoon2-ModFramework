@@ -9,8 +9,8 @@ Play co-op with a friend, browse character cards in game or add scenery to your 
 
 If a mod sent you here, download [b]Runtime[/b] from the [b]Files[/b] tab and follow the steps below. Then install the mods you want to play.
 
-[size=5][b]New in 0.5.1[/b][/size]
-Fixes a Multiplayer issue where selecting a building could change the shared simulation's random state. Use this Runtime with the matching Multiplayer beta.
+[size=5][b]New in 0.5.2[/b][/size]
+Adds the character-update hooks needed by the next Multiplayer beta. The matching Multiplayer update uses them to keep movement, turning and attribute recovery consistent when players look at different parts of the world. Check your mod's requirements and update the Runtime alongside it.
 
 Creating mods? Lua API 1.3.0 still provides all 254 functions. Get the matching SDK on GitHub for templates, examples, editor hints and offline documentation.
 
@@ -84,14 +84,14 @@ Experienced modders can also use C++ plugins and the [url=https://doodesch-mods.
 [size=5][b]What can mods do today?[/b][/size]
 Here's a look at the tools available to mod creators, from Lua scripts to custom scenery.
 
-[img]https://raw.githubusercontent.com/DooDesch-Mods/MMORPGTycoon2-ModFramework/v0.5.1/assets/brand/coverage.svg[/img]
+[img]https://raw.githubusercontent.com/DooDesch-Mods/MMORPGTycoon2-ModFramework/v0.5.2/assets/brand/coverage.svg[/img]
 
 The percentages count the tools shown, not how finished or bug-free the Framework is. [url=https://github.com/DooDesch-Mods/MMORPGTycoon2-ModFramework/blob/main/docs/ROADMAP.md]Read what each tool supports[/url].
 
 [size=5][b]More ways to change your world[/b][/size]
 We're expanding what mods can change in MT2 and making custom scenery easier to create. Animated models and C# mods are longer-term goals.
 
-[img]https://raw.githubusercontent.com/DooDesch-Mods/MMORPGTycoon2-ModFramework/v0.5.1/assets/brand/roadmap.svg[/img]
+[img]https://raw.githubusercontent.com/DooDesch-Mods/MMORPGTycoon2-ModFramework/v0.5.2/assets/brand/roadmap.svg[/img]
 
 [size=5][b]Credits[/b][/size]
 Framework, SDK, templates and documentation by [b]DooDesch[/b], under the MIT License. Dependencies retain their own notices. MMORPG Tycoon 2 is by VectorStorm; game names and artwork belong to their respective owners and are not covered by the Framework's MIT license.

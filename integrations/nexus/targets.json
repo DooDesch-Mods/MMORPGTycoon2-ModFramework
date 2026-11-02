@@ -1,7 +1,10 @@
 {
   "framework": {
     "name": "MT2 Mod Framework",
-    "silent_releases": ["v0.5.1"],
+    "silent_releases": [
+      "v0.5.1",
+      "v0.5.2"
+    ],
     "domain": "mmorpgtycoon2",
     "game_id": 4452,
     "page_id": 25,
@@ -14,7 +17,9 @@
   },
   "multiplayer": {
     "name": "MMORPG Tycoon 2 Multiplayer - Early Beta",
-    "silent_releases": ["v0.1.0-beta.26"],
+    "silent_releases": [
+      "v0.1.0-beta.26"
+    ],
     "domain": "mmorpgtycoon2",
     "game_id": 4452,
     "page_id": 28,

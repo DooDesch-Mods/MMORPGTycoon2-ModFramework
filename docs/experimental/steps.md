@@ -15,6 +15,25 @@ plugin and its registered session provider. Other mods should use the public
 [patch extension](patches.md). Declaring a manifest capability does not grant
 Step authority.
 
+## Character-update routes in Framework 0.5.2
+
+Framework 0.5.2 adds three exclusive native routes for the matching Multiplayer
+plugin: Toon scheduling, travel rotation and attribute cadence. Their pinned
+targets are listed in the [native catalog](https://github.com/DooDesch-Mods/MMORPGTycoon2-ModFramework/blob/main/adapters/mt2/multiplayer-catalog.json).
+The Framework admits and verifies these routes; the Multiplayer plugin owns the
+same-receiver scope, branch decisions and preservation of live registers, flags
+and stack. Installing the Framework alone does not change those game decisions.
+
+Native code checks recognize multiple authenticated hooks inside a named code
+window. They still reject unknown routes, mismatched pristine code and foreign
+changes. The Routes interfaces and their 4096-byte verification bound are
+unchanged. Larger pristine function checks must run before their first hook;
+subsequent checks must preserve exact seam, trampoline, ownership and lifetime
+proof. A failed or unknown hook operation must not be replayed automatically.
+
+These routes add no Lua functions or authority. Use the Runtime required by the
+Multiplayer release; Lua API 1.3.0 and stable native ABI 1 remain unchanged.
+
 ## Start with the matching header
 
 The source header is

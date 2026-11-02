@@ -1,5 +1,15 @@
 # Changelog
 
+## 0.5.2
+
+### Added
+
+- Add the native character-update hooks required by the next Multiplayer beta. They let Multiplayer keep movement, turning and attribute recovery consistent when players use different camera views.
+
+### Fixed
+
+- Allow native code verification to recognize multiple owned hooks inside one function.
+
 ## 0.5.1
 
 ### Fixed

@@ -5,6 +5,7 @@
 #include <iostream>
 #include <map>
 #include <stdexcept>
+#include <windows.h>
 using namespace mt2fw;
 using namespace mt2fw::mt2;
 namespace {
@@ -18,7 +19,7 @@ struct Fixture {
     Runtime runtime{fs::current_path()/"artifacts/overlap-routes"};
     Plugin a{&runtime},b{&runtime};
     NativeRoutes service{[&](const MT2FW_Host* host){return host==&a.host?&a:host==&b.host?&b:nullptr;}};
-    std::array<unsigned char,256> pristine{},live{};
+    std::array<unsigned char,1024> pristine{},live{};
     std::map<uintptr_t,void*> slots;
     int enable_calls=0,remove_calls=0;
     int batch_calls=0,batch_fail_after=-1;
@@ -215,6 +216,33 @@ void batch_failures(){
         check(!f.service.drain_errors().empty(),"original batch failure remains visible to runtime diagnostics");
     }
 }
+void internal_body(){
+    Fixture f;constexpr size_t gate=description+0xc2;
+    constexpr const char* gate_name="mp.toon-camera-schedule-gate.3ea462";
+    f.service.catalog(gate_name,gate);
+    f.service.set_game_thread(GetCurrentThreadId());
+    MT2FW_MT2_RouteReceipt out{sizeof(out)};
+    auto verify=[&]{return f.api.code_verify(f.api.context,description_name,0,f.pristine.data()+description,512,&out);};
+    check(verify()==MT2FW_MT2_OK,"pristine whole body accepted");
+    f.prepare(description_name,0x200100);f.enable(description_name);
+    f.prepare(gate_name,0x200300);f.enable(gate_name);
+    check(verify()==MT2FW_MT2_OK,"whole body composes entry and internal hook");
+    std::string cause;check(f.service.verify_body(description,512,"",cause),"native whole-body proof accepts both owned routes");
+    check(f.other.hook_prepare(f.other.context,gate_name,reinterpret_cast<void*>(0x200400),&out)==MT2FW_MT2_BUSY,"second owner cannot acquire internal site");
+    auto wrong=f.pristine;wrong[gate]^=1;
+    check(f.api.code_verify(f.api.context,description_name,0,wrong.data()+description,512,&out)==MT2FW_MT2_FAILED,"wrong pristine body pin rejected despite owned hooks");
+    f.live[gate+20]^=1;
+    check(verify()==MT2FW_MT2_FAILED,"foreign internal receipt tail rejected");
+    check(!f.service.verify_body(description,512,"",cause),"whole-body proof rejects foreign internal tail");
+    f.live[gate+20]^=1;f.live[gate+80]^=1;
+    check(verify()==MT2FW_MT2_FAILED,"uncatalogued body edit rejected");
+    f.live[gate+80]^=1;
+    check(f.api.hook_remove(f.api.context,gate_name,&out)==MT2FW_MT2_OK,"internal route can retire without removing entry");
+    check(verify()==MT2FW_MT2_OK,"entry proof survives internal retirement");
+    check(f.service.retire(f.a),"remaining entry owner retires");
+    check(f.live==f.pristine,"all owned entry and internal bytes restored");
+    check(f.api.hook_prepare(f.api.context,gate_name,reinterpret_cast<void*>(0x200300),&out)==MT2FW_MT2_UNAVAILABLE,"retired owner cannot reacquire internal site");
 }
-int main(){try{for(bool reverse:{false,true})for(bool both:{false,true})install_orders(reverse,both);rejects_foreign();rejects_during_admission();batch_contract();batch_failures();std::cout<<checks<<" adjacent and batch native route checks passed\n";return 0;}
+}
+int main(){try{for(bool reverse:{false,true})for(bool both:{false,true})install_orders(reverse,both);rejects_foreign();rejects_during_admission();batch_contract();batch_failures();internal_body();std::cout<<checks<<" adjacent and batch native route checks passed\n";return 0;}
 catch(const std::exception& error){std::cerr<<"Adjacent route check failed after "<<checks<<": "<<error.what()<<'\n';return 1;}}
