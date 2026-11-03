@@ -42,7 +42,7 @@ class MultiplayerCatalogTests(unittest.TestCase):
         prior = json.loads((ROOT / 'tests/fixtures/multiplayer-catalog-v0.2.1.json').read_text(encoding='utf-8'))['targets']
         previous = {row['name'] for row in prior}
         self.assertEqual([row for row in self.targets if row['name'] in previous], prior)
-        self.assertEqual(len(self.targets), 294)
+        self.assertEqual(len(self.targets), 296)
         self.assertEqual(sum(row['shared'] for row in self.targets), 12)
 
     def test_npc_camera_gate_preserves_one_exact_exclusive_original_branch(self):
@@ -122,6 +122,14 @@ class MultiplayerCatalogTests(unittest.TestCase):
             rows = [row for row in self.targets if row['rva'] == original['rva']]
             self.assertEqual(rows, [original])
         self.assertNotIn('mp.character.preview-get-int.9fc370', [r['name'] for r in self.targets])
+
+    def test_ability_apply_has_two_exclusive_pinned_presentation_entries(self):
+        expected = [{'name': 'mp.ability-apply-presentation-setup.570900', 'rva': 5703936, 'shared': False, 'groups': [{'feature': 'new Apply SetupFor presentation boundary', 'phase': 'Ability enable, bound Character Mainthread, once per process', 'site': 'src/game/ability_apply_native.inc:49'}], 'code_guard': {'offset': 0, 'length': 6, 'bytes': '56534883ec28', 'sha256': 'e4d2e640858192b8785473b169480665e72378bda382e5b96fdf3317f6bce1bf', 'game_sha256': 'bbab2dc68babcc644d0a1679548bf1e334b6c52aea669c3f61f6cb9d45c1aaf6', 'resume_rva': 5703942}, 'body_guard': {'rva': 5703936, 'length': 378, 'sha256': '8c17fdc046a0217cfb8e02cd8e6457c8a78e866f9fb3dba2340283a185f59054'}}, {'name': 'mp.ability-apply-presentation-event.5721f0', 'rva': 5710320, 'shared': False, 'groups': [{'feature': 'new Apply own Event40 presentation boundary', 'phase': 'Ability enable, bound Character Mainthread, once per process', 'site': 'src/game/ability_apply_native.inc:49'}], 'code_guard': {'offset': 0, 'length': 8, 'bytes': '555756534883ec28', 'sha256': '4692b8a69cc5e88c81eb4e467223072a5f99ba5e40d42d73c8bc37d7499ff4b5', 'game_sha256': 'bbab2dc68babcc644d0a1679548bf1e334b6c52aea669c3f61f6cb9d45c1aaf6', 'resume_rva': 5710328}, 'body_guard': {'rva': 5710320, 'length': 419, 'sha256': 'ddd2f2414946173bed99d51289c42f3c0206168bef220d93646381599a351d87'}}]
+        for original in expected:
+            self.assertEqual([row for row in self.targets if row['rva'] == original['rva']], [original])
+            guard = original['code_guard']
+            self.assertEqual(guard['resume_rva'], original['rva'] + guard['length'])
+            self.assertFalse(original['shared'])
 
 if __name__ == '__main__':
     unittest.main()

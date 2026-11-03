@@ -4,7 +4,7 @@ title: Compatibility and status
 
 # Compatibility and status
 
-Framework **0.5.6** provides Lua API **1.3.0** and native ABI **1**. It supports only Windows x64 with Steam and the exact verified MT2 executable:
+Framework **0.5.7** provides Lua API **1.3.0** and native ABI **1**. It supports only Windows x64 with Steam and the exact verified MT2 executable:
 
 ```text
 bbab2dc68babcc644d0a1679548bf1e334b6c52aea669c3f61f6cb9d45c1aaf6
@@ -17,8 +17,8 @@ The runtime does not resolve internal game functions through the executable's sy
 ## Runtime versions for native mods
 
 From Framework 0.5.4, the loaded `MT2Framework.dll` includes standard Windows
-`VERSIONINFO`. Both fixed FileVersion and ProductVersion are `0.5.6.0`; their
-display strings are `0.5.6`. The resource type is `VFT_DLL`, and
+`VERSIONINFO`. Both fixed FileVersion and ProductVersion are `0.5.7.0`; their
+display strings are `0.5.7`. The resource type is `VFT_DLL`, and
 `OriginalFilename` is `MT2Framework.dll`. String values use table `040904b0`
 with English/Unicode translation `0409`/`1200`.
 
@@ -68,3 +68,7 @@ From 0.2.3, the Framework identifies itself and its version in the original game
 ## Multiplayer Early Beta 29
 
 Multiplayer Early Beta 29 requires Framework Runtime **0.5.6** for character-card previews and shared class renaming. Both players need the matching Multiplayer and Runtime versions. The native preview selector is experimental Service V2; stable plugin ABI 1, Lua API 1.3.0 and its 254 functions stay unchanged. See the [native service contract](experimental/native-services.md) for exact ownership and failure behavior.
+
+## Ability editor routes in 0.5.7
+
+Framework 0.5.7 adds two named native presentation routes required by compatible Multiplayer ability-editor builds. Framework 0.5.6 does not admit these entries. Native SDK headers, stable ABI 1, Lua API 1.3.0 and all 254 functions remain unchanged. Route admission does not establish support for every ability-editing operation; check the matching Multiplayer release for its accepted actions.

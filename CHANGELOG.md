@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.5.7
+
+### Added
+
+- Support the next Multiplayer beta's ability editor.
+
 ## 0.5.6
 
 ### Added

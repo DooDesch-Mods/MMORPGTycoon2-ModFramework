@@ -6,10 +6,10 @@
 
 Build mods for **MMORPG Tycoon 2**. Start with Lua and a text editor, extend with C++, or bring your own static GLB scenery into the game.
 
-**Framework 0.5.6** supports viewing character cards and renaming classes
-together in Multiplayer Early Beta 29. Update the Runtime alongside the matching
-Multiplayer release. Modders keep Lua API **1.3.0** with **254 functions**,
-complete examples and the [query recipes](docs/recipes/world-queries.md).
+**Framework 0.5.7** adds support for the next Multiplayer beta's ability editor.
+Use the Runtime required by your Multiplayer release. Modders keep Lua API
+**1.3.0** with **254 functions**, complete examples and the
+[query recipes](docs/recipes/world-queries.md).
 
 **[Create your first mod](https://doodesch-mods.github.io/MMORPGTycoon2-ModFramework/quickstart.html)** · [Explore the API](https://doodesch-mods.github.io/MMORPGTycoon2-ModFramework/reference/index.html) · [Use an AI agent](https://doodesch-mods.github.io/MMORPGTycoon2-ModFramework/agents/start.html)
 
@@ -18,7 +18,7 @@ complete examples and the [query recipes](docs/recipes/world-queries.md).
 <!-- roadmap:start -->
 ## What can I build today?
 
-Included in [Framework 0.5.6](https://github.com/DooDesch-Mods/MMORPGTycoon2-ModFramework/releases/tag/v0.5.6). New gameplay tools are experimental. World-changing Lua gameplay operations currently run in singleplayer.
+Included in [Framework 0.5.7](https://github.com/DooDesch-Mods/MMORPGTycoon2-ModFramework/releases/tag/v0.5.7). New gameplay tools are experimental. World-changing Lua gameplay operations currently run in singleplayer.
 
 <picture>
   <source media="(max-width: 600px)" srcset="https://raw.githubusercontent.com/DooDesch-Mods/MMORPGTycoon2-ModFramework/main/assets/brand/coverage-mobile.svg">
@@ -30,7 +30,7 @@ Percentages count the listed areas equally. They describe feature coverage, not 
 <details>
 <summary>Feature details - what is included</summary>
 
-| Feature | 0.5.6 | What is covered |
+| Feature | 0.5.7 | What is covered |
 | --- | --- | --- |
 | Lua mods and reload | ✅ Available | Use a text editor; reload scripts without restarting. A rejected replacement keeps the previous mod running. [Start here](docs/quickstart.md). |
 | Native C++ plugins | ✅ Available | Build with the native SDK. Plugin updates require a game restart. [SDK guide](docs/reference/native.md). |
@@ -85,7 +85,7 @@ Give your mod a central Mods entry, native game windows, searchable lists and wo
 
 ## For contributors
 
-Framework **0.5.6** provides Lua API **1.3.0** and the experimental gameplay contract. Use the matching Runtime and SDK. The [gameplay guide](docs/experimental/gameplay.md) covers action results and lifetime rules; the [machine contract](api/experimental/gameplay.json) describes each operation and its result type.
+Framework **0.5.7** provides Lua API **1.3.0** and the experimental gameplay contract. Use the matching Runtime and SDK. The [gameplay guide](docs/experimental/gameplay.md) covers action results and lifetime rules; the [machine contract](api/experimental/gameplay.json) describes each operation and its result type.
 
 All required native source dependencies are inside this repository. Build with Visual Studio 2022 C++, CMake and Python:
 

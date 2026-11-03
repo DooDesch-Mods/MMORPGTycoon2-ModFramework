@@ -294,3 +294,5 @@ catalog.catalog("mp.ordered-clearance-make-scenery.559ee0",0x559ee0,false);
 catalog.catalog("mp.terrain-settlement.map-data",0x32c1e0,false);
 catalog.catalog("framework.character.preview-get-int.9fc370",0x9fc370,true);
 catalog.catalog("mp.character.preview-attach-weapon.6577d0",0x6577d0,false);
+catalog.catalog("mp.ability-apply-presentation-setup.570900",0x570900,false);
+catalog.catalog("mp.ability-apply-presentation-event.5721f0",0x5721f0,false);
