@@ -6,6 +6,10 @@
 
 - Support the next Multiplayer beta's ability editor.
 
+### Fixed
+
+- Reduce delays between Multiplayer world updates when background tasks finish.
+
 ## 0.5.6
 
 ### Added

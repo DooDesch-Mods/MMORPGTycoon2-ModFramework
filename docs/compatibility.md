@@ -72,3 +72,21 @@ Multiplayer Early Beta 29 requires Framework Runtime **0.5.6** for character-car
 ## Ability editor routes in 0.5.7
 
 Framework 0.5.7 adds three named native presentation and editor-lifetime routes required by compatible Multiplayer ability-editor builds. The editor-lifetime route lets the Multiplayer owner protect the live Ability identity while the original game destroys its temporary editor proposal. Framework 0.5.6 does not admit these entries. Native SDK headers, stable ABI 1, Lua API 1.3.0 and all 254 functions remain unchanged. Route admission does not establish support for every ability-editing operation; check the matching Multiplayer release for its accepted actions.
+
+## Ordered task polling in 0.5.7
+
+During an admitted Multiplayer world update, the Framework shortens one original
+task-completion polling delay from 100 ms to 10 ms. Selection requires the bound
+game thread, the current entered-step receipt, an active original task-drain
+scope, the exact native caller and the original 100 ms argument. The original
+drain still checks its queues and locks, runs completion callbacks and logs its
+waits. Other callers, threads and delays, including zero-duration yields, keep
+their original arguments.
+
+The Framework owns a named shared route at the verified EXE import thunk; it
+does not replace the SDL DLL export or rewrite the import table. Existing SDK
+headers and the 297-entry Multiplayer catalog are unchanged. Diagnostics add
+`step.*` wall-time scopes through the existing native trace service and expose
+selected/forwarded polling counters in `step_polling_delay`. These counters are
+process-lifetime totals, separate from capture-epoch scope counts. Requested
+milliseconds are not measured wait time or CPU usage.

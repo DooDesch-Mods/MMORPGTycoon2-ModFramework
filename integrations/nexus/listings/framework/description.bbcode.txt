@@ -10,7 +10,7 @@ Play co-op with a friend, browse character cards in game or add scenery to your 
 If a mod sent you here, download [b]Runtime[/b] from the [b]Files[/b] tab and follow the steps below. Then install the mods you want to play.
 
 [size=5][b]New in 0.5.7[/b][/size]
-Adds support for the next Multiplayer beta's ability editor. Install the Runtime required by your Multiplayer release. Both players need matching versions.
+Adds support for the next Multiplayer beta's ability editor and reduces delays between world updates when background tasks finish. Install the Runtime required by your Multiplayer release. Both players need matching versions.
 
 Creating mods? Lua API 1.3.0 still provides all 254 functions. Get the matching SDK on GitHub for templates, examples, editor hints and offline documentation.
 
