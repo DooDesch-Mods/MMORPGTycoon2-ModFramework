@@ -71,4 +71,4 @@ Multiplayer Early Beta 29 requires Framework Runtime **0.5.6** for character-car
 
 ## Ability editor routes in 0.5.7
 
-Framework 0.5.7 adds two named native presentation routes required by compatible Multiplayer ability-editor builds. Framework 0.5.6 does not admit these entries. Native SDK headers, stable ABI 1, Lua API 1.3.0 and all 254 functions remain unchanged. Route admission does not establish support for every ability-editing operation; check the matching Multiplayer release for its accepted actions.
+Framework 0.5.7 adds three named native presentation and editor-lifetime routes required by compatible Multiplayer ability-editor builds. The editor-lifetime route lets the Multiplayer owner protect the live Ability identity while the original game destroys its temporary editor proposal. Framework 0.5.6 does not admit these entries. Native SDK headers, stable ABI 1, Lua API 1.3.0 and all 254 functions remain unchanged. Route admission does not establish support for every ability-editing operation; check the matching Multiplayer release for its accepted actions.

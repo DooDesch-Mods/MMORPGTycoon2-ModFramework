@@ -42,7 +42,7 @@ class MultiplayerCatalogTests(unittest.TestCase):
         prior = json.loads((ROOT / 'tests/fixtures/multiplayer-catalog-v0.2.1.json').read_text(encoding='utf-8'))['targets']
         previous = {row['name'] for row in prior}
         self.assertEqual([row for row in self.targets if row['name'] in previous], prior)
-        self.assertEqual(len(self.targets), 296)
+        self.assertEqual(len(self.targets), 297)
         self.assertEqual(sum(row['shared'] for row in self.targets), 12)
 
     def test_npc_camera_gate_preserves_one_exact_exclusive_original_branch(self):
@@ -130,6 +130,11 @@ class MultiplayerCatalogTests(unittest.TestCase):
             guard = original['code_guard']
             self.assertEqual(guard['resume_rva'], original['rva'] + guard['length'])
             self.assertFalse(original['shared'])
+
+    def test_ability_proposal_destroy_has_one_exclusive_pinned_entry(self):
+        expected = {'name': 'mp.ability-proposal-window-destroy.569550', 'rva': 5674320, 'shared': False, 'groups': [{'feature': 'Preserve live Ability UID ownership while destroying the stock copied editor proposal', 'phase': 'Ability enable, bound main thread', 'site': 'src/game/ability_apply_native.inc'}], 'code_guard': {'offset': 0, 'length': 5, 'bytes': '534883ec20', 'sha256': '56d7f101a6c2ee7dc50760d9d7f16cfbbe7a7afb148ed0bfd4f643ecf9b77cee', 'game_sha256': 'bbab2dc68babcc644d0a1679548bf1e334b6c52aea669c3f61f6cb9d45c1aaf6', 'resume_rva': 5674325}, 'body_guard': {'rva': 5674320, 'length': 213, 'sha256': '834bbdbafdc393bc2e64b7c5a4064aff0f2aea5f34987aea3a3a0f96f9a1be63'}}
+        self.assertEqual([row for row in self.targets if row['rva'] == expected['rva']], [expected])
+        self.assertEqual(expected['code_guard']['resume_rva'], expected['rva'] + expected['code_guard']['length'])
 
 if __name__ == '__main__':
     unittest.main()

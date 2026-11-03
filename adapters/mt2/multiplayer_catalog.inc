@@ -296,3 +296,4 @@ catalog.catalog("framework.character.preview-get-int.9fc370",0x9fc370,true);
 catalog.catalog("mp.character.preview-attach-weapon.6577d0",0x6577d0,false);
 catalog.catalog("mp.ability-apply-presentation-setup.570900",0x570900,false);
 catalog.catalog("mp.ability-apply-presentation-event.5721f0",0x5721f0,false);
+catalog.catalog("mp.ability-proposal-window-destroy.569550",0x569550,false);
