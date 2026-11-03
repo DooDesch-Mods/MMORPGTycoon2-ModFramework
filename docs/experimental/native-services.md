@@ -4,7 +4,7 @@ title: Native MT2 services
 
 # Native MT2 services
 
-Framework 0.1.5 provides experimental MT2 native services alongside stable plugin ABI 1. The declarations are in `adapters/mt2/sdk/native_services.h`, and the developer package includes them under `sdk/native/mt2`. Keep these versioned game services separate from the stable Lua and native contracts.
+Experimental MT2 native services were introduced in Framework 0.1.5 alongside stable plugin ABI 1. The declarations are in `adapters/mt2/sdk/native_services.h`, and the developer package includes them under `sdk/native/mt2`. Keep these versioned game services separate from the stable Lua and native contracts.
 
 ## Bootstrap and ownership
 
@@ -24,7 +24,7 @@ Callbacks must return promptly and must not throw across the native boundary. A 
 
 The framework owns MinHook initialization, named target ownership, enable/disable and rollback. A native plugin can request a named adapter target; it cannot supply a target RVA or executable address. Different names cannot alias the same catalogued address. A claimed target cannot be claimed by another plugin. Failed installation and failed rollback retain ownership until actual cleanup succeeds.
 
-The current candidate reserves existing framework targets, including original Update, title/game commands, native desktop and StartMenu, create/move/remove observers, SDL and PhysFS. It deliberately has no live unique Multiplayer catalog entries yet. The Multiplayer hook inventory must provide exact verified targets and installation phases first. Shared operations require typed adapter dispatch and an owned original-call receipt; they cannot use a second detour or blind chaining. This remains an unfinished migration slice.
+The adapter catalog reserves Framework targets, including original Update, title/game commands, native desktop and StartMenu, create/move/remove observers, SDL and PhysFS. It also supplies named, version-pinned Multiplayer targets with explicit installation phases. Catalog admission alone does not install a hook or confirm a gameplay feature. Use the [native shared routes](native-routes.md) service for phased preparation, activation and ownership receipts. Shared operations require typed adapter dispatch and an owned original-call receipt; they cannot use a second detour or blind chaining.
 
 The loader continues to reject the legacy `MT2_Multiplayer.dll`. The migrated plugin uses `MT2MultiplayerPlugin.dll`. It must not call the standalone bootstrap, install another profile redirect, initialize another renderer/input system, call `MH_ALL_HOOKS` or uninitialize the process hook manager.
 
