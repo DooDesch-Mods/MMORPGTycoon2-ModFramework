@@ -98,9 +98,54 @@ typedef struct MT2FW_MT2_ServiceV1 {
     MT2FW_MT2_Result (MT2FW_CALL *section_read)(void*, uint32_t section, MT2FW_MT2_Section* result);
 } MT2FW_MT2_ServiceV1;
 
+/* Fixed Character preview selection. V1 and the stable plugin ABI are unchanged. */
+#define MT2FW_MT2_PREVIEW_SERVICE_VERSION 2u
+#define MT2FW_MT2_PREVIEW_RANDOM_BYTES 40u
+#define MT2FW_MT2_CHARACTER_PREVIEW_ABORT 0xE04D5432u
+
+typedef struct MT2FW_MT2_CharacterPreviewIntCall {
+    uint32_t size;
+    uint32_t reserved;
+    uint64_t return_rva;
+    uint64_t thread;
+    void* receiver;
+    int32_t limit;
+    uint32_t reserved2;
+} MT2FW_MT2_CharacterPreviewIntCall;
+
+typedef struct MT2FW_MT2_CharacterPreviewIntSelection {
+    uint32_t size;
+    uint32_t source_bytes;
+    void* source;
+    char cause[160];
+} MT2FW_MT2_CharacterPreviewIntSelection;
+
+/* UNAVAILABLE alone means no matching scope. OK borrows an initialized, writable
+   private 40-byte source until the original GetInt and its trace finish. Other
+   results, exceptions and invalid OK output abort before any original call with
+   MT2FW_MT2_CHARACTER_PREVIEW_ABORT. The consumer must latch this ingress failure
+   and refuse further connected preview originals until proper session teardown.
+   A callback must not throw, reenter selection or retain the borrowed call. */
+typedef MT2FW_MT2_Result (MT2FW_CALL *MT2FW_MT2_CharacterPreviewIntSelector)(
+    void* user, const MT2FW_MT2_CharacterPreviewIntCall* call,
+    MT2FW_MT2_CharacterPreviewIntSelection* selection);
+
+typedef struct MT2FW_MT2_ServiceV2 {
+    MT2FW_MT2_ServiceV1 v1;
+    /* One supported Multiplayer registration, bound game thread only. A second
+       bind is BUSY. Unbind prevents new selection; BUSY retains any in-flight
+       lease until original return/unwind. Plugin retirement unregisters it. */
+    MT2FW_MT2_Result (MT2FW_CALL *character_preview_int_bind)(
+        void* context, MT2FW_MT2_CharacterPreviewIntSelector selector,
+        void* user, uint64_t* token);
+    MT2FW_MT2_Result (MT2FW_CALL *character_preview_int_unbind)(void* context, uint64_t token);
+} MT2FW_MT2_ServiceV2;
+
 /* Resolve MT2FW_MT2_QueryService on the already loaded MT2Framework.dll. Query
    from an active framework callback, with the exact borrowed Host pointer from
    PluginLoad. An absent export means unsupported, never start another loader.
+   Query V2 with &service.v1 and sizeof(service); the returned prefix contains
+   version 2 and the full V2 size. Public Runtime 0.5.5 does not provide V2.
    All calls except capture_read/section_read and scope emission are restricted
    to framework callbacks. No exception may cross this boundary. */
 typedef MT2FW_MT2_Result (MT2FW_CALL *MT2FW_MT2_QueryServiceFn)(

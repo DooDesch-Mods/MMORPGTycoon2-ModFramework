@@ -21,6 +21,12 @@ public:
     void end_frame(bool original_returned);
     bool in_frame() const { return frame_depth_!=0; }
     bool has_hooks() const { return !hooks_.empty(); }
+    using PreviewProof=std::function<bool(std::string&)>;
+    void character_preview_backend(uintptr_t image,PreviewProof proof);
+    void set_game_thread(uint64_t thread){preview_thread_.store(thread,std::memory_order_release);}
+    struct CharacterPreviewLease {void* owner=nullptr;uint64_t token=0;void* source=nullptr;};
+    void character_preview_select(uintptr_t caller,void* receiver,int32_t limit,CharacterPreviewLease*);
+    void character_preview_release(CharacterPreviewLease*) noexcept;
 private:
     struct Owner {
         NativeServices* service;
@@ -45,6 +51,19 @@ private:
     std::vector<std::unique_ptr<FrameRun>> frame_slots_;
     size_t frame_depth_=0;
     uint64_t next_frame_=0;
+    struct PreviewRegistration {
+        Owner* owner=nullptr;uint64_t token=0;
+        MT2FW_MT2_CharacterPreviewIntSelector selector=nullptr;void* user=nullptr;
+        size_t inflight=0;bool active=false,failed=false,in_selector=false;char cause[160]{};
+    } preview_;
+    std::atomic<uintptr_t> preview_image_{0};
+    PreviewProof preview_proof_;
+    std::atomic<uint64_t> preview_thread_{0};
+    std::mutex preview_gate_;
+    static MT2FW_MT2_Result MT2FW_CALL character_preview_bind(void*,MT2FW_MT2_CharacterPreviewIntSelector,void*,uint64_t*);
+    static MT2FW_MT2_Result MT2FW_CALL character_preview_unbind(void*,uint64_t);
+    void character_preview_retire(Owner&);
+    [[noreturn]] void character_preview_fail(CharacterPreviewLease*,const char*);
     std::array<Section,4096> sections_;
     std::atomic<uint32_t> section_count_{0};
     std::atomic<uint64_t> active_capture_{0},next_scope_{1},dropped_{0},current_frame_{0};

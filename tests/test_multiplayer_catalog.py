@@ -42,8 +42,8 @@ class MultiplayerCatalogTests(unittest.TestCase):
         prior = json.loads((ROOT / 'tests/fixtures/multiplayer-catalog-v0.2.1.json').read_text(encoding='utf-8'))['targets']
         previous = {row['name'] for row in prior}
         self.assertEqual([row for row in self.targets if row['name'] in previous], prior)
-        self.assertEqual(len(self.targets), 292)
-        self.assertEqual(sum(row['shared'] for row in self.targets), 11)
+        self.assertEqual(len(self.targets), 294)
+        self.assertEqual(sum(row['shared'] for row in self.targets), 12)
 
     def test_npc_camera_gate_preserves_one_exact_exclusive_original_branch(self):
         matches = [row for row in self.targets if row['rva'] == 0x3c8db7]
@@ -115,6 +115,13 @@ class MultiplayerCatalogTests(unittest.TestCase):
         self.assertEqual(row['code_guard']['length'], 30)
         self.assertEqual(row['code_guard']['bytes'], '5756534883ec404889ce4889d14889d3e8cb322800488378080474744889')
 
+
+    def test_character_preview_uses_one_framework_rng_owner_and_exclusive_weapon_scope(self):
+        expected = [{'name': 'framework.character.preview-get-int.9fc370', 'rva': 10470256, 'shared': True, 'groups': [{'feature': 'Character preview RNG source selection', 'phase': 'Framework GetInt owner, typed Service V2 registration', 'site': 'Framework-owned existing GetInt wrapper; typed selector only, no consumer hook or observer handoff.'}], 'code_guard': {'offset': 0, 'length': 30, 'bytes': '488b41084c8b41184c8b094c8b51104931c04989c34d31ca4d31c149c1c8', 'sha256': '75e9849e8f684c36d5dc0226a16ff77626e56f7727fe4784c50a29a03df827b6'}, 'body_guard': {'rva': 10470256, 'length': 96, 'sha256': '7041b7ec325591b8d191a54b3ac8d9bd909ee099283d9d210014af498d160c61'}}, {'name': 'mp.character.preview-attach-weapon.6577d0', 'rva': 6649808, 'shared': False, 'groups': [{'feature': 'Character weapon preview scope', 'phase': 'typed_action_runtime::start, bound Mainthread, once per process', 'site': 'Original ActorOrbitPane AttachWeapon preview; the Multiplayer owner validates exact receiver and TLS scope.'}], 'code_guard': {'offset': 0, 'length': 30, 'bytes': '4157415641554154555756534881ecc8000000488b81000700004889cb48', 'sha256': 'e392c726dbbb98eba244ab0a04153ee131cfd3449c54a2a46638cdb6b2010e51'}, 'body_guard': {'rva': 6649808, 'length': 1056, 'sha256': '2bee69e1eaea954f0f772cc46dce5d42eea03606285d951b0062c39aa3a15126'}}]
+        for original in expected:
+            rows = [row for row in self.targets if row['rva'] == original['rva']]
+            self.assertEqual(rows, [original])
+        self.assertNotIn('mp.character.preview-get-int.9fc370', [r['name'] for r in self.targets])
 
 if __name__ == '__main__':
     unittest.main()

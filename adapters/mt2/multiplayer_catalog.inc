@@ -292,3 +292,5 @@ catalog.catalog("mp.ordered-tutorial-undo-clear.53a240",0x53a240,false);
 catalog.catalog("mp.ordered-clearance-make-scenery.559ee0",0x559ee0,false);
 
 catalog.catalog("mp.terrain-settlement.map-data",0x32c1e0,false);
+catalog.catalog("framework.character.preview-get-int.9fc370",0x9fc370,true);
+catalog.catalog("mp.character.preview-attach-weapon.6577d0",0x6577d0,false);

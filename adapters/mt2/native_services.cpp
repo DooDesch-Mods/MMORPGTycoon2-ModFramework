@@ -28,7 +28,8 @@ void NativeServices::target(const std::string& name,void* address){
 }
 NativeServices::Owner* NativeServices::owner(void* context){auto result=static_cast<Owner*>(context);return result&&result->alive.load(std::memory_order_acquire)?result:nullptr;}
 MT2FW_MT2_Result NativeServices::query(const MT2FW_Host* host,uint32_t version,MT2FW_MT2_ServiceV1* output,uint32_t capacity){
-    if(!output||capacity<sizeof(*output)||version!=MT2FW_MT2_SERVICE_VERSION)return MT2FW_MT2_INVALID;
+    const bool extended=version==MT2FW_MT2_PREVIEW_SERVICE_VERSION;
+    if(!output||(version!=MT2FW_MT2_SERVICE_VERSION&&!extended)||capacity<(extended?sizeof(MT2FW_MT2_ServiceV2):sizeof(*output)))return MT2FW_MT2_INVALID;
     auto plugin=lookup_(host);if(!plugin||!plugin->active||plugin->staging||plugin->manifest.type!="native")return MT2FW_MT2_UNAVAILABLE;
     try{
         auto& stored=owners_[plugin];if(!stored){
@@ -39,6 +40,8 @@ MT2FW_MT2_Result NativeServices::query(const MT2FW_Host* host,uint32_t version,M
         auto& value=*stored;if(!value.alive.load())return MT2FW_MT2_UNAVAILABLE;
         *output={sizeof(*output),MT2FW_MT2_SERVICE_VERSION,&value,value.game.c_str(),value.profile.c_str(),value.game_data.c_str(),value.directory.c_str(),value.data.c_str(),
             frame_subscribe,frame_unsubscribe,hook_install,hook_remove,section_register,scope_begin,scope_end,capture_start,capture_read,capture_stop,section_read};
+        if(extended){auto* v2=reinterpret_cast<MT2FW_MT2_ServiceV2*>(output);v2->v1.size=sizeof(*v2);v2->v1.version=version;
+            v2->character_preview_int_bind=character_preview_bind;v2->character_preview_int_unbind=character_preview_unbind;}
         return MT2FW_MT2_OK;
     }catch(const std::exception& problem){error(*plugin,std::string("Native service query failed: ")+problem.what());return MT2FW_MT2_FAILED;}
 }
@@ -119,6 +122,7 @@ MT2FW_MT2_Result MT2FW_CALL NativeServices::hook_remove(void* context,uint64_t t
 }
 bool NativeServices::retire(Plugin& plugin){
     auto found=owners_.find(&plugin);if(found==owners_.end())return true;auto& value=*found->second;
+    character_preview_retire(value);
     bool complete=true;
     for(auto it=hooks_.begin();it!=hooks_.end();){
         if(it->owner!=&value){++it;continue;}
@@ -192,4 +196,5 @@ MT2FW_MT2_Result MT2FW_CALL NativeServices::section_read(void* context,uint32_t 
     std::memcpy(result->owner,source.owner->plugin->manifest.id.c_str(),source.owner->plugin->manifest.id.size()+1);
     std::memcpy(result->name,source.name.c_str(),source.name.size()+1);return MT2FW_MT2_OK;
 }
+#include "native_character_preview.inc"
 }

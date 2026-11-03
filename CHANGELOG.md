@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.5.6
+
+### Added
+
+- Support viewing character cards and renaming classes together in Multiplayer Early Beta 29.
+
 ## 0.5.5
 
 ### Added

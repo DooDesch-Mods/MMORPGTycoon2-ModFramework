@@ -743,7 +743,7 @@ void update(void* game,float dt) {
     {std::lock_guard lock(gate);if(running&&native_services){
         if(!engine_thread)engine_thread=GetCurrentThreadId();
         if(engine_thread!=GetCurrentThreadId()){report("Native frame update changed thread identity");}
-        else {if(native_routes)native_routes->set_game_thread(engine_thread);if(native_ownership)native_ownership->set_game_thread(engine_thread);if(native_patches)native_patches->set_game_thread(engine_thread);try{step_runtime::configure();native_services->begin_frame(game,dt);paired=true;}catch(const std::exception& error){report(std::string("Native frame begin failed: ")+error.what());}}
+        else {if(native_routes)native_routes->set_game_thread(engine_thread);if(native_ownership)native_ownership->set_game_thread(engine_thread);if(native_patches)native_patches->set_game_thread(engine_thread);native_services->set_game_thread(engine_thread);try{step_runtime::configure();native_services->begin_frame(game,dt);paired=true;}catch(const std::exception& error){report(std::string("Native frame begin failed: ")+error.what());}}
     }}
     std::optional<PatchRegistry::Run> patch_run;
     {std::lock_guard lock(gate);if(running&&runtime&&runtime->patches.has_subscribers("game.update")){
@@ -1090,6 +1090,11 @@ extern "C" __declspec(dllexport) bool MT2FW_InitInstalled(const MT2FW_Bootstrap*
         start_save_worker();
         result=MH_EnableHook(MH_ALL_HOOKS);if(result!=MH_OK)throw std::runtime_error(std::string("Enable hooks failed: ")+MH_StatusToString(result));
         for(auto& item:framework_hooks){std::string cause;if(!native_routes->publish_framework_hook(item.target,item.replacement,*item.original,cause))throw std::runtime_error("Framework route publication failed: "+cause);}
+        native_services->character_preview_backend(reinterpret_cast<uintptr_t>(GetModuleHandleW(nullptr)),[](std::string& cause){
+            if(lab::enabled()||!step_runtime::rng_trace::installed){cause="Character preview requires the Framework Step RNG owner";return false;}
+            return native_routes->prove_framework_hook("framework.character.preview-get-int.9fc370",reinterpret_cast<void*>(&step_runtime::rng_trace::get_int),
+                reinterpret_cast<void*>(step_runtime::rng_trace::original_int),cause);
+        });
         mt2::configure_shared_operations(native_routes);running=true;return true;
     }catch(const std::exception& error){report(error.what());auto disabled=MH_DisableHook(MH_ALL_HOOKS);if(disabled!=MH_OK&&disabled!=MH_ERROR_NOT_INITIALIZED)report(std::string("Initialization rollback failed: ")+MH_StatusToString(disabled));return false;}
 }

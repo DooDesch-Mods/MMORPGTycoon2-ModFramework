@@ -57,7 +57,22 @@ template<class Function,class... Args>auto invoke(uintptr_t helper,uintptr_t cal
     finish(ticket,result);if(selected.count)++selected.count->completed;return result;
 }
 __declspec(noinline) uint64_t next(void* source){return invoke(0x9fc150,reinterpret_cast<uintptr_t>(_ReturnAddress()),source,original_next);}
-__declspec(noinline) int get_int(void* source,int limit){return invoke(0x9fc370,reinterpret_cast<uintptr_t>(_ReturnAddress()),source,original_int,limit);}
+__declspec(noinline) int get_int(void* source,int limit){
+    const auto caller=reinterpret_cast<uintptr_t>(_ReturnAddress());
+    const auto selected=select_source?select_source(0x9fc370,caller,source):Selection{source};
+    auto* service=native_services.get();
+    mt2::NativeServices::CharacterPreviewLease lease{nullptr,0,selected.source};
+    int result;
+    // POD SEH cleanup protects the borrowed source through native execution and
+    // trace completion, including exceptions that do not unwind /EHsc objects.
+    __try{
+        if(service)service->character_preview_select(caller,selected.source,limit,&lease);
+        const auto ticket=begin(0x9fc370,caller,lease.source);
+        result=original_int(lease.source,limit);
+        finish(ticket,result);if(selected.count)++selected.count->completed;
+    }__finally{if(service)service->character_preview_release(&lease);}
+    return result;
+}
 __declspec(noinline) int get_int_range(void* source,int low,int high){return invoke(0x9fc3d0,reinterpret_cast<uintptr_t>(_ReturnAddress()),source,original_int_range,low,high);}
 __declspec(noinline) float get_float_range(void* source,float low,float high){return invoke(0x9fc4b0,reinterpret_cast<uintptr_t>(_ReturnAddress()),source,original_float_range,low,high);}
 __declspec(noinline) uint64_t get_vector2_range(void* source,float low,float high){return invoke(0x9fc690,reinterpret_cast<uintptr_t>(_ReturnAddress()),source,original_vector2_range,low,high);}

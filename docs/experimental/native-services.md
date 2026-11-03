@@ -28,6 +28,18 @@ The adapter catalog reserves Framework targets, including original Update, title
 
 The loader continues to reject the legacy `MT2_Multiplayer.dll`. The migrated plugin uses `MT2MultiplayerPlugin.dll`. It must not call the standalone bootstrap, install another profile redirect, initialize another renderer/input system, call `MH_ALL_HOOKS` or uninitialize the process hook manager.
 
+## Character preview selector (Framework 0.5.6)
+
+`MT2FW_MT2_ServiceV2` adds a restricted Character preview selector for the migrated `doodesch.multiplayer` plugin. Query the existing export with `MT2FW_MT2_PREVIEW_SERVICE_VERSION` (2), `&service.v1` and `sizeof(service)`. Require `OK`, version 2, the full returned size and both selector function pointers. Service V1 and stable plugin ABI 1 keep their existing layouts. Framework 0.5.5 rejects this version; missing support does not authorize a separate RNG hook.
+
+The Framework remains the sole physical owner of `GetInt`. Its existing source selection runs first. The selector applies only to the two catalogued Character preview callers, the bound game thread and the supported Default RNG receiver. Multiplayer owns the exact InfoView/AttachWeapon scope and an initialized private RNG source. This service is not a general RNG replacement or a Lua API.
+
+Bind in an active game-thread callback and retain the returned owner token. Return `UNAVAILABLE` only when the current call is outside the owned preview scope. Return `OK` with the complete selection struct, a 40-byte initialized private source and a terminated `cause` buffer. The source must be aligned, committed writable storage and must not overlap the shared RNG or its pointer slot. The callback must not throw. The Framework calls the original once using the final selected source and traces that source.
+
+Callback errors, exceptions, malformed `OK` output and invalid sources retain their original cause, fail the registration and raise `MT2FW_MT2_CHARACTER_PREVIEW_ABORT`. The Framework releases the callback lease before this abort. It neither calls the shared RNG as a fallback nor invents an integer result. The consumer must catch this fixed abort at its POD native boundary, retain an ingress failure and refuse connected Character originals until controlled teardown. Original game exceptions propagate unchanged.
+
+The owner lease covers selection, the original call and trace completion, including native SEH unwinding. Unbind disables new selection immediately and returns `BUSY` while the current call still owns the source; retain callback state and source storage until quiescence, then complete unbinding. Plugin retirement uses the same native ownership and deferred shutdown rules. Do not unload or replay an uncertain native call.
+
 ## Optional profiling feed
 
 Register immutable named sections once. Cache the service and section IDs. `scope_begin` returns `{epoch, token}`; always pass the same section/token to `scope_end`. With no capture active, begin returns zero before reading a clock or allocating memory. No per-scope JSON, file access or observer callback runs.

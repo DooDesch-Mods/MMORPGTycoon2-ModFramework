@@ -3512,6 +3512,52 @@
           "site": "src/game/terrain_settlement.inc::install"
         }
       ]
+    },
+    {
+      "name": "framework.character.preview-get-int.9fc370",
+      "rva": 10470256,
+      "shared": true,
+      "groups": [
+        {
+          "feature": "Character preview RNG source selection",
+          "phase": "Framework GetInt owner, typed Service V2 registration",
+          "site": "Framework-owned existing GetInt wrapper; typed selector only, no consumer hook or observer handoff."
+        }
+      ],
+      "code_guard": {
+        "offset": 0,
+        "length": 30,
+        "bytes": "488b41084c8b41184c8b094c8b51104931c04989c34d31ca4d31c149c1c8",
+        "sha256": "75e9849e8f684c36d5dc0226a16ff77626e56f7727fe4784c50a29a03df827b6"
+      },
+      "body_guard": {
+        "rva": 10470256,
+        "length": 96,
+        "sha256": "7041b7ec325591b8d191a54b3ac8d9bd909ee099283d9d210014af498d160c61"
+      }
+    },
+    {
+      "name": "mp.character.preview-attach-weapon.6577d0",
+      "rva": 6649808,
+      "shared": false,
+      "groups": [
+        {
+          "feature": "Character weapon preview scope",
+          "phase": "typed_action_runtime::start, bound Mainthread, once per process",
+          "site": "Original ActorOrbitPane AttachWeapon preview; the Multiplayer owner validates exact receiver and TLS scope."
+        }
+      ],
+      "code_guard": {
+        "offset": 0,
+        "length": 30,
+        "bytes": "4157415641554154555756534881ecc8000000488b81000700004889cb48",
+        "sha256": "e392c726dbbb98eba244ab0a04153ee131cfd3449c54a2a46638cdb6b2010e51"
+      },
+      "body_guard": {
+        "rva": 6649808,
+        "length": 1056,
+        "sha256": "2bee69e1eaea954f0f772cc46dce5d42eea03606285d951b0062c39aa3a15126"
+      }
     }
   ],
   "unresolved": [],

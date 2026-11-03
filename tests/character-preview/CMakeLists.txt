@@ -1,0 +1,16 @@
+find_package(Python3 REQUIRED COMPONENTS Interpreter)
+set(PREVIEW_BODY "${CMAKE_CURRENT_BINARY_DIR}/preview_get_int_actual.inc")
+add_custom_command(OUTPUT "${PREVIEW_BODY}"
+  COMMAND "${Python3_EXECUTABLE}" -B -X utf8 "${CMAKE_CURRENT_SOURCE_DIR}/extract_actual.py" "${FRAMEWORK}" "${PREVIEW_BODY}"
+  DEPENDS extract_actual.py "${FRAMEWORK}/adapters/mt2/determinism_rng_trace.inc" VERBATIM)
+add_executable(mt2fw_character_preview_tests preview_tests.cpp "${PREVIEW_BODY}")
+target_include_directories(mt2fw_character_preview_tests PRIVATE "${CMAKE_CURRENT_BINARY_DIR}")
+target_link_libraries(mt2fw_character_preview_tests PRIVATE mt2fw_native_services)
+target_compile_definitions(mt2fw_character_preview_tests PRIVATE WIN32_LEAN_AND_MEAN NOMINMAX _SILENCE_CXX20_U8PATH_DEPRECATION_WARNING)
+target_compile_options(mt2fw_character_preview_tests PRIVATE /W4 /WX /utf-8 /EHsc)
+add_test(NAME framework_character_preview COMMAND mt2fw_character_preview_tests)
+set_tests_properties(framework_character_preview PROPERTIES TIMEOUT 20)
+add_executable(mt2fw_character_preview_abi_tests abi.c)
+target_include_directories(mt2fw_character_preview_abi_tests PRIVATE "${FRAMEWORK}/adapters/mt2" "${FRAMEWORK}/include")
+target_compile_options(mt2fw_character_preview_abi_tests PRIVATE /W4 /WX /utf-8)
+add_test(NAME framework_character_preview_abi COMMAND mt2fw_character_preview_abi_tests)
