@@ -2,7 +2,7 @@
 
 > 🛟 **Need help or found a bug?** Get support at [support.doodesch.de/modframework](https://support.doodesch.de/modframework).
 
-The **Publish Nexus files** workflow updates the existing Nexus files using the official [Nexus upload action](https://github.com/Nexus-Mods/upload-action). Framework and Vortex releases run when their GitHub release is published, including a prerelease. Multiplayer checks its latest published beta every five minutes. GitHub may delay scheduled runs. Every target supports manual validation before upload.
+The **Publish Nexus files** workflow updates the existing Nexus files using the official [Nexus upload action](https://github.com/Nexus-Mods/upload-action). Framework and Vortex releases run when their GitHub release is published, including a prerelease. Starting with Multiplayer Beta 29, the successful Multiplayer release job calls this same workflow directly. Scheduled polling is retained only for legacy Beta 27/28 recovery; new releases do not depend on it.
 
 | Product | Nexus page | Unique Mod ID for the API | Persistent File ID |
 | --- | --- | --- | --- |
@@ -23,9 +23,11 @@ The organization secrets `NEXUSMODS_API_KEY` and `DISCORD_RELEASE_WEBHOOK` are a
 - `NEXUS_MULTIPLAYER_MOD_ID=19121194401820`
 - `NEXUS_MULTIPLAYER_FILE_ID=8177136`
 
-Multiplayer remains excluded from `all`, so Framework release events cannot select it accidentally. The scheduled check selects only the latest published `vMAJOR.MINOR.PATCH-beta.N` prerelease, starting with `v0.1.0-beta.27`, and skips silent tags. It validates the exact native plugin ZIP, per-ZIP checksum, tagged source manifest and published GitHub release notes before Nexus upload and Discord delivery. The file description refers to that release's Runtime requirement instead of pinning an older Runtime. Prepared listing updates remain an explicit manual operation with exact cohort guards; future betas never apply Beta 27's listing metadata.
+Multiplayer remains excluded from `all`, so Framework release events cannot select it accidentally. The direct caller must be the Multiplayer repository, use a main-branch push, matching tag push or explicit dispatch, select only Multiplayer, and pin the reusable workflow and tooling checkout to the same full Framework commit. It passes only the two existing organization secrets and grants `contents: write` for its own release receipts. No cross-repository dispatch token is required. The tracked Nexus IDs supply defaults when caller repository variables are absent; conflicting variables still fail validation.
 
-Discord intent and acknowledgement assets stay on the configured Framework receipt release (`v0.2.0`); the announcement links to the Multiplayer release. A confirmed receipt with the same product, tag, version and GitHub asset digest closes the scheduled check. An uncertain or different receipt fails for inspection instead of replaying a send. This uses the existing publisher's organization credentials. The Multiplayer workflow's `GITHUB_TOKEN` cannot start a cross-repository release event, so the central scheduled check deliberately reads the published release instead.
+Every Multiplayer path validates the exact native plugin ZIP, per-ZIP checksum, tagged source manifest and published GitHub release notes before Nexus upload and Discord delivery. The file description refers to that release's Runtime requirement instead of pinning an older Runtime. Prepared listing updates remain an explicit operation with exact cohort guards; future betas never apply Beta 27's listing metadata.
+
+Beta 28 and earlier keep their Discord intent and acknowledgement assets on the configured Framework receipt release (`v0.2.0`). Beta 29 and later store them on the exact Multiplayer release being delivered. The central Framework workflow refuses delivery of those newer versions, and its legacy poll excludes them. This keeps one delivery owner per version. A confirmed receipt retains product, tag, version, source commit and package digest; an uncertain or different receipt fails for inspection instead of replaying a send. The announcement always links to the Multiplayer release.
 
 The workflow rejects variables that differ from the tracked destinations. Keys are only passed to API/action steps, never stored in source or receipts.
 
@@ -42,6 +44,8 @@ Framework and Vortex versions come from their archives, not from the shared rele
 Starting with 0.1.1, Nexus accepts only the allowlisted player runtime. The separate `MT2Framework-SDK` archive is a GitHub-only download. The release selector excludes SDK filenames, and preflight checks the runtime package kind, exact file inventory and all hashes before upload. The runtime includes the native mod checker needed by the existing Vortex extension; Python and authoring tools remain in the SDK.
 
 For a manual check, open **Actions > Publish Nexus files > Run workflow**, enter the existing release tag, select a target, and leave **publish** off. This validates artifacts and authenticated Nexus reads without writes. Turn **publish** on to upload a newer version or complete a missing changelog for an existing version. Enable **announce** to send a missing Discord announcement. Published-release events enable both automatically.
+
+That central manual entry remains for Framework, Vortex and legacy Multiplayer releases. For Multiplayer Beta 29 and later, rerun the matching Multiplayer delivery job. Its caller passes the published tag through the release job output, uses `needs: release`, pins both `uses` and `tooling_revision` to the accepted Framework commit, and sets `publish` and `announce` explicitly. An unsuccessful delivery fails that job; it is not converted into release success. A GitHub release may already exist when Nexus or Discord fails, so inspect its retained delivery state before recovery.
 
 Runs for the same product are serialized. After a timeout or failed acknowledgement, inspect the retained plan and Nexus versions before retrying. A successful version read prevents the same version from being uploaded again; upload failures are not silently retried.
 

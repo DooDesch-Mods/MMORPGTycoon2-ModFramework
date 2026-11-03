@@ -172,7 +172,7 @@ class MultiplayerReleaseTests(unittest.TestCase):
         with patch.object(nexus, 'gh_repository', return_value=json.dumps(releases)), \
              patch.object(nexus, 'gh', return_value=json.dumps({'assets': []})), patch.object(nexus, 'outputs') as output:
             nexus.poll_multiplayer()
-        self.assertEqual(output.call_args.args[0]['release_tag'], 'v0.2.0-beta.1')
+        self.assertEqual(output.call_args.args[0]['release_tag'], 'v0.1.0-beta.28')
 
     def test_poll_skips_only_confirmed_matching_delivery_and_blocks_uncertain_send(self):
         tag = 'v0.1.0-beta.27'
@@ -210,6 +210,7 @@ class MultiplayerReleaseTests(unittest.TestCase):
 
     def test_delivered_changelog_recovery_reads_existing_text_without_writes(self):
         plan = {'product': 'multiplayer', 'status': 'already-present', 'version': '0.1.0-beta.27',
+                'receipt_tag': 'v0.2.0',
                 'notes': 'Corrected GitHub copy', 'tag': 'v0.1.0-beta.27', 'sha256': 'a' * 64,
                 'notes_origin': 'https://github.com/DooDesch-Mods/MMORPGTycoon2-Multiplayer/releases/tag/v0.1.0-beta.27',
                 'release_url': 'https://github.com/DooDesch-Mods/MMORPGTycoon2-Multiplayer/releases/tag/v0.1.0-beta.27',
@@ -250,6 +251,128 @@ class MultiplayerReleaseTests(unittest.TestCase):
         description = nexus.targets()['multiplayer']['file_description']
         self.assertNotRegex(description, r'\d+\.\d+\.\d+')
         self.assertLessEqual(len(description), 255)
+
+    def test_receipt_owner_changes_once_after_beta_28(self):
+        self.assertEqual(nexus.multiplayer_receipt_location('v0.1.0-beta.28'), (nexus.REPOSITORY, 'v0.2.0'))
+        for tag in ('v0.1.0-beta.29', 'v0.1.0-beta.30', 'v0.2.0-beta.1', 'v0.2.0'):
+            self.assertEqual(nexus.multiplayer_receipt_location(tag), (nexus.MULTIPLAYER_REPOSITORY, tag))
+        with patch.dict(os.environ, {'GITHUB_REPOSITORY': nexus.REPOSITORY}), \
+             patch.object(nexus, 'gh_repository') as source, patch.object(nexus, 'gh') as central:
+            with self.assertRaisesRegex(ValueError, 'own release workflow'):
+                nexus.fetch_release('v0.1.0-beta.29', 'multiplayer', self.root / 'future')
+        source.assert_not_called(); central.assert_not_called()
+
+    def test_direct_caller_requires_owned_release_event_exact_ref_and_tooling(self):
+        tag = 'v0.1.0-beta.29'
+        fields = dict(repository=nexus.MULTIPLAYER_REPOSITORY, event='push', ref='refs/heads/main',
+                      checked_out_revision=self.commit, target='multiplayer')
+        nexus.validate_multiplayer_caller(tag, self.commit, **fields)
+        nexus.validate_multiplayer_caller(tag, self.commit, **{**fields, 'event': 'workflow_dispatch', 'ref': 'refs/tags/' + tag})
+        for changes in ({'repository': nexus.REPOSITORY}, {'repository': 'foreign/fork'},
+                        {'event': 'pull_request'}, {'event': 'release'}, {'ref': 'refs/heads/development'},
+                        {'ref': 'refs/tags/v0.1.0-beta.28'}, {'checked_out_revision': 'b' * 40}, {'target': 'framework'}):
+            with self.subTest(changes=changes), self.assertRaises(ValueError):
+                nexus.validate_multiplayer_caller(tag, self.commit, **{**fields, **changes})
+        for invalid in ('v0.1.0-beta.28', 'v0.1.0-beta.0', 'v0.1.0-beta.029', 'v0.2.0', 'invalid'):
+            with self.subTest(tag=invalid), self.assertRaises(ValueError):
+                nexus.validate_multiplayer_caller(invalid, self.commit, **fields)
+        with self.assertRaisesRegex(ValueError, 'pinned revision'):
+            nexus.validate_multiplayer_caller(tag, 'main', **fields)
+
+    def direct_plan(self):
+        tag = 'v0.1.0-beta.29'
+        return dict(product='multiplayer', version=tag[1:], tag=tag, receipt_tag=tag,
+                    receipt_repository=nexus.MULTIPLAYER_REPOSITORY, source_commit=self.commit, sha256='a' * 64,
+                    notes='### Added\n\n- Build together.', release_url='https://github.com/' + nexus.MULTIPLAYER_REPOSITORY + '/releases/tag/' + tag,
+                    nexus_url='https://www.nexusmods.com/mmorpgtycoon2/mods/28')
+
+    def test_direct_receipt_reads_only_its_matching_mp_release(self):
+        plan = self.direct_plan()
+        with patch.dict(os.environ, {'GITHUB_REPOSITORY': nexus.MULTIPLAYER_REPOSITORY}), \
+             patch.object(delivery, 'gh_repository', return_value=json.dumps({'assets': []})) as source, \
+             patch.object(delivery, 'gh') as legacy:
+            self.assertIsNone(delivery.remote_receipt(plan, 'receipt.json', self.root))
+        source.assert_called_once_with(nexus.MULTIPLAYER_REPOSITORY, 'release', 'view', plan['tag'], '--json', 'assets')
+        legacy.assert_not_called()
+        for changes in ({'receipt_repository': nexus.REPOSITORY}, {'receipt_tag': 'v0.2.0'},
+                        {'receipt_tag': 'v0.1.0-beta.30'}, {'version': '0.1.0-beta.30'}):
+            with self.subTest(changes=changes), patch.object(delivery, 'gh_repository') as source, \
+                 patch.object(delivery, 'gh') as legacy, self.assertRaises(ValueError):
+                delivery.remote_receipt({**plan, **changes}, 'receipt.json', self.root)
+            source.assert_not_called(); legacy.assert_not_called()
+
+    def test_future_release_preflight_keeps_package_proof_and_uses_its_own_receipt_release(self):
+        version = '0.1.0-beta.29'; tag = 'v' + version
+        archive = self.root / ('MMORPGTycoon2-Multiplayer-' + tag + '-windows-x64.zip')
+        entries = {**self.entries}
+        entries['mod.json'] = json.dumps({**json.loads(entries['mod.json']), 'version': version}).encode()
+        metadata = {**self.metadata, 'version': version, 'release_tag': tag,
+                    'files': {name: {'size': len(data), 'sha256': hashlib.sha256(data).hexdigest()}
+                              for name, data in entries.items() if name != 'package.json'}}
+        entries['package.json'] = json.dumps(metadata).encode()
+        with zipfile.ZipFile(archive, 'w') as stream:
+            for name, data in entries.items(): stream.writestr(name, data)
+        published = {'tagName': tag, 'isDraft': False, 'targetCommitish': self.commit, 'body': '- Build together.',
+                     'url': 'https://github.com/' + nexus.MULTIPLAYER_REPOSITORY + '/releases/tag/' + tag,
+                     'assets': [{'name': archive.name, 'size': archive.stat().st_size}, {'name': archive.name + '.sha256'}]}
+        output = self.root / 'direct-download'
+        calls = []
+        def source(repository, *args):
+            self.assertEqual(repository, nexus.MULTIPLAYER_REPOSITORY)
+            calls.append(args)
+            if args[:2] == ('release', 'view'): return json.dumps(published)
+            self.assertEqual(args[:2], ('release', 'download'))
+            shutil.copy2(archive, output / archive.name)
+            (output / (archive.name + '.sha256')).write_text(hashlib.sha256(archive.read_bytes()).hexdigest() + '  ' + archive.name + '\n')
+            return ''
+        with patch.dict(os.environ, {'GITHUB_REPOSITORY': nexus.MULTIPLAYER_REPOSITORY}), \
+             patch.object(nexus, 'gh_repository', side_effect=source), patch.object(nexus, 'gh') as legacy:
+            plan = nexus.fetch_release(tag, 'multiplayer', output)
+        legacy.assert_not_called()
+        self.assertEqual(plan['receipt_repository'], nexus.MULTIPLAYER_REPOSITORY)
+        self.assertEqual(plan['receipt_tag'], tag)
+        self.assertEqual(plan['source_commit'], self.commit)
+        self.assertEqual(plan['sha256'], hashlib.sha256(archive.read_bytes()).hexdigest())
+        self.assertEqual(calls[-1], ('release', 'view', tag, '--json', 'tagName,isDraft'))
+
+    def test_direct_receipt_write_failure_propagates_before_discord_post(self):
+        plan = self.direct_plan()
+        with patch.dict(os.environ, {'GITHUB_REPOSITORY': nexus.MULTIPLAYER_REPOSITORY,
+                                    'DISCORD_RELEASE_WEBHOOK': 'https://discord.com/api/webhooks/1/fixture'}), \
+             patch.object(delivery, 'remote_receipt', return_value=None), \
+             patch.object(delivery, 'gh_repository', side_effect=RuntimeError('MP receipt upload failed')) as store:
+            request = unittest.mock.Mock()
+            with self.assertRaisesRegex(RuntimeError, 'MP receipt upload failed'):
+                delivery.announce(plan, self.root, request)
+            request.assert_not_called()
+            self.assertEqual(store.call_args.args[:4], (nexus.MULTIPLAYER_REPOSITORY, 'release', 'upload', plan['tag']))
+            pending = json.loads((self.root / 'release-delivery-multiplayer-0.1.0-beta.29.json').read_text())
+            self.assertEqual(pending['status'], 'pending')
+            self.assertEqual(pending['source_commit'], self.commit)
+
+    def test_reusable_workflow_keeps_upload_guards_and_explicit_caller_validation(self):
+        import yaml
+        workflow = yaml.load((ROOT / '.github/workflows/nexus-release.yml').read_text(encoding='utf-8'), Loader=yaml.BaseLoader)
+        call = workflow['on']['workflow_call']
+        self.assertEqual(call['inputs']['tooling_revision']['required'], 'true')
+        self.assertEqual(call['inputs']['publish']['default'], 'false')
+        self.assertEqual(set(call['secrets']), {'NEXUSMODS_API_KEY', 'DISCORD_RELEASE_WEBHOOK'})
+        jobs = workflow['jobs']
+        plan_steps = jobs['plan']['steps']
+        validation = next(row for row in plan_steps if row.get('name') == 'Validate direct Multiplayer caller')
+        self.assertIn('validate-multiplayer-caller', validation['run'])
+        self.assertLess(plan_steps.index(validation), next(i for i, row in enumerate(plan_steps) if row.get('id') == 'targets'))
+        for name in ('plan', 'nexus'):
+            checkout = next(row for row in jobs[name]['steps'] if row.get('uses', '').startswith('actions/checkout@'))
+            self.assertEqual(checkout['with']['repository'], nexus.REPOSITORY)
+            self.assertIn('inputs.tooling_revision', checkout['with']['ref'])
+        self.assertEqual(jobs['nexus']['needs'], 'plan')
+        upload = next(row for row in jobs['nexus']['steps'] if row.get('id') == 'upload')
+        self.assertIn("steps.prepare.outputs.status == 'ready'", upload['if'])
+        self.assertIn('inputs.publish', upload['if'])
+        for job in jobs.values():
+            self.assertNotIn('continue-on-error', job)
+            for step in job['steps']: self.assertNotIn('continue-on-error', step)
 
 
 if __name__ == '__main__':

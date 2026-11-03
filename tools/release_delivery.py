@@ -12,7 +12,8 @@ import urllib.error
 import urllib.parse
 import urllib.request
 
-from nexus_release import API, REPOSITORY, gh, targets
+from nexus_release import (API, REPOSITORY, gh, gh_repository, targets,
+                           multiplayer_receipt_location, require_multiplayer_delivery_owner)
 from release_notes import plain, bbcode
 
 
@@ -154,13 +155,27 @@ def canonical_embeds(embeds):
     return result
 
 
+def receipt_gh(plan, *args):
+    repository = plan.get('receipt_repository', REPOSITORY)
+    if plan['product'] == 'multiplayer':
+        if plan['tag'] != 'v' + plan['version']:
+            raise ValueError('Multiplayer delivery receipt version differs from its tag')
+        expected_repository, expected_tag = multiplayer_receipt_location(plan['tag'])
+        if repository != expected_repository or plan.get('receipt_tag', plan['tag']) != expected_tag:
+            raise ValueError('Multiplayer delivery receipt repository or tag differs from its version owner')
+        require_multiplayer_delivery_owner(plan['tag'])
+    elif repository != REPOSITORY:
+        raise ValueError('Framework delivery receipt repository differs')
+    return gh(*args) if repository == REPOSITORY else gh_repository(repository, *args)
+
+
 def remote_receipt(plan, filename, directory):
-    release = json.loads(gh('release', 'view', plan.get('receipt_tag', plan['tag']), '--json', 'assets'))
+    release = json.loads(receipt_gh(plan, 'release', 'view', plan.get('receipt_tag', plan['tag']), '--json', 'assets'))
     if not any(row['name'] == filename for row in release['assets']):
         return None
     receipt_dir = directory / 'previous'
     receipt_dir.mkdir(parents=True, exist_ok=True)
-    gh('release', 'download', plan.get('receipt_tag', plan['tag']), '--dir', str(receipt_dir), '--pattern', filename)
+    receipt_gh(plan, 'release', 'download', plan.get('receipt_tag', plan['tag']), '--dir', str(receipt_dir), '--pattern', filename)
     return json.loads((receipt_dir / filename).read_text(encoding='utf-8'))
 
 
@@ -195,7 +210,7 @@ def announce(plan, directory, request=request_json, message_id=None, update=Fals
             (directory / 'discord-before.json').write_text(json.dumps(message, indent=2) + '\n', encoding='utf-8')
             previous.update(status='updating', message_id=message_id)
             path.write_text(json.dumps(previous, indent=2) + '\n', encoding='utf-8')
-            gh('release', 'upload', plan.get('receipt_tag', plan['tag']), str(path), '--clobber')
+            receipt_gh(plan, 'release', 'upload', plan.get('receipt_tag', plan['tag']), str(path), '--clobber')
             message = request(webhook + '/messages/' + message_id, 'PATCH', discord_payload(plan), service='Discord')
             (directory / 'discord-message.json').write_text(json.dumps(message, indent=2) + '\n', encoding='utf-8')
             message = request(webhook + '/messages/' + message_id, service='Discord')
@@ -204,7 +219,7 @@ def announce(plan, directory, request=request_json, message_id=None, update=Fals
         if previous.get('status') != 'confirmed' or previous.get('embeds') != expected:
             previous.update(status='confirmed', message_id=message_id, channel_id=message['channel_id'], embeds=expected)
             path.write_text(json.dumps(previous, indent=2) + '\n', encoding='utf-8')
-            gh('release', 'upload', plan.get('receipt_tag', plan['tag']), str(path), '--clobber')
+            receipt_gh(plan, 'release', 'upload', plan.get('receipt_tag', plan['tag']), str(path), '--clobber')
         print(f"Discord {plan['product']} {plan['version']}: already confirmed ({message['id']})")
         return
     if message_id:
@@ -212,19 +227,19 @@ def announce(plan, directory, request=request_json, message_id=None, update=Fals
     receipt = {**identity, 'status': 'pending', 'run_id': os.environ.get('GITHUB_RUN_ID')}
     path.write_text(json.dumps(receipt, indent=2) + '\n', encoding='utf-8')
     # Persist intent before sending. An ambiguous POST blocks replay across workflow reruns.
-    gh('release', 'upload', plan.get('receipt_tag', plan['tag']), str(path))
+    receipt_gh(plan, 'release', 'upload', plan.get('receipt_tag', plan['tag']), str(path))
     message = request(webhook + '?wait=true', 'POST', discord_payload(plan), service='Discord')
     (directory / 'discord-message.json').write_text(json.dumps(message, indent=2) + '\n', encoding='utf-8')
     if not message or not re.fullmatch(r'\d+', message.get('id', '')):
         raise RuntimeError('Discord did not acknowledge a message ID; send intent remains pending')
     receipt.update(status='acknowledged', message_id=message['id'], channel_id=message['channel_id'])
     path.write_text(json.dumps(receipt, indent=2) + '\n', encoding='utf-8')
-    gh('release', 'upload', plan.get('receipt_tag', plan['tag']), str(path), '--clobber')
+    receipt_gh(plan, 'release', 'upload', plan.get('receipt_tag', plan['tag']), str(path), '--clobber')
     if canonical_embeds(message['embeds']) != expected:
         raise ValueError('Discord acknowledged a message with different release content; inspect send intent before retrying')
     receipt.update(status='confirmed', message_id=message['id'], channel_id=message['channel_id'], embeds=expected)
     path.write_text(json.dumps(receipt, indent=2) + '\n', encoding='utf-8')
-    gh('release', 'upload', plan.get('receipt_tag', plan['tag']), str(path), '--clobber')
+    receipt_gh(plan, 'release', 'upload', plan.get('receipt_tag', plan['tag']), str(path), '--clobber')
     print(f"Discord {plan['product']} {plan['version']}: confirmed ({message['id']})")
 
 

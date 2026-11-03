@@ -33,6 +33,7 @@
     "source_repository": "DooDesch-Mods/MMORPGTycoon2-Multiplayer",
     "notes_source": "github_release",
     "receipt_tag": "v0.2.0",
+    "direct_delivery_min_version": "0.1.0-beta.29",
     "manual_only": true,
     "file_description": "Build an MMO world with a friend through Steam. Install the Framework Runtime required by this release's notes. Use the MMORPG Tycoon 2 Vortex Extension. Close both games before updating. Early Beta - expect bugs and desyncs.",
     "icon_url": "https://raw.githubusercontent.com/DooDesch-Mods/MMORPGTycoon2-Multiplayer/main/assets/ui/desktop_multiplayer/multiplayer.png",

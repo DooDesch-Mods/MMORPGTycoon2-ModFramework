@@ -4,6 +4,32 @@ on:
     types: [published]
   schedule:
     - cron: '3-58/5 * * * *'
+  workflow_call:
+    inputs:
+      release_tag:
+        required: true
+        type: string
+      tooling_revision:
+        description: Exact Framework commit containing this reusable delivery workflow
+        required: true
+        type: string
+      target:
+        type: string
+        default: multiplayer
+      publish:
+        type: boolean
+        default: false
+      announce:
+        type: boolean
+        default: false
+      update_listing:
+        type: boolean
+        default: false
+    secrets:
+      NEXUSMODS_API_KEY:
+        required: true
+      DISCORD_RELEASE_WEBHOOK:
+        required: true
   workflow_dispatch:
     inputs:
       release_tag:
@@ -55,11 +81,19 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          ref: main
+          repository: DooDesch-Mods/MMORPGTycoon2-ModFramework
+          ref: ${{ inputs.tooling_revision || 'main' }}
           persist-credentials: false
       - uses: actions/setup-python@v5
         with:
           python-version: '3.13'
+      - name: Validate direct Multiplayer caller
+        if: github.repository != 'DooDesch-Mods/MMORPGTycoon2-ModFramework'
+        env:
+          RELEASE_TAG: ${{ inputs.release_tag }}
+          TOOLING_REVISION: ${{ inputs.tooling_revision }}
+          TARGET: ${{ inputs.target }}
+        run: python tools/nexus_release.py validate-multiplayer-caller --tag "$RELEASE_TAG" --tooling-revision "$TOOLING_REVISION"
       - id: targets
         env:
           TARGET: ${{ inputs.target || 'all' }}
@@ -87,7 +121,8 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          ref: main
+          repository: DooDesch-Mods/MMORPGTycoon2-ModFramework
+          ref: ${{ inputs.tooling_revision || 'main' }}
           persist-credentials: false
       - uses: actions/setup-python@v5
         with:
@@ -97,8 +132,8 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
           NEXUSMODS_API_KEY: ${{ secrets.NEXUSMODS_API_KEY }}
-          NEXUS_FILE_ID: ${{ vars[matrix.file_variable] }}
-          NEXUS_MOD_ID: ${{ vars[matrix.mod_variable] }}
+          NEXUS_FILE_ID: ${{ vars[matrix.file_variable] || matrix.file_id }}
+          NEXUS_MOD_ID: ${{ vars[matrix.mod_variable] || matrix.mod_uid }}
           RELEASE_TAG: ${{ needs.plan.outputs.release_tag || github.event.release.tag_name || inputs.release_tag }}
           TARGET: ${{ github.event_name == 'schedule' && 'multiplayer' || inputs.target || 'all' }}
         run: |

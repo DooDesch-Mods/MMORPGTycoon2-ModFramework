@@ -20,6 +20,7 @@ sys.path.insert(0,str(ROOT/'tools'))
 from package_runtime import verify_runtime
 from release_notes import section, plain, bbcode
 REPOSITORY = 'DooDesch-Mods/MMORPGTycoon2-ModFramework'
+MULTIPLAYER_REPOSITORY = 'DooDesch-Mods/MMORPGTycoon2-Multiplayer'
 API = 'https://api.nexusmods.com/v3'
 MULTIPLAYER_SUPPORT = '> 🛟 **Need help or found a bug?** Get support at [support.doodesch.de/multiplayer](https://support.doodesch.de/multiplayer).'
 
@@ -41,6 +42,39 @@ def version_key(value):
     suffix = match[4]
     parts = tuple((0, int(part)) if part.isdigit() else (1, part) for part in suffix.split('.')) if suffix else ()
     return tuple(int(match[i]) for i in (1, 2, 3)) + (suffix is None, parts)
+
+
+def multiplayer_direct_delivery(tag, target=None):
+    target = target or targets()['multiplayer']
+    return version_key(tag.removeprefix('v')) >= version_key(target['direct_delivery_min_version'])
+
+
+def multiplayer_receipt_location(tag, target=None):
+    target = target or targets()['multiplayer']
+    if multiplayer_direct_delivery(tag, target):
+        return MULTIPLAYER_REPOSITORY, tag
+    return REPOSITORY, target['receipt_tag']
+
+
+def require_multiplayer_delivery_owner(tag):
+    caller = os.environ.get('GITHUB_REPOSITORY')
+    if multiplayer_direct_delivery(tag) and caller and caller != MULTIPLAYER_REPOSITORY:
+        raise ValueError('This Multiplayer version must be delivered by its own release workflow, not the legacy Framework poller')
+
+
+def validate_multiplayer_caller(tag, tooling_revision, *, repository, event, ref, checked_out_revision, target='multiplayer'):
+    if repository != MULTIPLAYER_REPOSITORY:
+        raise ValueError('Multiplayer delivery caller repository differs')
+    if event not in ('push', 'workflow_dispatch'):
+        raise ValueError('Multiplayer delivery caller event is not a release push or explicit dispatch')
+    if target != 'multiplayer':
+        raise ValueError('Multiplayer delivery caller cannot select another product')
+    if not re.fullmatch(r'v\d+\.\d+\.\d+-beta\.[1-9]\d*', tag) or not multiplayer_direct_delivery(tag):
+        raise ValueError('Direct Multiplayer delivery requires Beta 29 or later; legacy releases keep their existing receipts')
+    if ref not in ('refs/heads/main', 'refs/tags/' + tag):
+        raise ValueError('Multiplayer delivery caller ref does not match main or the exact release tag')
+    if not re.fullmatch(r'[0-9a-f]{40}', tooling_revision) or checked_out_revision != tooling_revision:
+        raise ValueError('Multiplayer delivery tooling checkout differs from its exact pinned revision')
 
 
 def archive_version(path, product):
@@ -157,6 +191,8 @@ def fetch_release(tag, product, directory, optional=False):
     if not re.fullmatch(r'[A-Za-z0-9][A-Za-z0-9._-]{0,127}', tag):
         raise ValueError('Invalid release tag')
     selected = targets()[product]
+    if product == 'multiplayer':
+        require_multiplayer_delivery_owner(tag)
     repository = selected.get('source_repository', REPOSITORY)
     call = gh if repository == REPOSITORY else lambda *args: gh_repository(repository, *args)
     metadata = json.loads(call('release', 'view', tag, '--json', 'tagName,isDraft,assets,url,targetCommitish,body'))
@@ -215,8 +251,10 @@ def fetch_release(tag, product, directory, optional=False):
             with urllib.request.urlopen(notes_request, timeout=30) as response:
                 plan['notes_source'] = response.read().decode('utf-8')
         plan['source_repository'] = repository
-        plan['receipt_tag'] = selected['receipt_tag']
-        receipt_release = json.loads(gh('release', 'view', plan['receipt_tag'], '--json', 'tagName,isDraft'))
+        receipt_repository, plan['receipt_tag'] = multiplayer_receipt_location(tag, selected)
+        plan['receipt_repository'] = receipt_repository
+        receipt_call = gh if receipt_repository == REPOSITORY else lambda *args: gh_repository(receipt_repository, *args)
+        receipt_release = json.loads(receipt_call('release', 'view', plan['receipt_tag'], '--json', 'tagName,isDraft'))
         if receipt_release['isDraft'] or receipt_release['tagName'] != plan['receipt_tag']:
             raise ValueError('Receipt release is not published')
     return plan
@@ -274,6 +312,7 @@ def poll_multiplayer():
     candidates = [row for row in releases if not row['draft'] and row['prerelease']
                   and re.fullmatch(r'v\d+\.\d+\.\d+-beta\.[1-9]\d*', row['tag_name'])
                   and version_key(row['tag_name'][1:]) >= version_key('0.1.0-beta.27')
+                  and not multiplayer_direct_delivery(row['tag_name'], target)
                   and row['tag_name'] not in target.get('silent_releases', [])]
     if not candidates:
         outputs({'active': 'false'})
@@ -298,7 +337,8 @@ def poll_multiplayer():
         # Pending intents require a human reconciliation, never an automatic replay.
         raise ValueError('Latest Multiplayer delivery receipt is unconfirmed or differs; inspect the existing receipt before retrying')
     outputs({'active': 'true', 'release_tag': tag, 'matrix': json.dumps({'include': [{
-        'product': 'multiplayer', 'file_variable': target['file_variable'], 'mod_variable': target['mod_variable']} ]})})
+        'product': 'multiplayer', 'file_variable': target['file_variable'], 'mod_variable': target['mod_variable'],
+        'file_id': target['file_id'], 'mod_uid': target['mod_uid']} ]})})
     print('info: automatic Multiplayer delivery selected: ' + tag)
 
 
@@ -360,6 +400,9 @@ def main():
     commands = parser.add_subparsers(dest='command', required=True)
     plan = commands.add_parser('matrix');plan.add_argument('--target', choices=['all', 'framework', 'vortex', 'multiplayer'], default='all')
     commands.add_parser('poll-multiplayer')
+    caller = commands.add_parser('validate-multiplayer-caller')
+    caller.add_argument('--tag', required=True)
+    caller.add_argument('--tooling-revision', required=True)
     command = commands.add_parser('prepare')
     command.add_argument('--product', choices=['framework', 'vortex', 'multiplayer'], required=True)
     command.add_argument('--tag', required=True);command.add_argument('--directory', required=True)
@@ -368,10 +411,18 @@ def main():
     command.add_argument('--directory', required=True);command.add_argument('--version-id', required=True)
     args = parser.parse_args()
     if args.command == 'matrix':
-        selected = [{'product': key, 'file_variable': value['file_variable'], 'mod_variable': value['mod_variable']} for key, value in targets().items() if args.target == key or args.target == 'all' and not value.get('manual_only', False)]
+        selected = [{'product': key, 'file_variable': value['file_variable'], 'mod_variable': value['mod_variable'],
+                     'file_id': value['file_id'], 'mod_uid': value['mod_uid']}
+                    for key, value in targets().items() if args.target == key or args.target == 'all' and not value.get('manual_only', False)]
         value = json.dumps({'include': selected}, separators=(',', ':'));outputs({'matrix': value});print(value)
     elif args.command == 'poll-multiplayer':
         poll_multiplayer()
+    elif args.command == 'validate-multiplayer-caller':
+        checked = subprocess.run(['git', '-C', str(ROOT), 'rev-parse', 'HEAD'], check=True, capture_output=True, text=True).stdout.strip()
+        validate_multiplayer_caller(args.tag, args.tooling_revision, repository=os.environ.get('GITHUB_REPOSITORY', ''),
+                                   event=os.environ.get('GITHUB_EVENT_NAME', ''), ref=os.environ.get('GITHUB_REF', ''),
+                                   checked_out_revision=checked, target=os.environ.get('TARGET', ''))
+        print('info: exact Multiplayer caller, release version and pinned delivery tooling admitted')
     elif args.command == 'prepare':
         prepare(args)
     else:
