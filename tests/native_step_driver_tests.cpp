@@ -2,6 +2,7 @@
 #include "native_step_pins.h"
 #include "native_step_proof.h"
 #include "native_step_profile.h"
+#include "native_poll_delay.h"
 #include <cstring>
 #include <iostream>
 #include <map>
@@ -109,6 +110,25 @@ struct Test {
 };
 }
 int main(){try{
+    {namespace poll=mt2fw::mt2::poll_delay;constexpr uintptr_t image=0x100000000;uint32_t observed=0;unsigned calls=0;
+        auto original=[&](uint32_t duration){observed=duration;++calls;};
+        poll::invoke(100,image+0x526ded,101,image,original);check(observed==100,"unarmed polling changed duration");
+        {poll::Scope scope(true,101);poll::invoke(100,image+0x526ded,101,image,original);check(observed==10,"exact owned polling did not select10ms");
+            poll::invoke(100,image+0x526ded,102,image,original);check(observed==100,"foreign thread polling changed duration");
+            poll::invoke(100,image+0x526eec,101,image,original);check(observed==100,"foreign caller polling changed duration");
+            poll::invoke(0,image+0x526eec,101,image,original);check(observed==0,"zero yield changed duration");
+            poll::invoke(99,image+0x526ded,101,image,original);check(observed==99,"foreign argument changed duration");
+            {poll::Scope disabled(false,101);poll::invoke(100,image+0x526ded,101,image,original);check(observed==100,"nested unowned drain inherited polling scope");}
+            check(poll::qualifies(100,image+0x526ded,101,image),"nested scope did not restore ownership");
+            check(raises([&]{poll::invoke(100,image+0x526ded,101,image,[](uint32_t){throw std::runtime_error("original-delay-failure");});},"original-delay-failure"),"polling changed original exception");}
+        check(!poll::active&&calls==7,"polling scope leaked or original call count changed");
+        check(poll::selected.entered==2&&poll::selected.returned==1&&poll::selected.failed==1&&poll::selected.requested_ms==200&&poll::selected.selected_ms==20,"selected wait counters differ");
+        check(poll::forwarded.entered==6&&poll::forwarded.returned==6&&!poll::forwarded.failed,"forwarding counters differ");
+        check(poll::failure_ready.load()&&std::string(poll::first_failure)=="original-delay-failure","original polling failure cause missing");
+        const auto elapsed=poll::selected.elapsed_ns.load();
+        {poll::Scope scope(true,101);poll::invoke(100,image+0x526ded,101,image,original,[]()->uint64_t{static uint64_t value=0;return value+=7;});}
+        check(poll::selected.elapsed_ns.load()==elapsed+7&&calls==8,"wait duration used requested milliseconds instead of measured clock span");
+    }
     {using namespace step_profile;Trace trace;int calls=0;
         check(call(Part::before_step,[&]{return ++calls;})==1&&!state.counts[size_t(Part::before_step)].entered,"unconfigured profiling changed a call or emitted a count");
         trace.registration_fails=true;check(!configure(trace.api)&&state.availability_cause[0]&&!state.configured,"trace registration failure was hidden");

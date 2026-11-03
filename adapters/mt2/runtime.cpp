@@ -24,6 +24,7 @@
 #include "native_patches.h"
 #include "native_step_adapter.h"
 #include "native_step_profile.h"
+#include "native_poll_delay.h"
 #include "native_step_windows.h"
 #include "shared_operations.h"
 #include "native_extensions.h"
@@ -309,6 +310,7 @@ __declspec(noinline) void save_command(void* mode,const void* filename,bool abso
 }
 namespace step_runtime::snapshot_prepare {void settle_cache();}
 namespace step_runtime::clock_pause {Json status();}
+namespace step_runtime::polling_delay {Json status();}
 void forward_blocking_save(void* mode,const void* filename,bool hide_logo){
     mt2::BlockingSaveScope scope(reinterpret_cast<uintptr_t>(mode),GetCurrentThreadId());
     original_blocking_save(mode,filename,hide_logo);
@@ -505,6 +507,7 @@ Json status() {
     if(native_steps)value["step_service"]=native_steps->status();
     value["step_presentation"]=step_runtime::presentation_status();
     value["step_clock_pause"]=step_runtime::clock_pause::status();
+    value["step_polling_delay"]=step_runtime::polling_delay::status();
     value["error"]=last_error;value["process_start_time"]=process_started;value["confirmed_saves"]=confirmed_saves;value["last_save"]=last_save;value["confirmed_initial_saves"]=confirmed_initial_saves;value["last_initial_save"]=last_initial_save;
     value["menu_input_active"]=menu_input_active;
     value["diagnostic_response"]={{"pending_id",pending_diagnostic_response?pending_diagnostic_response->at("id"):Json(nullptr)},

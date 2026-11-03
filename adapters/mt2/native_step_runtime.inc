@@ -367,6 +367,7 @@ void terminal_hold(void* game){
         if(terminal_error!=cause){terminal_error=cause;runtime->log("steps","error",cause);}
     }
 }
+#include "native_poll_delay.inc"
 void configure(){
     if(!installed||configured||configuration_attempted)return;
     require(engine_thread&&engine_thread==GetCurrentThreadId(),"Step configuration requires actual bound game thread");thread=engine_thread;
@@ -374,9 +375,18 @@ void configure(){
     auto backend=mt2::make_native_step_backend(image,executable,*native_routes,
         {original_go,timer_step::original_update,reinterpret_cast<void*>(&go),reinterpret_cast<void*>(&timer)},before_step);
     snapshot_prepare::install();clock_pause::install();async_save::install();client_periodic_ui::install();
+    polling_delay::install();
     const auto native_finish=backend.finish_all;
     recovery_runtime::native_finish=native_finish;
-    backend.finish_all=[native_finish](void* tasks){loading_dispatch::finish_complete_step(tasks,native_finish);};
+    backend.finish_all=[native_finish](void* tasks){
+        const auto receipt=native_steps->snapshot();
+        const bool ordered=GetCurrentThreadId()==thread&&receipt.thread==thread&&receipt.phase==MT2FW_MT2_STEP_ENTERED&&
+            receipt.lease&&receipt.session&&receipt.world_epoch&&receipt.tick&&receipt.invocation&&receipt.callbacks_inflight==1&&
+            receipt.original_attempted==1&&receipt.original_returned==0&&receipt.workers_held==0;
+        if(ordered)polling_delay::proof();
+        mt2::poll_delay::Scope scope(ordered,thread);
+        loading_dispatch::finish_complete_step(tasks,native_finish);
+    };
     snapshot_prepare::finish_all=backend.finish_all;
     snapshot_prepare::all_done=backend.all_done;
     backend.after_go=snapshot_prepare::after_go;
