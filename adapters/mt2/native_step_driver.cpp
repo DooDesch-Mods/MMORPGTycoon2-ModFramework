@@ -1,6 +1,7 @@
 #include "native_step_driver.h"
 #include "native_step_pins.h"
 #include "native_step_proof.h"
+#include "native_step_profile.h"
 #include <algorithm>
 #include <bit>
 #include <cstring>
@@ -164,7 +165,7 @@ void NativeStepDriver::after_update(void* game){
     require(read<int32_t>(tasks+0xc0)>=0,"Step finished-task count is negative");
     if(!native_.all_done(reinterpret_cast<void*>(tasks))||read<int32_t>(tasks+0xc0)!=0){
         // Preserve the engine's wait, GL pump, callback ownership and one attempt.
-        native_.finish_all(reinterpret_cast<void*>(tasks));
+        step_profile::call(step_profile::Part::finish_all,[&]{native_.finish_all(reinterpret_cast<void*>(tasks));});
         require(native_.all_done(reinterpret_cast<void*>(tasks))&&read<int32_t>(tasks+0xc0)==0,
             "Step FinishAllTasks returned with pending or finished work; no repeated drain");
     }
@@ -179,7 +180,7 @@ void NativeStepDriver::advance(const MT2FW_MT2_StepBoundary& frame,MT2FW_MT2_Ste
     require(!active_&&!failed(),"Step original is active or retains a failed result");
     require(frozen_&&frame.size==sizeof(frame)&&frame.session==frozen_->session&&frame.thread==frozen_->thread&&
         frame.dt_bits==MT2FW_MT2_STEP_FIXED_DT_BITS,"Step original boundary identity differs");
-    auto observed=loaded(frozen_->owner);
+    auto observed=step_profile::call(step_profile::Part::driver_preproof,[&]{return loaded(frozen_->owner);});
     require(frame.world_epoch==observed.world_epoch,"Step original world epoch differs");
     game_=observed.game;tasks_=scheduler(game_);resume_workers_=observed.resume_workers;
     // A permanently paused Task manager cannot execute the admitted simulation.
@@ -187,18 +188,18 @@ void NativeStepDriver::advance(const MT2FW_MT2_StepBoundary& frame,MT2FW_MT2_Ste
     passive_dt_=read<uint32_t>(game_+0x1c);receipt_=&receipt;active_frame_=frame;active_=true;pause_attempted_=false;timer_calls_=update_calls_=0;
     receipt.workers_held=0;
     try{
-        native_.before_step(frame);write(game_+0x1c,MT2FW_MT2_STEP_FIXED_DT_BITS);
-        native_.resume(reinterpret_cast<void*>(tasks_));require(read<uint8_t>(tasks_+0xf8)==0,"Step original Task Resume was not acknowledged");
-        receipt.original_attempted=1;native_.original_go(reinterpret_cast<void*>(game_));receipt.original_returned=1;
+        step_profile::call(step_profile::Part::before_step,[&]{native_.before_step(frame);});write(game_+0x1c,MT2FW_MT2_STEP_FIXED_DT_BITS);
+        step_profile::call(step_profile::Part::resume,[&]{native_.resume(reinterpret_cast<void*>(tasks_));});require(read<uint8_t>(tasks_+0xf8)==0,"Step original Task Resume was not acknowledged");
+        receipt.original_attempted=1;step_profile::call(step_profile::Part::original_go,[&]{native_.original_go(reinterpret_cast<void*>(game_));});receipt.original_returned=1;
         require(timer_calls_==1&&update_calls_==1&&read<uint32_t>(game_+0x1c)==MT2FW_MT2_STEP_FIXED_DT_BITS,"Step original Timer/update/fixed dt proof is incomplete");
-        if(native_.after_go)native_.after_go();
-        pause_and_restore();active_=false;receipt_=nullptr;loaded(frozen_->owner);
+        if(native_.after_go)step_profile::call(step_profile::Part::after_go,[&]{native_.after_go();});
+        step_profile::call(step_profile::Part::pause_restore,[&]{pause_and_restore();});active_=false;receipt_=nullptr;step_profile::call(step_profile::Part::driver_postproof,[&]{loaded(frozen_->owner);});
     }catch(...){
         const auto original=std::current_exception();
         failure_=exception_cause(original);
         // A failed original is never retried. Make one held-restoration attempt
         // only if Pause has not already been attempted by this driver.
-        if(!pause_attempted_){try{pause_and_restore();}catch(...){failure_+="; held restoration failed: "+exception_cause(std::current_exception());}}
+        if(!pause_attempted_){try{step_profile::call(step_profile::Part::pause_restore,[&]{pause_and_restore();});}catch(...){failure_+="; held restoration failed: "+exception_cause(std::current_exception());}}
         active_=false;receipt_=nullptr;throw std::runtime_error(failure_);
     }
 }

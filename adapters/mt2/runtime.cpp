@@ -23,6 +23,7 @@
 #include "native_ownership.h"
 #include "native_patches.h"
 #include "native_step_adapter.h"
+#include "native_step_profile.h"
 #include "native_step_windows.h"
 #include "shared_operations.h"
 #include "native_extensions.h"
@@ -977,7 +978,22 @@ extern "C" __declspec(dllexport) MT2FW_MT2_Result MT2FW_CALL MT2FW_MT2_QueryPatc
     catch(...){report("Native patch discovery failed: unknown native exception");return MT2FW_MT2_FAILED;}
 }
 extern "C" __declspec(dllexport) MT2FW_MT2_Result MT2FW_CALL MT2FW_MT2_QueryStepServiceDraft(const MT2FW_Host* owner,uint32_t version,MT2FW_MT2_StepServiceDraftV1* output,uint32_t capacity){
-    try{std::lock_guard lock(gate);if(!running||!native_steps)return MT2FW_MT2_UNAVAILABLE;return native_steps->query(owner,version,output,capacity);}
+    try{std::lock_guard lock(gate);if(!running||!native_steps)return MT2FW_MT2_UNAVAILABLE;
+        const auto result=native_steps->query(owner,version,output,capacity);
+        if(result==MT2FW_MT2_OK&&!mt2::step_profile::state.attempted){
+            try{
+                MT2FW_MT2_ServiceV1 service{};
+                const auto profile_result=native_services?native_services->query(owner,MT2FW_MT2_SERVICE_VERSION,&service,sizeof(service)):MT2FW_MT2_UNAVAILABLE;
+                if(profile_result!=MT2FW_MT2_OK){mt2::step_profile::state.attempted=true;
+                    std::snprintf(mt2::step_profile::state.availability_cause,sizeof(mt2::step_profile::state.availability_cause),"Native trace query returned status %u",unsigned(profile_result));
+                    runtime->log("steps","warn",mt2::step_profile::state.availability_cause);
+                }else if(!mt2::step_profile::configure(service))runtime->log("steps","warn",mt2::step_profile::state.availability_cause);
+            }catch(const std::exception& error){mt2::step_profile::state.attempted=true;mt2::step_profile::state.configured=false;
+                std::snprintf(mt2::step_profile::state.availability_cause,sizeof(mt2::step_profile::state.availability_cause),"Optional Step profiling failed: %s",error.what());}
+            catch(...){mt2::step_profile::state.attempted=true;mt2::step_profile::state.configured=false;
+                std::snprintf(mt2::step_profile::state.availability_cause,sizeof(mt2::step_profile::state.availability_cause),"Optional Step profiling raised an unknown exception");}
+        }
+        return result;}
     catch(const std::exception& error){report(std::string("Native step discovery failed: ")+error.what());return MT2FW_MT2_FAILED;}
     catch(...){report("Native step discovery failed: unknown native exception");return MT2FW_MT2_FAILED;}
 }

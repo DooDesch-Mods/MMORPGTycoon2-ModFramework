@@ -1,4 +1,5 @@
 #include "native_step_adapter.h"
+#include "native_step_profile.h"
 #include <stdexcept>
 
 namespace mt2fw::mt2 {
@@ -161,7 +162,7 @@ MT2FW_MT2_Result MT2FW_CALL NativeStepAdapter::proof_call(void* context,const MT
     if(adapter.proof_inflight_)return error("Step proof callback reentered");
     struct Release {bool& flag;~Release(){flag=false;}} release{adapter.proof_inflight_};adapter.proof_inflight_=true;
     try{
-        const auto result=adapter.pinned(MT2FW_MT2_FAILED,[&]{return adapter.callbacks_.proof(adapter.callbacks_.proof_user,query,out);});
+        const auto result=adapter.pinned(MT2FW_MT2_FAILED,[&]{return step_profile::consumer_proof([&]{return adapter.callbacks_.proof(adapter.callbacks_.proof_user,query,out);});});
         if(!adapter.current()||adapter.callbacks_retired_)return error("Step proof owner retired during callback");
         return result;
     }catch(const std::exception& e){return error(e.what());}
@@ -210,7 +211,13 @@ bool NativeStepAdapter::reset_after_world_exit(){
 }
 Json NativeStepAdapter::status()const{
     auto r=kernel_?kernel_->snapshot():MT2FW_MT2_StepReceipt{sizeof(MT2FW_MT2_StepReceipt)};
+    Json profile_counts=Json::object();
+    for(size_t i=0;i<step_profile::names.size();++i){const auto& c=step_profile::state.counts[i];
+        profile_counts[step_profile::names[i]]={{"entered",c.entered},{"returned",c.returned},{"failed",c.failed}};}
     return {{"configured",bool(driver_.inspect)&&bool(driver_.advance)},{"held",retained()},{"phase",r.phase},
+        {"step_profile",{{"configured",step_profile::state.configured},{"epoch",step_profile::state.epoch},
+            {"availability_cause",step_profile::state.availability_cause},{"first_failure",step_profile::state.first_failure},
+            {"counts",profile_counts},{"scope","existing trace wall spans; counts for the latest observed capture epoch; inclusive spans overlap; CPU unavailable"}}},
         {"lease",r.lease},{"tick",r.tick},{"completed_tick",r.completed_tick},{"actual_role",r.actual_role},
         {"exit_preflight",{{"ready",exit_preflight_ready_&&r.lease==exit_preflight_lease_&&r.phase==exit_preflight_phase_},
             {"lease",exit_preflight_lease_},{"phase",exit_preflight_phase_},{"cause",exit_preflight_cause_}}},

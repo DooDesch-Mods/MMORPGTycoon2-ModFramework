@@ -1,6 +1,7 @@
 #include "native_step_driver.h"
 #include "native_step_pins.h"
 #include "native_step_proof.h"
+#include "native_step_profile.h"
 #include <cstring>
 #include <iostream>
 #include <map>
@@ -12,6 +13,27 @@ namespace {
 int checks=0;
 void check(bool value,const char* cause){++checks;if(!value)throw std::runtime_error(cause);}
 template<class F>bool raises(F&& fn,const std::string& text){try{fn();return false;}catch(const std::exception& e){return std::string(e.what()).find(text)!=std::string::npos;}}
+struct Trace {
+    uint64_t epoch=1,next=1;
+    bool active=false,registration_fails=false;
+    unsigned registered=0,begins=0,ends=0;
+    std::vector<std::pair<uint32_t,uint64_t>> stack;
+    std::vector<std::string> events;
+    MT2FW_MT2_ServiceV1 api{};
+    Trace(){
+        api.context=this;
+        api.section_register=[](void* p,const char*){auto& t=*static_cast<Trace*>(p);return t.registration_fails?0u:++t.registered;};
+        api.scope_begin=[](void* p,uint32_t section)->MT2FW_MT2_Scope{auto& t=*static_cast<Trace*>(p);if(!t.active)return {};
+            const auto token=t.next++;t.stack.emplace_back(section,token);++t.begins;t.events.push_back("+"+std::to_string(section));return {t.epoch,token};};
+        api.scope_end=[](void* p,uint32_t section,MT2FW_MT2_Scope scope){auto& t=*static_cast<Trace*>(p);
+            check(!t.stack.empty()&&t.stack.back()==std::make_pair(section,scope.token),"profiling scope exit lost its nesting or token");
+            t.stack.pop_back();++t.ends;t.events.push_back("-"+std::to_string(section));};
+        step_profile::state={};
+    }
+    ~Trace(){step_profile::state={};}
+    void configure(){check(step_profile::configure(api),"profiling bridge registration failed");}
+    void next_capture(){check(stack.empty(),"capture reset while scopes remain open");++epoch;active=true;events.clear();}
+};
 struct Test {
     static constexpr uintptr_t image=0x100000000,game=0x200000000,tasks=0x210000000,
         timer=0x220000000,systems=0x230000000,mode=0x240000000,state=0x250000000,world=0x260000000,map=0x270000000;
@@ -87,6 +109,40 @@ struct Test {
 };
 }
 int main(){try{
+    {using namespace step_profile;Trace trace;int calls=0;
+        check(call(Part::before_step,[&]{return ++calls;})==1&&!state.counts[size_t(Part::before_step)].entered,"unconfigured profiling changed a call or emitted a count");
+        trace.registration_fails=true;check(!configure(trace.api)&&state.availability_cause[0]&&!state.configured,"trace registration failure was hidden");
+        check(call(Part::before_step,[&]{return ++calls;})==2,"diagnostic configuration failure blocked native work");
+        state={};trace.registration_fails=false;trace.configure();
+        check(trace.registered==names.size()&&call(Part::before_step,[&]{return ++calls;})==3&&!trace.begins&&!state.epoch,"inactive capture emitted profiling events");
+        trace.next_capture();
+        call(Part::driver_preproof,[&]{check(consumer_proof([]{return MT2FW_MT2_OK;})==MT2FW_MT2_OK,"successful consumer result changed");});
+        check(trace.events==std::vector<std::string>({"+3","+11","-11","-3"}),"nested consumer proof lost provider parent");
+        const auto& outer=state.counts[size_t(Part::driver_preproof)];check(outer.entered==1&&outer.returned==1&&!outer.failed,"normal scope counters differ");
+        check(raises([&]{call(Part::original_go,[&]{call(Part::finish_all,[]{throw std::runtime_error("retained-drain-cause");});});},"retained-drain-cause"),"scope changed original exception");
+        check(std::string(state.first_failure)=="step.finish_all: retained-drain-cause","first nested failure cause was replaced");
+        const auto& drain=state.counts[size_t(Part::finish_all)];check(drain.entered==1&&!drain.returned&&drain.failed==1,"throwing drain claimed a return");
+        bool preserved=false;try{call(Part::resume,[]{throw 17;});}catch(int value){preserved=value==17;}
+        check(preserved&&state.counts[size_t(Part::resume)].failed==1,"scope changed an unknown exception");
+        check(consumer_proof([]{return MT2FW_MT2_UNAVAILABLE;})==MT2FW_MT2_UNAVAILABLE,"failed proof status changed");
+        const auto& proof=state.counts[size_t(Part::consumer_proof)];check(proof.entered==2&&proof.returned==2&&proof.failed==1,"failed returned proof lacks distinct return and failure counters");
+        check(trace.stack.empty()&&trace.begins==trace.ends,"exception paths left profiling scopes open");
+        trace.next_capture();call(Part::before_step,[]{});
+        check(state.epoch==trace.epoch&&state.counts[size_t(Part::before_step)].entered==1&&!state.first_failure[0]&&!state.counts[size_t(Part::finish_all)].entered,"capture counters crossed epochs");
+    }
+    {using namespace step_profile;Trace trace;trace.configure();trace.next_capture();Test t;t.freeze();t.advance();
+        check(trace.stack.empty()&&trace.begins==trace.ends,"actual driver scopes are unbalanced");
+        for(auto part:{Part::driver_preproof,Part::before_step,Part::resume,Part::original_go,Part::finish_all,Part::pause_restore,Part::driver_postproof}){
+            const auto& c=state.counts[size_t(part)];check(c.entered==1&&c.returned==1&&!c.failed,"actual driver component was not measured exactly once");}
+        check(!state.counts[size_t(Part::after_go)].entered,"absent optional after_go was measured as an executed call");
+    }
+    {using namespace step_profile;Trace trace;trace.configure();trace.next_capture();Test t;t.freeze();t.throw_finish=true;
+        check(raises([&]{t.advance();},"finish-failed"),"profiled driver hid original drain failure");
+        const auto& c=state.counts[size_t(Part::finish_all)];check(c.entered==1&&!c.returned&&c.failed==1,"actual throwing drain counters differ");
+        check(trace.stack.empty()&&trace.begins==trace.ends&&t.go_count==1&&t.pause_count==1,"profiled driver failure changed original/restore attempts or scope balance");
+    }
+    {using namespace step_profile;Trace trace;trace.configure();trace.next_capture();Test t;t.freeze();t.done=true;t.put(Test::tasks+0xc0,int32_t(0));t.advance();
+        check(!state.counts[size_t(Part::finish_all)].entered&&!t.finish_count,"already drained step emitted a false FinishAllTasks call");}
     {Test t(true);t.observed.identity.region_rng_mode=2;t.observed.identity.region_rng_count=2;
         check(t.driver->inspect(t.observed.identity.owner,t.spec()).context,"preserved Region preload unavailable");
         const auto rows=t.driver->region_rng_rows();check(rows.size()==2&&rows[0].id==3&&rows[1].id==7&&rows[1].value.words[0]==18&&rows[1].value.extra==-7,"preserved Region proof rows differ");

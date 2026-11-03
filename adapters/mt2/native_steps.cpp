@@ -1,4 +1,5 @@
 #include "native_steps.h"
+#include "native_step_profile.h"
 #include <algorithm>
 #include <cstring>
 #include <limits>
@@ -121,7 +122,7 @@ MT2FW_MT2_Result NativeStepKernel::next(uint64_t invocation,MT2FW_MT2_StepReceip
     return control([&]{
         if(!entered_||retiring_||!bound_||invocation!=invocation_||thread_()!=bound_thread_)return reject(MT2FW_MT2_INVALID,"Native step continuation is stale, retired or outside its callback/thread");
         if(next_attempted_){fail("Native step continuation was attempted twice; no replay");return MT2FW_MT2_FAILED;}
-        next_attempted_=true;current(true);receipt_.phase=MT2FW_MT2_STEP_ENTERED;
+        next_attempted_=true;step_profile::call(step_profile::Part::kernel_preproof,[&]{current(true);});receipt_.phase=MT2FW_MT2_STEP_ENTERED;
         MT2FW_MT2_StepBoundary frame{sizeof(frame),receipt_.actual_role,receipt_.lease,spec_.session,receipt_.world_epoch,next_tick_,invocation_,bound_thread_,spec_.dt_bits,0};
         advance_(frame,receipt_);
         require(!retiring_&&receipt_.phase!=MT2FW_MT2_STEP_FAILED,"Native step retired or reentered during the original");
@@ -130,7 +131,7 @@ MT2FW_MT2_Result NativeStepKernel::next(uint64_t invocation,MT2FW_MT2_StepReceip
             "Native step driver changed immutable boundary identity");
         require(receipt_.original_attempted==1&&receipt_.original_returned==1&&receipt_.timer_calls==1&&receipt_.dt_bits==spec_.dt_bits&&receipt_.workers_held==1,
             "Native step original/Timer/held proof is incomplete");
-        current(true);receipt_.outcome=MT2FW_MT2_STEP_CONFIRMED;
+        step_profile::call(step_profile::Part::kernel_postproof,[&]{current(true);});receipt_.outcome=MT2FW_MT2_STEP_CONFIRMED;
         return MT2FW_MT2_OK;
     },out);
 }
