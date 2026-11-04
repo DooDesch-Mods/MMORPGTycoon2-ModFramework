@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.5.8
+
+### Fixed
+
+- Prevent the Windows cursor from appearing over the game cursor when Card Vault is loaded.
+
 ## 0.5.7
 
 ### Added

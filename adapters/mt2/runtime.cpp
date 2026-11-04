@@ -98,6 +98,7 @@ using Relative=bool(*)(SDL_Window*,bool);
 Update original_update=nullptr;Swap original_swap=nullptr;Poll original_poll=nullptr;
 Hide original_hide=nullptr;Relative original_relative=nullptr;
 bool show_menu=false,ui_ready=false,running=false,developer=false,german=false,restore_relative=false,menu_input_active=false;
+bool restore_cursor_visible=false;
 SDL_Window* window=nullptr;
 int diagnostic_mouse_frames=0;
 float diagnostic_mouse_x=0,diagnostic_mouse_y=0;
@@ -536,8 +537,17 @@ Json status() {
 void menu_input(bool visible) {
     if(!window||menu_input_active==visible)return;
     menu_input_active=visible;
-    if(visible){restore_relative=SDL_GetWindowRelativeMouseMode(window);if(!original_relative(window,false))report(std::string("Disable relative mouse failed: ")+SDL_GetError());if(!SDL_ShowCursor())report(std::string("Show cursor failed: ")+SDL_GetError());if(!SDL_StartTextInput(window))report(std::string("Start text input failed: ")+SDL_GetError());}
-    else{if(!SDL_StopTextInput(window))report(std::string("Stop text input failed: ")+SDL_GetError());if(restore_relative&&!original_relative(window,true))report(std::string("Restore relative mouse failed: ")+SDL_GetError());}
+    if(visible){
+        restore_relative=SDL_GetWindowRelativeMouseMode(window);
+        restore_cursor_visible=SDL_CursorVisible();
+        if(!original_relative(window,false))report(std::string("Disable relative mouse failed: ")+SDL_GetError());
+        if(!SDL_ShowCursor())report(std::string("Show cursor failed: ")+SDL_GetError());
+        if(!SDL_StartTextInput(window))report(std::string("Start text input failed: ")+SDL_GetError());
+    }else{
+        if(!SDL_StopTextInput(window))report(std::string("Stop text input failed: ")+SDL_GetError());
+        if(restore_relative&&!original_relative(window,true))report(std::string("Restore relative mouse failed: ")+SDL_GetError());
+        if(!(restore_cursor_visible?SDL_ShowCursor():original_hide()))report(std::string("Restore cursor visibility failed: ")+SDL_GetError());
+    }
 }
 void menu_state(bool visible) {
     show_menu=visible;menu_input(visible);
@@ -834,6 +844,8 @@ bool swap(SDL_Window* target) {
         if(runtime&&running) {
             if(!ui_ready) {
                 window=target;ImGui::CreateContext();ImGui::GetIO().IniFilename=nullptr;ImGui::StyleColorsDark();
+                // Native game UI owns the cursor. The ImGui management menu sets visibility explicitly.
+                ImGui::GetIO().ConfigFlags|=ImGuiConfigFlags_NoMouseCursorChange;
                 document_ui::initialize();
                 if(!ImGui_ImplSDL3_InitForOpenGL(window,SDL_GL_GetCurrentContext())||!ImGui_ImplOpenGL3_Init("#version 150"))throw std::runtime_error("Framework UI backend initialization failed");
                 bind_framebuffer=reinterpret_cast<BindFramebuffer>(SDL_GL_GetProcAddress("glBindFramebuffer"));
@@ -924,7 +936,11 @@ bool poll(SDL_Event* event) {
         return true;
     }
 }
-bool hide_cursor(){if(show_menu)return SDL_ShowCursor();return original_hide();}
+bool hide_cursor(){
+    if(!menu_input_active)return original_hide();
+    restore_cursor_visible=false;
+    return SDL_ShowCursor();
+}
 bool relative_mouse(SDL_Window* target,bool active){if(show_menu){restore_relative=active;return original_relative(target,false);}return original_relative(target,active);}
 void hook(void* target,void* replacement,void** original) {
     if(!target)throw std::runtime_error("Native hook target absent");auto result=MH_CreateHook(target,replacement,original);if(result!=MH_OK)throw std::runtime_error(std::string("Create hook failed: ")+MH_StatusToString(result));
