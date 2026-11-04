@@ -3,6 +3,8 @@ Build your MMO world together.
 
 🛟 [b]Need help or found a bug?[/b] Get support at [url=https://support.doodesch.de/multiplayer]support.doodesch.de/multiplayer[/url].
 
+[url=https://mods.doodesch.de][img]https://mods.doodesch.de/img/badge.png[/img][/url]
+
 [size=4][b]Early Beta[/b][/size]
 Manage supported staff and advertising actions together, change release plans and Inn service prices, and continue building after a shared autosave. Read your installed version's release notes for its changes and requirements.
 
@@ -25,3 +27,9 @@ Use [b]Report a problem[/b] in the Multiplayer window and keep the report number
 The earlier Beta 23 used a different synchronization system. Its feature list does not describe current releases. [url=https://github.com/DooDesch-Mods/MMORPGTycoon2-Multiplayer/releases/tag/v0.1.0-beta.23]Earlier releases[/url] remain available.
 
 [url=https://github.com/DooDesch-Mods/MMORPGTycoon2-Multiplayer/releases]Source and release notes[/url]
+
+[size=5][b]Community[/b][/size]
+
+[url=https://mods.doodesch.de][img]https://mods.doodesch.de/img/card.png[/img][/url]
+
+Join the DooDesch Mods Discord: update pings, polls on what comes next, and playtests of new mods.

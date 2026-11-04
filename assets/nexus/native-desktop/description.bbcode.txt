@@ -5,6 +5,8 @@
 
 [url=https://github.com/DooDesch-Mods/MMORPGTycoon2-ModFramework/blob/main/docs/quickstart.md]Create your first mod[/url] | [url=https://github.com/DooDesch-Mods/MMORPGTycoon2-ModFramework/blob/main/docs/reference/index.md]API reference[/url] | [url=https://github.com/DooDesch-Mods/MMORPGTycoon2-ModFramework]GitHub[/url]
 
+[url=https://mods.doodesch.de][img]https://mods.doodesch.de/img/badge.png[/img][/url]
+
 [img]https://raw.githubusercontent.com/DooDesch-Mods/MMORPGTycoon2-ModFramework/main/assets/nexus/native-desktop/thumbnail.png[/img]
 
 Add your own windows, tools and scenery to MMORPG Tycoon 2. Write Lua mods in a text editor, build native C++ plugins, or import a static GLB model for the scenery catalog.
@@ -76,3 +78,9 @@ Close the game. For a Vortex installation, use Vortex to purge deployment and re
 
 [size=5][b]Credits[/b][/size]
 Framework, SDK, templates and documentation by [b]DooDesch[/b], under the MIT License. Dependencies retain their own notices. MMORPG Tycoon 2 is by VectorStorm; game names and artwork belong to their respective owners and are not covered by the framework's MIT license.
+
+[size=5][b]Community[/b][/size]
+
+[url=https://mods.doodesch.de][img]https://mods.doodesch.de/img/card.png[/img][/url]
+
+Join the DooDesch Mods Discord: update pings, polls on what comes next, and playtests of new mods.
