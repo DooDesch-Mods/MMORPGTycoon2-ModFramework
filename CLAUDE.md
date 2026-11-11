@@ -24,6 +24,7 @@ python -m unittest discover -s tests -p "test_*.py"
 python tools/generate_docs.py --check                  # generated sources are current
 python tools/check_contract.py                         # needs the built probe
 python tools/render_roadmap.py --check
+node --test tests/vortex.cjs                           # Vortex extension
 npm ci --ignore-scripts; npm run docs:build; python tools/check_docs.py; npm run docs:test
 ```
 
