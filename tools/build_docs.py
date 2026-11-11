@@ -8,6 +8,38 @@ ROOT=Path(__file__).resolve().parents[1]
 sys.path.insert(0,str(ROOT/'tools'))
 from mt2fw import packages
 
+LLMS = """# MT2 Mod Framework
+
+> Framework {version}, Lua API {api_version}, native ABI 1. Windows x64 Steam. Multiplayer compatibility is not established.
+
+Use the version matching the installed framework. World mutations need confirmed acknowledgement; never automatically retry unknown results.
+
+## Start
+
+- [First mod](quickstart.md): create, edit, reload and package Lua.
+- [Agent guide](agents/start.md): lifecycle rules and validation.
+- [Lua apps and dashboards](recipes/lua-apps.md): complete central launcher, native window, document and snapshot examples.
+- [API reference](reference/index.md): generated public functions.
+- [Events](reference/events.md): exact event payload types.
+- [Experimental patches](experimental/patches.md): named targets, ordering and typed changes.
+- [Native Step SDK](experimental/steps.md): experimental draft 9, restricted native multiplayer lifecycle and Save coordination.
+- [Step machine contract](api/experimental/steps.json): exact header, version, methods and ownership.
+- [Step recovery extension](experimental/step-recovery.md): optional exact-version native interruption and fresh capture extension included in Framework 0.5.0; availability does not establish game or Multiplayer compatibility.
+- [Recovery machine contract](api/experimental/step-recovery.json): frozen processes, single-use operations and retirement boundaries.
+- [Native C ABI](reference/native.md): authoritative header and ownership.
+- [Compatibility](compatibility.md): supported executable and current limits.
+
+- [Experimental gameplay](experimental/gameplay.md): direct Lua game operations, exact handles and confirmed action results.
+
+## Machine contracts
+
+- [API JSON](api/{api_version}/api.json): functions, types, capabilities, errors and examples.
+- [Patch target contract](api/experimental/patches.json): experimental protocol 1, requires Framework 0.2.0.
+- [Mod schema](api/{api_version}/mod.schema.json): structure; mt2fw check adds semantic validation.
+- [Versioned Markdown](versions/{api_version}/reference/index.md): documentation snapshot for this API.
+- [Gameplay contract](api/experimental/gameplay.json): experimental protocol 1; native requirements and parameters for each game operation.
+"""
+
 def source_pages():return sorted(p for p in (ROOT/'docs').rglob('*.md') if '.vitepress' not in p.parts)
 
 def markdown_assets(text,relative):
@@ -44,13 +76,7 @@ def prepare():
     (ROOT/'docs/public/search-index.js').write_text('window.MT2FW_SEARCH_INDEX = '+json.dumps(pages,ensure_ascii=False).replace('</','<\\/')+';\n',encoding='utf-8')
     contract=packages.read_json(ROOT/'api/contract.json')
     version=contract['framework_version'];api_version=contract['api_version']
-    llms='# MT2 Mod Framework\n\n> Framework '+version+', Lua API '+api_version+', native ABI 1. Windows x64 Steam. Multiplayer compatibility is not established.\n\nUse the version matching the installed framework. World mutations need confirmed acknowledgement; never automatically retry unknown results.\n\n## Start\n\n- [First mod](quickstart.md): create, edit, reload and package Lua.\n- [Agent guide](agents/start.md): lifecycle rules and validation.\n- [API reference](reference/index.md): generated public functions.\n- [Events](reference/events.md): exact event payload types.\n- [Experimental patches](experimental/patches.md): named targets, ordering and typed changes.\n- [Native C ABI](reference/native.md): authoritative header and ownership.\n- [Compatibility](compatibility.md): supported executable and current limits.\n\n## Machine contracts\n\n- [API JSON](api/'+api_version+'/api.json): functions, types, capabilities, errors and examples.\n- [Patch target contract](api/experimental/patches.json): experimental protocol 1, requires Framework 0.2.0.\n- [Mod schema](api/'+api_version+'/mod.schema.json): structure; mt2fw check adds semantic validation.\n- [Versioned Markdown](versions/'+api_version+'/reference/index.md): documentation snapshot for this API.\n'
-    llms=llms.replace('- [API reference]', '- [Lua apps and dashboards](recipes/lua-apps.md): complete central launcher, native window, document and snapshot examples.\n- [API reference]')
-    llms=llms.replace('- [Native C ABI]', '- [Native Step SDK](experimental/steps.md): experimental draft 9, restricted native multiplayer lifecycle and Save coordination.\n- [Step machine contract](api/experimental/steps.json): exact header, version, methods and ownership.\n- [Native C ABI]')
-    llms=llms.replace('## Machine contracts', '- [Experimental gameplay](experimental/gameplay.md): direct Lua game operations, exact handles and confirmed action results.\n\n## Machine contracts')
-    llms=llms.replace('- [Native C ABI]', '- [Step recovery extension](experimental/step-recovery.md): optional exact-version native interruption and fresh capture extension included in Framework 0.5.0; availability does not establish game or Multiplayer compatibility.\n- [Recovery machine contract](api/experimental/step-recovery.json): frozen processes, single-use operations and retirement boundaries.\n- [Native C ABI]')
-    llms+='- [Gameplay contract](api/experimental/gameplay.json): experimental protocol 1; native requirements and parameters for each game operation.\n'
-    (ROOT/'docs/public/llms.txt').write_text(llms,encoding='utf-8')
+    (ROOT/'docs/public/llms.txt').write_text(LLMS.format(version=version,api_version=api_version),encoding='utf-8')
     (ROOT/'docs/public/media/LICENSE.txt').write_text('Framework UI and original branding: Copyright (c) 2026 DooDesch, MIT.\nOriginal game artwork shown in real MMORPG Tycoon 2 captures retains its respective rights and is not licensed under the framework MIT license.\nNo original game files or private reference icon are redistributed here. See media.json for individual capture cases.\n',encoding='utf-8')
     return pages
 
