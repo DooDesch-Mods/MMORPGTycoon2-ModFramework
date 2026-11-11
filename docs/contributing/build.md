@@ -11,7 +11,7 @@ python tools/build.py --check
 python tools/build.py --smoke
 ```
 
-`--check` builds, runs CTest and the offline checks: unit tests, generated sources, API contract, roadmap and the Vortex extension. `--deploy` copies `WSOCK32.dll` and `MT2Framework.dll` into the game folder; `--smoke` also starts the game through Steam, waits for `MT2 Mod Framework <version> loaded` in the profile's game log and closes the game. The game folder is `--game`, else `MT2_GAME_DIR`, else the Steam default. CMake comes from PATH or the Visual Studio installation.
+`--check` builds, runs CTest and the offline checks: unit tests, generated sources, API contract, roadmap and the Vortex extension. `--deploy` copies `WSOCK32.dll` and `MT2Framework.dll` into the game folder; `--smoke` also starts the game through Steam, waits for `MT2 Mod Framework <version> loaded` in the profile's game log and closes the game. The game folder is `--game`, else `MT2_GAME_DIR`, else the Steam default. CMake comes from PATH or the Visual Studio installation. The build uses the Visual Studio generator with two jobs unless `CMAKE_GENERATOR` and `CMAKE_BUILD_PARALLEL_LEVEL` are set; CI sets `Ninja Multi-Config` with `sccache` as compiler launcher inside the Visual Studio developer shell.
 
 Builds and detailed logs stay under ignored `build/` and `artifacts/`. `--core-only` omits the Windows adapter. `--skip-tests` skips CTest.
 
