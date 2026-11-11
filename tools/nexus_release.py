@@ -1,28 +1,28 @@
-"""Validate release artifacts and Nexus destinations; uploading stays in the official action."""
+"""Validate a release directory against its tag and Nexus destination, confirm uploads and complete changelogs.
+
+The upload itself runs in the official Nexus upload action (.github/workflows/release.yml).
+"""
 from pathlib import Path, PurePosixPath
 import argparse
-import base64
 import fnmatch
 import hashlib
+import html
 import json
 import os
 import re
-import subprocess
 import sys
 import urllib.error
 import urllib.request
-import zipfile
 import uuid
-import tempfile
+import zipfile
 
 ROOT = Path(__file__).resolve().parents[1]
-sys.path.insert(0,str(ROOT/'tools'))
+sys.path.insert(0, str(ROOT / 'tools'))
 from package_runtime import verify_runtime
 from release_notes import section, plain, bbcode
-REPOSITORY = 'DooDesch-Mods/MMORPGTycoon2-ModFramework'
-MULTIPLAYER_REPOSITORY = 'DooDesch-Mods/MMORPGTycoon2-Multiplayer'
+
 API = 'https://api.nexusmods.com/v3'
-MULTIPLAYER_SUPPORT = '> 🛟 **Need help or found a bug?** Get support at [support.doodesch.de/multiplayer](https://support.doodesch.de/multiplayer).'
+TAG_PREFIXES = (('vortex-v', 'vortex'), ('v', 'framework'))
 
 
 def targets():
@@ -44,37 +44,14 @@ def version_key(value):
     return tuple(int(match[i]) for i in (1, 2, 3)) + (suffix is None, parts)
 
 
-def multiplayer_direct_delivery(tag, target=None):
-    target = target or targets()['multiplayer']
-    return version_key(tag.removeprefix('v')) >= version_key(target['direct_delivery_min_version'])
-
-
-def multiplayer_receipt_location(tag, target=None):
-    target = target or targets()['multiplayer']
-    if multiplayer_direct_delivery(tag, target):
-        return MULTIPLAYER_REPOSITORY, tag
-    return REPOSITORY, target['receipt_tag']
-
-
-def require_multiplayer_delivery_owner(tag):
-    caller = os.environ.get('GITHUB_REPOSITORY')
-    if multiplayer_direct_delivery(tag) and caller and caller != MULTIPLAYER_REPOSITORY:
-        raise ValueError('This Multiplayer version must be delivered by its own release workflow, not the legacy Framework poller')
-
-
-def validate_multiplayer_caller(tag, tooling_revision, *, repository, event, ref, checked_out_revision, target='multiplayer'):
-    if repository != MULTIPLAYER_REPOSITORY:
-        raise ValueError('Multiplayer delivery caller repository differs')
-    if event not in ('push', 'workflow_dispatch'):
-        raise ValueError('Multiplayer delivery caller event is not a release push or explicit dispatch')
-    if target != 'multiplayer':
-        raise ValueError('Multiplayer delivery caller cannot select another product')
-    if not re.fullmatch(r'v\d+\.\d+\.\d+-beta\.[1-9]\d*', tag) or not multiplayer_direct_delivery(tag):
-        raise ValueError('Direct Multiplayer delivery requires Beta 29 or later; legacy releases keep their existing receipts')
-    if ref not in ('refs/heads/main', 'refs/tags/' + tag):
-        raise ValueError('Multiplayer delivery caller ref does not match main or the exact release tag')
-    if not re.fullmatch(r'[0-9a-f]{40}', tooling_revision) or checked_out_revision != tooling_revision:
-        raise ValueError('Multiplayer delivery tooling checkout differs from its exact pinned revision')
+def product_for(tag):
+    """Return (product, version) for a release tag: v<version> is the framework, vortex-v<version> the extension."""
+    for prefix, product in TAG_PREFIXES:
+        if tag.startswith(prefix):
+            version = tag[len(prefix):]
+            version_key(version)
+            return product, version
+    raise ValueError('Release tags are v<version> or vortex-v<version>: ' + tag)
 
 
 def archive_version(path, product):
@@ -96,31 +73,6 @@ def archive_version(path, product):
                 if hashlib.sha256(archive.read(name)).hexdigest() != expected:
                     raise ValueError('Framework file checksum differs: ' + name)
             verify_runtime(path)
-        elif product == 'multiplayer':
-            metadata = json.loads(archive.read('package.json'))
-            mod = json.loads(archive.read('mod.json'))
-            required = {'MT2MultiplayerPlugin.dll', 'mod.json', 'assets/multiplayer.png', 'README.md',
-                        'LICENSE.md', 'THIRD_PARTY_NOTICES.md', 'licenses/MinHook.txt',
-                        'licenses/DearImGui.txt', 'licenses/nlohmann-json.txt', 'licenses/SDL3.txt'}
-            if set(names) != required | {'package.json'} or set(metadata.get('files', {})) != required:
-                raise ValueError('Multiplayer inventory differs')
-            if (mod.get('id') != 'doodesch.multiplayer' or mod.get('type') != 'native'
-                    or mod.get('entry') != 'MT2MultiplayerPlugin.dll' or mod.get('api_version') != '1.0.0'
-                    or mod.get('version') != metadata.get('version') or metadata.get('package_mode') != 'vortex'):
-                raise ValueError('Multiplayer release identity differs')
-            if 'source_commit' in metadata or 'release_tag' in metadata:
-                if (metadata.get('release_tag') != 'v' + str(metadata.get('version'))
-                        or not re.fullmatch(r'[0-9a-f]{40}', str(metadata.get('source_commit', '')))):
-                    raise ValueError('Multiplayer explicit source identity differs')
-            elif (metadata.get('schema_version') != 2 or metadata.get('candidate') != 'framework-native-plugin'
-                    or metadata.get('inputs', {}).get('mod_manifest_sha256') != hashlib.sha256(archive.read('mod.json')).hexdigest()
-                    or not re.fullmatch(r'[0-9a-f]{64}', str(metadata.get('inputs', {}).get('candidate_receipt_sha256', '')))):
-                raise ValueError('Multiplayer canonical package identity differs')
-            for name in required:
-                data = archive.read(name)
-                record = metadata['files'][name]
-                if not data or record.get('size') != len(data) or record.get('sha256') != hashlib.sha256(data).hexdigest():
-                    raise ValueError('Multiplayer file checksum differs: ' + name)
         elif product == 'vortex':
             metadata = json.loads(archive.read('info.json'))
             if metadata['gameId'] != 4452 or metadata['id'] != 'game-mmorpgtycoon2':
@@ -144,135 +96,31 @@ def checksum_for(text, filename):
     return matches[0]
 
 
-def gh(*args):
-    return gh_repository(REPOSITORY, *args)
+def request_json(url, method='GET', body=None, headers=None):
+    data = None if body is None else json.dumps(body).encode('utf-8')
+    request = urllib.request.Request(url, data=data, method=method,
+        headers={'Accept': 'application/json', 'Content-Type': 'application/json',
+                 'User-Agent': 'MT2-ModFramework-CI', **(headers or {})})
+    try:
+        with urllib.request.urlopen(request, timeout=45) as response:
+            raw = response.read()
+            return json.loads(raw) if raw else None
+    except urllib.error.HTTPError as error:
+        # API bodies can contain account details; the endpoint and status identify this failure.
+        raise RuntimeError(f'Nexus {method} {url} failed: HTTP {error.code}; inspect the destination before retrying a write') from None
+    except (urllib.error.URLError, TimeoutError, json.JSONDecodeError) as error:
+        raise RuntimeError(f'Nexus {method} {url} failed ({type(error).__name__}); inspect the destination before retrying a write') from None
 
 
-def gh_repository(repository, *args):
-    if repository not in (REPOSITORY, 'DooDesch-Mods/MMORPGTycoon2-Multiplayer'):
-        raise ValueError('Release source repository is not allowlisted')
-    if args[0] == 'api':
-        if not args[1].startswith('repos/' + repository + '/'):
-            raise ValueError('GitHub API path differs from the release repository')
-        command = ['gh', *args]
-    else:
-        command = ['gh', *args, '--repo', repository]
-    result = subprocess.run(command, capture_output=True, text=True, timeout=600)
-    if result.returncode:
-        cause = result.stderr.strip()
-        for name in ('GH_TOKEN', 'GITHUB_TOKEN', 'NEXUSMODS_API_KEY', 'DISCORD_RELEASE_WEBHOOK'):
-            if value := os.environ.get(name):cause = cause.replace(value, '[redacted]')
-        raise RuntimeError(f'GitHub release {args[1]} failed (exit {result.returncode}): {cause[:2000]}')
-    return result.stdout
-
-
-def multiplayer_source_commit(manifest, mod, repository, tag, commit, call):
-    if tag != 'v' + str(manifest.get('version')) or not re.fullmatch(r'[0-9a-f]{40}', str(commit)):
-        raise ValueError('Multiplayer release source commit differs')
-    if 'source_commit' in manifest:
-        if manifest['source_commit'] != commit:
-            raise ValueError('Multiplayer source commit differs from its published release')
-    else:
-        # Canonical schema2 packages bind to their authenticated published tag
-        # and source manifest instead of legacy in-package provenance fields.
-        resolved = json.loads(call('api', f'repos/{repository}/commits/{tag}'))
-        if resolved.get('sha') != commit:
-            raise ValueError('Multiplayer GitHub tag source commit differs from its release')
-        source = json.loads(call('api', f'repos/{repository}/contents/mod.json?ref={commit}'))
-        if source.get('type') != 'file' or source.get('encoding') != 'base64':
-            raise ValueError('Multiplayer source manifest response is not a file')
-        source_mod = json.loads(base64.b64decode(source['content']))
-        if source_mod != mod:
-            raise ValueError('Multiplayer packaged manifest differs from the exact tagged source')
-    return commit
-
-
-def fetch_release(tag, product, directory, optional=False):
-    if not re.fullmatch(r'[A-Za-z0-9][A-Za-z0-9._-]{0,127}', tag):
-        raise ValueError('Invalid release tag')
-    selected = targets()[product]
-    if product == 'multiplayer':
-        require_multiplayer_delivery_owner(tag)
-    repository = selected.get('source_repository', REPOSITORY)
-    call = gh if repository == REPOSITORY else lambda *args: gh_repository(repository, *args)
-    metadata = json.loads(call('release', 'view', tag, '--json', 'tagName,isDraft,assets,url,targetCommitish,body'))
-    if metadata['isDraft'] or metadata['tagName'] != tag:
-        raise ValueError('Expected a published GitHub release')
-    matches = [row for row in metadata['assets'] if fnmatch.fnmatchcase(row['name'], selected['asset_pattern'])]
-    if not matches and optional:
-        return None
-    if len(matches) != 1:
-        raise ValueError(f'{product}: expected one release archive, found {len(matches)}')
-    asset = matches[0]
-    checksum_name = asset['name'] + '.sha256' if product == 'multiplayer' else 'SHA256SUMS.txt'
-    if not any(row['name'] == checksum_name for row in metadata['assets']):
-        raise ValueError('Release is missing ' + checksum_name)
-    directory.mkdir(parents=True, exist_ok=True)
-    call('release', 'download', tag, '--dir', str(directory), '--pattern', asset['name'], '--pattern', checksum_name)
-    path = directory / asset['name']
-    expected = checksum_for((directory / checksum_name).read_text(encoding='utf-8'), path.name)
-    actual = hashlib.sha256(path.read_bytes()).hexdigest()
-    if actual != expected or path.stat().st_size != asset['size']:
-        raise ValueError('GitHub release asset integrity differs: ' + path.name)
-    version = archive_version(path, product)
-    expected_name = (f'MMORPGTycoon2-Multiplayer-v{version}-windows-x64.zip' if product == 'multiplayer' else
-                     f'MT2Framework-{version}-windows-x64.zip' if product == 'framework' else f'MMORPGTycoon2-Vortex-{version}.zip')
-    if path.name != expected_name:
-        raise ValueError('Archive filename differs from embedded product version')
-    plan = {'product': product, 'tag': tag, 'release_url': metadata['url'], 'version': version,
-            'filename': str(path), 'sha256': actual, 'bytes': path.stat().st_size}
-    if product == 'multiplayer':
-        with zipfile.ZipFile(path) as archive:
-            manifest = json.loads(archive.read('package.json'))
-            mod = json.loads(archive.read('mod.json'))
-        plan['source_commit'] = multiplayer_source_commit(manifest, mod, repository, tag, metadata.get('targetCommitish'), call)
-        notes_source = selected.get('notes_source')
-        if notes_source not in (None, 'github_release'):
-            raise ValueError('Unsupported Multiplayer release notes source: ' + str(notes_source))
-        if notes_source == 'github_release':
-            notes = metadata.get('body')
-            if not isinstance(notes, str) or not notes.strip() or len(notes) > 10000:
-                raise ValueError('Published GitHub release notes must contain 1 to 10000 characters')
-            notes = notes.strip()
-            plan['notes_source_sha256'] = hashlib.sha256(notes.encode('utf-8')).hexdigest()
-            # Keep the standard support callout on the listing; version changelogs contain the release text.
-            if notes.startswith(MULTIPLAYER_SUPPORT + '\n\n'):
-                notes = notes[len(MULTIPLAYER_SUPPORT):].strip()
-                plan['notes_transform'] = 'omit standard listing support callout from version changelog'
-                print('info: omit the standard listing support callout from the Multiplayer version changelog', file=sys.stderr)
-            if not notes:
-                raise ValueError('Published GitHub release notes contain no release text')
-            plan['release_notes'] = notes
-            plan['notes_origin'] = metadata['url']
-            plan['notes_sha256'] = hashlib.sha256(notes.encode('utf-8')).hexdigest()
-        else:
-            notes_request = urllib.request.Request(f'https://raw.githubusercontent.com/{repository}/{tag}/CHANGELOG.md',
-                                                   headers={'User-Agent': 'MT2-release-validation'})
-            with urllib.request.urlopen(notes_request, timeout=30) as response:
-                plan['notes_source'] = response.read().decode('utf-8')
-        plan['source_repository'] = repository
-        receipt_repository, plan['receipt_tag'] = multiplayer_receipt_location(tag, selected)
-        plan['receipt_repository'] = receipt_repository
-        receipt_call = gh if receipt_repository == REPOSITORY else lambda *args: gh_repository(receipt_repository, *args)
-        receipt_release = json.loads(receipt_call('release', 'view', plan['receipt_tag'], '--json', 'tagName,isDraft'))
-        if receipt_release['isDraft'] or receipt_release['tagName'] != plan['receipt_tag']:
-            raise ValueError('Receipt release is not published')
-    return plan
-
-
-def api_get(endpoint):
+def api_key():
     key = os.environ.get('NEXUSMODS_API_KEY', '').strip()
     if not key:
         raise ValueError('NEXUSMODS_API_KEY is missing; configure the repository or organization secret')
-    request = urllib.request.Request(API + endpoint, headers={'apikey': key, 'Accept': 'application/json', 'User-Agent': 'MT2-ModFramework-CI'})
-    try:
-        with urllib.request.urlopen(request, timeout=45) as response:
-            return json.load(response)['data']
-    except urllib.error.HTTPError as error:
-        # API bodies can contain account details; the endpoint and status identify this failure.
-        raise RuntimeError(f'Nexus GET {endpoint} failed: HTTP {error.code}') from None
-    except urllib.error.URLError as error:
-        raise RuntimeError(f'Nexus GET {endpoint} failed: {error.reason}') from None
+    return key
+
+
+def api_get(endpoint):
+    return request_json(API + endpoint, headers={'apikey': api_key()})['data']
 
 
 def check_destination(target, version, get=api_get):
@@ -305,133 +153,106 @@ def outputs(values):
                 stream.write(f'{name}<<{delimiter}\n{value}\n{delimiter}\n')
 
 
-def poll_multiplayer():
-    target = targets()['multiplayer']
-    repository = target['source_repository']
-    releases = json.loads(gh_repository(repository, 'api', f'repos/{repository}/releases?per_page=100'))
-    candidates = [row for row in releases if not row['draft'] and row['prerelease']
-                  and re.fullmatch(r'v\d+\.\d+\.\d+-beta\.[1-9]\d*', row['tag_name'])
-                  and version_key(row['tag_name'][1:]) >= version_key('0.1.0-beta.27')
-                  and not multiplayer_direct_delivery(row['tag_name'], target)
-                  and row['tag_name'] not in target.get('silent_releases', [])]
-    if not candidates:
-        outputs({'active': 'false'})
-        print('info: no published Multiplayer beta is eligible for automatic delivery')
-        return
-    release = max(candidates, key=lambda row: version_key(row['tag_name'][1:]))
-    tag = release['tag_name']
-    filename = f'release-delivery-multiplayer-{tag[1:]}.json'
-    receipts = json.loads(gh('release', 'view', target['receipt_tag'], '--json', 'assets'))['assets']
-    if any(row['name'] == filename for row in receipts):
-        with tempfile.TemporaryDirectory() as temporary:
-            gh('release', 'download', target['receipt_tag'], '--dir', temporary, '--pattern', filename)
-            receipt = json.loads((Path(temporary) / filename).read_text(encoding='utf-8'))
-        archives = [row for row in release['assets'] if fnmatch.fnmatchcase(row['name'], target['asset_pattern'])]
-        if (receipt.get('status') == 'confirmed' and receipt.get('product') == 'multiplayer'
-                and receipt.get('tag') == tag and receipt.get('version') == tag[1:]
-                and receipt.get('source_commit') == release.get('target_commitish')
-                and len(archives) == 1 and archives[0].get('digest') == 'sha256:' + receipt.get('sha256', '')):
-            outputs({'active': 'false'})
-            print('info: latest published Multiplayer beta delivery is already confirmed: ' + tag)
-            return
-        # Pending intents require a human reconciliation, never an automatic replay.
-        raise ValueError('Latest Multiplayer delivery receipt is unconfirmed or differs; inspect the existing receipt before retrying')
-    outputs({'active': 'true', 'release_tag': tag, 'matrix': json.dumps({'include': [{
-        'product': 'multiplayer', 'file_variable': target['file_variable'], 'mod_variable': target['mod_variable'],
-        'file_id': target['file_id'], 'mod_uid': target['mod_uid']} ]})})
-    print('info: automatic Multiplayer delivery selected: ' + tag)
+def local_release(tag, directory):
+    """Check the one product archive in directory against SHA256SUMS.txt, its embedded version and the tag."""
+    product, tag_version = product_for(tag)
+    target = targets()[product]
+    archives = [path for path in directory.iterdir() if fnmatch.fnmatchcase(path.name, target['asset_pattern'])]
+    if len(archives) != 1:
+        raise ValueError(f'{product}: expected one release archive in {directory}, found {len(archives)}')
+    path = archives[0]
+    actual = hashlib.sha256(path.read_bytes()).hexdigest()
+    if actual != checksum_for((directory / 'SHA256SUMS.txt').read_text(encoding='utf-8'), path.name):
+        raise ValueError('Release archive differs from SHA256SUMS.txt: ' + path.name)
+    version = archive_version(path, product)
+    if version != tag_version:
+        raise ValueError(f'Tag {tag} differs from the archive version {version}')
+    expected_name = f'MT2Framework-{version}-windows-x64.zip' if product == 'framework' else f'MMORPGTycoon2-Vortex-{version}.zip'
+    if path.name != expected_name:
+        raise ValueError('Archive filename differs from embedded product version')
+    return {'product': product, 'tag': tag, 'version': version, 'filename': str(path), 'sha256': actual,
+            'bytes': path.stat().st_size}
 
 
-def prepare(args):
-    target = targets()[args.product]
-    silent = target.get('silent_releases', [])
-    if not isinstance(silent, list) or any(not isinstance(tag, str) for tag in silent):
-        raise ValueError('silent_releases must list exact release tags')
-    for variable, expected in [('NEXUS_FILE_ID', target['file_id']), ('NEXUS_MOD_ID', target['mod_uid'])]:
-        if os.environ.get(variable) != expected:
-            raise ValueError(variable + ' is missing or differs from integrations/nexus/targets.json')
-    directory = Path(args.directory)
-    plan = fetch_release(args.tag, args.product, directory, args.optional)
-    if plan is None:
-        plan = {'product': args.product, 'tag': args.tag, 'status': 'not-in-release'}
-    else:
-        plan['allow_announcement'] = args.tag not in silent
-        plan.update({'status': check_destination(target, plan['version']), 'file_id': target['file_id'],
-                     'mod_uid': target['mod_uid'], 'nexus_url': f"https://www.nexusmods.com/{target['domain']}/mods/{target['page_id']}"})
-        notes = plan.pop('release_notes', None)
-        if notes is None:
-            notes_source = plan.pop('notes_source', None)
-            notes = section(notes_source if notes_source is not None else (ROOT / 'CHANGELOG.md').read_text(encoding='utf-8'), args.product, plan['version'])
-        plan.update(notes=notes, notes_plain=plain(notes), notes_bbcode=bbcode(notes))
-        if 'file_description' in target:
-            description = target['file_description']
-            if not isinstance(description, str) or not description.strip() or len(description) > 255 or '\n' in description or '\r' in description:
-                raise ValueError('Nexus file description must be one non-empty line of at most 255 characters')
-            plan['file_description'] = description
-    directory.mkdir(parents=True, exist_ok=True)
+def prepare(tag, directory, get=api_get):
+    plan = local_release(tag, directory)
+    target = targets()[plan['product']]
+    notes = section((ROOT / 'CHANGELOG.md').read_text(encoding='utf-8'), plan['product'], plan['version'])
+    plan.update(status=check_destination(target, plan['version'], get), file_id=target['file_id'], mod_uid=target['mod_uid'],
+                nexus_url=f"https://www.nexusmods.com/{target['domain']}/mods/{target['page_id']}",
+                notes=notes, notes_plain=plain(notes), notes_bbcode=bbcode(notes))
     (directory / 'plan.json').write_text(json.dumps(plan, indent=2) + '\n', encoding='utf-8')
-    result = {'status': plan['status'], 'allow_announcement': 'true' if plan.get('allow_announcement', False) else 'false'}
-    if 'version' in plan:
-        result.update({name: plan[name] for name in ('filename', 'version', 'file_id', 'mod_uid')})
-        result.update({'display_name': target['name'], 'description': plan.get('file_description', plan['notes_bbcode'])})
-    outputs(result)
-    print(json.dumps(plan))
-    if summary := os.environ.get('GITHUB_STEP_SUMMARY'):
-        with open(summary, 'a', encoding='utf-8') as stream:
-            stream.write(f"### {target['name']}\n\nStatus: **{plan['status']}**\n\n")
-            if 'version' in plan:
-                stream.write(f"Version: {plan['version']}\n\nFile ID: {target['file_id']}\n\nSHA-256: `{plan['sha256']}`\n\n")
-                if plan['status'] == 'already-present':
-                    stream.write('This version exists on Nexus. No upload is performed. Remote file bytes were not compared.\n\n')
+    (directory / 'notes.md').write_text(notes + '\n', encoding='utf-8')
+    outputs({'status': plan['status'], 'title': f"{target['name']} {plan['version']}",
+             'display_name': target['name'], 'description': plan['notes_bbcode'],
+             **{name: plan[name] for name in ('filename', 'version', 'file_id', 'mod_uid')}})
+    print(f"info: {plan['product']} {plan['version']} validated, Nexus status {plan['status']}, sha256 {plan['sha256']}")
+    return plan
 
 
-def verify(args):
-    directory = Path(args.directory);plan = json.loads((directory / 'plan.json').read_text())
-    row = api_get('/mod-file-versions/' + args.version_id)
-    if str(row['id']) != args.version_id or str(row['file']['id']) != plan['file_id'] or row['version'] != plan['version'] or row['category'] != 'main':
+def verify(directory, version_id):
+    plan = json.loads((directory / 'plan.json').read_text(encoding='utf-8'))
+    row = api_get('/mod-file-versions/' + version_id)
+    if str(row['id']) != version_id or str(row['file']['id']) != plan['file_id'] or row['version'] != plan['version'] or row['category'] != 'main':
         raise ValueError('Nexus upload readback differs from the release plan')
-    receipt = {**plan, 'status': 'confirmed', 'nexus_version_id': args.version_id}
-    (directory / 'uploaded.json').write_text(json.dumps(receipt, indent=2) + '\n', encoding='utf-8')
-    print(json.dumps(receipt))
+    print(f"info: Nexus file version {version_id} confirmed for {plan['product']} {plan['version']}")
+
+
+def normalized_notes(value, html_encoded=False):
+    lines = [line for item in value for line in item.splitlines()] if isinstance(value, list) else value.splitlines()
+    if html_encoded:
+        lines = [html.unescape(line) for line in lines]
+    return ' '.join(re.sub(r'^\s*[-*]\s+', '', line).strip() for line in lines if line.strip())
+
+
+def changelog_status(existing, version, expected):
+    rows = existing.get(version, [])
+    if not rows:
+        return 'missing'
+    if normalized_notes(rows, html_encoded=True) == normalized_notes(expected):
+        return 'confirmed'
+    raise ValueError(f'Nexus changelog {version} already contains different text; additive API must not append a duplicate')
+
+
+def sync_changelog(plan, request=request_json):
+    """Write the version changelog once: read through v1, write through v3, read back."""
+    target = targets()[plan['product']]
+    url = f"https://api.nexusmods.com/v1/games/{target['domain']}/mods/{target['page_id']}/changelogs.json"
+    headers = {'apikey': api_key()}
+    status = changelog_status(request(url, headers=headers), plan['version'], plan['notes_plain'])
+    if status == 'missing':
+        request(API + f"/mods/{target['mod_uid']}/changelogs", 'POST',
+                {'version': plan['version'], 'changelog': plan['notes_plain']}, headers)
+        if changelog_status(request(url, headers=headers), plan['version'], plan['notes_plain']) != 'confirmed':
+            raise RuntimeError('Nexus accepted the changelog write, but readback is missing; inspect the destination before retrying')
+        print(f"info: Nexus changelog {plan['product']} {plan['version']} written and read back")
+    else:
+        print(f"info: Nexus changelog {plan['product']} {plan['version']} already matches; nothing written")
 
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     commands = parser.add_subparsers(dest='command', required=True)
-    plan = commands.add_parser('matrix');plan.add_argument('--target', choices=['all', 'framework', 'vortex', 'multiplayer'], default='all')
-    commands.add_parser('poll-multiplayer')
-    caller = commands.add_parser('validate-multiplayer-caller')
-    caller.add_argument('--tag', required=True)
-    caller.add_argument('--tooling-revision', required=True)
-    command = commands.add_parser('prepare')
-    command.add_argument('--product', choices=['framework', 'vortex', 'multiplayer'], required=True)
-    command.add_argument('--tag', required=True);command.add_argument('--directory', required=True)
-    command.add_argument('--optional', action='store_true')
-    command = commands.add_parser('verify')
-    command.add_argument('--directory', required=True);command.add_argument('--version-id', required=True)
+    command = commands.add_parser('prepare', help='Validate the release directory and the Nexus destination')
+    command.add_argument('--tag', required=True)
+    command.add_argument('--directory', type=Path, required=True)
+    command = commands.add_parser('verify', help='Read back the uploaded Nexus file version')
+    command.add_argument('--directory', type=Path, required=True)
+    command.add_argument('--version-id', required=True)
+    command = commands.add_parser('changelog', help='Complete the Nexus changelog of the prepared version')
+    command.add_argument('--directory', type=Path, required=True)
     args = parser.parse_args()
-    if args.command == 'matrix':
-        selected = [{'product': key, 'file_variable': value['file_variable'], 'mod_variable': value['mod_variable'],
-                     'file_id': value['file_id'], 'mod_uid': value['mod_uid']}
-                    for key, value in targets().items() if args.target == key or args.target == 'all' and not value.get('manual_only', False)]
-        value = json.dumps({'include': selected}, separators=(',', ':'));outputs({'matrix': value});print(value)
-    elif args.command == 'poll-multiplayer':
-        poll_multiplayer()
-    elif args.command == 'validate-multiplayer-caller':
-        checked = subprocess.run(['git', '-C', str(ROOT), 'rev-parse', 'HEAD'], check=True, capture_output=True, text=True).stdout.strip()
-        validate_multiplayer_caller(args.tag, args.tooling_revision, repository=os.environ.get('GITHUB_REPOSITORY', ''),
-                                   event=os.environ.get('GITHUB_EVENT_NAME', ''), ref=os.environ.get('GITHUB_REF', ''),
-                                   checked_out_revision=checked, target=os.environ.get('TARGET', ''))
-        print('info: exact Multiplayer caller, release version and pinned delivery tooling admitted')
-    elif args.command == 'prepare':
-        prepare(args)
+    if args.command == 'prepare':
+        prepare(args.tag, args.directory)
+    elif args.command == 'verify':
+        verify(args.directory, args.version_id)
     else:
-        verify(args)
+        sync_changelog(json.loads((args.directory / 'plan.json').read_text(encoding='utf-8')))
 
 
 if __name__ == '__main__':
     try:
         main()
-    except (ValueError, KeyError, OSError, RuntimeError, zipfile.BadZipFile, subprocess.SubprocessError) as error:
-        # subprocess output is not dumped: release/API errors must not expose authenticated requests.
-        print('error: ' + str(error), file=sys.stderr);sys.exit(1)
+    except (ValueError, KeyError, OSError, RuntimeError, zipfile.BadZipFile) as error:
+        print('error: ' + str(error), file=sys.stderr)
+        sys.exit(1)
