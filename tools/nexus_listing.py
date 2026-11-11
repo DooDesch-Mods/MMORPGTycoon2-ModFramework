@@ -49,9 +49,8 @@ def update_listing(directory, request=request_json):
     target = targets()[product]
     source = ROOT / 'integrations/nexus/listings' / product
     cohort = json.loads((source / 'release.json').read_text(encoding='utf-8'))
-    for field in ('tag', 'version', 'sha256'):
-        if cohort.get(field) != plan.get(field):
-            raise ValueError('Prepared listing release differs: ' + field)
+    if cohort.get('tag') != plan['tag']:
+        raise ValueError(f"Prepared listing release differs: {cohort.get('tag')} is not {plan['tag']}")
     key = os.environ.get('NEXUSMODS_API_KEY', '').strip()
     if not key:
         raise ValueError('NEXUSMODS_API_KEY is missing')

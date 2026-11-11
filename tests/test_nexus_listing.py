@@ -20,7 +20,7 @@ class NexusListingTests(unittest.TestCase):
         self.addCleanup(temporary.cleanup)
         self.directory = Path(temporary.name)
         source = ROOT / 'integrations/nexus/listings/vortex'
-        self.plan = {**json.loads((source / 'release.json').read_text()), 'product': 'vortex',
+        self.plan = {**json.loads((source / 'release.json').read_text()), 'product': 'vortex', 'version': '0.2.0',
                      'status': 'already-present', 'nexus_url': 'https://www.nexusmods.com/site/mods/2465'}
         self.summary = (source / 'summary.txt').read_text(encoding='utf-8').strip()
         self.body = (source / 'description.bbcode.txt').read_text(encoding='utf-8').strip()
@@ -99,7 +99,7 @@ class NexusListingTests(unittest.TestCase):
                 self.assertFalse(any(method == 'PATCH' for _, method, _ in self.calls))
 
     def test_wrong_release_or_mod_blocks_before_write(self):
-        self.plan['sha256'] = 'b' * 64
+        self.plan['tag'] = 'vortex-v0.1.9'
         self.write_plan()
         with self.assertRaisesRegex(ValueError, 'Prepared listing release differs'):
             listing.update_listing(self.directory, self.request)

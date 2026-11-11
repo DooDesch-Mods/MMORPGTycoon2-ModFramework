@@ -31,6 +31,6 @@ Open **Actions > Release > Run workflow** and enter an existing release tag.
 
 - With **publish** off, the run validates the release assets and the Nexus destination and writes nothing.
 - With **publish** on, it uploads a newer version or completes a missing changelog.
-- With **publish** and **update_listing** on, it also replaces the Nexus summary and description with `listings/<product>/summary.txt` and `description.bbcode.txt`. `listings/<product>/release.json` must name that exact tag, version and SHA-256, and the run fails if Nexus does not read back the new text or changed any other field.
+- With **publish** and **update_listing** on, it also replaces the Nexus summary and description with `listings/<product>/summary.txt` and `description.bbcode.txt`. `listings/<product>/release.json` must name that release tag, and the run fails if Nexus does not read back the new text or changed any other field.
 
 File descriptions of existing versions cannot be edited through the public API; use Nexus file management for that.
