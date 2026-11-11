@@ -1,0 +1,118 @@
+name: Release
+on:
+  push:
+    tags: ['v*', 'vortex-v*']
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: Existing GitHub release tag (v<version> or vortex-v<version>)
+        required: true
+        type: string
+      publish:
+        description: Upload a newer Nexus version or complete its changelog; off validates only
+        type: boolean
+        default: false
+      update_listing:
+        description: Also apply integrations/nexus/listings/<product> to the Nexus page (needs publish)
+        type: boolean
+        default: false
+permissions:
+  contents: read
+jobs:
+  build:
+    if: github.event_name == 'push'
+    uses: ./.github/workflows/checks.yml
+  release:
+    needs: build
+    if: ${{ !cancelled() && (needs.build.result == 'success' || needs.build.result == 'skipped') }}
+    permissions:
+      contents: write # Create the GitHub release for a pushed tag.
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    concurrency:
+      group: release-${{ startsWith(inputs.tag || github.ref_name, 'vortex-v') && 'vortex' || 'framework' }}
+      cancel-in-progress: false
+    env:
+      TAG: ${{ inputs.tag || github.ref_name }}
+      PUBLISH: ${{ github.event_name == 'push' || inputs.publish }}
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+      - name: Download build packages
+        if: github.event_name == 'push'
+        uses: actions/download-artifact@v4
+        with:
+          name: MT2-ModFramework-windows-x64-${{ github.sha }}
+          path: dist
+      - name: Collect release files
+        id: collect
+        run: |
+          mkdir -p artifacts/release
+          if gh release view "$TAG" --repo "$GITHUB_REPOSITORY" > /dev/null 2>&1; then
+            echo "info: GitHub release $TAG exists; validating its assets"
+            gh release download "$TAG" --repo "$GITHUB_REPOSITORY" --dir artifacts/release
+          elif [[ "$GITHUB_EVENT_NAME" == push ]]; then
+            if [[ "$TAG" == vortex-v* ]]; then
+              cp dist/vortex/*.zip artifacts/release/
+            else
+              cp dist/nexus/MT2Framework-*.zip dist/sdk/*.zip artifacts/release/
+            fi
+            (cd artifacts/release && sha256sum *.zip > SHA256SUMS.txt)
+            echo "create=true" >> "$GITHUB_OUTPUT"
+            echo "info: staged $(ls artifacts/release | tr '\n' ' ')for a new GitHub release"
+          else
+            echo "error: GitHub release $TAG does not exist" >&2
+            exit 1
+          fi
+      - name: Validate release and Nexus destination
+        id: prepare
+        env:
+          NEXUSMODS_API_KEY: ${{ secrets.NEXUSMODS_API_KEY }}
+        run: python tools/nexus_release.py prepare --tag "$TAG" --directory artifacts/release
+      - name: Create GitHub release
+        if: steps.collect.outputs.create == 'true'
+        env:
+          TITLE: ${{ steps.prepare.outputs.title }}
+        run: |
+          options=()
+          if [[ "$TAG" == vortex-v* ]]; then options+=(--prerelease); fi
+          gh release create "$TAG" artifacts/release/*.zip artifacts/release/SHA256SUMS.txt --repo "$GITHUB_REPOSITORY" \
+            --verify-tag --title "$TITLE" --notes-file artifacts/release/notes.md "${options[@]}"
+      - name: Upload file version
+        id: upload
+        if: steps.prepare.outputs.status == 'ready' && env.PUBLISH == 'true'
+        uses: Nexus-Mods/upload-action@98532f7670c27cbecc78fae03fa3e278147827e2 # v1.0.0-beta.11
+        with:
+          api_key: ${{ secrets.NEXUSMODS_API_KEY }}
+          file_id: ${{ steps.prepare.outputs.file_id }}
+          mod_id: ${{ steps.prepare.outputs.mod_uid }}
+          filename: ${{ steps.prepare.outputs.filename }}
+          version: ${{ steps.prepare.outputs.version }}
+          display_name: ${{ steps.prepare.outputs.display_name }}
+          description: ${{ steps.prepare.outputs.description }}
+          category: main
+          archive_existing_version: true
+          update_mod_version: true
+          primary_mod_manager_download: true
+          allow_mod_manager_download: true
+      - name: Confirm Nexus file version
+        if: steps.upload.outcome == 'success'
+        env:
+          NEXUSMODS_API_KEY: ${{ secrets.NEXUSMODS_API_KEY }}
+          VERSION_ID: ${{ steps.upload.outputs.version_id }}
+        run: python tools/nexus_release.py verify --directory artifacts/release --version-id "$VERSION_ID"
+      - name: Complete Nexus changelog
+        if: (steps.prepare.outputs.status == 'already-present' || steps.upload.outcome == 'success') && env.PUBLISH == 'true'
+        env:
+          NEXUSMODS_API_KEY: ${{ secrets.NEXUSMODS_API_KEY }}
+        run: python tools/nexus_release.py changelog --directory artifacts/release
+      - name: Update Nexus listing text
+        if: inputs.update_listing && inputs.publish && (steps.prepare.outputs.status == 'already-present' || steps.upload.outcome == 'success')
+        env:
+          NEXUSMODS_API_KEY: ${{ secrets.NEXUSMODS_API_KEY }}
+        run: python tools/nexus_listing.py --directory artifacts/release

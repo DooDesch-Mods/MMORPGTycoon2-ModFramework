@@ -1,57 +1,20 @@
 {
   "framework": {
     "name": "MT2 Mod Framework",
-    "silent_releases": [
-      "v0.5.1",
-      "v0.5.2",
-      "v0.5.3",
-      "v0.5.4"
-    ],
     "domain": "mmorpgtycoon2",
     "game_id": 4452,
     "page_id": 25,
     "mod_uid": "19121194401817",
     "file_id": "8170305",
-    "file_variable": "NEXUS_FRAMEWORK_FILE_ID",
-    "mod_variable": "NEXUS_FRAMEWORK_MOD_ID",
-    "asset_pattern": "MT2Framework-[0-9]*-windows-x64.zip",
-    "description": "Player runtime for Lua mods, native plugins and custom scenery. Install this ZIP through the MMORPG Tycoon 2 Vortex Extension, or follow the included manual installation guide. Developer tools and the SDK are available separately on GitHub. Requires Windows x64 and a supported Steam game build."
-  },
-  "multiplayer": {
-    "name": "MMORPG Tycoon 2 Multiplayer - Early Beta",
-    "silent_releases": [
-      "v0.1.0-beta.26"
-    ],
-    "domain": "mmorpgtycoon2",
-    "game_id": 4452,
-    "page_id": 28,
-    "mod_uid": "19121194401820",
-    "file_id": "8177136",
-    "file_variable": "NEXUS_MULTIPLAYER_FILE_ID",
-    "mod_variable": "NEXUS_MULTIPLAYER_MOD_ID",
-    "asset_pattern": "MMORPGTycoon2-Multiplayer-v*-windows-x64.zip",
-    "source_repository": "DooDesch-Mods/MMORPGTycoon2-Multiplayer",
-    "notes_source": "github_release",
-    "receipt_tag": "v0.2.0",
-    "direct_delivery_min_version": "0.1.0-beta.29",
-    "manual_only": true,
-    "file_description": "Build an MMO world with a friend through Steam. Install the Framework Runtime required by this release's notes. Use the MMORPG Tycoon 2 Vortex Extension. Close both games before updating. Early Beta - expect bugs and desyncs.",
-    "icon_url": "https://raw.githubusercontent.com/DooDesch-Mods/MMORPGTycoon2-Multiplayer/main/assets/ui/desktop_multiplayer/multiplayer.png",
-    "footer": "MMORPG Tycoon 2 - MMORPGTycoon2-Multiplayer"
+    "asset_pattern": "MT2Framework-[0-9]*-windows-x64.zip"
   },
   "vortex": {
     "name": "MMORPG Tycoon 2 Vortex Extension",
-    "silent_releases": [
-      "vortex-v0.2.0"
-    ],
     "domain": "site",
     "game_id": 2295,
     "page_id": 2465,
     "mod_uid": "9856949946785",
     "file_id": "8170257",
-    "file_variable": "NEXUS_VORTEX_FILE_ID",
-    "mod_variable": "NEXUS_VORTEX_MOD_ID",
-    "asset_pattern": "MMORPGTycoon2-Vortex-*.zip",
-    "description": "Adds MMORPG Tycoon 2 support to Vortex for MT2 Mod Framework and its mods. Install through Vortex's Extensions view and restart Vortex. Download the framework runtime separately. Requires Windows x64, Vortex 2.8.2 or newer and a supported Steam game build."
+    "asset_pattern": "MMORPGTycoon2-Vortex-*.zip"
   }
 }

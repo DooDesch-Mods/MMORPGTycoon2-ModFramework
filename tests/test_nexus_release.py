@@ -8,7 +8,6 @@ import unittest
 from unittest.mock import patch
 import urllib.error
 import zipfile
-from types import SimpleNamespace
 
 spec = importlib.util.spec_from_file_location('nexus_release', Path(__file__).resolve().parents[1] / 'tools/nexus_release.py')
 nexus = importlib.util.module_from_spec(spec)
@@ -92,75 +91,68 @@ class NexusReleaseTests(unittest.TestCase):
             with self.assertRaisesRegex(RuntimeError, 'HTTP 403') as caught:nexus.api_get('/mods/1/files')
         self.assertNotIn('private-fixture-key', str(caught.exception))
 
-    def test_short_file_description_does_not_truncate_changelog(self):
-        target = nexus.targets()['multiplayer']
-        self.assertLessEqual(len(target['file_description']), 255)
-        notes = '# Changelog\n\n## 0.1.0-beta.23\n\n### Fixed\n\n- ' + 'Detailed release note. ' * 30
-        plan = {'product': 'multiplayer', 'tag': 'v0.1.0-beta.23', 'version': '0.1.0-beta.23',
-                'filename': 'release.zip', 'sha256': 'a' * 64, 'notes_source': notes}
-        root = nexus.ROOT / 'artifacts/nexus-tests'
-        root.mkdir(parents=True, exist_ok=True)
-        with tempfile.TemporaryDirectory(dir=root) as directory:
-            args = SimpleNamespace(product='multiplayer', tag=plan['tag'], directory=directory, optional=False)
-            environment = {'NEXUS_FILE_ID': target['file_id'], 'NEXUS_MOD_ID': target['mod_uid']}
-            with patch.dict(os.environ, environment), patch.object(nexus, 'fetch_release', return_value=plan), \
-                 patch.object(nexus, 'check_destination', return_value='ready'), patch.object(nexus, 'outputs') as outputs, \
-                 patch('builtins.print'):
-                nexus.prepare(args)
-            saved = json.loads((Path(directory) / 'plan.json').read_text(encoding='utf-8'))
-            self.assertEqual(outputs.call_args.args[0]['description'], target['file_description'])
-            self.assertGreater(len(saved['notes_plain']), 255)
-            self.assertIn('Detailed release note.', saved['notes_bbcode'])
+    def test_tag_names_the_product_and_must_match_the_archive_version(self):
+        self.assertEqual(nexus.product_for('v0.5.9'), ('framework', '0.5.9'))
+        self.assertEqual(nexus.product_for('vortex-v0.2.1'), ('vortex', '0.2.1'))
+        with self.assertRaises(ValueError):nexus.product_for('multiplayer-v1.0.0')
+        test_root = nexus.ROOT / 'artifacts/nexus-tests'
+        test_root.mkdir(parents=True, exist_ok=True)
+        with tempfile.TemporaryDirectory(dir=test_root) as folder:
+            directory = Path(folder)
+            path = directory / 'MMORPGTycoon2-Vortex-0.2.1.zip'
+            with zipfile.ZipFile(path, 'w') as archive:
+                archive.writestr('info.json', json.dumps({'gameId': 4452, 'id': 'game-mmorpgtycoon2', 'version': '0.2.1'}))
+            (directory / 'SHA256SUMS.txt').write_text(hashlib.sha256(path.read_bytes()).hexdigest() + '  ' + path.name + '\n')
+            self.assertEqual(nexus.local_release('vortex-v0.2.1', directory)['version'], '0.2.1')
+            with self.assertRaisesRegex(ValueError, 'differs from the archive version'):
+                nexus.local_release('vortex-v0.2.2', directory)
 
-    def test_invalid_configured_file_description_blocks_before_upload(self):
-        target = {**nexus.targets()['multiplayer'], 'file_description': 'x' * 256}
-        plan = {'product': 'multiplayer', 'tag': 'v0.1.0-beta.23', 'version': '0.1.0-beta.23',
-                'notes_source': '# Changelog\n\n## 0.1.0-beta.23\n\n- A change.'}
-        environment = {'NEXUS_FILE_ID': target['file_id'], 'NEXUS_MOD_ID': target['mod_uid']}
-        with patch.dict(os.environ, environment), patch.object(nexus, 'targets', return_value={'multiplayer': target}), \
-             patch.object(nexus, 'fetch_release', return_value=plan), patch.object(nexus, 'check_destination', return_value='ready'):
-            with self.assertRaisesRegex(ValueError, 'at most 255'):
-                nexus.prepare(SimpleNamespace(product='multiplayer', tag=plan['tag'], directory='unused', optional=False))
 
-    def test_published_release_notes_do_not_require_a_tagged_changelog_section(self):
-        target = nexus.targets()['multiplayer']
-        notes = 'Rejoin your friend and continue building.\n\nBoth players need Beta 25.'
-        plan = {'product': 'multiplayer', 'tag': 'v0.1.0-beta.25', 'version': '0.1.0-beta.25',
-                'filename': 'release.zip', 'sha256': 'a' * 64, 'release_notes': notes,
-                'notes_origin': 'https://github.com/DooDesch-Mods/MMORPGTycoon2-Multiplayer/releases/tag/v0.1.0-beta.25'}
-        root = nexus.ROOT / 'artifacts/nexus-tests'
-        root.mkdir(parents=True, exist_ok=True)
-        environment = {'NEXUS_FILE_ID': target['file_id'], 'NEXUS_MOD_ID': target['mod_uid']}
-        with tempfile.TemporaryDirectory(dir=root) as directory:
-            with patch.dict(os.environ, environment), patch.object(nexus, 'fetch_release', return_value=plan), \
-                 patch.object(nexus, 'check_destination', return_value='ready'), patch.object(nexus, 'outputs'), \
-                 patch.object(nexus, 'section', side_effect=AssertionError('Tagged changelog is not the configured source')), \
-                 patch('builtins.print'):
-                nexus.prepare(SimpleNamespace(product='multiplayer', tag=plan['tag'], directory=directory, optional=False))
-            saved = json.loads((Path(directory) / 'plan.json').read_text(encoding='utf-8'))
-            self.assertEqual(saved['notes'], notes)
-            self.assertEqual(saved['notes_plain'], notes)
-            self.assertEqual(saved['notes_origin'], plan['notes_origin'])
+class ChangelogTests(unittest.TestCase):
+    plan = {'product': 'framework', 'version': '0.1.2', 'notes_plain': '- Fix menu.\n- English default.'}
 
-    def test_silent_release_policy_blocks_automatic_announcement_output(self):
-        root = nexus.ROOT / 'artifacts/nexus-tests'
-        root.mkdir(parents=True, exist_ok=True)
-        for product, tag in [('framework', 'v0.5.1'), ('framework', 'v0.5.2'), ('framework', 'v0.5.3'), ('framework', 'v0.5.4'),
-                             ('multiplayer', 'v0.1.0-beta.26'), ('vortex', 'vortex-v0.2.0')]:
-            with self.subTest(product=product), tempfile.TemporaryDirectory(dir=root) as directory:
-                target = nexus.targets()[product]
-                plan = {'product': product, 'tag': tag, 'version': tag.rsplit('v', 1)[1],
-                        'filename': 'release.zip', 'sha256': 'a' * 64, 'release_notes': '- A published fix.'}
-                environment = {'NEXUS_FILE_ID': target['file_id'], 'NEXUS_MOD_ID': target['mod_uid']}
-                with patch.dict(os.environ, environment), patch.object(nexus, 'fetch_release', return_value=plan), \
-                     patch.object(nexus, 'check_destination', return_value='ready'), patch.object(nexus, 'outputs') as outputs, \
-                     patch('builtins.print'):
-                    nexus.prepare(SimpleNamespace(product=product, tag=plan['tag'], directory=directory, optional=False))
-                self.assertEqual(outputs.call_args.args[0]['allow_announcement'], 'false')
-                saved = json.loads((Path(directory) / 'plan.json').read_text())
-                self.assertFalse(saved['allow_announcement'])
-                self.assertEqual(saved['notes'], '- A published fix.')
-                self.assertEqual(saved['sha256'], 'a' * 64)
+    def test_product_sections_are_exact_and_missing_or_duplicates_fail(self):
+        text = '## 0.1.2\n\n- Framework\n## Vortex extension 0.1.2\n\n- Extension\n'
+        self.assertEqual(nexus.section(text, 'framework', '0.1.2'), '- Framework')
+        self.assertEqual(nexus.section(text, 'vortex', '0.1.2'), '- Extension')
+        for invalid in ('## 0.1.20\n- Wrong', text + '\n## 0.1.2\n- Duplicate', '## 0.1.2\n'):
+            with self.assertRaises(ValueError):nexus.section(invalid, 'framework', '0.1.2')
+
+    def test_format_preserves_quotes_newlines_and_link_targets(self):
+        text = '- **Fix** `menu` "first"\n- [Guide](https://example.org/help)'
+        self.assertEqual(nexus.plain(text), '- Fix menu "first"\n- Guide (https://example.org/help)')
+        self.assertEqual(nexus.bbcode(text), '[list]\n[*][b]Fix[/b] menu "first"\n[*][url=https://example.org/help]Guide[/url]\n[/list]')
+
+    def test_changelog_write_is_read_back_and_never_repeated(self):
+        calls = []
+        published = {}
+        def request(url, method='GET', body=None, headers=None):
+            calls.append(method)
+            if method == 'POST':published[body['version']] = [body['changelog']]
+            return published
+        with patch.dict(os.environ, {'NEXUSMODS_API_KEY': 'fixture'}), patch('builtins.print'):
+            nexus.sync_changelog(self.plan, request)
+            nexus.sync_changelog(self.plan, request)
+        self.assertEqual(calls, ['GET', 'POST', 'GET', 'GET'])
+
+    def test_conflicting_changelog_stops_before_additive_write(self):
+        def request(url, **kwargs):
+            self.assertNotIn('body', kwargs)
+            return {'0.1.2': ['Different release notes']}
+        with patch.dict(os.environ, {'NEXUSMODS_API_KEY': 'fixture'}):
+            with self.assertRaisesRegex(ValueError, 'different text'):nexus.sync_changelog(self.plan, request)
+
+    def test_nexus_html_escapes_are_decoded_once_before_changelog_comparison(self):
+        expected = "Settings > Mods & profiles: Vortex's menu"
+        self.assertEqual(nexus.changelog_status({'0.1.2': ['Settings &gt; Mods &amp; profiles: Vortex&#39;s menu']}, '0.1.2', expected), 'confirmed')
+        self.assertEqual(nexus.changelog_status({'0.1.2': ['Show &amp;gt; literally']}, '0.1.2', 'Show &gt; literally'), 'confirmed')
+        with self.assertRaisesRegex(ValueError, 'different text'):
+            nexus.changelog_status({'0.1.2': ['Settings &gt; Downloads']}, '0.1.2', 'Settings > Mods')
+
+    def test_missing_changelog_readback_is_a_failure(self):
+        with patch.dict(os.environ, {'NEXUSMODS_API_KEY': 'fixture'}), patch('builtins.print'):
+            with self.assertRaisesRegex(RuntimeError, 'readback is missing'):
+                nexus.sync_changelog(self.plan, lambda *args, **kwargs: {})
 
 
 if __name__ == '__main__':unittest.main()

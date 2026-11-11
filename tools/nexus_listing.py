@@ -8,8 +8,7 @@ import os
 import re
 import sys
 
-from nexus_release import API, ROOT, targets
-from release_delivery import request_json
+from nexus_release import API, ROOT, request_json, targets
 
 PRESERVED = ('name', 'author', 'uploader', 'game_id', 'game_scoped_id',
              'category', 'tags', 'primary_image', 'gallery_images')
@@ -50,9 +49,8 @@ def update_listing(directory, request=request_json):
     target = targets()[product]
     source = ROOT / 'integrations/nexus/listings' / product
     cohort = json.loads((source / 'release.json').read_text(encoding='utf-8'))
-    for field in ('tag', 'version', 'source_commit', 'sha256'):
-        if cohort.get(field) != plan.get(field):
-            raise ValueError('Prepared listing release differs: ' + field)
+    if cohort.get('tag') != plan['tag']:
+        raise ValueError(f"Prepared listing release differs: {cohort.get('tag')} is not {plan['tag']}")
     key = os.environ.get('NEXUSMODS_API_KEY', '').strip()
     if not key:
         raise ValueError('NEXUSMODS_API_KEY is missing')
@@ -81,8 +79,8 @@ def update_listing(directory, request=request_json):
                 'after_summary': after_summary.get('summary'), 'expected_summary': summary,
                 'before_description': before.get('description'), 'after_description': after.get('description'),
                 'expected_description': body}
-    (directory / 'listing-readback.json').write_text(json.dumps(readback, indent=2) + '\n', encoding='utf-8')
     if not all(matches.values()):
+        print('error: listing readback ' + json.dumps(readback), file=sys.stderr)
         failed = ', '.join(field for field, matched in matches.items() if not matched)
         raise RuntimeError('Nexus listing acknowledgement differs from the prepared text: ' + failed + '; inspect before retrying')
     for field in ('id', 'version', *PRESERVED):
@@ -94,7 +92,6 @@ def update_listing(directory, request=request_json):
                'summary_source': SUMMARY_API,
                'summary_sha256': hashlib.sha256(summary.encode('utf-8')).hexdigest(),
                'description_sha256': hashlib.sha256(body.encode('utf-8')).hexdigest()}
-    (directory / 'listing.json').write_text(json.dumps(receipt, indent=2) + '\n', encoding='utf-8')
     print(json.dumps(receipt))
     return receipt
 
