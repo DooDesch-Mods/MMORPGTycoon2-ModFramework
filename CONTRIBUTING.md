@@ -35,4 +35,4 @@ Use the original brand SVGs in `assets/brand` and the documented tokens in `docs
 
 Contribute original work under this repository's MIT license. Keep third-party notices with copied dependencies. The provenance inventory covers explicitly extracted authored copies, not the entire multiplayer product. This source tree does not include the game's original files.
 
-Checks for an unchanged path remain closed. Documentation edits alone do not require another game run. Source checks, a synthetic-host example test and actual game acceptance are distinct results.
+`python tools/build.py --check` runs the offline checks, `--smoke` builds, deploys and starts the game once. CI skips the native build for changes only under `docs/`, `assets/` or root Markdown files; the documentation workflow checks those. Documentation edits alone do not require another game run. Source checks, a synthetic-host example test and actual game acceptance are distinct results.

@@ -7,12 +7,13 @@ title: Build and contribute
 Use Windows x64, Visual Studio 2022 Desktop development with C++, CMake 3.24 or newer, Python 3.11 or newer, and Node 22 or newer for documentation. The repository vendors native dependencies, including pinned Lua 5.4.9 source, and needs no multiplayer checkout or installed game to compile and run core/example checks.
 
 ```powershell
-python tools/build.py
-python -m unittest discover -s tests -p "test_*.py"
-python tools/check_contract.py
+python tools/build.py --check
+python tools/build.py --smoke
 ```
 
-Builds and detailed logs stay under ignored `build/` and `artifacts/`. `--core-only` omits the Windows adapter. `--skip-tests` is available when the unchanged core scope has already passed and the affected scope is checked separately.
+`--check` builds, runs CTest and the offline checks: unit tests, generated sources, API contract, roadmap and the Vortex extension. `--deploy` copies `WSOCK32.dll` and `MT2Framework.dll` into the game folder; `--smoke` also starts the game through Steam, waits for `MT2 Mod Framework <version> loaded` in the profile's game log and closes the game. The game folder is `--game`, else `MT2_GAME_DIR`, else the Steam default. CMake comes from PATH or the Visual Studio installation.
+
+Builds and detailed logs stay under ignored `build/` and `artifacts/`. `--core-only` omits the Windows adapter. `--skip-tests` skips CTest.
 
 ## Build documentation
 

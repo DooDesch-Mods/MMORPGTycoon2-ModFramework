@@ -91,9 +91,7 @@ This source provides Lua API **1.3.0** and the experimental gameplay contract. U
 All required native source dependencies are inside this repository. Build with Visual Studio 2022 C++, CMake and Python:
 
 ```powershell
-python tools/build.py
-python -m unittest discover -s tests -p "test_*.py"
-python tools/check_contract.py
+python tools/build.py --check
 npm ci --ignore-scripts
 npm run docs:build
 ```
