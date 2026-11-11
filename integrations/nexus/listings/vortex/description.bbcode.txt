@@ -27,7 +27,7 @@
 [*]Install your mods, enable them and deploy.
 [*]Start the game through Steam. [b]F10[/b] opens the Mods menu.
 [/list]
-Framework mods go to [font=Courier New]mt2fw-profile\mods[/font], classic mods to [font=Courier New]mt2fw-profile\game-data\&lt;Steam ID&gt;\mod[/font]. Your worlds and settings are stored in [font=Courier New]mt2fw-profile\game-data[/font].
+Framework mods go to [font=Courier New]mt2fw-profile\mods[/font], classic mods to [font=Courier New]mt2fw-profile\game-data\YOUR-STEAM-ID\mod[/font]. Your worlds and settings are stored in [font=Courier New]mt2fw-profile\game-data[/font].
 
 [size=5][b]Classic mods[/b][/size]
 Classic mods load only while the Runtime is enabled and deployed. Without it, Vortex shows a warning after you install or deploy one. Keep Steam signed in when you install a classic mod, so the extension finds your account folder. Classic mod support is tested with a test archive only. MT2 Mod Manager packages, character cards and tools are not recognized; install those by hand.
@@ -42,7 +42,7 @@ Classic mods load only while the Runtime is enabled and deployed. Without it, Vo
 [size=5][b]Updating from 0.1.x[/b][/size]
 [list=1]
 [*]Before you update the extension, open [b]Mods[/b] in Vortex and click [b]Purge[/b].
-[*]To keep your worlds, copy [font=Courier New]MMORPG Tycoon 2\.mt2fw-vortex\profiles\vortex-&lt;profile-id&gt;\game-data[/font] to [font=Courier New]MMORPG Tycoon 2\mt2fw-profile\game-data[/font].
+[*]To keep your worlds, copy [font=Courier New]MMORPG Tycoon 2\.mt2fw-vortex\profiles\vortex-PROFILE-ID\game-data[/font] to [font=Courier New]MMORPG Tycoon 2\mt2fw-profile\game-data[/font].
 [*]Reinstall classic scenery packs.
 [/list]
 Already updated without purging? Close the game and delete [font=Courier New]WSOCK32.dll[/font], [font=Courier New]MT2Framework.dll[/font], [font=Courier New]mt2fw.json[/font], [font=Courier New]framework-package.json[/font], the [font=Courier New]mt2fw[/font] folder, [font=Courier New].mt2fw-vortex-owner.json[/font] and [font=Courier New].mt2fw-copy-deployment.json[/font] from the game folder. Then deploy.
