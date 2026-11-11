@@ -49,7 +49,7 @@
       "name": "Native C++ plugins",
       "short_name": "C++ plugins",
       "status": "available",
-      "scope": "Build with the native SDK. Plugin updates require a game restart. [SDK guide](docs/reference/native.md)."
+      "scope": "Build with the native SDK. Plugin updates require a game restart. [SDK guide](https://doodesch-mods.github.io/MMORPGTycoon2-ModFramework/reference/native.html)."
     },
     {
       "name": "In-game mod apps",
@@ -67,7 +67,7 @@
       "name": "Camera, objects and world actions",
       "short_name": "Game basics",
       "status": "available",
-      "scope": "Use the documented camera, time, object and checked world-operation APIs. [API reference](docs/reference/index.md)."
+      "scope": "Use the documented camera, time, object and checked world-operation APIs. [API reference](https://doodesch-mods.github.io/MMORPGTycoon2-ModFramework/reference/index.html)."
     },
     {
       "name": "Character design",
