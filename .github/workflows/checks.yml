@@ -19,17 +19,52 @@ jobs:
     env:
       # Pull requests check the docs in docs.yml; other events build them for the packages.
       PACKAGE: ${{ github.event_name != 'pull_request' }}
+      SCCACHE_DIR: ${{ github.workspace }}\.ci-cache\sccache
+      # One compiler cache per main commit; pull requests and branch pushes only read main's newest.
+      # Manual runs also write, so a branch can prove its warm build.
+      SAVE_COMPILER_CACHE: ${{ (github.event_name == 'push' && github.ref == 'refs/heads/main') || github.event_name == 'workflow_dispatch' }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with:
           python-version: '3.13'
+          cache: pip
+          cache-dependency-path: requirements-dev.txt
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
           cache: npm
       - run: python -m pip install -r requirements-dev.txt
-      - run: python tools/build.py --check
+      - name: Restore compiler cache
+        id: compiler_cache
+        uses: actions/cache/restore@v4
+        with:
+          path: .ci-cache/sccache
+          key: sccache-v1-windows-x64-msvc-${{ github.sha }}
+          restore-keys: sccache-v1-windows-x64-msvc-
+      - uses: mozilla-actions/sccache-action@fd02668681acd5f960e1372061bee5e3e987195c # v0.0.11
+      - name: Build and check with Ninja and sccache
+        env:
+          CMAKE_GENERATOR: Ninja Multi-Config
+          CMAKE_C_COMPILER_LAUNCHER: sccache
+          CMAKE_CXX_COMPILER_LAUNCHER: sccache
+        run: |
+          $vswhere = Join-Path ${env:ProgramFiles(x86)} 'Microsoft Visual Studio/Installer/vswhere.exe'
+          $vs = & $vswhere -latest -products * -requires Microsoft.VisualStudio.Component.VC.Tools.x86.x64 -property installationPath
+          Import-Module (Join-Path $vs 'Common7/Tools/Microsoft.VisualStudio.DevShell.dll')
+          Enter-VsDevShell -VsInstallPath $vs -SkipAutomaticLocation -DevCmdArguments '-arch=x64 -host_arch=x64'
+          $env:CMAKE_BUILD_PARALLEL_LEVEL = $env:NUMBER_OF_PROCESSORS
+          sccache --zero-stats
+          python tools/build.py --check
+      - name: Compiler cache statistics
+        if: always()
+        run: sccache --show-stats
+      - name: Save compiler cache
+        if: ${{ !cancelled() && env.SAVE_COMPILER_CACHE == 'true' && steps.compiler_cache.outputs.cache-hit != 'true' }}
+        uses: actions/cache/save@v4
+        with:
+          path: .ci-cache/sccache
+          key: ${{ steps.compiler_cache.outputs.cache-primary-key }}
       - if: env.PACKAGE == 'true'
         run: npm ci --ignore-scripts
       - if: env.PACKAGE == 'true'
@@ -38,6 +73,12 @@ jobs:
         run: npm run docs:build
       - if: env.PACKAGE == 'true'
         run: python tools/check_docs.py
+      # One browser cache per Playwright version; it is written only when that version has none.
+      - if: env.PACKAGE == 'true'
+        uses: actions/cache@v4
+        with:
+          path: ~/AppData/Local/ms-playwright
+          key: playwright-${{ runner.os }}-${{ hashFiles('package-lock.json') }}
       - if: env.PACKAGE == 'true'
         run: npx playwright install chromium
       - if: env.PACKAGE == 'true'
