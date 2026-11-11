@@ -58,10 +58,8 @@
         "third_party/lua/src/ltablib.c": "3d430a6f9cde66d0b791444c6164e7559ccf62b7cdc3a6325882408c6806e26c",
         "third_party/lua/src/ltm.c": "7cbe645ed7e1161d31eb32ea467d8220b592c0acfa6107f0194487f0ddbf954b",
         "third_party/lua/src/ltm.h": "5b2f6e59951edeef6e71bebe5ac4351f4b3602ee0461729308b80dcee8cea910",
-        "third_party/lua/src/lua.c": "ee7b72f64fa489d3e5393494f09c2517f5bdceb43f768c087a9ced74060af254",
         "third_party/lua/src/lua.h": "06138352a12f0710bc214eb3a2e134889979cadc9a7a761a4e43dafa926419af",
         "third_party/lua/src/lua.hpp": "fd83f7e823cfbb03ac2da937ec83f01b4a6ddaac220a4fa1ffd6c6c3842c5890",
-        "third_party/lua/src/luac.c": "3a424e6cb4177886c8790821cf15345f488764bc215eb29719c80002ef24cdc1",
         "third_party/lua/src/luaconf.h": "af243c94bee6d2601383e8b65ed66a0d1b4ab3b7418ff903fcd0679912160e3a",
         "third_party/lua/src/lualib.h": "4ea0f67d3e467f5d6a327616e22a3c2da8e03d47a3c3660916275f2842f521ea",
         "third_party/lua/src/lundump.c": "7f7b078026e162161d402feba73a69cbe66a98558ec0745a445a595f42eac688",
@@ -70,8 +68,7 @@
         "third_party/lua/src/lvm.c": "7df5095ee2f6c88162d3536afb1fa04527b98fa3265cb579fc9aa6dcf05606de",
         "third_party/lua/src/lvm.h": "aba601b887236d5e135392e0c49370df3b5a9ac5c66ab2d44156b3244f2dcef3",
         "third_party/lua/src/lzio.c": "fba61ceeeb257a3fe5f63310f21e14fc26c4be647583dcf8e74cbc7fb7e43e8a",
-        "third_party/lua/src/lzio.h": "9673f62eac2d0fe3010f9d23148be7b8113319fdf4c4490015cd9feae2ecaad4",
-        "third_party/lua/src/Makefile": "d945aee4718785b5bbdbc575d76a16ef60bd65cbfed47ef53e7ced99b580371d"
+        "third_party/lua/src/lzio.h": "9673f62eac2d0fe3010f9d23148be7b8113319fdf4c4490015cd9feae2ecaad4"
       }
     },
     {

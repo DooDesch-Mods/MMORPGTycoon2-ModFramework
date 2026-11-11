@@ -39,9 +39,6 @@ jobs:
       - name: Package player runtime and developer SDK
         if: github.event_name != 'pull_request'
         run: build/helper-env/Scripts/python.exe tools/package_product.py
-      - name: Export source
-        if: github.event_name != 'pull_request'
-        run: python tools/export_source.py
       - name: Package Nexus and Vortex downloads
         if: github.event_name != 'pull_request'
         run: |
@@ -56,7 +53,6 @@ jobs:
             dist/nexus/*.zip
             dist/sdk/*.zip
             dist/vortex/*.zip
-            dist/source/*.zip
             dist/docs/offline/**
           if-no-files-found: error
           retention-days: 30

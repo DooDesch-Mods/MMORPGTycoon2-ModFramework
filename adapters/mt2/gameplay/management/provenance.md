@@ -28,9 +28,8 @@ evidence for executable SHA-256
   celebration, skip, abort, and publication paths.
 
 Digest include files contain addresses, lengths, and SHA-256 values only.
-`tests/gameplay/management/generate_native_pins.py` regenerates these facts from
-the sibling reference checkout without copying executable bytes into this
-repository. Native helpers with no retained body digest use
+These facts were generated from the sibling reference checkout without copying
+executable bytes into this repository; the generator script is not kept here. Native helpers with no retained body digest use
 `Context::verify_original`, which checks the exact supported executable's
 pristine bytes and any acknowledged Framework route composition.
 

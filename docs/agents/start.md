@@ -4,39 +4,17 @@ title: Build a mod with an agent
 
 # Build a mod with an agent
 
-Use the same public contract and complete examples as a human modder. This source targets Framework **0.5.8** and Lua API **1.3.0**; native C ABI stays at **1**. New API 1.3 functions require Framework 0.4.0 or later. The [compatibility page](../compatibility.md) identifies the supported game build.
+Use the same public contract and complete examples as a human modder. The current Lua API is **1.3.0**; the native C ABI is **1**. Set `api_version` in `mod.json` to the oldest Lua API that has every function you call. The [API reference](../reference/index.md) lists `Since` and `Requires Framework` per function; older runtimes refuse a newer `api_version`. The [compatibility page](../compatibility.md) names the supported game build.
 
 ## Context to give your agent
 
-Read this page, the [quickstart](../quickstart.md), [API reference](../reference/index.md) and [machine contract](../public/api/1.3.0/api.json). A generated project includes `AGENTS.md`, `.mt2fw/mt2.lua` and `.mt2fw/api.json` for offline use. Source examples are under `examples/` in the SDK documentation bundle and repository. Use the retained [1.2.0 contract](../public/api/1.2.0/api.json) when targeting an older API 1.2 runtime.
-
-For central Mods entries, native windows, document layouts and read-only world dashboards, use the [Lua apps guide](../recipes/lua-apps.md) and its three complete examples. Set the package's API requirement to 1.1.0. UI calls belong directly in render callbacks; game snapshots belong in game-thread update/world_ready callbacks.
-
-Use `.md` counterparts of the HTML pages for compact reading, or follow [llms.txt](../public/llms.txt). Discovery by an agent is not automatic; provide the entry file or link explicitly. Documentation exports include a versioned Markdown copy under `versions/1.3.0/`.
-
-For direct Dungeon, character, actor, Region and management operations, use the [experimental gameplay guide](../experimental/gameplay.md) and [gameplay contract](../public/api/experimental/gameplay.json). Require API 1.2.0 and the matching runtime. Query from game callbacks, cache for render, and inspect `action_completed` or action status before treating a mutation as complete.
-
-For the new API 1.3.0 queries and paired fee action, read the
-[world-query recipes](../recipes/world-queries.md). `terrain.sample` and
-`terrain.samples` take zero-based grid coordinates and return raw height values.
-They do not interpolate terrain or perform collision tests. Targeted network
-queries still validate the current graph, so cache results outside render and
-avoid repeated network scans each frame. A paired fee action has no automatic
-rollback; a partial native failure remains unknown.
-
-Experimental typed patches require Framework 0.2.0 or newer. Read the [patch guide](../experimental/patches.md) and [patch target contract](../public/api/experimental/patches.json) before using them. Never infer Host authority from a manifest or a missing session flag.
-
-Framework 0.5.0 adds the [native Step draft 9 guide](../experimental/steps.md)
-and [machine contract](../public/api/experimental/steps.json). Its authority is
-restricted to the supported native Multiplayer owner. Do not infer new Lua
-functions or permissions from this native contract; the public Lua API remains 1.3.0.
-
-The optional [Step recovery extension](../experimental/step-recovery.md) is
-included in Framework 0.5.0 and has a separate exact-version export and
-[machine contract](../public/api/experimental/step-recovery.json). Query draft 1
-with exact sizes; interface availability does not prove game or Multiplayer
-compatibility. Do not weaken normal membership proof to emulate recovery. It adds
-no Lua calls.
+- This page, the [quickstart](../quickstart.md), the [API reference](../reference/index.md) and the [machine contract](../public/api/1.3.0/api.json).
+- `mt2fw new` adds `AGENTS.md`, `.mt2fw/mt2.lua` and `.mt2fw/api.json` to a new mod for offline use. Complete examples are under `examples/` in the SDK and the repository.
+- `.md` counterparts of the HTML pages, or [llms.txt](../public/llms.txt), for compact reading. An agent does not discover them on its own; pass the entry file or link.
+- Central Mods entries, native windows and world dashboards: the [Lua apps guide](../recipes/lua-apps.md). Queries and the paired fee action: the [world-query recipes](../recipes/world-queries.md).
+- Dungeon, character, actor, Region and management operations: the [experimental gameplay guide](../experimental/gameplay.md) and its [contract](../public/api/experimental/gameplay.json). Query from game callbacks, cache for render, and check the action status before treating a mutation as done.
+- Typed patches: the [patch guide](../experimental/patches.md) and [contract](../public/api/experimental/patches.json). Never infer Host authority from a manifest or a missing session flag.
+- The native [Step SDK](../experimental/steps.md) and its [recovery extension](../experimental/step-recovery.md) belong to the native Multiplayer owner. They add no Lua functions or permissions.
 
 ## Author and validate
 
@@ -46,25 +24,18 @@ mt2fw check C:/Mods/yourname.hello
 mt2fw pack C:/Mods/yourname.hello C:/Mods/hello-1.0.0.zip
 ```
 
-Edit only the generated mod. Keep its namespace and declare capabilities. Register windows once, keep widget calls inside render callbacks, and wait for `world_ready` before world-dependent work. `start` is still preparation. The first Hello template has a `local message` line that can be changed directly.
-
-To add a setting, define it with `mt2.config.define` and read it inside your window. Use the complete `examples/config` project and the [function contract](../reference/functions/config-define.md). Lua needs no compiler.
+Edit only the generated mod. Keep its namespace and declare capabilities. Register windows once, keep widget calls inside render callbacks, and wait for `world_ready` before world-dependent work; `start` is still preparation. To add a setting, define it with `mt2.config.define` and read it inside your window (`examples/config`).
 
 ## Rules that prevent damaging mistakes
 
 - Preserve exact handle UIDs as strings. World epochs expire. Persist supported building references with world storage and confirmed saves.
 - Accepted actions are queued. Only confirmed is success. Preserve unknown outcomes and inspect state; never auto-retry a mutation.
-- Lua reload replaces registrations but does not undo world changes. Content/native changes need restart.
-- Use public APIs only. Raw addresses, arbitrary process starts and native Lua modules are outside the regular Lua contract.
-- Keep source/package checks distinct from real game acceptance. A synthetic host can prove syntax and API wiring, not native world effects.
+- Lua reload replaces registrations but does not undo world changes. Content and native changes need a restart.
+- Use public APIs only. Raw addresses, arbitrary process starts and native Lua modules are outside the Lua contract.
+- A synthetic host proves syntax and API wiring, not native world effects. Keep source and package checks apart from real game checks.
 
 ## Verify the result
 
-Check the generated manifest, run `check`, pack outside the source folder, and retain output and package hash. Then load the mod in an owned profile, edit the greeting, reload and inspect the visible result. Ask the human for genuinely missing intent, not for routine reversible authoring choices.
+Run `check`, pack outside the source folder and keep the package hash. Load the mod in an owned profile, edit the greeting, reload and look at the result. Ask the human only for missing intent, not for routine reversible choices.
 
-Framework contributors should also read repository `AGENTS.md` and [contributor build guide](../contributing/build.md). Human newcomer timing and multiplayer bridge acceptance remain separate release gates.
-
-For a native mod that needs a Runtime fix, follow the
-[loaded Runtime version check](../compatibility.md#runtime-versions-for-native-mods).
-Framework 0.5.4 adds a Windows DLL version resource; it does not change the Host
-layout, Lua API or exact experimental draft versions.
+Framework contributors: see the repository `CLAUDE.md` and the [contributor build guide](../contributing/build.md). For a native mod that depends on a Runtime fix, use the [loaded Runtime version check](../compatibility.md#runtime-versions-for-native-mods).

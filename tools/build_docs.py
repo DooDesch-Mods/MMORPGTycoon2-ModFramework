@@ -21,6 +21,7 @@ def prepare():
     if result.returncode:raise RuntimeError('API generation failed')
     result=subprocess.run([sys.executable,str(ROOT/'tools/license_inventory.py')],cwd=ROOT)
     if result.returncode:raise RuntimeError('Dependency notice/integrity check failed')
+    shutil.copytree(ROOT/'assets/brand',ROOT/'docs/public/brand',dirs_exist_ok=True)
     media=packages.read_json(ROOT/'docs/media.json')
     captures=ROOT/'artifacts/helper-doc-captures.json'
     if captures.exists():
