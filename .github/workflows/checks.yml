@@ -28,7 +28,7 @@ jobs:
       - run: python -m unittest discover -s tests -p "test_*.py"
       - run: python tools/generate_docs.py --check
       - run: python tools/check_contract.py
-      - run: node --test tests/vortex-routing.cjs tests/runtime-vortex.cjs
+      - run: node --test tests/vortex.cjs
       - run: npm run docs:build
       - run: python tools/check_docs.py
       - run: npx playwright install chromium
