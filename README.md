@@ -87,7 +87,7 @@ Give your mod a central Mods entry, native game windows, searchable lists and wo
 
 ## For contributors
 
-Framework **0.5.7** provides Lua API **1.3.0** and the experimental gameplay contract. Use the matching Runtime and SDK. The [gameplay guide](docs/experimental/gameplay.md) covers action results and lifetime rules; the [machine contract](api/experimental/gameplay.json) describes each operation and its result type.
+This source provides Lua API **1.3.0** and the experimental gameplay contract. Use the matching Runtime and SDK. The [gameplay guide](docs/experimental/gameplay.md) covers action results and lifetime rules; the [machine contract](api/experimental/gameplay.json) describes each operation and its result type.
 
 All required native source dependencies are inside this repository. Build with Visual Studio 2022 C++, CMake and Python:
 

@@ -44,8 +44,6 @@ text=text.replace('https://doodesch-mods.github.io/MMORPGTycoon2-ModFramework/',
 text=text.replace('[CONTRIBUTING.md](CONTRIBUTING.md)', '[the contributor guide](docs/contributing/build.md)')
 text=re.sub(r'\]\((docs/[^)]+)\.md\)',r'](\1.html)',text)
 readme.write_text(text,encoding='utf-8')
-copy(ROOT/'evidence/runtime-acceptance.json',destination/'mt2fw/evidence/runtime-acceptance.json')
-copy(ROOT/'evidence/repository-acceptance.json',destination/'mt2fw/evidence/repository-acceptance.json')
 notices=destination/'mt2fw/licenses'
 for folder,name in [('imgui','LICENSE.txt'),('minhook','LICENSE.txt'),('nlohmann','LICENSE.MIT'),('SDL3','LICENSE.txt')]:
     copy(ROOT/'third_party/vendor'/folder/name,notices/(folder+'-'+name))

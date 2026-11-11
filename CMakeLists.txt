@@ -8,7 +8,6 @@ set(MT2FW_VENDOR "${CMAKE_CURRENT_SOURCE_DIR}/third_party/vendor" CACHE PATH "Ve
 option(MT2FW_GAME "Build the Windows game adapter and loader" ON)
 set(lua_SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/third_party/lua")
 file(GLOB LUA_SOURCES "${lua_SOURCE_DIR}/src/*.c")
-list(REMOVE_ITEM LUA_SOURCES "${lua_SOURCE_DIR}/src/lua.c" "${lua_SOURCE_DIR}/src/luac.c")
 set(LUA_CPP_SOURCES)
 foreach(source IN LISTS LUA_SOURCES)
   get_filename_component(stem "${source}" NAME_WE)

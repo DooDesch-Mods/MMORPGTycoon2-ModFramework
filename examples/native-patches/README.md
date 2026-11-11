@@ -2,9 +2,9 @@
 
 > 🛟 **Need help or found a bug?** Get support at [support.doodesch.de/modframework](https://support.doodesch.de/modframework).
 
-Observe one native object create through experimental patch protocol 1. Requires MT2 Mod Framework 0.2.0 or later, Windows x64, CMake 3.24 or later and Visual Studio 2022 C++ tools. Stable Lua API 1.0.0 and native plugin ABI 1 are unchanged.
+Observe one native object create through experimental patch protocol 1. Requires Windows x64, CMake 3.24 or later and Visual Studio 2022 C++ tools. Uses native plugin ABI 1.
 
-The project includes its matching public headers. It resolves `MT2FW_MT2_QueryPatches` on the loaded framework from an active update callback and passes the exact borrowed Host pointer from Load. The typed create callbacks keep only an atomic count. No game addresses or additional hook library are needed.
+The headers come from the SDK: `include/mt2fw/plugin.h` and `sdk/native/mt2/` (`adapters/mt2/sdk/` in the repository). It resolves `MT2FW_MT2_QueryPatches` on the loaded framework from an active update callback and passes the exact borrowed Host pointer from Load. The typed create callbacks keep only an atomic count. No game addresses or additional hook library are needed.
 
 1. Copy this project to `C:/Mods/native-patches`.
 2. Run `cmake -S C:/Mods/native-patches -B C:/Mods/native-patches/build -A x64`.

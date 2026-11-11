@@ -1,6 +1,6 @@
 # MT2 mod authoring
 
-Use the bundled `.mt2fw/mt2.lua` types and `.mt2fw/api.json` contract. Set `api_version` to `1.1.0` when using the new app or world-query functions. API 1.0 mods remain supported. Create Lua mods with a text editor; no compiler is required. Read the installed documentation's Agents section for complete examples.
+Use the bundled `.mt2fw/mt2.lua` types and `.mt2fw/api.json` contract. Set `api_version` to `1.3.0`. Create Lua mods with a text editor; no compiler is required. Read the installed documentation's Agents section for complete examples.
 
 - Declare every required capability in `mod.json`. Use a namespaced lowercase ID. Local mods cannot change world state.
 - Register basic windows once with `mt2.ui.window`, or call `mt2.ui.app` and `mt2.ui.native`/`mt2.ui.document` directly from `render`. Keep app registration active while its window is closed. Read game state from game-thread `world_ready` or `update` callbacks. The `start` event still belongs to preparation.
