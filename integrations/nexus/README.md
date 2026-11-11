@@ -20,7 +20,7 @@ The workflow then:
 
 1. Runs the full **Build and verify framework** checks and packages the downloads.
 2. Checks that the ZIP's embedded version equals the tag, its checksum, inventory and file hashes, and that the Nexus page and file ID belong together. A version already on Nexus is skipped; an older one fails.
-3. Creates the GitHub release with the changelog section as notes. Framework releases carry the runtime ZIP, the SDK ZIP and `SHA256SUMS.txt`; Vortex releases carry the extension ZIP and `SHA256SUMS.txt` and are marked as prerelease.
+3. Creates the GitHub release with the changelog section as notes. Framework releases carry the runtime ZIP, the SDK ZIP and `SHA256SUMS.txt`; Vortex releases carry the extension ZIP and `SHA256SUMS.txt` and are never marked as the latest release, so "Latest" stays on the runtime.
 4. Uploads the runtime or extension ZIP to Nexus as the new main file, archives the previous version, reads the upload back and writes the same changelog section as the Nexus version changelog.
 
 Only the player runtime goes to Nexus; the SDK stays on GitHub. A rerun reuses an existing GitHub release and its assets, and a version already on Nexus is not uploaded again. Nexus changelogs are additive: matching text is skipped, different text fails instead of adding a second entry.

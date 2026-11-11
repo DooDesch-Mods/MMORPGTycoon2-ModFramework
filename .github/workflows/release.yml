@@ -80,7 +80,8 @@ jobs:
           TITLE: ${{ steps.prepare.outputs.title }}
         run: |
           options=()
-          if [[ "$TAG" == vortex-v* ]]; then options+=(--prerelease); fi
+          # The runtime release stays "Latest"; Vortex releases never take that mark.
+          if [[ "$TAG" == vortex-v* ]]; then options+=(--latest=false); fi
           gh release create "$TAG" artifacts/release/*.zip artifacts/release/SHA256SUMS.txt --repo "$GITHUB_REPOSITORY" \
             --verify-tag --title "$TITLE" --notes-file artifacts/release/notes.md "${options[@]}"
       - name: Upload file version
