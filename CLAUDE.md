@@ -16,17 +16,16 @@ Read `README.md`, `CONTRIBUTING.md` and `docs/contributing/build.md` first. `doc
 
 ## Commands
 
-Needs Visual Studio 2022 C++, CMake 3.24+, Python 3.11+ and Node 22+. CI (`.github/workflows/checks.yml`) runs the same steps in this order.
+Needs Visual Studio 2022 C++, Python 3.11+ (`pip install -r requirements-dev.txt`) and Node 22+. `build.py` takes CMake from PATH or from the Visual Studio installation.
 
 ```powershell
-python tools/build.py                                  # native build and tests
-python -m unittest discover -s tests -p "test_*.py"
-python tools/generate_docs.py --check                  # generated sources are current
-python tools/check_contract.py                         # needs the built probe
-python tools/render_roadmap.py --check
-node --test tests/vortex.cjs                           # Vortex extension
+python tools/build.py --check    # native build, CTest, unit tests, generated sources, contract, roadmap, Vortex
+python tools/build.py --deploy   # build, copy WSOCK32.dll and MT2Framework.dll into the game
+python tools/build.py --smoke    # deploy, start the game through Steam, wait for the load line, close the game
 npm ci --ignore-scripts; npm run docs:build; python tools/check_docs.py; npm run docs:test
 ```
+
+The game folder is `--game`, else `MT2_GAME_DIR`, else the Steam default. `--deploy` refuses a running game and a foreign `WSOCK32.dll`, and writes `mt2fw.json` with `<game>/mt2fw-profile` only when none exists. `--smoke` uses the profile in `mt2fw.json`. `checks.yml` runs `build.py --check` on every change outside `docs/`, `assets/` and root Markdown files; `docs.yml` builds and tests the docs when docs inputs change.
 
 ## Rules for a change
 
