@@ -41,6 +41,9 @@
   },
   "vortex": {
     "name": "MMORPG Tycoon 2 Vortex Extension",
+    "silent_releases": [
+      "vortex-v0.2.0"
+    ],
     "domain": "site",
     "game_id": 2295,
     "page_id": 2465,

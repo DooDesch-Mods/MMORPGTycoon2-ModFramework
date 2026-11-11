@@ -145,10 +145,11 @@ class NexusReleaseTests(unittest.TestCase):
     def test_silent_release_policy_blocks_automatic_announcement_output(self):
         root = nexus.ROOT / 'artifacts/nexus-tests'
         root.mkdir(parents=True, exist_ok=True)
-        for product, version in [('framework', '0.5.1'), ('framework', '0.5.2'), ('framework', '0.5.3'), ('framework', '0.5.4'), ('multiplayer', '0.1.0-beta.26')]:
+        for product, tag in [('framework', 'v0.5.1'), ('framework', 'v0.5.2'), ('framework', 'v0.5.3'), ('framework', 'v0.5.4'),
+                             ('multiplayer', 'v0.1.0-beta.26'), ('vortex', 'vortex-v0.2.0')]:
             with self.subTest(product=product), tempfile.TemporaryDirectory(dir=root) as directory:
                 target = nexus.targets()[product]
-                plan = {'product': product, 'tag': 'v' + version, 'version': version,
+                plan = {'product': product, 'tag': tag, 'version': tag.rsplit('v', 1)[1],
                         'filename': 'release.zip', 'sha256': 'a' * 64, 'release_notes': '- A published fix.'}
                 environment = {'NEXUS_FILE_ID': target['file_id'], 'NEXUS_MOD_ID': target['mod_uid']}
                 with patch.dict(os.environ, environment), patch.object(nexus, 'fetch_release', return_value=plan), \
