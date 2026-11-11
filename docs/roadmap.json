@@ -115,7 +115,7 @@
       "name": "Vortex installation",
       "short_name": "Vortex",
       "status": "available",
-      "scope": "Manage the player Runtime and mod ZIPs using the separate Vortex Extension. [Install guide](integrations/vortex/README.md)."
+      "scope": "Manage the player Runtime and mod ZIPs using the separate Vortex Extension. [Install guide](docs/guides/vortex.md)."
     },
     {
       "name": "Editor types and agent docs",

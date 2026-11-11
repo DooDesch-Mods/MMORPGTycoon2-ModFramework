@@ -25,7 +25,7 @@ parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.R
 parser.add_argument('--core-only', action='store_true')
 parser.add_argument('--configure-only', action='store_true')
 parser.add_argument('--skip-tests', action='store_true', help='Skip CTest')
-parser.add_argument('--check', action='store_true', help='Also run the Python, contract, roadmap and Vortex checks')
+parser.add_argument('--check', action='store_true', help='Also run the Python, contract and roadmap checks')
 parser.add_argument('--deploy', action='store_true', help='Copy WSOCK32.dll and MT2Framework.dll into the game folder')
 parser.add_argument('--smoke', action='store_true', help='Deploy, start the game, wait for the framework load line, close the game')
 parser.add_argument('--game', type=Path, default=Path(os.environ.get('MT2_GAME_DIR') or STEAM_GAME),
@@ -162,8 +162,7 @@ if args.check:
     commands += [[sys.executable, '-m', 'unittest', 'discover', '-s', 'tests', '-p', 'test_*.py'],
                  [sys.executable, 'tools/generate_docs.py', '--check'],
                  [sys.executable, 'tools/check_contract.py'],
-                 [sys.executable, 'tools/render_roadmap.py', '--check'],
-                 ['node', '--test', 'tests/vortex.cjs']]
+                 [sys.executable, 'tools/render_roadmap.py', '--check']]
 for index, command in enumerate(commands):
     path = logs / f'{index}.log'
     started = time.time()

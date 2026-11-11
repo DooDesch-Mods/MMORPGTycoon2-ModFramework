@@ -11,7 +11,7 @@ Read `README.md`, `CONTRIBUTING.md` and `docs/contributing/build.md` first. `doc
 - `include/mt2fw/plugin.h`: native C ABI, the only source for it.
 - `api/contract.json`: source of the Lua API. `api/experimental/`: gameplay and patch contracts. `api/baselines/`: accepted API releases.
 - `sdk/`, `templates/`, `examples/`: shipped to modders. `examples/` are complete projects; docs snippets are included from their real files.
-- `tools/`: build, docs, packaging and release scripts. `tests/`: unit tests. `integrations/`: Nexus and Vortex.
+- `tools/`: build, docs, packaging and release scripts. `tests/`: unit tests. `integrations/`: Nexus.
 - `docs/`: VitePress site. `third_party/`: pinned native sources.
 
 ## Commands
@@ -19,7 +19,7 @@ Read `README.md`, `CONTRIBUTING.md` and `docs/contributing/build.md` first. `doc
 Needs Visual Studio 2022 C++, Python 3.11+ (`pip install -r requirements-dev.txt`) and Node 22+. `build.py` takes CMake from PATH or from the Visual Studio installation.
 
 ```powershell
-python tools/build.py --check    # native build, CTest, unit tests, generated sources, contract, roadmap, Vortex
+python tools/build.py --check    # native build, CTest, unit tests, generated sources, contract, roadmap
 python tools/build.py --deploy   # build, copy WSOCK32.dll and MT2Framework.dll into the game
 python tools/build.py --smoke    # deploy, start the game through Steam, wait for the load line, close the game
 npm ci --ignore-scripts; npm run docs:build; python tools/check_docs.py; npm run docs:test

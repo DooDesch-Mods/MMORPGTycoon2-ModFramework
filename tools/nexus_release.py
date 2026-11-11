@@ -22,7 +22,7 @@ from package_runtime import verify_runtime
 from release_notes import section, plain, bbcode
 
 API = 'https://api.nexusmods.com/v3'
-TAG_PREFIXES = (('vortex-v', 'vortex'), ('v', 'framework'))
+TAG_PREFIXES = (('v', 'framework'),)
 
 
 def targets():
@@ -45,13 +45,13 @@ def version_key(value):
 
 
 def product_for(tag):
-    """Return (product, version) for a release tag: v<version> is the framework, vortex-v<version> the extension."""
+    """Return (product, version) for a release tag: v<version> is the framework."""
     for prefix, product in TAG_PREFIXES:
         if tag.startswith(prefix):
             version = tag[len(prefix):]
             version_key(version)
             return product, version
-    raise ValueError('Release tags are v<version> or vortex-v<version>: ' + tag)
+    raise ValueError('Release tags are v<version>: ' + tag)
 
 
 def archive_version(path, product):
@@ -73,10 +73,6 @@ def archive_version(path, product):
                 if hashlib.sha256(archive.read(name)).hexdigest() != expected:
                     raise ValueError('Framework file checksum differs: ' + name)
             verify_runtime(path)
-        elif product == 'vortex':
-            metadata = json.loads(archive.read('info.json'))
-            if metadata['gameId'] != 4452 or metadata['id'] != 'game-mmorpgtycoon2':
-                raise ValueError('Wrong Vortex game extension')
         else:
             raise ValueError('Unknown release product: ' + product)
         version_key(metadata['version'])
@@ -167,7 +163,7 @@ def local_release(tag, directory):
     version = archive_version(path, product)
     if version != tag_version:
         raise ValueError(f'Tag {tag} differs from the archive version {version}')
-    expected_name = f'MT2Framework-{version}-windows-x64.zip' if product == 'framework' else f'MMORPGTycoon2-Vortex-{version}.zip'
+    expected_name = f'MT2Framework-{version}-windows-x64.zip'
     if path.name != expected_name:
         raise ValueError('Archive filename differs from embedded product version')
     return {'product': product, 'tag': tag, 'version': version, 'filename': str(path), 'sha256': actual,
@@ -177,7 +173,7 @@ def local_release(tag, directory):
 def prepare(tag, directory, get=api_get):
     plan = local_release(tag, directory)
     target = targets()[plan['product']]
-    notes = section((ROOT / 'CHANGELOG.md').read_text(encoding='utf-8'), plan['product'], plan['version'])
+    notes = section((ROOT / 'CHANGELOG.md').read_text(encoding='utf-8'), plan['version'])
     plan.update(status=check_destination(target, plan['version'], get), file_id=target['file_id'], mod_uid=target['mod_uid'],
                 nexus_url=f"https://www.nexusmods.com/{target['domain']}/mods/{target['page_id']}",
                 notes=notes, notes_plain=plain(notes), notes_bbcode=bbcode(notes))

@@ -28,11 +28,9 @@ class NexusReleaseTests(unittest.TestCase):
             return {'mod_files': [{'id': self.target['file_id']}]}
         return {'versions': self.versions}
 
-    def test_global_ids_and_file_destinations_are_distinct(self):
+    def test_global_ids_and_file_destinations(self):
         values = nexus.targets()
         self.assertEqual(values['framework']['mod_uid'], '19121194401817')
-        self.assertEqual(values['vortex']['mod_uid'], '9856949946785')
-        self.assertNotEqual(values['framework']['file_id'], values['vortex']['file_id'])
         self.assertEqual(nexus.check_destination(self.target, '0.1.1', self.get), 'ready')
         self.assertEqual(self.calls, ['/games/mmorpgtycoon2/mods/25', '/mods/19121194401817/files', '/mod-files/8170305/versions'])
 
@@ -91,32 +89,19 @@ class NexusReleaseTests(unittest.TestCase):
             with self.assertRaisesRegex(RuntimeError, 'HTTP 403') as caught:nexus.api_get('/mods/1/files')
         self.assertNotIn('private-fixture-key', str(caught.exception))
 
-    def test_tag_names_the_product_and_must_match_the_archive_version(self):
+    def test_tag_names_the_product(self):
         self.assertEqual(nexus.product_for('v0.5.9'), ('framework', '0.5.9'))
-        self.assertEqual(nexus.product_for('vortex-v0.2.1'), ('vortex', '0.2.1'))
         with self.assertRaises(ValueError):nexus.product_for('multiplayer-v1.0.0')
-        test_root = nexus.ROOT / 'artifacts/nexus-tests'
-        test_root.mkdir(parents=True, exist_ok=True)
-        with tempfile.TemporaryDirectory(dir=test_root) as folder:
-            directory = Path(folder)
-            path = directory / 'MMORPGTycoon2-Vortex-0.2.1.zip'
-            with zipfile.ZipFile(path, 'w') as archive:
-                archive.writestr('info.json', json.dumps({'gameId': 4452, 'id': 'game-mmorpgtycoon2', 'version': '0.2.1'}))
-            (directory / 'SHA256SUMS.txt').write_text(hashlib.sha256(path.read_bytes()).hexdigest() + '  ' + path.name + '\n')
-            self.assertEqual(nexus.local_release('vortex-v0.2.1', directory)['version'], '0.2.1')
-            with self.assertRaisesRegex(ValueError, 'differs from the archive version'):
-                nexus.local_release('vortex-v0.2.2', directory)
 
 
 class ChangelogTests(unittest.TestCase):
     plan = {'product': 'framework', 'version': '0.1.2', 'notes_plain': '- Fix menu.\n- English default.'}
 
-    def test_product_sections_are_exact_and_missing_or_duplicates_fail(self):
-        text = '## 0.1.2\n\n- Framework\n## Vortex extension 0.1.2\n\n- Extension\n'
-        self.assertEqual(nexus.section(text, 'framework', '0.1.2'), '- Framework')
-        self.assertEqual(nexus.section(text, 'vortex', '0.1.2'), '- Extension')
+    def test_sections_are_exact_and_missing_or_duplicates_fail(self):
+        text = '## 0.1.2\n\n- Framework\n## 0.1.1\n\n- Older\n'
+        self.assertEqual(nexus.section(text, '0.1.2'), '- Framework')
         for invalid in ('## 0.1.20\n- Wrong', text + '\n## 0.1.2\n- Duplicate', '## 0.1.2\n'):
-            with self.assertRaises(ValueError):nexus.section(invalid, 'framework', '0.1.2')
+            with self.assertRaises(ValueError):nexus.section(invalid, '0.1.2')
 
     def test_format_preserves_quotes_newlines_and_link_targets(self):
         text = '- **Fix** `menu` "first"\n- [Guide](https://example.org/help)'
