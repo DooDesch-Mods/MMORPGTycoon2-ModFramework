@@ -1,0 +1,4 @@
+{
+  "workspace.library": ["../sdk"],
+  "runtime.version": "Lua 5.4"
+}
