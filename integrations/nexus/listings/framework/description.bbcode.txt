@@ -26,7 +26,7 @@ Open [b]Mods...[/b] in the game's menu to see your installed mods, change their 
 [/list]These are separate downloads. Check each mod's requirements and instructions before installing.
 
 [size=5][b]Install and start playing[/b][/size]
-You'll need Windows x64 and the Steam version of MMORPG Tycoon 2. [url=https://github.com/DooDesch-Mods/MMORPGTycoon2-ModFramework/blob/main/docs/compatibility.md]Check supported game versions[/url]; Vortex also checks your game before deployment.
+You'll need Windows x64 and the Steam version of MMORPG Tycoon 2. [url=https://github.com/DooDesch-Mods/MMORPGTycoon2-ModFramework/blob/main/docs/compatibility.md]Check supported game versions[/url]. On an unsupported game build the game starts without mods.
 
 [list=1]
 [*]Close the game. Install the [url=https://www.nexusmods.com/site/mods/2465][b]MMORPG Tycoon 2 Vortex Extension[/b][/url] and restart Vortex.[/*]
