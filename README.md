@@ -35,10 +35,10 @@ Percentages count the listed areas equally. They describe feature coverage, not 
 | Feature | 0.5.8 | What is covered |
 | --- | --- | --- |
 | Lua mods and reload | ✅ Available | Use a text editor; reload scripts without restarting. A rejected replacement keeps the previous mod running. [Start here](docs/quickstart.md). |
-| Native C++ plugins | ✅ Available | Build with the native SDK. Plugin updates require a game restart. [SDK guide](docs/reference/native.md). |
+| Native C++ plugins | ✅ Available | Build with the native SDK. Plugin updates require a game restart. [SDK guide](https://doodesch-mods.github.io/MMORPGTycoon2-ModFramework/reference/native.html). |
 | In-game mod apps | ✅ Available | Open Lua and native mods through the central Mods window, with optional game-desktop icons. Lua apps can use native windows, PNGs and document layouts. [Lua app guide](docs/recipes/lua-apps.md). |
 | Static GLB scenery | ✅ Available | Import static models and textures into the scenery catalog. Keep required packs installed for your saves. [Scenery guide](docs/guides/scenery.md). |
-| Camera, objects and world actions | ✅ Available | Use the documented camera, time, object and checked world-operation APIs. [API reference](docs/reference/index.md). |
+| Camera, objects and world actions | ✅ Available | Use the documented camera, time, object and checked world-operation APIs. [API reference](https://doodesch-mods.github.io/MMORPGTycoon2-ModFramework/reference/index.html). |
 | Character design | ◇ Experimental | Create character definitions and variants; edit stats, appearance, weapons and abilities from Lua. [Gameplay guide](docs/experimental/gameplay.md). |
 | Actors, quests and Monster Zones | ◇ Experimental | Place, move and remove supported NPCs, Monsters and Bosses. Edit quests, Boss phases and Monster Zones, including native paint and erase tools. |
 | Dungeon tools | ◇ Experimental | Edit Dungeon cells, themes, lighting, paint, gizmos and instances. Building operations use the active editable Dungeon template. |
