@@ -296,6 +296,23 @@ Close the game and update the Framework Runtime. Players only need the Runtime Z
 
 Published as [v0.1.0](https://github.com/DooDesch-Mods/MMORPGTycoon2-ModFramework/releases/tag/v0.1.0), with framework 0.1.0 and separate Vortex extension 0.1.1. The tag identifies the exact accepted package source. Multiplayer bridge acceptance and human newcomer timing remain pending.
 
+## Vortex extension 0.2.0
+
+### Changed
+
+- Deploy with Vortex's own hardlink deployment. The staging folder must be on the same drive as the game.
+- Install the runtime and framework mods into one framework profile, `<game>\mt2fw-profile`, shared by all Vortex profiles.
+- Install classic mods without `mod.json`, not only scenery packs. They need the player runtime.
+- Write every install step and failure to the Vortex log.
+
+### Removed
+
+- Protected copy deployment, the game build check, ownership records and per-profile saves.
+
+### Install
+
+Purge in Vortex before installing 0.2.0, then install the extension ZIP, restart Vortex and deploy. The [Vortex guide](docs/guides/vortex.md) lists leftover files to delete and how to keep your worlds.
+
 ## Vortex extension 0.1.4
 
 ### Fixed

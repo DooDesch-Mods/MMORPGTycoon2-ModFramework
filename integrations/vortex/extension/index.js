@@ -1,138 +1,103 @@
 // SPDX-License-Identifier: MIT
 'use strict';
 const path = require('node:path');
-const fs = require('node:fs/promises');
-const syncFS = require('node:fs');
-const {execFile} = require('node:child_process');
-const {promisify} = require('node:util');
-const {util,selectors,actions} = require('vortex-api');
-const routing = require('./routing');
-const deployment = require('./guarded-deployment');
-const {createCopyDeployment} = require('./copy-deployment');
-const {steamAccount} = require('./steam-account');
-const run = promisify(execFile);
-const {GAME_ID,FRAMEWORK_TYPE,SCENERY_TYPE} = routing;
-const error = message => { throw new Error('MT2 Framework: ' + message); };
-function profileId(api) {
-  const state = api.getState();
-  for (const id of [state.settings.profiles.nextProfileId,state.settings.profiles.activeProfileId]) {
-    if (state.persistent.profiles[id]?.gameId === GAME_ID) return id;
-  }
-  error('Select an MT2 Vortex profile before deployment');
+const fs = require('node:fs');
+const {log} = require('vortex-api');
+
+const GAME_ID = 'mmorpgtycoon2';
+const STEAM_APP_ID = '486860';
+// One framework profile inside the game folder keeps every deployment target on the game's drive,
+// which Vortex's hardlink deployment needs.
+const PROFILE = 'mt2fw-profile';
+// Folders the game reads inside a classic mod folder. An archive that starts with one of them has no mod folder of its own.
+// ponytail: names taken from the install notes of the classic mods on Nexus; add one when a classic archive lands a level too deep.
+const DATA_DIRS = new Set(['building_definitions', 'building_themes', 'buildings', 'icons', 'materials', 'scenery', 'wall_themes']);
+
+function fail(message, details) {
+  log('error', 'MT2: ' + message, details);
+  throw new Error('MMORPG Tycoon 2: ' + message);
 }
-function modPath(api,game) {
-  const profile = routing.profilePath(game,profileId(api));
-  return prepareDirectory(path.join(profile,'mods'));
-}
-function prepareDirectory(directory) {
-  let cursor = directory;
-  while (true) {
-    try { if (syncFS.lstatSync(cursor).isSymbolicLink()) error('Framework profile path contains a symbolic link'); }
-    catch(cause) { if (cause.code !== 'ENOENT') throw cause; }
-    const parent = path.dirname(cursor); if (parent === cursor) break; cursor = parent;
-  }
-  // Vortex checks deployment availability before it emits will-deploy.
-  syncFS.mkdirSync(directory,{recursive:true});return directory;
-}
-function classicPath(api) {
-  const profile=routing.profilePath(gamePath(api),profileId(api));
-  const account=steamAccount();
-  if (account.status==='available') return prepareDirectory(routing.sceneryPath(profile,account.id));
-  const data=path.join(profile,'game-data');
-  const existing=(syncFS.existsSync(data)?syncFS.readdirSync(data,{withFileTypes:true}):[]).filter(row=>row.isDirectory()&&routing.validSteamAccount(row.name));
-  if (existing.length===1) return prepareDirectory(routing.sceneryPath(profile,existing[0].name));
-  const enabled=Object.entries(api.getState().persistent.mods[GAME_ID] || {}).some(([id,mod])=>mod.type===SCENERY_TYPE&&api.getState().persistent.profiles[profileId(api)].modState[id]?.enabled);
-  if (enabled) error('Start Steam and sign in before deploying classic scenery: '+account.cause);
-  return undefined;
-}
+
 function gamePath(api) {
-  const result = api.getState().settings.gameMode.discovered[GAME_ID]?.path;
-  if (!result) error('Discover the Steam game first'); return result;
+  const discovered = api.getState().settings.gameMode.discovered[GAME_ID]?.path;
+  if (!discovered) fail('the game is not discovered yet');
+  // The framework loader rejects a profile path whose letter case differs from the real folder.
+  return fs.realpathSync.native(discovered);
 }
-async function requireClosed(game) {
-  const command = 'Get-CimInstance Win32_Process -Filter "Name=\'MT2.exe\'" | Select-Object ExecutablePath,ProcessId | ConvertTo-Json -Compress';
-  const {stdout} = await run('powershell.exe',['-NoProfile','-NonInteractive','-Command',command],{windowsHide:true,encoding:'utf8'});
-  if (!stdout.trim()) return;
-  const rows = JSON.parse(stdout);
-  for (const row of Array.isArray(rows) ? rows : [rows]) {
-    if (!row.ExecutablePath || path.resolve(row.ExecutablePath).toLowerCase() === path.join(game,'MT2.exe').toLowerCase()) error('Close MT2 before deployment or purge');
+
+// The game reads classic mods from <data>/<SteamID64>/mod. With the framework runtime, <data> is the profile's game-data.
+function steamId(api) {
+  try {
+    const user = require('winapi-bindings').RegGetValue('HKEY_CURRENT_USER', 'Software\\Valve\\Steam\\ActiveProcess', 'ActiveUser').value;
+    if (user) return (76561197960265728n + BigInt(user)).toString();
+    log('info', 'MT2: no Steam user is signed in; looking for one account folder');
+  } catch (error) {
+    log('warn', 'MT2: reading the Steam user from the registry failed; looking for one account folder', error.message);
   }
+  const roots = [path.join(gamePath(api), PROFILE, 'game-data'), path.join(process.env.APPDATA || '', 'VectorStorm', 'MMORPG Tycoon 2')];
+  const ids = new Set(roots.flatMap(root => {
+    try { return fs.readdirSync(root).filter(name => /^7656\d{13}$/.test(name)); }
+    catch (error) { log('info', 'MT2: no account folders in ' + root, error.code); return []; }
+  }));
+  if (ids.size !== 1) fail('sign in to Steam before installing a classic mod (' + ids.size + ' account folders found)');
+  return [...ids][0];
 }
-async function willDeploy(api, id) {
-  const state = api.getState(); const profile = state.persistent.profiles[id];
-  if (!profile || profile.gameId !== GAME_ID) return;
-  const game = gamePath(api); await requireClosed(game); await routing.assertGame(game);
-  const mods = state.persistent.mods[GAME_ID] || {};
-  const enabled = Object.entries(mods).filter(([key]) => profile.modState[key]?.enabled);
-  const runtimes = enabled.filter(([,mod]) => mod.type === FRAMEWORK_TYPE);
-  if (runtimes.length > 1) error('Enable exactly one framework version');
-  const content = enabled.filter(([,mod]) => mod.type !== FRAMEWORK_TYPE);
-  if (content.length && runtimes.length !== 1) error('Enable the MT2 Framework package before deploying its mods');
-  const staging = selectors.installPathForGame(state,GAME_ID);
-  const target = routing.profilePath(game,id); await routing.prepareProfile(target);
-  if (runtimes.length) {
-    const [,runtime] = runtimes[0]; const directory = path.join(staging,runtime.installationPath);
-    const owner = await routing.readJSON(directory,routing.OWNER);
-    for (const [name,expected] of Object.entries(owner.files)) {
-      routing.frameworkName(name);
-      if (routing.hash(await routing.readFile(directory,name)) !== expected) error('Staged framework checksum differs: ' + name);
-    }
-    const seen = new Set();
-    const scenery=[];
-    for (const [,mod] of content) {
-      if (mod.type===SCENERY_TYPE) {
-        classicPath(api);
-        scenery.push(await routing.checkScenery(path.join(staging,mod.installationPath),mod.attributes?.mt2fwClassicId));
-        continue;
-      }
-      const modId = mod.attributes?.mt2fwModId;
-      if (!modId) error('Reinstall this mod with the MT2 Framework installer');
-      if (seen.has(modId)) error('Two enabled packages use mod ID ' + modId); seen.add(modId);
-      const folder = path.join(staging,mod.installationPath,modId);
-      try { await run(path.join(directory,'mt2fw','mt2fw.exe'),['check',folder],{windowsHide:true,encoding:'utf8'}); }
-      catch (cause) { error('Mod '+modId+' failed the shared CLI validation: '+(cause.stderr || cause.message)); }
-    }
-    routing.checkSceneryConflicts(scenery);
-    await routing.verifyOwnership(game,owner.files,target,true);
-    const backup = await routing.migrateLegacyLoader(game,target);
-    if (backup) api.sendNotification?.({type:'info',title:'Previous Multiplayer loader backed up',message:'The old standalone loader was replaced by Framework deployment. Backup: '+backup});
-    await routing.releaseRetainedConfiguration(game,target);
-    await routing.verifyOwnership(game,owner.files,target);
-    // Vortex tracks this generated file. Update the staging copy before it deploys the selected profile.
-    await fs.writeFile(path.join(directory,'mt2fw.json'),JSON.stringify({profile:target,enabled:true},null,2));
+
+function install(api, files, extraction, archivePath) {
+  const rows = files.filter(file => !/[\\/]$/.test(file)).map(file => file.split(/[\\/]/));
+  const named = name => rows.filter(row => row.at(-1).toLowerCase() === name).sort((a, b) => a.length - b.length);
+  const copy = (root, destination) => rows
+    .filter(row => row.length > root.length && root.every((part, index) => row[index] === part))
+    .map(row => ({type: 'copy', source: row.join(path.sep), destination: path.join(destination, ...row.slice(root.length))}));
+
+  const [runtime] = named('framework-package.json');
+  if (runtime) {
+    const profile = path.join(gamePath(api), PROFILE);
+    const instructions = copy(runtime.slice(0, -1), '');
+    instructions.push({type: 'generatefile', destination: 'mt2fw.json', data: JSON.stringify({enabled: true, profile}, null, 2)});
+    log('info', 'MT2: installing the framework runtime into the game folder', {files: instructions.length - 1, profile});
+    return {instructions};
   }
+
+  const manifests = named('mod.json');
+  if (manifests.length) {
+    if (manifests[1]?.length === manifests[0].length) fail('the archive holds more than one framework mod', manifests.map(row => row.join('/')));
+    const id = JSON.parse(fs.readFileSync(path.join(extraction, ...manifests[0]), 'utf8')).id;
+    if (typeof id !== 'string' || !/^[a-z][a-z0-9]*(?:[._-][a-z0-9]+)*$/.test(id)) fail('mod.json has an invalid id', id);
+    const instructions = copy(manifests[0].slice(0, -1), path.join(PROFILE, 'mods', id));
+    log('info', 'MT2: installing framework mod ' + id, {files: instructions.length});
+    return {instructions};
+  }
+
+  const wrap = rows.some(row => row.length > 1 && DATA_DIRS.has(row[0].toLowerCase()));
+  const source = archivePath || extraction;
+  const folder = wrap ? [path.basename(source, path.extname(source))] : [];
+  const destination = path.join(PROFILE, 'game-data', steamId(api), 'mod', ...folder);
+  // Without a wrapping folder, every top-level folder is a mod folder; loose top-level files are readmes.
+  const instructions = wrap ? copy([], destination) : copy([], destination).filter(row => row.source.includes(path.sep));
+  if (!instructions.length) fail('the archive has no framework runtime, framework mod or classic mod folder');
+  log('info', 'MT2: installing a classic mod into ' + destination, {files: instructions.length, wrapped: wrap});
+  return {instructions};
 }
-async function willPurge(api,id) {
-  const profile = api.getState().persistent.profiles[id];
-  if (profile?.gameId !== GAME_ID) return;
-  await requireClosed(gamePath(api));
-}
+
 function main(context) {
-  const api = context.api;
-  const copy = createCopyDeployment();
-  context.registerDeploymentMethod(deployment.createGuardedDeployment(
-    ()=>copy,
-    ()=>willDeploy(api,profileId(api)),
-    ()=>willPurge(api,profileId(api)),
-    ()=>requireClosed(gamePath(api)),async()=>{}));
-  context.registerActionCheck('SET_ACTIVATOR',deployment.checkActivator);
   context.registerGame({
-    id:GAME_ID,name:'MMORPG Tycoon 2',mergeMods:true,
-    queryPath:()=>util.GameStoreHelper.findByAppId(['486860'],'steam').then(game=>game.gamePath),
-    queryModPath:game=>modPath(api,game),
-    executable:()=> 'MT2.exe',requiredFiles:['MT2.exe'],logo:'gameart.png',
-    setup:async discovery=>{await routing.prepareProfile(routing.profilePath(discovery.path,profileId(api)));api.store.dispatch(actions.setActivator(GAME_ID,deployment.ID));},
-    requiresLauncher:()=>Promise.resolve({launcher:'steam'}),
-    environment:{SteamAppId:'486860'},
-    details:{steamAppId:486860,nexusPageId:GAME_ID,supportsSymlinks:false},
-    supportedTools:[{id:'mt2fw-helper',name:'MT2 Framework Helper',executable:()=>path.join('mt2fw','MT2FW-Helper.exe'),requiredFiles:[path.join('mt2fw','MT2FW-Helper.exe')],relative:true}],
+    id: GAME_ID,
+    name: 'MMORPG Tycoon 2',
+    mergeMods: true,
+    queryArgs: {steam: [{id: STEAM_APP_ID}]},
+    queryModPath: () => '.',
+    logo: 'gameart.png',
+    executable: () => 'MT2.exe',
+    requiredFiles: ['MT2.exe'],
+    requiresLauncher: () => Promise.resolve({launcher: 'steam'}),
+    environment: {SteamAppId: STEAM_APP_ID},
+    details: {steamAppId: Number(STEAM_APP_ID), nexusPageId: GAME_ID},
   });
-  context.registerModType(FRAMEWORK_TYPE,25,id=>id===GAME_ID,()=>api.getState().settings.gameMode.discovered[GAME_ID]?.path,
-    instructions=>Promise.resolve(instructions.some(row=>row.type==='generatefile' && row.destination===routing.OWNER)),{name:'MT2 Framework runtime'});
-  context.registerModType(SCENERY_TYPE,24,id=>id===GAME_ID,()=>classicPath(api),
-    instructions=>Promise.resolve(instructions.some(row=>row.type==='generatefile'&&path.basename(row.destination)===routing.SCENERY_RECORD)),{name:'MT2 classic scenery'});
-  context.registerInstaller('mt2fw-packages',25,(_files,id)=>Promise.resolve({supported:id===GAME_ID,requiredFiles:[]}),
-    (files,extraction)=>routing.installArchive(files,extraction,routing.profilePath(gamePath(api),profileId(api))));
+  context.registerInstaller('mt2-mods', 25, (files, gameId) => Promise.resolve({supported: gameId === GAME_ID, requiredFiles: []}),
+    async (files, extraction, gameId, progress, choices, unattended, archivePath) => install(context.api, files, extraction, archivePath));
+  log('info', 'MT2: game extension registered');
   return true;
 }
-module.exports = {default:main,willDeploy,willPurge,requireClosed};
+
+module.exports = {default: main, install};

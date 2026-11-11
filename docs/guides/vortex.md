@@ -4,39 +4,48 @@ title: Install with Vortex
 
 # Install with Vortex
 
-The [MMORPG Tycoon 2 Vortex Extension](https://www.nexusmods.com/site/mods/2465) installs the framework and its mods through Vortex. Each Vortex profile keeps separate settings, mod data and worlds.
+The [MMORPG Tycoon 2 Vortex Extension](https://www.nexusmods.com/site/mods/2465) installs the framework, framework mods and classic mods through Vortex's own hardlink deployment.
 
 ## Requirements
 
 - Windows x64 and Vortex 2.8.2 or newer.
 - The [supported Steam game build](../compatibility.md).
 - The player runtime ZIP from [Nexus](https://www.nexusmods.com/mmorpgtycoon2/mods/25) or [GitHub Releases](https://github.com/DooDesch-Mods/MMORPGTycoon2-ModFramework/releases).
-- A staging folder on the same volume as the game.
+- A staging folder on the same drive as the game.
 
 ## Install
 
 1. Close the game. Remove an existing manual framework installation with its original helper.
 2. Open **Extensions** in Vortex, drop in the extension ZIP and restart Vortex.
 3. Manage **MMORPG Tycoon 2** and select the Steam installation.
-4. Import the player runtime ZIP as a mod, enable it and deploy. The developer SDK is a separate GitHub download and stays outside the game folder.
-5. Import and enable your mod ZIPs, deploy, then start the game through Steam. **F10** opens Mods.
+4. Install the player runtime ZIP as a mod, enable it and deploy. The developer SDK is a separate GitHub download and stays outside the game folder.
+5. Install and enable your mod ZIPs, deploy, then start the game through Steam. **F10** opens Mods.
 
-Vortex manages deployment and removal for this installation. Keep the game closed while switching profiles or changing deployment. Original game archives are not replaced. Unknown loaders or modified managed files produce a named conflict.
+## Where files go
 
-## Classic scenery
+| Archive contains | Installed to |
+| --- | --- |
+| `framework-package.json` (player runtime) | the game folder, plus `mt2fw.json` pointing at `<game>\mt2fw-profile` |
+| `mod.json` (framework mod) | `<game>\mt2fw-profile\mods\<id>\` |
+| anything else (classic mod) | `<game>\mt2fw-profile\game-data\<SteamID64>\mod\<folder>\` |
 
-The extension also recognizes model-only scenery archives, including the original [More Sceneries - Lite Mode](https://www.nexusmods.com/mmorpgtycoon2/mods/2) download by Cow. Download such packs from their authors; the extension does not bundle them.
+All Vortex profiles share `<game>\mt2fw-profile`. Worlds and settings are stored in its `game-data` folder.
 
-Supported archives have one named pack folder containing `.vmb` models under `scenery/festival`, `scenery/prop` or `scenery/table`. Import the original ZIP without adding `mod.json`. Conflicting resource names are reported before deployment.
+Classic mods need the player runtime, because the runtime points the game's data folder to `mt2fw-profile\game-data`. An archive that starts with a game data folder such as `buildings`, `icons`, `materials` or `scenery` is placed in a folder named after the archive. Otherwise each top-level folder is a mod folder and loose readme files are skipped. Sign in to Steam before installing a classic mod, so the extension can pick your account folder.
 
-Sign in to Steam before the first classic deployment. Models are placed in the selected Vortex profile and Steam account's game-data directory. Restart the game after scenery changes, and keep the packs required by your worlds. Classic packs use native save references without the framework's missing-content metadata.
+MT2 Mod Manager packages (`manifest.json`), character cards and tools are not recognized. Install those by hand.
 
-Deployment, profile switching, disable and purge have been checked with the original More Sceneries Lite 1.3 ZIP. The engine loaded one representative model. Interactive catalog placement and saving/reloading a placed classic object remain unverified; see the [acceptance record](https://github.com/DooDesch-Mods/MMORPGTycoon2-ModFramework/blob/main/evidence/vortex-scenery-acceptance.json).
+Every install step and every failure is written to the Vortex log with the prefix `MT2:`.
 
-Legacy MT2 Mod Manager `manifest.json` merging and replacements for original game archives are not supported. Multiplayer compatibility is not confirmed.
+## Update from extension 0.1.x
+
+1. Before you update the extension, purge in Vortex.
+2. If you updated without purging: close the game and delete `WSOCK32.dll`, `MT2Framework.dll`, `mt2fw.json`, `framework-package.json`, the `mt2fw` folder, `.mt2fw-vortex-owner.json` and `.mt2fw-copy-deployment.json` from the game folder. Then deploy.
+3. To keep your worlds, copy `<game>\.mt2fw-vortex\profiles\vortex-<profile-id>\game-data` to `<game>\mt2fw-profile\game-data`.
+4. Reinstall classic scenery packs.
 
 ## Remove
 
-Close the game, purge deployment and remove the managed packages through Vortex. Profile data and saves remain available. Remove the extension itself after purging, then restart Vortex.
+Close the game, disable the mods and purge in Vortex. Your worlds and settings stay in `<game>\mt2fw-profile\game-data`. Remove the extension itself after purging, then restart Vortex.
 
-For development, keep source projects outside Vortex's managed folders. Check and pack a mod with the helper or CLI, then import that ZIP into Vortex.
+For development, keep source projects outside Vortex's managed folders. Check and pack a mod with the helper or CLI, then install that ZIP in Vortex.
