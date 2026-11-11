@@ -12,7 +12,7 @@ Run Lua mods, native plugins and custom scenery in the supported Windows Steam v
 4. Install your mods through Vortex, enable them and deploy.
 5. Start through Steam. Open **Mods** on the game's desktop, or press F10.
 
-Keep one enabled framework version. Vortex provides separate profiles and checks the supported game build, file ownership and mod packages. Use Vortex to update, disable or remove its managed runtime. Existing saves and multiplayer test profiles are not imported automatically.
+Keep one enabled framework version. Vortex deploys the runtime and your mods into one framework profile, `mt2fw-profile` in the game folder, shared by all Vortex profiles. On an unsupported game build the game starts without mods. Use Vortex to update, disable or remove its managed runtime. Existing saves and multiplayer test profiles are not imported automatically.
 
 ## Manual installation
 
@@ -34,7 +34,7 @@ To update a previous helper installation or switch to Vortex, first remove it wi
 
 The separate **MT2Framework-SDK** download on [GitHub Releases](https://github.com/DooDesch-Mods/MMORPGTycoon2-ModFramework/releases) contains the portable helper, full CLI, GLB importer, templates, editor types, examples and offline documentation. It also includes the runtime under `runtime/`. Keep the SDK outside the game folder.
 
-The runtime's `mt2fw/mt2fw.exe check <mod-directory>` only validates packages. It does not execute a mod or open a GUI. Vortex uses this command before deployment.
+The runtime's `mt2fw/mt2fw.exe check <mod-directory>` only validates packages. It does not execute a mod or open a GUI.
 
 ## Compatibility and diagnostics
 

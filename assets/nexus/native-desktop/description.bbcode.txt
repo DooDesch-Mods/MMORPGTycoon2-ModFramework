@@ -28,7 +28,7 @@ Open [b]Mods[/b] from the game desktop or press [b]F10[/b]. Manage installed mod
 [size=5][b]Requirements[/b][/size]
 [list]
 [*]Windows x64 and the Steam version of MMORPG Tycoon 2.
-[*]A supported game build. Vortex checks it before deployment; see [url=https://github.com/DooDesch-Mods/MMORPGTycoon2-ModFramework/blob/main/docs/compatibility.md]supported builds and compatibility[/url].
+[*]A supported game build. On an unsupported build the game starts without mods; see [url=https://github.com/DooDesch-Mods/MMORPGTycoon2-ModFramework/blob/main/docs/compatibility.md]supported builds and compatibility[/url].
 [*]The [url=https://www.nexusmods.com/site/mods/2465]MMORPG Tycoon 2 Vortex Extension[/url] for installation through Vortex. Manual installation is also supported.
 [/list]
 
