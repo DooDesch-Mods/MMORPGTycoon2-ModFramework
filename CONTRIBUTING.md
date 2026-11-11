@@ -17,7 +17,7 @@ The package build produces two downloads: `MT2Framework-<version>-windows-x64.zi
 3. Run `python tools/generate_docs.py --check` and `python tools/check_contract.py` after building the probe.
 4. Add a migration note for a semantic change. A generated signature diff cannot detect changed meaning.
 
-Never update the 1.0.0 baseline merely to hide a breaking change. Add a new versioned baseline when preparing an accepted API release. Generated outputs are checked in so documentation and types are visible without build tools.
+Never update the 1.0.0 baseline merely to hide a breaking change. Add a new versioned baseline when preparing an accepted API release. Only `sdk/mt2.lua`, `api/generated`, `api/experimental/gameplay.json` and the two C++ `.inc` files are generated into Git; the reference pages, public API copies, search index, `llms.txt` and dependency notices are rebuilt by `npm run docs:build`.
 
 ## Documentation and images
 

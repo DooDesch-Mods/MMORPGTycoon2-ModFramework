@@ -18,26 +18,12 @@ class DocumentationContractTests(unittest.TestCase):
         self.assertEqual(set(re.findall(r'\*(\w+)\)\(',service)),set(contract['functions']))
         self.assertEqual(contract['base_step_draft'],9)
         self.assertEqual(contract['layouts_windows_x64']['receipt_bytes'],720)
-        build_docs.prepare()
-        self.assertIn('api/experimental/step-recovery.json',(ROOT/'docs/public/llms.txt').read_text(encoding='utf-8'))
     def test_function_page_exposes_its_api_and_framework_requirements(self):
         contract=generate_docs.read(ROOT/'api/contract.json')
         page=generate_docs.outputs(contract)['docs/reference/functions/terrain-sample.md']
         function=next(f for f in contract['functions'] if f['name']=='mt2.terrain.sample')
         self.assertIn('Lua API **'+function['since']+'**',page)
         self.assertIn('Framework **'+function['minimum_framework_version']+'**',page)
-    def test_source_machine_links_resolve_in_repository(self):
-        import re
-        from urllib.parse import urlsplit
-        for name in ('agents/start.md','reference/manifests.md'):
-            page=ROOT/'docs'/name
-            for href in re.findall(r'\]\(([^)]+)\)',page.read_text(encoding='utf-8')):
-                url=urlsplit(href)
-                if url.scheme or url.netloc or not url.path:continue
-                with self.subTest(page=name,href=href):
-                    self.assertFalse(url.path.startswith('/'))
-                    self.assertTrue((page.parent/url.path).is_file())
-
     def test_exported_machine_links_work_in_nested_and_versioned_markdown(self):
         text='[API](../public/api/1.0.0/api.json) [Index](../public/llms.txt)'
         self.assertEqual(build_docs.markdown_assets(text,Path('agents/start.md')),
@@ -91,10 +77,6 @@ class DocumentationContractTests(unittest.TestCase):
             except (ValueError,TypeError):expected=False
             with self.subTest(manifest=item):self.assertEqual(validator.is_valid(item),expected)
 
-    def test_generated_outputs_match_versioned_sources_and_examples(self):
-        contract=generate_docs.read(ROOT/'api/contract.json')
-        for name,body in generate_docs.outputs(contract).items():
-            with self.subTest(output=name):self.assertEqual((ROOT/name).read_text(encoding='utf-8'),body)
     def test_screenshot_inventory_has_actual_files_and_rights(self):
         media=generate_docs.read(ROOT/'docs/media.json')
         for image in media['images']:

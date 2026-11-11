@@ -187,7 +187,6 @@ def outputs(c):
         contract = read(source)
         contract['documentation'] = 'https://doodesch-mods.github.io/MMORPGTycoon2-ModFramework/' + contract.get('documentation', 'experimental/native-document-ui.html')
         result['docs/public/api/experimental/'+source.name] = encoded(contract)
-    result['docs/public/evidence/patches-acceptance.json']=encoded(read(ROOT/'evidence/patches-acceptance.json'))
     return result
 
 def main():
@@ -195,6 +194,8 @@ def main():
     contract=read(ROOT/'api/contract.json');validate(contract);generated=outputs(contract);stale=[]
     for name,body in generated.items():
         path=ROOT/name
+        # Everything under docs/ is ignored by Git and rebuilt by tools/build_docs.py.
+        if args.check and name.startswith('docs/'):continue
         if args.check:
             if not path.is_file() or path.read_text(encoding='utf-8')!=body:stale.append(name)
         elif not path.is_file() or path.read_text(encoding='utf-8')!=body:

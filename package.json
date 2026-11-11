@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "docs:generate": "python tools/generate_docs.py",
-    "docs:dev": "vitepress dev docs",
+    "docs:dev": "python tools/build_docs.py --prepare-only && vitepress dev docs",
     "docs:site": "vitepress build docs",
     "docs:build": "python tools/build_docs.py",
     "docs:check": "python tools/generate_docs.py --check",
