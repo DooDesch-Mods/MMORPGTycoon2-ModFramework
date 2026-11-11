@@ -51,7 +51,7 @@ The empty-core p95 measured 0.3478 ms over 2048 samples in the retained paused f
 
 The [patch API](experimental/patches.md) shares ordering between Lua and native plugins. It observes the existing native Update and object-create envelopes. `api.time.set` mediates Framework requests only; it does not intercept native game clock controls.
 
-An isolated game run confirmed real Update pairs, a shared Lua/native create observation with a confirmed placed object, a Framework speed request limited from 4 to 2, rejected and successful Lua replacement, owner-only callback failure and world-epoch change. Exact binary identities and scope are recorded in [patch acceptance](public/evidence/patches-acceptance.json). Session-provider roles and retirement boundaries also have controlled native fixture coverage; this does not establish two-account multiplayer compatibility.
+An isolated game run confirmed real Update pairs, a shared Lua/native create observation with a confirmed placed object, a Framework speed request limited from 4 to 2, rejected and successful Lua replacement, owner-only callback failure and world-epoch change. Session-provider roles and retirement boundaries also have controlled native fixture coverage; this does not establish two-account multiplayer compatibility.
 
 `mt2.time.set` now requires acknowledged standalone or trusted Host authority. An active supported Multiplayer plugin without a session provider has unknown authority and cannot use this operation. Clients are denied. The general multiplayer bridge fence still applies, including for a provider reporting Host.
 
