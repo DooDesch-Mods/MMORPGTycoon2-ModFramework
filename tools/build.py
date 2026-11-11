@@ -145,10 +145,17 @@ logs = ROOT / 'artifacts' / datetime.now(timezone.utc).strftime('%Y%m%dT%H%M%S%f
 logs.mkdir(parents=True)
 cmake = find_cmake()
 print(f'info: cmake={cmake}', flush=True)
-commands = [[str(cmake), '-S', str(ROOT), '-B', str(build), '-G', 'Visual Studio 17 2022', '-A', 'x64',
+# CMake reads CMAKE_GENERATOR, CMAKE_<LANG>_COMPILER_LAUNCHER and CMAKE_BUILD_PARALLEL_LEVEL from the
+# environment; CI sets them for Ninja Multi-Config with sccache. Without them the Visual Studio build stays.
+generator = [] if os.environ.get('CMAKE_GENERATOR') else ['-G', 'Visual Studio 17 2022', '-A', 'x64']
+parallel = [] if os.environ.get('CMAKE_BUILD_PARALLEL_LEVEL') else ['--parallel', '2']
+print(f'info: generator={os.environ.get("CMAKE_GENERATOR") or "Visual Studio 17 2022"} '
+      f'jobs={os.environ.get("CMAKE_BUILD_PARALLEL_LEVEL") or 2} '
+      f'launcher={os.environ.get("CMAKE_CXX_COMPILER_LAUNCHER") or "none"}', flush=True)
+commands = [[str(cmake), '-S', str(ROOT), '-B', str(build), *generator,
              '-DMT2FW_GAME=' + ('OFF' if args.core_only else 'ON')]]
 if not args.configure_only:
-    commands += [[str(cmake), '--build', str(build), '--config', 'Release', '--parallel', '2']]
+    commands += [[str(cmake), '--build', str(build), '--config', 'Release', *parallel]]
     if not args.skip_tests:
         commands += [[str(cmake.with_name('ctest.exe')), '--test-dir', str(build), '-C', 'Release', '--output-on-failure']]
 if args.check:
