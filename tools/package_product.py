@@ -37,7 +37,6 @@ for source_root,folder in ((offline,'docs'),(ROOT/'sdk','sdk'),(ROOT/'include','
 for name in ('native_services.h','native_routes.h','native_ownership.h','native_patches.h','native_release.h','native_steps_draft.h','native_step_recovery_draft.h'):
     copy(ROOT/'adapters/mt2/sdk'/name,destination/'mt2fw/sdk/native/mt2'/name)
 for name in ('LICENSE','README.md','THIRD_PARTY_NOTICES.md'):copy(ROOT/name,destination/'mt2fw'/name)
-copy(ROOT/'integrations/vortex/README.md',destination/'mt2fw/integrations/vortex/README.md')
 readme=destination/'mt2fw/README.md'
 text=readme.read_text(encoding='utf-8').replace('docs/public/media/','docs/media/')
 text=text.replace('https://doodesch-mods.github.io/MMORPGTycoon2-ModFramework/','docs/')

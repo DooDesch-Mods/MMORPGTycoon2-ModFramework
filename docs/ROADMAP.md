@@ -40,7 +40,7 @@ Priorities can change. No release dates are promised.
 | Terrain, paths and scenery tools | ◇ Experimental | Edit Regions and terrain, build paths and curved walls, and paint, group or transform scenery through native game operations. |
 | Management and development tools | ◇ Experimental | Manage fees, loans, staff, marketing, game releases, research projects and server networks from Lua. |
 | Native patches | ◇ Experimental | Observe named game calls with ordered callbacks and conflict diagnostics. [Patch guide](experimental/patches.md). |
-| Vortex installation | ✅ Available | Manage the player Runtime and mod ZIPs using the separate Vortex Extension. [Install guide](https://github.com/DooDesch-Mods/MMORPGTycoon2-ModFramework/blob/main/integrations/vortex/README.md). |
+| Vortex installation | ✅ Available | Manage the player Runtime and mod ZIPs using the separate Vortex Extension. [Install guide](guides/vortex.md). |
 | Editor types and agent docs | ✅ Available | Generated Lua types, complete examples and a versioned machine contract. [Agent entry point](agents/start.md). |
 | Multiplayer mods | ◐ Partial | Run the separate Multiplayer mod with its matching requirements. Other mods need their own synchronization; the new Lua gameplay mutations currently run in singleplayer. |
 | Animated models and C# | ○ Planned | Future extensions. The current release uses static scenery, Lua and native C++. |

@@ -81,11 +81,10 @@ jobs:
       - name: Package player runtime and developer SDK
         if: env.PACKAGE == 'true'
         run: build/helper-env/Scripts/python.exe tools/package_product.py
-      - name: Package Nexus and Vortex downloads
+      - name: Package Nexus download
         if: env.PACKAGE == 'true'
         run: |
           python tools/package_nexus.py
-          python tools/package_vortex.py
       - name: Retain build packages
         if: env.PACKAGE == 'true'
         uses: actions/upload-artifact@v4
@@ -94,7 +93,6 @@ jobs:
           path: |
             dist/nexus/*.zip
             dist/sdk/*.zip
-            dist/vortex/*.zip
             dist/docs/offline/**
           if-no-files-found: error
           retention-days: 30

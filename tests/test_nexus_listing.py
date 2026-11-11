@@ -19,12 +19,12 @@ class NexusListingTests(unittest.TestCase):
         temporary = tempfile.TemporaryDirectory(dir=parent)
         self.addCleanup(temporary.cleanup)
         self.directory = Path(temporary.name)
-        source = ROOT / 'integrations/nexus/listings/vortex'
-        self.plan = {**json.loads((source / 'release.json').read_text()), 'product': 'vortex', 'version': '0.2.0',
-                     'status': 'already-present', 'nexus_url': 'https://www.nexusmods.com/site/mods/2465'}
+        source = ROOT / 'integrations/nexus/listings/framework'
+        self.plan = {**json.loads((source / 'release.json').read_text()), 'product': 'framework', 'version': '0.5.7',
+                     'status': 'already-present', 'nexus_url': 'https://www.nexusmods.com/mmorpgtycoon2/mods/25'}
         self.summary = (source / 'summary.txt').read_text(encoding='utf-8').strip()
         self.body = (source / 'description.bbcode.txt').read_text(encoding='utf-8').strip()
-        self.mod = {'id': '9856949946785', 'game_id': '2295', 'game_scoped_id': '2465',
+        self.mod = {'id': '19121194401817', 'game_id': '4452', 'game_scoped_id': '25',
                     'version': self.plan['version'], 'name': 'Keep this title', 'author': 'Keep these credits',
                     'gallery_images': [{'url': 'existing-image'}], 'description': 'Previous description'}
         self.current_summary = 'Previous summary'
@@ -51,8 +51,8 @@ class NexusListingTests(unittest.TestCase):
             return None
         if url == listing.SUMMARY_API:
             self.assertEqual(method, 'POST')
-            self.assertEqual(body['variables'], {'modId': '2465', 'gameId': '2295'})
-            return {'data': {'mod': {'uid': self.mod['id'], 'modId': 2465, 'gameId': 2295,
+            self.assertEqual(body['variables'], {'modId': '25', 'gameId': '4452'})
+            return {'data': {'mod': {'uid': self.mod['id'], 'modId': 25, 'gameId': 4452,
                                      'version': self.mod['version'], 'summary': self.current_summary}}}
         return {'data': copy.deepcopy(self.mod)}
 
@@ -88,9 +88,9 @@ class NexusListingTests(unittest.TestCase):
 
     def test_graphql_errors_or_wrong_identity_block_before_write(self):
         for changed in [{'errors': [{'message': 'Unavailable'}]}, *[
-            {'data': {'mod': {'uid': '9856949946785', 'modId': 2465, 'gameId': 2295,
+            {'data': {'mod': {'uid': '19121194401817', 'modId': 25, 'gameId': 4452,
                               'version': self.plan['version'], field: value}}}
-            for field, value in [('uid', '19121194401817'), ('modId', 25), ('gameId', 4452), ('version', '0.1.0')]]]:
+            for field, value in [('uid', '9856949946785'), ('modId', 2465), ('gameId', 2295), ('version', '0.1.0')]]]:
             with self.subTest(changed=changed):
                 def request(url, method='GET', body=None, headers=None):
                     return changed if url == listing.SUMMARY_API else self.request(url, method, body, headers)
@@ -99,14 +99,14 @@ class NexusListingTests(unittest.TestCase):
                 self.assertFalse(any(method == 'PATCH' for _, method, _ in self.calls))
 
     def test_wrong_release_or_mod_blocks_before_write(self):
-        self.plan['tag'] = 'vortex-v0.1.9'
+        self.plan['tag'] = 'v0.1.9'
         self.write_plan()
         with self.assertRaisesRegex(ValueError, 'Prepared listing release differs'):
             listing.update_listing(self.directory, self.request)
         self.assertEqual(self.calls, [])
 
     def test_wrong_destination_blocks_before_write(self):
-        self.mod['id'] = '19121194401817'
+        self.mod['id'] = '9856949946785'
         with self.assertRaisesRegex(ValueError, 'identity/version differs'):
             listing.update_listing(self.directory, self.request)
         self.assertFalse(any(method == 'PATCH' for _, method, _ in self.calls))

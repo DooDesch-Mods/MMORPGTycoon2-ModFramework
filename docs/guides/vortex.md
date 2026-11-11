@@ -4,7 +4,7 @@ title: Install with Vortex
 
 # Install with Vortex
 
-The [MMORPG Tycoon 2 Vortex Extension](https://www.nexusmods.com/site/mods/2465) installs the framework, framework mods and classic mods through Vortex's own hardlink deployment.
+The [MMORPG Tycoon 2 Vortex Extension](https://www.nexusmods.com/site/mods/2465) installs the framework, framework mods and classic mods through Vortex's own hardlink deployment. Its source, releases and issues live in [DooDesch-Mods/MMORPGTycoon2-Vortex](https://github.com/DooDesch-Mods/MMORPGTycoon2-Vortex).
 
 ## Requirements
 
@@ -16,7 +16,7 @@ The [MMORPG Tycoon 2 Vortex Extension](https://www.nexusmods.com/site/mods/2465)
 ## Install
 
 1. Close the game. Remove an existing manual framework installation with its original helper.
-2. Open **Extensions** in Vortex, drop in the extension ZIP and restart Vortex.
+2. Open **Extensions** in Vortex, drop in the extension ZIP from Nexus or the [GitHub releases](https://github.com/DooDesch-Mods/MMORPGTycoon2-Vortex/releases) and restart Vortex.
 3. Manage **MMORPG Tycoon 2** and select the Steam installation.
 4. Install the player runtime ZIP as a mod, enable it and deploy. The developer SDK is a separate GitHub download and stays outside the game folder.
 5. Install and enable your mod ZIPs, deploy, then start the game through Steam. **F10** opens Mods.

@@ -7,14 +7,5 @@
     "mod_uid": "19121194401817",
     "file_id": "8170305",
     "asset_pattern": "MT2Framework-[0-9]*-windows-x64.zip"
-  },
-  "vortex": {
-    "name": "MMORPG Tycoon 2 Vortex Extension",
-    "domain": "site",
-    "game_id": 2295,
-    "page_id": 2465,
-    "mod_uid": "9856949946785",
-    "file_id": "8170257",
-    "asset_pattern": "MMORPGTycoon2-Vortex-*.zip"
   }
 }

@@ -1,1 +1,0 @@
-Adds MMORPG Tycoon 2 to Vortex. Installs the MT2 Mod Framework, framework mods and classic mods into the folders the game reads.

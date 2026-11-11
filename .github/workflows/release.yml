@@ -1,11 +1,11 @@
 name: Release
 on:
   push:
-    tags: ['v*', 'vortex-v*']
+    tags: ['v*']
   workflow_dispatch:
     inputs:
       tag:
-        description: Existing GitHub release tag (v<version> or vortex-v<version>)
+        description: Existing GitHub release tag (v<version>)
         required: true
         type: string
       publish:
@@ -30,7 +30,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 30
     concurrency:
-      group: release-${{ startsWith(inputs.tag || github.ref_name, 'vortex-v') && 'vortex' || 'framework' }}
+      group: release
       cancel-in-progress: false
     env:
       TAG: ${{ inputs.tag || github.ref_name }}
@@ -57,11 +57,7 @@ jobs:
             echo "info: GitHub release $TAG exists; validating its assets"
             gh release download "$TAG" --repo "$GITHUB_REPOSITORY" --dir artifacts/release
           elif [[ "$GITHUB_EVENT_NAME" == push ]]; then
-            if [[ "$TAG" == vortex-v* ]]; then
-              cp dist/vortex/*.zip artifacts/release/
-            else
-              cp dist/nexus/MT2Framework-*.zip dist/sdk/*.zip artifacts/release/
-            fi
+            cp dist/nexus/MT2Framework-*.zip dist/sdk/*.zip artifacts/release/
             (cd artifacts/release && sha256sum *.zip > SHA256SUMS.txt)
             echo "create=true" >> "$GITHUB_OUTPUT"
             echo "info: staged $(ls artifacts/release | tr '\n' ' ')for a new GitHub release"
@@ -79,10 +75,8 @@ jobs:
         env:
           TITLE: ${{ steps.prepare.outputs.title }}
         run: |
-          options=()
-          if [[ "$TAG" == vortex-v* ]]; then options+=(--prerelease); fi
           gh release create "$TAG" artifacts/release/*.zip artifacts/release/SHA256SUMS.txt --repo "$GITHUB_REPOSITORY" \
-            --verify-tag --title "$TITLE" --notes-file artifacts/release/notes.md "${options[@]}"
+            --verify-tag --title "$TITLE" --notes-file artifacts/release/notes.md
       - name: Upload file version
         id: upload
         if: steps.prepare.outputs.status == 'ready' && env.PUBLISH == 'true'
