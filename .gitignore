@@ -19,8 +19,9 @@ __pycache__/
 # Written by tools/build_docs.py and tools/generate_docs.py
 /docs/reference/*
 !/docs/reference/manifests.md
-/docs/public/api/experimental/
-/docs/public/api/1.3.0/
+/docs/public/api/*/
+!/docs/public/api/1.1.0/
+!/docs/public/api/1.2.0/
 /docs/public/llms.txt
 /docs/public/search-index.js
 /docs/public/media/LICENSE.txt

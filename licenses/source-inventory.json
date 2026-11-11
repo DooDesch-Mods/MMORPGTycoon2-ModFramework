@@ -1381,12 +1381,6 @@
       "license": "MIT"
     },
     {
-      "source": "framework/build/_deps/lua-src/src/lua.c",
-      "destination": "third_party/lua/src/lua.c",
-      "sha256": "ee7b72f64fa489d3e5393494f09c2517f5bdceb43f768c087a9ced74060af254",
-      "license": "MIT"
-    },
-    {
       "source": "framework/build/_deps/lua-src/src/lua.h",
       "destination": "third_party/lua/src/lua.h",
       "sha256": "06138352a12f0710bc214eb3a2e134889979cadc9a7a761a4e43dafa926419af",
@@ -1396,12 +1390,6 @@
       "source": "framework/build/_deps/lua-src/src/lua.hpp",
       "destination": "third_party/lua/src/lua.hpp",
       "sha256": "fd83f7e823cfbb03ac2da937ec83f01b4a6ddaac220a4fa1ffd6c6c3842c5890",
-      "license": "MIT"
-    },
-    {
-      "source": "framework/build/_deps/lua-src/src/luac.c",
-      "destination": "third_party/lua/src/luac.c",
-      "sha256": "3a424e6cb4177886c8790821cf15345f488764bc215eb29719c80002ef24cdc1",
       "license": "MIT"
     },
     {
@@ -1456,12 +1444,6 @@
       "source": "framework/build/_deps/lua-src/src/lzio.h",
       "destination": "third_party/lua/src/lzio.h",
       "sha256": "9673f62eac2d0fe3010f9d23148be7b8113319fdf4c4490015cd9feae2ecaad4",
-      "license": "MIT"
-    },
-    {
-      "source": "framework/build/_deps/lua-src/src/Makefile",
-      "destination": "third_party/lua/src/Makefile",
-      "sha256": "d945aee4718785b5bbdbc575d76a16ef60bd65cbfed47ef53e7ced99b580371d",
       "license": "MIT"
     },
     {
@@ -1522,18 +1504,6 @@
       "source": "_drafts/framework-brand/style.css",
       "destination": "docs/theme/astra.css",
       "sha256": "c8b8db50bc4aef3ab0e6eafde5171a761476a58927eff79517af1cd2b5dff1a5",
-      "license": "MIT"
-    },
-    {
-      "source": "framework/evidence/acceptance.json",
-      "destination": "evidence/runtime-acceptance.json",
-      "sha256": "79a5bf0a2e31d778ec2e5efb5498a78b6c22f610f6aa8aff93ad1ef5d20ebdd5",
-      "license": "MIT"
-    },
-    {
-      "source": "framework/docs/quickstart.html",
-      "destination": "docs/legacy/quickstart.html",
-      "sha256": "f3560bfa2229530f785f2e26f9360caa82b93ef3e20a6b64313af3006a60ca4c",
       "license": "MIT"
     },
     {
