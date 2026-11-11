@@ -107,13 +107,6 @@ def outputs(c):
         sdk.append('')
     sdk+=['---@class MT2']+['---@field '+g+' MT2'+('UI' if g=='ui' else g.title())+'API' for g in groups]+['---@type MT2','mt2 = {}','']
     result['sdk/mt2.lua']='\n'.join(sdk)
-    for directory in sorted((ROOT/'examples').glob('*/.mt2fw')):
-        result[directory.relative_to(ROOT).as_posix()+'/mt2.lua']=result['sdk/mt2.lua']
-        result[directory.relative_to(ROOT).as_posix()+'/api.json']=encoded(c)
-    native_example='examples/native-patches/.mt2fw/'
-    result[native_example+'mt2fw/plugin.h']=(ROOT/'include/mt2fw/plugin.h').read_text(encoding='utf-8')
-    for name in ('native_services.h','native_patches.h'):
-        result[native_example+'native/mt2/'+name]=(ROOT/'adapters/mt2/sdk'/name).read_text(encoding='utf-8')
     result['docs/public/api/'+c['api_version']+'/api.json']=encoded(c)
     result['api/generated/mod.schema.json']=encoded(schema(c))
     result['api/generated/content.schema.json']=encoded(schema(c,True))
