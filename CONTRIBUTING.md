@@ -21,7 +21,9 @@ Never update the 1.0.0 baseline merely to hide a breaking change. Add a new vers
 
 ## Documentation and images
 
-Public roadmap stages and feature coverage come from `docs/roadmap.json`. Update the released version and only mark features available when they are included in that download. Run `python tools/render_roadmap.py` to refresh the README, text roadmap and desktop/mobile SVGs. CI runs the same command with `--check` to prevent stale copies. Coverage percentages count each listed area once, without crediting partial or experimental areas as fully available. Keep planned work separate from released behavior and omit internal test records and date promises.
+The Framework version lives only in `framework_version` of `api/contract.json`. A release changes it there and adds its `CHANGELOG.md` section; CMake, the DLL version resource, the docs site and the roadmap read it.
+
+Public roadmap stages and feature coverage come from `docs/roadmap.json`, where `{version}` stands for the Framework version. Only mark features available when they are included in that download. Run `python tools/render_roadmap.py` to refresh the README, text roadmap and desktop/mobile SVGs. CI runs the same command with `--check` to prevent stale copies. Coverage percentages count each listed area once, without crediting partial or experimental areas as fully available. Keep planned work separate from released behavior and omit internal test records and date promises.
 
 Author guides in English Markdown. Keep each tutorial step small and show the actual result. Use existing captured images if their workflow is unchanged. Update `docs/media.json` when a pictured interface changes. Keep the original capture separate from optional editable annotation and export.
 

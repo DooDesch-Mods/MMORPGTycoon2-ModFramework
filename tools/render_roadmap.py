@@ -203,7 +203,8 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--check', action='store_true', help='Reject stale generated output without writing')
     args = parser.parse_args()
-    data = json.loads((ROOT / 'docs/roadmap.json').read_text(encoding='utf-8'))
+    version = json.loads((ROOT / 'api/contract.json').read_text(encoding='utf-8'))['framework_version']
+    data = json.loads((ROOT / 'docs/roadmap.json').read_text(encoding='utf-8').replace('{version}', version))
     if len(data['stages']) != 3:
         raise ValueError('The public roadmap needs available, next and later stages')
     readme = (ROOT / 'README.md').read_text(encoding='utf-8')

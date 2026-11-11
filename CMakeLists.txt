@@ -1,5 +1,9 @@
 cmake_minimum_required(VERSION 3.24)
-project(MT2Framework VERSION 0.5.8 LANGUAGES C CXX)
+# api/contract.json is the only place that names the Framework version.
+file(READ "${CMAKE_CURRENT_SOURCE_DIR}/api/contract.json" MT2FW_CONTRACT)
+string(JSON MT2FW_FRAMEWORK_VERSION GET "${MT2FW_CONTRACT}" framework_version)
+set_property(DIRECTORY APPEND PROPERTY CMAKE_CONFIGURE_DEPENDS api/contract.json)
+project(MT2Framework VERSION ${MT2FW_FRAMEWORK_VERSION} LANGUAGES C CXX)
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_POLICY_VERSION_MINIMUM 3.5)
