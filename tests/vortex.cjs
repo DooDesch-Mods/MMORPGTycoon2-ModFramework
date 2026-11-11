@@ -19,9 +19,14 @@ const extension = require('../integrations/vortex/extension/index.js');
 const root = fs.mkdtempSync(path.join(os.tmpdir(), 'mt2-vortex-'));
 test.after(() => fs.rmSync(root, {recursive: true, force: true}));
 const game = fs.realpathSync.native(fs.mkdtempSync(path.join(root, 'game-')));
-const api = {getState: () => ({settings: {gameMode: {discovered: {mmorpgtycoon2: {path: game}}}}})};
+const notices = [];
+const state = {
+  settings: {gameMode: {discovered: {mmorpgtycoon2: {path: game}}}},
+  persistent: {profiles: {p1: {gameId: 'mmorpgtycoon2', modState: {inn: {enabled: true}}}}, mods: {mmorpgtycoon2: {inn: {id: 'inn', attributes: {mt2Classic: true}}}}},
+};
+const api = {getState: () => state, sendNotification: notice => notices.push(notice.id)};
 const steamId = (76561197960265728n + 42n).toString();
-const destinations = result => result.instructions.map(row => row.destination);
+const destinations = result => result.instructions.filter(row => row.type !== 'attribute').map(row => row.destination);
 const extraction = files => {
   const folder = fs.mkdtempSync(path.join(root, 'archive-'));
   for (const [name, text] of Object.entries(files)) {
@@ -31,11 +36,24 @@ const extraction = files => {
   return folder;
 };
 
-test('registers the game and one installer', () => {
+test('registers the game and one installer, and warns after a deploy without the Runtime', async () => {
   const calls = [];
-  const context = {api, registerGame: game => calls.push(['game', game.id]), registerInstaller: id => calls.push(['installer', id])};
+  let deployed;
+  const context = {
+    api: {...api, onAsync: (event, handler) => { calls.push(['event', event]); deployed = handler; }},
+    once: callback => callback(),
+    registerGame: game => calls.push(['game', game.id]),
+    registerInstaller: id => calls.push(['installer', id]),
+  };
   assert.equal(extension.default(context), true);
-  assert.deepEqual(calls, [['game', 'mmorpgtycoon2'], ['installer', 'mt2-mods']]);
+  assert.deepEqual(calls, [['game', 'mmorpgtycoon2'], ['installer', 'mt2-mods'], ['event', 'did-deploy']]);
+  notices.length = 0;
+  await deployed('p1');
+  assert.deepEqual(notices, ['mt2-runtime-missing']);
+  fs.writeFileSync(path.join(game, 'mt2fw.json'), '{}');
+  await deployed('p1');
+  fs.rmSync(path.join(game, 'mt2fw.json'));
+  assert.deepEqual(notices, ['mt2-runtime-missing']);
 });
 
 test('runtime goes to the game folder with an mt2fw.json for the profile', () => {
@@ -62,6 +80,7 @@ test('classic archive with data folders at the top gets a folder named after the
   const result = extension.install(api, ['buildings/inn.json', 'icons/inn.png', 'readme.txt'], root, path.join(root, 'network_cheat-1-0.zip'));
   const mod = path.join('mt2fw-profile', 'game-data', steamId, 'mod', 'network_cheat-1-0');
   assert.deepEqual(destinations(result), [path.join(mod, 'buildings', 'inn.json'), path.join(mod, 'icons', 'inn.png'), path.join(mod, 'readme.txt')]);
+  assert.deepEqual(result.instructions.at(-1), {type: 'attribute', key: 'mt2Classic', value: true});
 });
 
 test('classic archive with mod folders at the top keeps them and drops loose files', () => {

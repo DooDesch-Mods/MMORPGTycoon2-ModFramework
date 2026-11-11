@@ -43,6 +43,14 @@ function steamId(api) {
   return [...ids][0];
 }
 
+// Classic mods sit in the framework profile, so the game reads them only while the deployed Runtime redirects its data folder.
+function checkRuntime(api, classicMods) {
+  if (fs.existsSync(path.join(gamePath(api), 'mt2fw.json'))) return log('info', 'MT2: the Framework Runtime is deployed for classic mods', classicMods);
+  log('warn', 'MT2: classic mods have no effect because the Framework Runtime is not deployed', classicMods);
+  api.sendNotification({id: 'mt2-runtime-missing', type: 'warning', title: 'MT2 classic mods have no effect',
+    message: 'Enable and deploy the MT2 Mod Framework Runtime. Classic mods load only through it.'});
+}
+
 function install(api, files, extraction, archivePath) {
   const rows = files.filter(file => !/[\\/]$/.test(file)).map(file => file.split(/[\\/]/));
   const named = name => rows.filter(row => row.at(-1).toLowerCase() === name).sort((a, b) => a.length - b.length);
@@ -77,6 +85,8 @@ function install(api, files, extraction, archivePath) {
   const instructions = wrap ? copy([], destination) : copy([], destination).filter(row => row.source.includes(path.sep));
   if (!instructions.length) fail('the archive has no framework runtime, framework mod or classic mod folder');
   log('info', 'MT2: installing a classic mod into ' + destination, {files: instructions.length, wrapped: wrap});
+  checkRuntime(api, [path.basename(source)]);
+  instructions.push({type: 'attribute', key: 'mt2Classic', value: true});
   return {instructions};
 }
 
@@ -96,6 +106,15 @@ function main(context) {
   });
   context.registerInstaller('mt2-mods', 25, (files, gameId) => Promise.resolve({supported: gameId === GAME_ID, requiredFiles: []}),
     async (files, extraction, gameId, progress, choices, unattended, archivePath) => install(context.api, files, extraction, archivePath));
+  context.once(() => context.api.onAsync('did-deploy', async profileId => {
+    const state = context.api.getState();
+    const profile = state.persistent.profiles[profileId];
+    if (profile?.gameId !== GAME_ID) return log('debug', 'MT2: deployment of another game', profileId);
+    const classic = Object.values(state.persistent.mods[GAME_ID] ?? {})
+      .filter(mod => mod.attributes?.mt2Classic && profile.modState?.[mod.id]?.enabled).map(mod => mod.id);
+    if (!classic.length) return log('debug', 'MT2: deployed without classic mods');
+    checkRuntime(context.api, classic);
+  }));
   log('info', 'MT2: game extension registered');
   return true;
 }

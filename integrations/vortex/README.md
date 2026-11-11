@@ -16,7 +16,7 @@ Every install step and every failure is written to the Vortex log with the prefi
 
 ## Classic mods
 
-Classic mods are mods without a `mod.json`. They need the Framework Runtime, because the runtime points the game's data folder to `mt2fw-profile\game-data`.
+Classic mods are mods without a `mod.json`. They load only while the Framework Runtime is enabled and deployed, because the runtime points the game's data folder to `mt2fw-profile\game-data`. Without it, the extension logs a warning and shows a Vortex notification after installing or deploying a classic mod. If the runtime rejects a new game build, the game uses its normal AppData folder; classic mods and worlds in `mt2fw-profile\game-data` stay on disk but are not loaded.
 
 - If the archive starts with a game data folder (`buildings`, `building_definitions`, `building_themes`, `icons`, `materials`, `scenery`, `wall_themes`), its content goes into a folder named after the archive.
 - Otherwise each top-level folder is a mod folder. Loose files at the top, such as readmes, are skipped.

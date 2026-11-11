@@ -31,7 +31,7 @@ The [MMORPG Tycoon 2 Vortex Extension](https://www.nexusmods.com/site/mods/2465)
 
 All Vortex profiles share `<game>\mt2fw-profile`. Worlds and settings are stored in its `game-data` folder.
 
-Classic mods need the player runtime, because the runtime points the game's data folder to `mt2fw-profile\game-data`. An archive that starts with a game data folder such as `buildings`, `icons`, `materials` or `scenery` is placed in a folder named after the archive. Otherwise each top-level folder is a mod folder and loose readme files are skipped. Sign in to Steam before installing a classic mod, so the extension can pick your account folder.
+Classic mods load only while the player runtime is enabled and deployed, because the runtime points the game's data folder to `mt2fw-profile\game-data`. Without it, the extension logs a warning and shows a Vortex notification. If the runtime rejects a new game build, the game starts without mods and uses its normal AppData folder: classic mods and the worlds in `mt2fw-profile\game-data` stay on disk but are not loaded until a runtime update supports that build. An archive that starts with a game data folder such as `buildings`, `icons`, `materials` or `scenery` is placed in a folder named after the archive. Otherwise each top-level folder is a mod folder and loose readme files are skipped. Sign in to Steam before installing a classic mod, so the extension can pick your account folder.
 
 MT2 Mod Manager packages (`manifest.json`), character cards and tools are not recognized. Install those by hand.
 
