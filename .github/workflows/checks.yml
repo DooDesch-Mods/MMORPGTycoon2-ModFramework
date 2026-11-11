@@ -28,8 +28,6 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.13'
-          cache: pip
-          cache-dependency-path: requirements-dev.txt
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
@@ -73,12 +71,6 @@ jobs:
         run: npm run docs:build
       - if: env.PACKAGE == 'true'
         run: python tools/check_docs.py
-      # One browser cache per Playwright version; it is written only when that version has none.
-      - if: env.PACKAGE == 'true'
-        uses: actions/cache@v4
-        with:
-          path: ~/AppData/Local/ms-playwright
-          key: playwright-${{ runner.os }}-${{ hashFiles('package-lock.json') }}
       - if: env.PACKAGE == 'true'
         run: npx playwright install chromium
       - if: env.PACKAGE == 'true'
