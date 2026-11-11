@@ -4,7 +4,7 @@ title: Compatibility and status
 
 # Compatibility and status
 
-Framework **0.5.8** provides Lua API **1.3.0** and native ABI **1**. It supports only Windows x64 with Steam and the exact verified MT2 executable:
+Framework **0.4.0** and later provide Lua API **1.3.0** and native ABI **1**. It supports only Windows x64 with Steam and the exact verified MT2 executable:
 
 ```text
 bbab2dc68babcc644d0a1679548bf1e334b6c52aea669c3f61f6cb9d45c1aaf6
@@ -17,8 +17,9 @@ The runtime does not resolve internal game functions through the executable's sy
 ## Runtime versions for native mods
 
 From Framework 0.5.4, the loaded `MT2Framework.dll` includes standard Windows
-`VERSIONINFO`. Both fixed FileVersion and ProductVersion are `0.5.8.0`; their
-display strings are `0.5.8`. The resource type is `VFT_DLL`, and
+`VERSIONINFO`. Both fixed FileVersion and ProductVersion are the Framework
+version with a fourth part `0`, for example `0.5.4.0`; their display strings omit it
+(`0.5.4`). The resource type is `VFT_DLL`, and
 `OriginalFilename` is `MT2Framework.dll`. String values use table `040904b0`
 with English/Unicode translation `0409`/`1200`.
 

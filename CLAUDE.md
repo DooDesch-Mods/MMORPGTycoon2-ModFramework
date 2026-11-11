@@ -1,6 +1,6 @@
 # MT2 Mod Framework
 
-Lua and C++ mod framework for MMORPG Tycoon 2 (Windows x64). This source is Framework 0.5.8, Lua API 1.3.0, native C ABI 1. Keep these distinct from the supported game executable hash. API 1.3 functions need Framework 0.4.0 or later.
+Lua and C++ mod framework for MMORPG Tycoon 2 (Windows x64). `api/contract.json` names the Framework version (`framework_version`), the Lua API (`api_version`) and the native C ABI (`abi_version`). CMake, the DLL version resource, the docs and the README roadmap read them from there. Keep these distinct from the supported game executable hash. API 1.3 functions need Framework 0.4.0 or later.
 
 Read `README.md`, `CONTRIBUTING.md` and `docs/contributing/build.md` first. `docs/agents/start.md` is for agents that write a mod, not for changes to the framework.
 

@@ -8,7 +8,6 @@
 
 Build mods for **MMORPG Tycoon 2**. Start with Lua and a text editor, extend with C++, or bring your own static GLB scenery into the game.
 
-**Framework 0.5.8** fixes a double cursor when Card Vault is loaded.
 Use the Runtime required by your Multiplayer release. Modders keep Lua API
 **1.3.0** with **254 functions**, complete examples and the
 [query recipes](docs/recipes/world-queries.md).
