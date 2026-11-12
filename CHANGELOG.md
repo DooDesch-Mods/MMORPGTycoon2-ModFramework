@@ -2,6 +2,22 @@
 
 The Vortex extension has its own repository, [MMORPGTycoon2-Vortex](https://github.com/DooDesch-Mods/MMORPGTycoon2-Vortex), and its own changelog. Its releases up to 0.2.0 were published here as `vortex-v*` tags.
 
+## 0.6.0
+
+Lua API 1.3.0 and native ABI 1 are unchanged. Existing mods keep working.
+
+### Changed
+
+- The Framework log is now `mt2fw.log` in your Framework profile folder, and its per-topic logs are in `mt2fw_logs`. Older versions wrote `mt2mp.log` and `mt2mp_logs`; you can delete those.
+- The Vortex extension moved to its own repository, [MMORPGTycoon2-Vortex](https://github.com/DooDesch-Mods/MMORPGTycoon2-Vortex). Install it from Nexus as before.
+- The SDK examples no longer carry their own copies of the SDK files. They use the `sdk` folder of the SDK package. `mt2fw new` still creates a complete mod project.
+- The mod template tells you to set `api_version` to the oldest Lua API that has every function you call.
+
+### Removed
+
+- Multiplayer code and names left the Framework. The Multiplayer mod is a separate Framework plugin.
+- The Framework no longer checks for the old standalone Multiplayer (`MT2_Multiplayer.dll`).
+
 ## 0.5.8
 
 ### Fixed

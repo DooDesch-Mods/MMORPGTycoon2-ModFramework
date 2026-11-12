@@ -26,16 +26,16 @@ const char* Logger::category_name(LogCategory cat) {
 
 const char* Logger::category_filename(LogCategory cat) {
     switch (cat) {
-        case LogCategory::General:  return "mt2mp_general.log";
-        case LogCategory::Hooks:    return "mt2mp_hooks.log";
-        case LogCategory::Network:  return "mt2mp_network.log";
-        case LogCategory::Steam:    return "mt2mp_steam.log";
-        case LogCategory::Overlay:  return "mt2mp_overlay.log";
-        case LogCategory::Sync:     return "mt2mp_sync.log";
-        case LogCategory::PhysFS:   return "mt2mp_physfs.log";
-        case LogCategory::OpenGL:   return "mt2mp_opengl.log";
-        case LogCategory::API:      return "mt2mp_api.log";
-        default: return "mt2mp_other.log";
+        case LogCategory::General:  return "mt2fw_general.log";
+        case LogCategory::Hooks:    return "mt2fw_hooks.log";
+        case LogCategory::Network:  return "mt2fw_network.log";
+        case LogCategory::Steam:    return "mt2fw_steam.log";
+        case LogCategory::Overlay:  return "mt2fw_overlay.log";
+        case LogCategory::Sync:     return "mt2fw_sync.log";
+        case LogCategory::PhysFS:   return "mt2fw_physfs.log";
+        case LogCategory::OpenGL:   return "mt2fw_opengl.log";
+        case LogCategory::API:      return "mt2fw_api.log";
+        default: return "mt2fw_other.log";
     }
 }
 
@@ -56,12 +56,12 @@ void Logger::init(const std::string& base_dir) {
     base_dir_ = base_dir;
 
     // Create logs directory
-    std::string log_dir = base_dir + "\\mt2mp_logs";
+    std::string log_dir = base_dir + "\\mt2fw_logs";
     std::filesystem::create_directories(log_dir);
     base_dir_ = log_dir;
 
     // Open combined log
-    main_file_.open(base_dir + "\\mt2mp.log", std::ios::out | std::ios::trunc);
+    main_file_.open(base_dir + "\\mt2fw.log", std::ios::out | std::ios::trunc);
 
     initialized_ = true;
     log(LogCategory::General, LogLevel::Info, __FILE__, __LINE__, "Logger initialized: " + log_dir);
