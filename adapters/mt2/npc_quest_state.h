@@ -4,7 +4,7 @@
 #include <string>
 #include <vector>
 
-namespace mt2mp::npc_quest_records {
+namespace mt2fw::npc_quest_records {
 
 struct DailyCount {
     std::vector<int32_t> history;
@@ -38,4 +38,4 @@ struct Record {
     bool operator==(const Record&) const = default;
 };
 
-} // namespace mt2mp::npc_quest_records
+} // namespace mt2fw::npc_quest_records

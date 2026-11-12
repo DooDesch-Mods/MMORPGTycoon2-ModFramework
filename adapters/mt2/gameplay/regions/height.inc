@@ -50,8 +50,8 @@ Json height_history(Context& c){
     return {{"manager",manager},{"undo",history_array(c,manager+8)},{"redo",history_array(c,manager+0x20)}};
 }
 Json height_ledger(){
-    mt2mp::game::native::SimulationState value;std::string error;
-    need(mt2mp::game::native::read_simulation_state(value,error),"Terrain native ledger read failed: "+error);
+    mt2fw::game::native::SimulationState value;std::string error;
+    need(mt2fw::game::native::read_simulation_state(value,error),"Terrain native ledger read failed: "+error);
     return {{"cash",value.cash},{"day",value.clock.flat_day},{"present",value.record_present},{"record_day",value.record_day},
         {"record_cash",value.record_cash},{"income",value.record_income},{"expense",value.record_expense},
         {"line_counts",value.line_counts},{"line_income",value.line_income}};

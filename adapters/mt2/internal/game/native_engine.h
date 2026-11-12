@@ -6,7 +6,7 @@
 #include <string>
 #include <vector>
 
-namespace mt2mp::game::native {
+namespace mt2fw::game::native {
 
 enum class EntryPoint { GameUpdate, ModeUpdate, ClockUpdate, ModeCommand, BeginEdit, EndEdit, SoftwareTick, SoftwareTickerTick,
     SoftwareCalculateRating, SoftwareCalculateFun, BusinessNextDayFinances, SubscriberNewDay,
@@ -294,4 +294,4 @@ bool prepare_test_world(const std::string& name, std::string& error);
 bool test_world_ready(bool& complete, std::string& error);
 bool create_test_world(const std::string& name, std::string& error);
 
-} // namespace mt2mp::game::native
+} // namespace mt2fw::game::native

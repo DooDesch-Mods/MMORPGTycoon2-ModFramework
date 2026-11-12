@@ -3,7 +3,7 @@
 #include "npc_census.h"
 #include "snapshot_npc_key.h"
 
-namespace mt2mp::game::npc_saved_identity {
+namespace mt2fw::game::npc_saved_identity {
 namespace read = npc_quest_targets;
 using read::at;
 using read::typed;

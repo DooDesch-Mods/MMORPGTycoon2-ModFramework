@@ -1,5 +1,5 @@
 #include "regions.h"
-#include "internal/mt2mp/game/native_engine.h"
+#include "internal/game/native_engine.h"
 #include "level_census.h"
 #include "paint_model.h"
 #include "sample_grid.h"

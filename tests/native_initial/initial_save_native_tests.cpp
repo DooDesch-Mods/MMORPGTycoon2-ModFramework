@@ -1,9 +1,9 @@
-#include "mt2mp/net/snapshot_world_path.h"
+#include "net/snapshot_world_path.h"
 #include <array>
 #include <cstring>
 #include <iostream>
 #include <stdexcept>
-namespace mt2mp::game::native {
+namespace mt2fw::game::native {
 std::array<unsigned char,1536> game_bytes{},mode_bytes{};
 constexpr uintptr_t game_slot=0x13df8f0,mode_slot=0x13df320;
 bool bound=true,game_type=true,mode_type=true,folder_readable=true;
@@ -25,7 +25,7 @@ void expect(bool ok,const char* cause){++checks;if(!ok)throw std::runtime_error(
 template<class Change> void rejects(Change change){reset();change();std::string folder="stale",error;expect(!read_initial_save_world(mode_bytes.data(),folder,error)&&folder.empty()&&!error.empty(),"guard must return an explicit failure with no folder");}
 }
 int main(){
-    using namespace mt2mp::game::native;
+    using namespace mt2fw::game::native;
     try {
         reset();std::string folder,error;
         expect(read_initial_save_world(mode_bytes.data(),folder,error)&&folder=="Fresh","exact current pre-ready state3 identity accepted");

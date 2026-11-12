@@ -201,7 +201,7 @@ public:
     }
 
     Json developers(bool before_first_mode_update=false){
-        namespace staff=mt2mp::game::developer_staff;
+        namespace staff=mt2fw::game::developer_staff;
         struct Port final:staff::passive::Memory {
             std::function<bool(uintptr_t,void*,size_t,std::string&)> read;
             bool copy(uintptr_t p,void* out,size_t n,std::string& e)override{return read(p,out,n,e);}
@@ -223,20 +223,20 @@ public:
                 {"receivers",local.developers},{"inside",local.inside},{"outside",local.outside}}}};
     }
     Json tutorial(){
-        struct Port final:mt2mp::game::tutorial_observer::passive::Memory {
+        struct Port final:mt2fw::game::tutorial_observer::passive::Memory {
             std::function<bool(uintptr_t,void*,size_t,std::string&)> read;
             bool copy(uintptr_t p,void* out,size_t n,std::string& e)override{return read(p,out,n,e);}
         } port;
         port.read=[&](uintptr_t p,void* out,size_t n,std::string&){const auto value=bytes(p,n);std::memcpy(out,value.data(),n);return true;};
         Json fields;std::string error;
-        need(mt2mp::game::tutorial_observer::passive::observe(port,image,state,fields,error),error);
+        need(mt2fw::game::tutorial_observer::passive::observe(port,image,state,fields,error),error);
         missing.insert("Tutorial history contents, inactive step payloads and non-tutorial scenario state are not captured");
         return {{"comparable",fields},{"local_evidence",{{"state",state}}}};
     }
 
     Json subscribers(){
-        namespace passive=mt2mp::game::subscriber_passive;
-        namespace region_identity=mt2mp::game::region_saved_identity;
+        namespace passive=mt2fw::game::subscriber_passive;
+        namespace region_identity=mt2fw::game::region_saved_identity;
         struct Memory {
             std::function<Bytes(uintptr_t,size_t)> read;
             bool copy(uintptr_t p,void* out,size_t n,std::string&){auto value=read(p,n);std::memcpy(out,value.data(),n);return true;}
@@ -266,7 +266,7 @@ public:
             struct Row {int32_t serialized_id=-1;std::optional<passive::Motion> motion;};
             uintptr_t subscriber_manager=0,subscriber_data=0;int32_t next_id=0;
             std::vector<Row> rows;std::vector<uintptr_t> subscribers;std::vector<size_t> subscriber_slots;
-            std::vector<mt2mp::game::subscriber_needs::Owner> needs_owners;
+            std::vector<mt2fw::game::subscriber_needs::Owner> needs_owners;
         } census;
         auto motion=[&](uintptr_t subscriber,std::optional<passive::Motion>& pose,std::string& e){
             return passive::motion(port,read,image,subscriber,world_reader,region_reader,member,pose,e);
@@ -274,8 +274,8 @@ public:
         need(passive::census(read,image,motion,census,error),error);
         Json rows=Json::array();
         for(size_t i=0;i<census.rows.size();++i){const auto& row=census.rows[i];
-            mt2mp::game::subscriber_activity::State activity;
-            need(mt2mp::game::subscriber_activity::sample(read,image,census.subscribers[i],row.serialized_id,activity,error),error);
+            mt2fw::game::subscriber_activity::State activity;
+            need(mt2fw::game::subscriber_activity::sample(read,image,census.subscribers[i],row.serialized_id,activity,error),error);
             Json pose=nullptr;if(row.motion){std::array<uint32_t,10> bits{};size_t slot=0;
                 for(float value:row.motion->orientation)bits[slot++]=std::bit_cast<uint32_t>(value);
                 for(float value:row.motion->position)bits[slot++]=std::bit_cast<uint32_t>(value);
@@ -292,7 +292,7 @@ public:
     }
 
     Json npcs(const std::map<uintptr_t,std::string>& npc_identities){
-        namespace census=mt2mp::npc_census;
+        namespace census=mt2fw::npc_census;
         need(npc_identities.size()==2,"NPC witness requires two pinned saved load identities");
         struct Port: census::Memory {
             std::function<Bytes(uintptr_t,size_t)> read;
@@ -301,8 +301,8 @@ public:
         const auto world=ptr(state,0x160);type(world,0x174aef0,"World");need(world==ptr(image,0x13df9c0),"NPC World singleton differs");
         const auto map=ptr(world,0x158);type(map,0x1742860,"Map");need(map==ptr(image,0x13df8c0),"NPC Map singleton differs");
         auto read=[&](uintptr_t p,size_t n,auto& value,std::string&){value=at<std::remove_reference_t<decltype(value)>>(offset(p,n));return true;};
-        mt2mp::game::region_saved_identity::Index index;std::string error;
-        need(mt2mp::game::region_saved_identity::capture(image,map,offset(map,0x1c0),index,read,error),error);
+        mt2fw::game::region_saved_identity::Index index;std::string error;
+        need(mt2fw::game::region_saved_identity::capture(image,map,offset(map,0x1c0),index,read,error),error);
         uintptr_t region=0;for(const auto& [id,p]:index.saved)if(id==67)region=p;need(region!=0,"NPC saved Region 67 absent");
         census::State sampled;need(census::read(port,image,region,sampled,error),error);need(sampled.rows.size()==2,"NPC fixture current census count differs");
         std::map<std::string,Json> sorted;Json local=Json::array();
@@ -321,9 +321,9 @@ public:
     }
 
     Json bind_fixture_dispatch(const std::map<uintptr_t,std::string>& npc_keys){
-        namespace quests=mt2mp::npc_quest_records;
+        namespace quests=mt2fw::npc_quest_records;
         need(dispatch_keys.empty()&&npc_keys.size()==2,"Fixture dispatch binding requires two saved NPC owners and one fresh binding");
-        struct Port:mt2mp::npc_census::Memory {
+        struct Port:mt2fw::npc_census::Memory {
             std::function<Bytes(uintptr_t,size_t)> read;
             bool copy(uintptr_t p,void* out,size_t n,std::string&)override{auto b=read(p,n);std::memcpy(out,b.data(),n);return true;}
         } port;port.read=[&](uintptr_t p,size_t n){return bytes(p,n);};
@@ -352,8 +352,8 @@ public:
         const auto world=ptr(state,0x160);type(world,0x174aef0,"World");need(world==ptr(image,0x13df9c0),"Path World singleton differs");
         const auto map=ptr(world,0x158);type(map,0x1742860,"Map");need(map==ptr(image,0x13df8c0),"Path Map singleton differs");
         auto read=[&](uintptr_t p,size_t n,auto& value,std::string&){value=at<std::remove_reference_t<decltype(value)>>(offset(p,n));return true;};
-        mt2mp::game::region_saved_identity::Index regions;
-        need(mt2mp::game::region_saved_identity::capture(image,map,offset(map,0x1c0),regions,read,error),error);
+        mt2fw::game::region_saved_identity::Index regions;
+        need(mt2fw::game::region_saved_identity::capture(image,map,offset(map,0x1c0),regions,read,error),error);
         uintptr_t region=0;for(const auto& [id,p]:regions.saved)if(id==67)region=p;need(region!=0,"Path saved Region absent");
         const auto manager=ptr(region,0x9a0);need(ptr(manager,0x6a0)==region,"Path manager reciprocal Region differs");
         std::vector<uintptr_t> paths,nodes;

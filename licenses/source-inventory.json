@@ -338,7 +338,7 @@
     },
     {
       "source": "include/mt2mp/game/native_engine.h",
-      "destination": "adapters/mt2/internal/mt2mp/game/native_engine.h",
+      "destination": "adapters/mt2/internal/game/native_engine.h",
       "sha256": "3be5abddf01ad3157e826e0402bdb9f0499a4df7b8c9aa98008da59494a9dec2",
       "license": "MIT"
     },
@@ -356,13 +356,13 @@
     },
     {
       "source": "include/mt2mp/net/snapshot_world_path.h",
-      "destination": "adapters/mt2/internal/mt2mp/net/snapshot_world_path.h",
+      "destination": "adapters/mt2/internal/net/snapshot_world_path.h",
       "sha256": "efe5dcc00ae782a9c7340fe345a0da1e4bef373a0b75d974f898fd9cea66d84a",
       "license": "MIT"
     },
     {
       "source": "include/mt2mp/core/logger.h",
-      "destination": "adapters/mt2/internal/mt2mp/core/logger.h",
+      "destination": "adapters/mt2/internal/core/logger.h",
       "sha256": "32eb1f59f3e2dd3adbe269117c63cdce77a18c825539d85c8975859a1749ff54",
       "license": "MIT"
     },

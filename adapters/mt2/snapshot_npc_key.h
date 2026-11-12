@@ -2,7 +2,7 @@
 #include "snapshot_building_key.h"
 #include <array>
 
-namespace mt2mp::game::snapshot_npc_key {
+namespace mt2fw::game::snapshot_npc_key {
 inline constexpr std::array<std::string_view, 3> type_names{"QuestGiver", "Guard", "ClassTrainer"};
 inline std::string root_suffix(int32_t region, int32_t type, int32_t child) {
     if (region < 0 || type < 0 || type >= 3 || child < 0) return {};

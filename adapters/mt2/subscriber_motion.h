@@ -3,7 +3,7 @@
 #include <cmath>
 #include <cstdint>
 #include <string>
-namespace mt2mp::game::subscriber_motion {
+namespace mt2fw::game::subscriber_motion {
 // Portable pose fields, not native transform cache or object addresses.
 struct Pose {
     int32_t region=-1;

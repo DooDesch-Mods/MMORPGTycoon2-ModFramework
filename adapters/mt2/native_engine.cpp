@@ -1,7 +1,7 @@
 // Copyright (c) 2026 DooDesch. Extracted adapter licensed under the root LICENSE.
-#include "mt2mp/game/native_engine.h"
-#include "mt2mp/net/snapshot_world_path.h"
-#include "mt2mp/core/logger.h"
+#include "game/native_engine.h"
+#include "net/snapshot_world_path.h"
+#include "core/logger.h"
 #include "native_extensions.h"
 #include "shared_operations.h"
 #include <intrin.h>
@@ -21,7 +21,7 @@
 
 #pragma comment(lib, "bcrypt.lib")
 
-namespace mt2mp::game::native {
+namespace mt2fw::game::native {
 namespace {
 constexpr char expected_hash[] = "bbab2dc68babcc644d0a1679548bf1e334b6c52aea669c3f61f6cb9d45c1aaf6";
 std::string resolved_executable_sha256;
@@ -107,7 +107,7 @@ bool fail(std::string& error, const std::string& message) {
 bool readable(const void* pointer, size_t bytes) {
     if (!pointer || !bytes) return false;
     MEMORY_BASIC_INFORMATION memory{};
-    if (!mt2mp::game::live_host_state::apply_timing::virtual_query(pointer, &memory, sizeof(memory)) || memory.State != MEM_COMMIT ||
+    if (!mt2fw::game::live_host_state::apply_timing::virtual_query(pointer, &memory, sizeof(memory)) || memory.State != MEM_COMMIT ||
         (memory.Protect & (PAGE_GUARD | PAGE_NOACCESS))) return false;
     const auto address = reinterpret_cast<uintptr_t>(pointer);
     const auto start = reinterpret_cast<uintptr_t>(memory.BaseAddress);
@@ -1087,7 +1087,7 @@ bool apply_software_cache(uint64_t epoch, uint64_t revision, const SoftwareCache
             "/" + std::to_string(expected_before.fun));
     auto* destination = static_cast<unsigned char*>(software) + 0x314;
     MEMORY_BASIC_INFORMATION memory{};
-    if (!readable(destination, sizeof(float) * 2) || !mt2mp::game::live_host_state::apply_timing::virtual_query(destination, &memory, sizeof(memory)) ||
+    if (!readable(destination, sizeof(float) * 2) || !mt2fw::game::live_host_state::apply_timing::virtual_query(destination, &memory, sizeof(memory)) ||
         !(memory.Protect & (PAGE_READWRITE | PAGE_WRITECOPY | PAGE_EXECUTE_READWRITE | PAGE_EXECUTE_WRITECOPY)))
         return fail(error, "software cache apply rejected: cache pair is not writable");
     LOG_INFO("[Native] Software cache apply attempted epoch={} revision={} before={}/{} host={}/{}", epoch, revision,
@@ -1493,7 +1493,7 @@ bool apply_subscriber_needs(uint64_t epoch, int32_t serialized_id, uint64_t revi
     }
     auto* destination = static_cast<unsigned char*>(needs_replica.needs) + 0x18;
     MEMORY_BASIC_INFORMATION memory{};
-    if (!readable(destination, sizeof(SubscriberNeeds)) || !mt2mp::game::live_host_state::apply_timing::virtual_query(destination, &memory, sizeof(memory)) ||
+    if (!readable(destination, sizeof(SubscriberNeeds)) || !mt2fw::game::live_host_state::apply_timing::virtual_query(destination, &memory, sizeof(memory)) ||
         !(memory.Protect & (PAGE_READWRITE | PAGE_WRITECOPY | PAGE_EXECUTE_READWRITE | PAGE_EXECUTE_WRITECOPY)))
         return fail(error, "needs apply rejected: complete seven-value destination is not writable");
     needs_replica.permit_index = -1;
@@ -2714,6 +2714,6 @@ std::vector<ObservationHook> observation_hooks() {
             {reinterpret_cast<void*>(image.load()+0x2d42c0),reinterpret_cast<void*>(remove_buildings),reinterpret_cast<void**>(&original_remove_buildings)}};
 }
 std::vector<ObjectChange> take_object_changes(){auto result=std::move(observed_changes);observed_changes.clear();if(dropped_changes){LOG_WARN("[Framework] Native object event queue recovered; dropped={}",dropped_changes);dropped_changes=0;}return result;}
-} // namespace mt2mp::game::native
+} // namespace mt2fw::game::native
 
 #include "global_root.inc"

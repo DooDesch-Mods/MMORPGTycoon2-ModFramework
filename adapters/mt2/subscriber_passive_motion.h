@@ -1,5 +1,5 @@
-#ifndef MT2MP_SUBSCRIBER_PASSIVE_MOTION_H
-#define MT2MP_SUBSCRIBER_PASSIVE_MOTION_H
+#ifndef MT2FW_SUBSCRIBER_PASSIVE_MOTION_H
+#define MT2FW_SUBSCRIBER_PASSIVE_MOTION_H
 #include "subscriber_motion.h"
 #include "subscriber_needs.h"
 #include "region_saved_identity.h"
@@ -13,7 +13,7 @@
 #include <optional>
 #include <set>
 #include <vector>
-namespace mt2mp::game::subscriber_passive {
+namespace mt2fw::game::subscriber_passive {
 using Motion=subscriber_motion::Pose;
 struct MotionOwner {uintptr_t map=0,root=0,toon=0,region=0,manager=0;};
 inline bool fail(std::string& e,const std::string& s){e=s;return false;}

@@ -1,8 +1,8 @@
-#include "mt2mp/core/logger.h"
+#include "core/logger.h"
 #include <chrono>
 #include <filesystem>
 
-namespace mt2mp {
+namespace mt2fw {
 
 Logger& Logger::instance() {
     static Logger logger;
@@ -125,4 +125,4 @@ void Logger::log(LogCategory cat, LogLevel level, const char* file, int line, co
     }
 }
 
-} // namespace mt2mp
+} // namespace mt2fw

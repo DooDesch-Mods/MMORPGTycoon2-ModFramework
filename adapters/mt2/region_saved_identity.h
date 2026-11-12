@@ -6,7 +6,7 @@
 #include <utility>
 #include <vector>
 
-namespace mt2mp::game::region_saved_identity {
+namespace mt2fw::game::region_saved_identity {
 struct Index {
     uintptr_t data=0,owned=0;
     int32_t count=0,capacity=0,owned_count=0,owned_capacity=0;

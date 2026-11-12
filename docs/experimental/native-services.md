@@ -26,7 +26,7 @@ The framework owns MinHook initialization, named target ownership, enable/disabl
 
 The adapter catalog reserves Framework targets, including original Update, title/game commands, native desktop and StartMenu, create/move/remove observers, SDL and PhysFS. It also supplies named, version-pinned Multiplayer targets with explicit installation phases. Catalog admission alone does not install a hook or confirm a gameplay feature. Use the [native shared routes](native-routes.md) service for phased preparation, activation and ownership receipts. Shared operations require typed adapter dispatch and an owned original-call receipt; they cannot use a second detour or blind chaining.
 
-The loader continues to reject the legacy `MT2_Multiplayer.dll`. The migrated plugin uses `MT2MultiplayerPlugin.dll`. It must not call the standalone bootstrap, install another profile redirect, initialize another renderer/input system, call `MH_ALL_HOOKS` or uninitialize the process hook manager.
+The Multiplayer plugin `MT2MultiplayerPlugin.dll` must not call the standalone bootstrap, install another profile redirect, initialize another renderer/input system, call `MH_ALL_HOOKS` or uninitialize the process hook manager.
 
 ## Character preview selector (Framework 0.5.6)
 

@@ -5,7 +5,7 @@
 
 using namespace mt2fw;
 namespace reads = mt2fw::mt2::public_reads;
-namespace native = mt2mp::game::native;
+namespace native = mt2fw::game::native;
 int checks = 0;
 void expect(bool result, const char* cause) { ++checks; if (!result) throw std::runtime_error(cause); }
 template<class Call> void rejects(Call call, const char* cause) {
