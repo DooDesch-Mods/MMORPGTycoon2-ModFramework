@@ -3,7 +3,7 @@
 // npc_property_runtime.inc, npc_quest_records.h and boss_phase_*.
 #include "actors.h"
 #include "model.h"
-#include "../../internal/mt2mp/game/native_engine.h"
+#include "../../internal/game/native_engine.h"
 #include <Windows.h>
 #include <algorithm>
 #include <array>
@@ -134,7 +134,7 @@ QuestCensus quest_census(Context& c) {
 struct Undo {uintptr_t manager;std::vector<uintptr_t> undo,redo;};
 Undo undo(Context& c) {need(!c.read<uintptr_t>(c.image+0x1a3aa80),"quest edit requires an idle native Undo graph");auto manager=c.singleton(0x13df380);type(c,manager,0x16fe070);type(c,manager+8,0x16e1320);type(c,manager+0x20,0x16e1320);return {manager,array(c,manager+8,20),array(c,manager+0x20,20)};}
 Json ledger() {
-    mt2mp::game::native::SimulationState value;std::string error;need(mt2mp::game::native::read_simulation_state(value,error),"actor ledger read failed: "+error);
+    mt2fw::game::native::SimulationState value;std::string error;need(mt2fw::game::native::read_simulation_state(value,error),"actor ledger read failed: "+error);
     return {{"cash",value.cash},{"day",value.clock.flat_day},{"present",value.record_present},{"record_day",value.record_day},{"record_cash",value.record_cash},{"income",value.record_income},{"expense",value.record_expense},{"line_counts",value.line_counts},{"line_income",value.line_income}};
 }
 void quest_inverse(Context& c,const Undo& before,const Undo& after,uintptr_t owner,const Json& prior) {

@@ -9,7 +9,7 @@
 #include <utility>
 #include <vector>
 
-namespace mt2mp::game::npc_quest_targets {
+namespace mt2fw::game::npc_quest_targets {
 // These observers wrap the engine's existing snapshot calls. They never call
 // Save, Load, Register or a game mutation themselves.
 // The enumerated property inlines the array routines in normal world saves.

@@ -35,7 +35,7 @@ void report(const std::string& cause){failure=cause;}
 bool prepare_save(){++prepares;return prepared;}
 DWORD command_view(const void* pointer,const char*& data,size_t& length){if(!pointer)return 87;const auto& value=*static_cast<const std::string*>(pointer);data=value.data();length=value.size();return 0;}
 DWORD command_copy(const char* data,char* output,size_t size){std::memcpy(output,data,size);return 0;}
-namespace mt2mp::game::native {
+namespace mt2fw::game::native {
 bool read_initial_save_world(void*,std::string& folder,std::string& error){if(!native_valid){error="wrong native state";return false;}folder="Fresh";return true;}
 }
 void original_impl(void*,const void*,bool);

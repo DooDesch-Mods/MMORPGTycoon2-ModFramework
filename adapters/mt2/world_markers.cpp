@@ -9,7 +9,7 @@
 
 namespace mt2fw::mt2::world_markers {
 namespace {
-namespace native = mt2mp::game::native;
+namespace native = mt2fw::game::native;
 Runtime* host = nullptr;
 uintptr_t image = 0;
 DWORD game_thread = 0;

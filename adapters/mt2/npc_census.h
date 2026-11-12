@@ -8,7 +8,7 @@
 #include <string>
 #include <vector>
 
-namespace mt2mp::npc_census {
+namespace mt2fw::npc_census {
 
 struct Memory {
     virtual ~Memory() = default;
@@ -219,4 +219,4 @@ inline bool read(Memory& memory, uintptr_t image, uintptr_t region,
     return true;
 }
 
-} // namespace mt2mp::npc_census
+} // namespace mt2fw::npc_census

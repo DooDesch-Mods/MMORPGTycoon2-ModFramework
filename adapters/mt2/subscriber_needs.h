@@ -4,7 +4,7 @@
 #include <cmath>
 #include <cstdint>
 #include <string>
-namespace mt2mp::game::subscriber_needs {
+namespace mt2fw::game::subscriber_needs {
 using Bits=std::array<uint32_t,7>;
 inline bool valid(uint32_t bits){const float value=std::bit_cast<float>(bits);return std::isfinite(value)&&value>=-100.0f&&value<=100.0f;}
 inline bool valid(const Bits& values,std::string& error){for(size_t i=0;i<values.size();++i)if(!valid(values[i])){error="Subscriber Needs invalid float bits index="+std::to_string(i)+" bits="+std::to_string(values[i])+" required finite -100..100";return false;}return true;}

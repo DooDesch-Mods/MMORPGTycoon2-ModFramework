@@ -9,7 +9,7 @@
 #include "apply_timing.h"
 #include <map>
 #include <cstring>
-namespace mt2mp::game::live_host_state::apply_timing {
+namespace mt2fw::game::live_host_state::apply_timing {
 class PageReadScope;
 inline thread_local PageReadScope* page_read_scope=nullptr;
 enum class PageBoundary {Reader,OriginalCall};

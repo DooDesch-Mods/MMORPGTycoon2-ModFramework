@@ -55,7 +55,6 @@ void prepare() {
             std::ifstream stream(game/"mt2fw.json");if(!stream){record("info","No framework configuration; original game continues");return;}
             Json config;stream>>config;if(!config.value("enabled",true)){record("info","Framework disabled; original game continues");return;}
             if(file_digest(game/"MT2.exe")!="bbab2dc68babcc644d0a1679548bf1e334b6c52aea669c3f61f6cb9d45c1aaf6") {record("error","Unsupported executable; adapter and mods disabled");return;}
-            if(GetModuleHandleW(L"MT2_Multiplayer.dll")){record("error","Another runtime already owns this process; framework disabled");return;}
             auto selected=fs::u8path(config.at("profile").get<std::string>());
             if(!selected.is_absolute())throw std::runtime_error("Framework profile must be absolute");
             auto canonical=fs::weakly_canonical(selected);
@@ -170,7 +169,7 @@ bool bridges() {
     return true;
 }
 }
-extern "C" void** mt2mp_wsock_resolve(unsigned index) {
+extern "C" void** mt2fw_wsock_resolve(unsigned index) {
     DWORD error=GetLastError();
     try {if(index>=std::size(exports))throw std::runtime_error("Invalid WSOCK32 export index");ensure_system();SetLastError(error);return &targets[index];}
     catch(const std::exception& cause){record("error",cause.what());RaiseFailFastException(nullptr,nullptr,0);return nullptr;}

@@ -1,5 +1,5 @@
 #pragma once
-#include "mt2mp/game/native_engine.h"
+#include "game/native_engine.h"
 #include <nlohmann/json.hpp>
 #include <cmath>
 #include <limits>
@@ -7,7 +7,7 @@
 
 namespace mt2fw::mt2::public_reads {
 using Json = nlohmann::json;
-namespace native = mt2mp::game::native;
+namespace native = mt2fw::game::native;
 
 inline float coordinate(const Json& args, const char* field) {
     if (!args.contains(field) || !args.at(field).is_number())

@@ -58,10 +58,10 @@ private:
         auto mode=at<uintptr_t>(image+0x13df320);type(mode,0x16e6730);need(context&&at<uintptr_t>(mode+0xd8)==context,"current Mode context differs");
         if(!bound_mode){bound_mode=mode;bound_context=context;}
         Frame f{array,reader,context,at<uintptr_t>(reader+8),0,thread,0,-1};f.file=at<uintptr_t>(f.stream+0x18);chain(f);
-        Port port{*this};mt2mp::game::npc_saved_identity::ChildHeader header;std::string error;
-        need(mt2mp::game::npc_saved_identity::child_header(port,reader,header,error),error);
+        Port port{*this};mt2fw::game::npc_saved_identity::ChildHeader header;std::string error;
+        need(mt2fw::game::npc_saved_identity::child_header(port,reader,header,error),error);
         f.declared=header.count;f.kind=-1;
-        for(int32_t k=0;k<3;++k)if(mt2mp::game::snapshot_npc_key::type_names[size_t(k)]==header.label)f.kind=k;
+        for(int32_t k=0;k<3;++k)if(mt2fw::game::snapshot_npc_key::type_names[size_t(k)]==header.label)f.kind=k;
         need(f.kind>=0&&(f.declared==0||(f.kind==0&&f.declared==2)),"fixture declared NPC type/count differs");
         need(rows(array,context).empty(),"NPC array was not empty before load");need(!arrays.contains(array)&&pending.size()<128,"duplicate array or pending load budget exceeded");
         for(const auto& [id,other]:pending){(void)id;need(other.array!=array,"recursive load of same array");}
@@ -104,10 +104,10 @@ private:
                     loaded_links.emplace(row.pointer,child==0?34:39);
                 }
             }
-            Port port{*this};mt2mp::game::npc_saved_identity::Pool pool;std::string error;
+            Port port{*this};mt2fw::game::npc_saved_identity::Pool pool;std::string error;
             auto links=[&](uintptr_t p,int32_t& link,std::string& e){auto found=loaded_links.find(p);if(found==loaded_links.end()){e="NPC lacks immutable child-order link receipt";return false;}link=found->second;return true;};
-            need(mt2mp::game::npc_saved_identity::observe(port,image,manager,links,pool,error),error);
-            for(const auto& row:pool.records)keys.emplace(row.pointer,mt2mp::game::npc_saved_identity::key(fixture,id,row));
+            need(mt2fw::game::npc_saved_identity::observe(port,image,manager,links,pool,error),error);
+            for(const auto& row:pool.records)keys.emplace(row.pointer,mt2fw::game::npc_saved_identity::key(fixture,id,row));
         }
         need(seen_arrays.size()==arrays.size()&&keys.size()==2,"fixture coverage differs");
         // The flat owned list is a subset, not the serialized owner list.

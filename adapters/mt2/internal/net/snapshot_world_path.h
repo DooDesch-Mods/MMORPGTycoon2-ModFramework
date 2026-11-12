@@ -5,7 +5,7 @@
 #include <string_view>
 #include "vendor/nlohmann/json.hpp"
 
-namespace mt2mp::net::snapshot_world_path {
+namespace mt2fw::net::snapshot_world_path {
 inline std::filesystem::path utf8_path(std::string_view value) {
     return std::filesystem::path(std::u8string_view(reinterpret_cast<const char8_t*>(value.data()),value.size()));
 }

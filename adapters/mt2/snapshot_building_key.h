@@ -4,7 +4,7 @@
 #include <string>
 #include <string_view>
 
-namespace mt2mp::game::snapshot_building_key {
+namespace mt2fw::game::snapshot_building_key {
 inline std::string root_suffix(int32_t region, int32_t child) {
     return "inline:region{" + std::to_string(region) + "}/buildingManager/building[" + std::to_string(child) + "]";
 }

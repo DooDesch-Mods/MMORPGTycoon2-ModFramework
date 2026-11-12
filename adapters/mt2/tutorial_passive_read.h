@@ -1,5 +1,5 @@
-#ifndef MT2MP_TUTORIAL_PASSIVE_READ_H
-#define MT2MP_TUTORIAL_PASSIVE_READ_H
+#ifndef MT2FW_TUTORIAL_PASSIVE_READ_H
+#define MT2FW_TUTORIAL_PASSIVE_READ_H
 #if __has_include(<nlohmann/json.hpp>)
 #include <nlohmann/json.hpp>
 #else
@@ -12,7 +12,7 @@
 #include <set>
 #include <string>
 #include <vector>
-namespace mt2mp::game::tutorial_observer::passive {
+namespace mt2fw::game::tutorial_observer::passive {
 struct Memory {
     virtual ~Memory()=default;
     virtual bool copy(uintptr_t,void*,size_t,std::string&)=0;

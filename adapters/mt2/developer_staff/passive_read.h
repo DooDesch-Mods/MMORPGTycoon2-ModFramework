@@ -1,5 +1,5 @@
-#ifndef MT2MP_DEVELOPER_STAFF_PASSIVE_READ_H
-#define MT2MP_DEVELOPER_STAFF_PASSIVE_READ_H
+#ifndef MT2FW_DEVELOPER_STAFF_PASSIVE_READ_H
+#define MT2FW_DEVELOPER_STAFF_PASSIVE_READ_H
 #include <algorithm>
 #include <array>
 #include <cmath>
@@ -7,7 +7,7 @@
 #include <set>
 #include <string>
 #include <vector>
-namespace mt2mp::game::developer_staff {
+namespace mt2fw::game::developer_staff {
 struct Row {
     int32_t id=-1,slot=-1,state=0;
     bool employed=false,active=false,on_map=false,job_link=false;

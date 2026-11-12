@@ -1,6 +1,6 @@
 // Common native driver. The private diagnostic Gate is not armed or queried.
 namespace step_runtime {
-namespace native=mt2mp::game::native;
+namespace native=mt2fw::game::native;
 using Go=void(*)(void*);
 using Seed=void(*)(void*,uint64_t);
 Go original_go=nullptr,original_pause=nullptr,original_resume=nullptr;

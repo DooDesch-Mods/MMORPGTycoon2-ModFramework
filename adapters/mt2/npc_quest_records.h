@@ -10,7 +10,7 @@
 #include <string>
 #include <vector>
 
-namespace mt2mp::npc_quest_records {
+namespace mt2fw::npc_quest_records {
 
 enum class TaskStatus { Absent, Pending, FinishedWaitingTick };
 
@@ -238,4 +238,4 @@ bool read(npc_census::Memory& memory,uintptr_t image,uintptr_t npc,
     output=std::move(result);error.clear();return true;
 }
 
-} // namespace mt2mp::npc_quest_records
+} // namespace mt2fw::npc_quest_records

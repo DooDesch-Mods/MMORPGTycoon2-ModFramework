@@ -1,6 +1,6 @@
 #include "global_root.h"
 #include <limits>
-namespace mt2mp::game::native {
+namespace mt2fw::game::native {
 namespace {
 DWORD global_root_copy(const void* from,void* to,size_t bytes){
     __try {std::memcpy(to,from,bytes);return 0;}

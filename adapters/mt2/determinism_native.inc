@@ -1,6 +1,6 @@
 // Included by the Framework adapter only in the private experiment candidate.
 namespace lab {
-namespace native=mt2mp::game::native;
+namespace native=mt2fw::game::native;
 mt2::determinism::Gate control;
 using Go=void(*)(void*);
 Go original_go=nullptr;

@@ -10,7 +10,7 @@
 
 The framework is authored by DooDesch. The retained native adapter, native ABI constants and proxy-forwarding technique originate in DooDesch's MMORPG Tycoon 2 Multiplayer work. These extracted authored copies are explicitly MIT licensed under the root LICENSE. `licenses/extracted-authored.json` records the copied input hashes and original paths. This permission does not relicense the original multiplayer product.
 
-The standalone tree contains its own extracted logger and native declarations. DooDesch permits these authored copies under MIT as part of this framework. The internal retained mt2mp namespace is not a public SDK. No parent repository is needed to build. Third-party dependencies keep their own notices.
+The standalone tree contains its own extracted logger and native declarations. DooDesch permits these authored copies under MIT as part of this framework. These internal headers are not a public SDK. No parent repository is needed to build. Third-party dependencies keep their own notices.
 
 The public VectorStorm source is consulted to understand model and material contracts. Game-specific implementations, game archives, decompilation outputs and disassembly dumps are not distributed. Reading a file format does not grant rights to redistribute a game's assets.
 

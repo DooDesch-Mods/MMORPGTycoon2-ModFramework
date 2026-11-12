@@ -1,6 +1,6 @@
 #include "adapter.h"
-#include "mt2mp/game/native_engine.h"
-#include "mt2mp/core/logger.h"
+#include "game/native_engine.h"
+#include "core/logger.h"
 #include "crypto.h"
 #include "native_extensions.h"
 #include "public_reads.h"
@@ -10,7 +10,7 @@
 #include <deque>
 
 namespace mt2fw::mt2 {
-namespace native=mt2mp::game::native;
+namespace native=mt2fw::game::native;
 namespace {
 fs::path game_root,profile_root;
 Runtime* current_runtime=nullptr;
@@ -86,7 +86,7 @@ void perform_actions(Runtime& runtime) {
 }
 }
 void initialize(const fs::path& game,const fs::path& profile) {
-    game_root=game;profile_root=profile;mt2mp::Logger::instance().init(profile.string());
+    game_root=game;profile_root=profile;mt2fw::Logger::instance().init(profile.string());
     std::string error;require(native::initialize(error),error);
 }
 void* game_update(){return native::entrypoint(native::EntryPoint::GameUpdate);}

@@ -4,7 +4,7 @@
 #include <cmath>
 #include <cstdint>
 #include <string>
-namespace mt2mp::game::subscriber_activity {
+namespace mt2fw::game::subscriber_activity {
 // These are stored Subscriber fields. Satisfaction is not derived from NeedSet.
 struct State {int32_t satisfaction=0,addiction=0;uint32_t logged_in_time_bits=0;bool operator==(const State&)const=default;};
 inline constexpr std::array<size_t,3> offsets{0x24,0x28,0x6c};

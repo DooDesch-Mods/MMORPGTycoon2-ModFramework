@@ -36,9 +36,9 @@ void arm(const mt2::StepPreloadIdentity& identity,const std::vector<Row>& rows){
 }
 std::map<int32_t,uintptr_t> census(){
     const auto map=read<uintptr_t>(image+0x13df8c0);
-    mt2mp::game::region_saved_identity::Index index;std::string cause;
+    mt2fw::game::region_saved_identity::Index index;std::string cause;
     auto at=[](uintptr_t object,size_t offset,auto& out,std::string&){out=read<std::remove_reference_t<decltype(out)>>(object+offset);return true;};
-    const bool captured=mt2mp::game::region_saved_identity::capture(image,map,map+0x1c0,index,at,cause);
+    const bool captured=mt2fw::game::region_saved_identity::capture(image,map,map+0x1c0,index,at,cause);
     require(captured,"Region RNG root census: "+cause);
     return {index.saved.begin(),index.saved.end()};
 }

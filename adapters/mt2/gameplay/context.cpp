@@ -1,5 +1,5 @@
 #include "context.h"
-#include "mt2mp/game/native_engine.h"
+#include "game/native_engine.h"
 #include "crypto.h"
 #include <windows.h>
 #include <charconv>
@@ -18,18 +18,18 @@ DWORD lookup(uintptr_t entry,uint64_t uid,uintptr_t& result) {
 void configure_code_verifier(CodeVerifier verifier){verify_code=std::move(verifier);}
 Context context(uint64_t epoch) {
     Context result;result.epoch=epoch;std::string sha,error;
-    if(!mt2mp::game::native::read_resolver_receipt(result.image,result.thread,sha,error))
+    if(!mt2fw::game::native::read_resolver_receipt(result.image,result.thread,sha,error))
         throw std::runtime_error("GAMEPLAY_RESOLVER: "+error);
     if(sha!=supported_game)throw std::runtime_error("GAMEPLAY_VERSION: unsupported game executable");
     result.require_world();return result;
 }
 void Context::require_world() const {
     if(!image||!thread||thread!=GetCurrentThreadId())throw std::runtime_error("GAMEPLAY_THREAD: requires the bound game thread");
-    if(!epoch||!mt2mp::game::native::in_game())throw std::runtime_error("GAMEPLAY_WORLD: requires a loaded world");
+    if(!epoch||!mt2fw::game::native::in_game())throw std::runtime_error("GAMEPLAY_WORLD: requires a loaded world");
 }
 void Context::require_mutation() const {
-    require_world();mt2mp::game::native::WorldStatus state;std::string cause;
-    if(!mt2mp::game::native::read_world_status(state,cause))throw std::runtime_error("GAMEPLAY_WORLD: "+cause);
+    require_world();mt2fw::game::native::WorldStatus state;std::string cause;
+    if(!mt2fw::game::native::read_world_status(state,cause))throw std::runtime_error("GAMEPLAY_WORLD: "+cause);
     if(state.quitting||state.title_transition_pending||state.saves_in_progress!=0||state.edit_operations!=0||state.map_task_pending)
         throw std::runtime_error("GAMEPLAY_BUSY: native world transition/edit/save must be idle; edits="+std::to_string(state.edit_operations)+
             " saves="+std::to_string(state.saves_in_progress)+" map_task="+std::to_string(state.map_task_pending));

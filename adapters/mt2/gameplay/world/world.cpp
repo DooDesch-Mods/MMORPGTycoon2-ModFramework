@@ -1,9 +1,9 @@
 #include "world.h"
-#include "mt2mp/game/native_engine.h"
+#include "game/native_engine.h"
 #include <limits>
 
 namespace mt2fw::mt2::gameplay::world {
-namespace native=mt2mp::game::native;
+namespace native=mt2fw::game::native;
 std::optional<Json> query(Context& context,const std::string& operation,const Json& args) {
     if(operation=="world.entities"){
         auto limit=args.value("limit",100);

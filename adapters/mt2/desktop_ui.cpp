@@ -16,7 +16,7 @@
 
 namespace mt2fw::mt2::desktop {
 namespace {
-namespace native = mt2mp::game::native;
+namespace native = mt2fw::game::native;
 Runtime* runtime = nullptr;
 constexpr int desktop_entry_resource = 202;
 uintptr_t image = 0;

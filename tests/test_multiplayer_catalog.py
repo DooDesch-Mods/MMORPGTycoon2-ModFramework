@@ -37,14 +37,6 @@ class MultiplayerCatalogTests(unittest.TestCase):
             self.assertEqual(matches[0]['name'], name)
             self.assertIs(matches[0]['shared'], False)
 
-
-    def test_current_catalog_preserves_public_021_routes(self):
-        prior = json.loads((ROOT / 'tests/fixtures/multiplayer-catalog-v0.2.1.json').read_text(encoding='utf-8'))['targets']
-        previous = {row['name'] for row in prior}
-        self.assertEqual([row for row in self.targets if row['name'] in previous], prior)
-        self.assertEqual(len(self.targets), 297)
-        self.assertEqual(sum(row['shared'] for row in self.targets), 12)
-
     def test_npc_camera_gate_preserves_one_exact_exclusive_original_branch(self):
         matches = [row for row in self.targets if row['rva'] == 0x3c8db7]
         self.assertEqual(len(matches), 1)

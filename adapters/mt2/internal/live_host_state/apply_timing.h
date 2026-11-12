@@ -3,7 +3,7 @@
 #include <array>
 #include <chrono>
 #include <cstdint>
-namespace mt2mp::game::live_host_state::apply_timing {
+namespace mt2fw::game::live_host_state::apply_timing {
 enum class Part:size_t {Take,BeforeDay,DayTake,AfterDay,Preflight,FullBefore,Scalar,Motion,FullFinal,EconomyRead,DayRead,MotionOriginal,MemoryVirtualQuery,QueryPlacement,QueryOpenWitness,QueryEngine,QuerySavedFields,QueryWorldProp,QueryOther,BugPreflight,BugAdopt,BugFinish,DeveloperPreflight,DeveloperAdopt,NetworkPreflight,NetworkApply,TutorialPreflight,TutorialApply,PlacementScopedOs,PlacementUnscopedOs,ReaderNestedReset,OriginalNestedReset,QuestStores,NpcStores,Count};
 struct Totals {uint64_t count=0,total_ns=0,max_ns=0;};
 // The diagnostic reader sees its game-thread aggregates. Rejected foreign-thread

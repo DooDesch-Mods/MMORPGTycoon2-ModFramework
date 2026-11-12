@@ -30,7 +30,7 @@ __declspec(noinline) void save_blocking(void* mode,const void* filename,bool abs
         if(code || absolute || stem!="initial_state")
             throw std::runtime_error("Initial save requires original relative initial_state submission; exception="+std::to_string(code));
         std::string error;
-        if(!mt2mp::game::native::read_initial_save_world(mode,scope.folder,error))throw std::runtime_error(error);
+        if(!mt2fw::game::native::read_initial_save_world(mode,scope.folder,error))throw std::runtime_error(error);
         scope.metadata=runtime->capture_initial_save(scope.folder);
     } catch(const std::exception& error) {
         scope.cause=error.what();std::lock_guard lock(gate);

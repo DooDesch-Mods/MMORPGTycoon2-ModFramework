@@ -6,7 +6,7 @@
 #include "determinism_building_receipt.h"
 #include "determinism_npc_receipt.h"
 #include "determinism_presentation_rng.h"
-#include "mt2mp/game/native_engine.h"
+#include "game/native_engine.h"
 #include <array>
 #include <atomic>
 #include <bit>
@@ -339,7 +339,7 @@ __declspec(noinline) void save_blocking(void* mode,const void* filename,bool abs
         if(code || absolute || stem!="initial_state")
             throw std::runtime_error("Initial save requires original relative initial_state submission; exception="+std::to_string(code));
         std::string error;
-        if(!mt2mp::game::native::read_initial_save_world(mode,scope.folder,error))throw std::runtime_error(error);
+        if(!mt2fw::game::native::read_initial_save_world(mode,scope.folder,error))throw std::runtime_error(error);
         scope.metadata=runtime->capture_initial_save(scope.folder);
     } catch(const std::exception& error) {
         scope.cause=error.what();std::lock_guard lock(gate);
@@ -1044,7 +1044,7 @@ extern "C" __declspec(dllexport) bool MT2FW_InitInstalled(const MT2FW_Bootstrap*
         native_routes=std::make_shared<mt2::NativeRoutes>([](const MT2FW_Host* host){return runtime?runtime->native_plugin(host):nullptr;});
         native_routes->set_patch_runtime(runtime.get());
         native_patches=std::make_unique<mt2::NativePatches>(*runtime,[]{return uint64_t(GetCurrentThreadId());},[](uint64_t& epoch,std::string& cause){
-            namespace native=mt2mp::game::native;
+            namespace native=mt2fw::game::native;
             native::WorldStatus world;std::string folder;
             if(!runtime||!native::read_world_status(world,cause))return false;
             if(world.active_mode_index!=3||world.in_game_state!=4||!world.world_present||world.quitting||!native::in_game()){cause="native active world mode/state is not ready";return false;}
