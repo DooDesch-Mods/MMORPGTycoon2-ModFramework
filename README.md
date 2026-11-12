@@ -19,7 +19,7 @@ Use the Runtime required by your Multiplayer release. Modders keep Lua API
 <!-- roadmap:start -->
 ## What can I build today?
 
-Included in [Framework 0.5.8](https://github.com/DooDesch-Mods/MMORPGTycoon2-ModFramework/releases/tag/v0.5.8). New gameplay tools are experimental. World-changing Lua gameplay operations currently run in singleplayer.
+Included in [Framework 0.6.0](https://github.com/DooDesch-Mods/MMORPGTycoon2-ModFramework/releases/tag/v0.6.0). New gameplay tools are experimental. World-changing Lua gameplay operations currently run in singleplayer.
 
 <picture>
   <source media="(max-width: 600px)" srcset="https://raw.githubusercontent.com/DooDesch-Mods/MMORPGTycoon2-ModFramework/main/assets/brand/coverage-mobile.svg">
@@ -31,7 +31,7 @@ Percentages count the listed areas equally. They describe feature coverage, not 
 <details>
 <summary>Feature details - what is included</summary>
 
-| Feature | 0.5.8 | What is covered |
+| Feature | 0.6.0 | What is covered |
 | --- | --- | --- |
 | Lua mods and reload | ✅ Available | Use a text editor; reload scripts without restarting. A rejected replacement keeps the previous mod running. [Start here](docs/quickstart.md). |
 | Native C++ plugins | ✅ Available | Build with the native SDK. Plugin updates require a game restart. [SDK guide](https://doodesch-mods.github.io/MMORPGTycoon2-ModFramework/reference/native.html). |
