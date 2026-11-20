@@ -113,6 +113,7 @@ class Port:
         self._pairs = {}
         self.data_pairs = None
         self.accepted = set()
+        self.data_accept = {}  # old .data/.bss address -> reviewed new address
         if accept:
             self._load_accept(accept)
 
@@ -129,6 +130,12 @@ class Port:
             spec = line.split()[0]
             old, _, new = spec.partition('=')
             v = int(old, 16)
+            if self.o.section(v) not in ('.text', None):
+                # A data pair overrides the neighbour-offset guess, e.g. when two globals swapped places.
+                if not new or not self.n.section(int(new, 16)):
+                    raise SystemExit(f'accept: data entry {spec} needs OLD=NEW inside the new image')
+                self.data_accept[v] = int(new, 16)
+                continue
             if v not in self.o.begin_set:
                 raise SystemExit(f'accept: {old} is not a function start in the old build')
             k = self.o.begins.index(v)
@@ -252,7 +259,8 @@ class Port:
         j, amap, clean = p
         if v == b and k in self.accepted:
             return self.n.funcs[j][0], 'exact'
-        if v in amap:
+        # A function entry maps only to the new entry: callers and hooks need the prologue.
+        if v in amap and (v != b or amap[v] == self.n.funcs[j][0]):
             return amap[v], 'exact' if clean else 'aligned'
         if v == b:
             return self.n.funcs[j][0], 'begin-changed'
@@ -358,6 +366,8 @@ class Port:
             name = self.o.iat[v]
             ns = next((s for s, nm in self.n.iat.items() if nm == name), None)
             return (ns, 'exact') if ns is not None else (None, 'unmapped')
+        if v in self.data_accept:
+            return self.data_accept[v], 'exact'
         if self.data_pairs is None:
             self.build_data_pairs()
         if v in self.data_pairs:
@@ -418,7 +428,8 @@ class Rewriter:
                 return
             edits[span] = value
 
-        nums = [(m.span(), int(m.group(1), 0)) for m in NUM.finditer(text)]
+        # int(x, 0) rejects decimal digits with a leading zero ("05" in a time format string).
+        nums = [(m.span(), int(m.group(1), 16 if m.group(1)[:2] == '0x' else 10)) for m in NUM.finditer(text)]
         num_at = {s: v for s, v in nums}
         starts = [s[0] for s, _ in nums]
 
@@ -427,6 +438,15 @@ class Rewriter:
             return nums[i:k]
 
         claimed = set()  # spans already handled as pin or guard slots
+
+        def array_bytes(m):
+            if m.re is XSTR:
+                return bytes(int(x, 16) for x in re.findall(r'\\x([0-9a-fA-F]{2})', m.group(1)))
+            return bytes(int(x, 0) for x in re.split(r'\s*,\s*', m.group(1).strip()))
+
+        arrays = list(XSTR.finditer(text)) + list(BRACE.finditer(text))
+        # A digest may cover sizeof(byte array) instead of a size literal; those sizes have no span to rewrite.
+        array_sizes = [(None, k) for k in sorted({len(array_bytes(a)) for a in arrays})]
         # Digests: find the (rva, size) pair in the preceding text whose old bytes hash to the digest.
         for m in SHA.finditer(text):
             sha = m.group(0)
@@ -436,7 +456,7 @@ class Rewriter:
                 continue
             cands = window(m.start(), 700, 0)
             addrs = [(s, v) for s, v in cands if v >= 0x1000 and o.section(v)]
-            sizes = [(s, v) for s, v in cands if 0 < v <= 0x40000]
+            sizes = array_sizes + [(s, v) for s, v in cands if 0 < v <= 0x40000]
             hit = None
             for sa, va in reversed(addrs):
                 for ss, vs in reversed(sizes):
@@ -457,7 +477,8 @@ class Rewriter:
                 self.learned_num[va] = na
             if st == 'clean':
                 if nsize != vs:
-                    put(ss, str(nsize) if not text[ss[0]:ss[1]].startswith('0x') else hex(nsize))
+                    if ss is not None:
+                        put(ss, str(nsize) if not text[ss[0]:ss[1]].startswith('0x') else hex(nsize))
                     self.flag(rel, text, m.start(), 'pin', hex(va), 'size-changed', f'{vs} -> {nsize}')
                 new_sha = hashlib.sha256(n.img[na:na + nsize]).hexdigest()
                 put(m.span(), new_sha)
@@ -468,17 +489,18 @@ class Rewriter:
                 self.counts['pin ' + st] += 1
 
         # Byte guards: the literal bytes must sit at a nearby address in the old image.
-        for m in list(XSTR.finditer(text)) + list(BRACE.finditer(text)):
-            if m.re is XSTR:
-                old = bytes(int(x, 16) for x in re.findall(r'\\x([0-9a-fA-F]{2})', m.group(1)))
-            else:
-                old = bytes(int(x, 0) for x in re.split(r'\s*,\s*', m.group(1).strip()))
+        for m in arrays:
+            old = array_bytes(m)
             if len(old) < 4:
                 continue
             hit = None
-            for s, v in sorted(window(m.start(), 400, 400), key=lambda x: abs(x[0][0] - m.start())):
-                if v >= 0x1000 and o.img[v:v + len(old)] == old:
-                    hit = (s, v)
+            # Nearby first; then the whole file, for guard arrays declared apart from their RVA table.
+            for cands in (window(m.start(), 400, 400), nums):
+                for s, v in sorted(cands, key=lambda x: abs(x[0][0] - m.start())):
+                    if v >= 0x1000 and o.img[v:v + len(old)] == old:
+                        hit = (s, v)
+                        break
+                if hit:
                     break
             if not hit:
                 self.flag(rel, text, m.start(), 'bytes', old[:8].hex(), 'unresolved', f'{len(old)} bytes not found at a nearby address')
@@ -635,7 +657,7 @@ def apply(text, edits):
     return ''.join(out)
 
 
-def audit(port, repo):
+def audit(port, repo, code_dirs):
     """Report function starts whose new partner does not read the mapped globals, with nearby candidates.
 
     Byte similarity can pick the wrong template twin: instances share a body and differ only in the global
@@ -644,7 +666,7 @@ def audit(port, repo):
     """
     o, n = port.o, port.n
     starts = defaultdict(set)  # old function start -> source lines or the accept list
-    for path in sorted(x for d in ('adapters', 'tests') for x in (repo / d).rglob('*') if x.suffix in CODE_SUFFIXES):
+    for path in sorted(x for d in {*code_dirs, 'tests'} for x in (repo / d).rglob('*') if x.suffix in CODE_SUFFIXES):
         rel = path.relative_to(repo).as_posix()
         for i, line in enumerate(path.read_text(encoding='utf-8', errors='replace').splitlines(), 1):
             for m in HEX.finditer(line):
@@ -692,16 +714,19 @@ def main():
     ap.add_argument('--report', default='port-report.tsv')
     ap.add_argument('--accept', help='reviewed functions, one `OLD[=NEW] reason` per line')
     ap.add_argument('--audit', action='store_true', help='check the function map against the globals each function reads; run on unported sources')
+    ap.add_argument('--code', action='append', metavar='DIR',
+                    help='folder under --repo whose literals are rewritten in full (repeatable; default adapters)')
     args = ap.parse_args()
     repo = pathlib.Path(args.repo)
+    code_dirs = args.code or ['adapters']
     port = Port(args.old_exe, args.new_exe, args.accept)
     print(f'old {port.o.sha}\nnew {port.n.sha}\nfunctions mapped {len(port.fmap)} of {len(port.o.funcs)}', flush=True)
     if args.audit:
-        audit(port, repo)
+        audit(port, repo, code_dirs)
         return
     rw = Rewriter(port, repo)
     changed = {}
-    adapters = sorted(p for p in (repo / 'adapters').rglob('*') if p.suffix in CODE_SUFFIXES + ('.json',))
+    adapters = sorted(p for d in code_dirs for p in (repo / d).rglob('*') if p.suffix in CODE_SUFFIXES + ('.json',))
     for path in adapters:
         rel = path.relative_to(repo).as_posix()
         text = path.read_bytes().decode('utf-8')
@@ -721,7 +746,7 @@ def main():
         new = SHA.sub(lambda m: rw.learned_sha.get(m.group(0), m.group(0)), text)
         if new != text:
             changed[path] = new
-    others =[p for d in ('src', 'tests', 'tools') for p in (repo / d).rglob('*')
+    others = [p for d in ('src', 'tests', 'tools') if d not in code_dirs for p in (repo / d).rglob('*')
               if p.suffix in CODE_SUFFIXES + ('.py', '.json') and p.name != 'port_game_build.py' and 'third_party' not in p.parts]
     for path in sorted(others):
         rel = path.relative_to(repo).as_posix()
