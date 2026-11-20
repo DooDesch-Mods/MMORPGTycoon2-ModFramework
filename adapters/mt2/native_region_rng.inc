@@ -76,12 +76,12 @@ Json seal(){
 void cancel(){std::lock_guard lock(gate);armed=false;}
 void reset(){std::lock_guard lock(gate);require(!armed,"Region RNG reset retains an armed load");receipts={};sealed.clear();mode=0;agreed_seed=0;first_error.clear();}
 void install(){
-    native_routes->catalog("framework.step.region-rng-constructor",0x9fbfa0,true);
+    native_routes->catalog("framework.step.region-rng-constructor",0xa06400,true);
     native_routes->catalog("framework.step.region-finish",0x3588f0,true);
     native_services->reserve("framework.step.region-rng-constructor");
     native_services->reserve("framework.step.region-finish");
     for(const auto& [offset,size,sha]:std::array<std::tuple<uintptr_t,size_t,const char*>,4>{{
-        {0x9fbfa0,224,"d47d25c1590b15ecd338ab68eba277eb47523426a9eb2252af5e761e5c4a56a9"},
+        {0xa06400,256,"505f611985117180367ccbbdbbc6c3d62b3e13473f215c251c24dc6cce792d53"},
         {0x3588f0,1824,"b83ab5484bda2308806a65752b19fda9fc6c1b7b8c2cc5ae15a8145c2f980e06"},
         {0x35c510,1952,"b8db5d3c895d96839ee519613b5dda1880fb9341f819b5c8a78241f588d028da"},
         {0x336710,9072,"0d1bcab3911112956734c61dd12e345d66540c232306e3682e21b25742af6fd4"}}}){
@@ -89,7 +89,7 @@ void install(){
         require(ReadProcessMemory(GetCurrentProcess(),reinterpret_cast<void*>(image+offset),body.data(),size,&copied)&&copied==size&&digest(body)==sha,
             "Region RNG original load/Finish/constructor/Map body differs");
     }
-    hook(reinterpret_cast<void*>(image+0x9fbfa0),reinterpret_cast<void*>(&constructor),reinterpret_cast<void**>(&original_constructor));
+    hook(reinterpret_cast<void*>(image+0xa06400),reinterpret_cast<void*>(&constructor),reinterpret_cast<void**>(&original_constructor));
     hook(reinterpret_cast<void*>(image+0x3588f0),reinterpret_cast<void*>(&finish),reinterpret_cast<void**>(&original_finish));
 }
 }
