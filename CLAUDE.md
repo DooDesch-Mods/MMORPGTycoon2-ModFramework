@@ -22,6 +22,8 @@ Needs Visual Studio 2022 C++, Python 3.11+ (`pip install -r requirements-dev.txt
 python tools/build.py --check    # native build, CTest, unit tests, generated sources, contract, roadmap
 python tools/build.py --deploy   # build, copy WSOCK32.dll and MT2Framework.dll into the game
 python tools/build.py --smoke    # deploy, start the game through Steam, wait for the load line, close the game
+python tools/build.py --live --game <owned copy>  # new world, feature requests, native remove, capture, exit
+python tools/port_game_build.py OLD_EXE NEW_EXE --accept FILE --audit  # game update: see docs/contributing/build.md
 npm ci --ignore-scripts; npm run docs:build; python tools/check_docs.py; npm run docs:test
 ```
 
