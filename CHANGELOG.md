@@ -2,6 +2,19 @@
 
 The Vortex extension has its own repository, [MMORPGTycoon2-Vortex](https://github.com/DooDesch-Mods/MMORPGTycoon2-Vortex), and its own changelog. Its releases up to 0.2.0 were published here as `vortex-v*` tags.
 
+## 0.6.1
+
+Lua API 1.3.0 and native ABI 1 are unchanged. Existing mods keep working.
+
+### Fixed
+
+- The Framework runs on the MMORPG Tycoon 2 update of 17 November 2026 (Steam build 26719430). Older game builds are no longer supported.
+- An unknown game version no longer turns the whole Framework off. The Framework logs a warning and starts; each game feature checks its own game code and stays off when it does not match.
+
+### Known issues
+
+- The Multiplayer step routes are not ported to build 26719430 yet. The Multiplayer plugin needs a later Framework release.
+
 ## 0.6.0
 
 Lua API 1.3.0 and native ABI 1 are unchanged. Existing mods keep working.
