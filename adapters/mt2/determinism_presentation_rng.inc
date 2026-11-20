@@ -185,12 +185,12 @@ core::Selection select_digital(uintptr_t helper,uintptr_t caller,void* source){
 void verify_callers(){
     verify(0x823800,1056,"691c6c37dd91e81a65cc345bb1bff9ceec3a1b161c5eb5c3949757eed1c90bc2");
     verify(0x8496d0,336,"1d769709877af7bc542c2a940cca47628aa5e4ad056516e47a2eedac197fc99d");
-    verify(0xa06517,192,"7a7ab329d2eb747de62d61f791723eef44f3e850a468747f41708e6d08b981e5");
+    verify(0xa06510,192,"7a7ab329d2eb747de62d61f791723eef44f3e850a468747f41708e6d08b981e5");
 }
 __declspec(noinline) float get_float(void* source,float limit){
     const auto caller=reinterpret_cast<uintptr_t>(_ReturnAddress());
     const auto selected=caller>=image?core::site(caller-image):core::Site::Other;
-    if(!armed.load(std::memory_order_acquire)||selected==core::Site::Other)return rng_trace::invoke(0xa06a18,caller,source,original_float,limit);
+    if(!armed.load(std::memory_order_acquire)||selected==core::Site::Other)return rng_trace::invoke(0xa069b0,caller,source,original_float,limit);
     uintptr_t current=0;
     try{
         current=read<uintptr_t>(image+0x1650830);
@@ -199,13 +199,13 @@ __declspec(noinline) float get_float(void* source,float limit){
         {std::lock_guard lock(failure_mutex);if(failure.empty())failure=problem.what();}
         // Admission failed before any redirected native call. Preserve vanilla
         // behavior once and fail the experiment at its next held observation.
-        return rng_trace::invoke(0xa06a18,caller,source,original_float,limit);
+        return rng_trace::invoke(0xa069b0,caller,source,original_float,limit);
     }
     const auto epoch=generation.load(std::memory_order_acquire);
     auto& count=counts[selected==core::Site::Window?0:1];
     return core::dispatch(true,epoch,selected,source,reinterpret_cast<void*>(current),limit,local,count,
         [](void* state,uint64_t seed){original_seed(state,seed);},
-        [caller](void* state,float max){return rng_trace::invoke(0xa06a18,caller,state,original_float,max);});
+        [caller](void* state,float max){return rng_trace::invoke(0xa069b0,caller,state,original_float,max);});
 }
 void install(const Json& config){
     digital_enabled=config.value("digital_rng",false);
@@ -214,9 +214,9 @@ void install(const Json& config){
     if(!config.value("presentation_rng",false))return;
     if(digital_enabled)verify_digital();
     verify_callers();
-    verify(0xa06a18,128,"5f2e7755f953a9e5755c9af6e38b4b86c8c134223a76525845487a3187ca39e0");
-    original_seed=reinterpret_cast<Seed>(image+0xa06517);
-    hook(reinterpret_cast<void*>(image+0xa06a18),reinterpret_cast<void*>(&get_float),reinterpret_cast<void**>(&original_float));
+    verify(0xa069b0,128,"5f2e7755f953a9e5755c9af6e38b4b86c8c134223a76525845487a3187ca39e0");
+    original_seed=reinterpret_cast<Seed>(image+0xa06510);
+    hook(reinterpret_cast<void*>(image+0xa069b0),reinterpret_cast<void*>(&get_float),reinterpret_cast<void**>(&original_float));
     if(config.value("rng_trace",false)){
         if(building_widget_owner){
             verify(0x40e3c0,720,"c83326c0ff184f077069d7cc9c99c2d464a3e0363ead78329f06ad3d1856c9ad");

@@ -21,7 +21,7 @@ struct Selection { void* source;Counters* count=nullptr; };
 struct BuildingWidgetQuery {
     bool active=false;
     bool matches(uintptr_t helper,uintptr_t caller)const noexcept {
-        return active&&helper==0xa078e2&&caller==0xdb722;
+        return active&&helper==0xa078e0&&caller==0xdb722;
     }
 };
 template<class Initialize>
@@ -69,7 +69,7 @@ struct SceneryPattern {
         return caller==0x5d9e67||caller==0x5da795||caller==0x5da67d;
     }
     bool matches(uintptr_t helper,uintptr_t caller) const noexcept {
-        return active&&helper==0xa06925&&
+        return active&&helper==0xa06920&&
             (caller==0xa04c2a||caller==0xa04c3f||caller==0xa04c55);
     }
 };
@@ -93,7 +93,7 @@ Selection select_scenery_pattern(bool armed,uint64_t generation,const SceneryPat
 struct BlueprintPuppet {
     bool active=false;
     bool matches(uintptr_t helper,uintptr_t caller) const noexcept {
-        return active&&helper==0xa06ad4&&caller==0x3b8cea;
+        return active&&helper==0xa06a60&&caller==0x3b8cea;
     }
 };
 template<class Initialize>
@@ -114,7 +114,7 @@ Selection select_blueprint_puppet(bool armed,uint64_t generation,const Blueprint
 // Running characters choose a visible jump animation and its next delay.
 // These two exact calls do not select movement or gameplay outcomes.
 inline bool character_jump_site(uintptr_t helper,uintptr_t caller) noexcept {
-    return (helper==0xa068a0&&caller==0x3a6257)||(helper==0xa06ad4&&caller==0x3a6277);
+    return (helper==0xa068a0&&caller==0x3a6257)||(helper==0xa06a60&&caller==0x3a6277);
 }
 template<class Initialize>
 Selection select_character_jump(bool armed,uint64_t generation,uintptr_t helper,uintptr_t caller,
@@ -134,21 +134,21 @@ Selection select_character_jump(bool armed,uint64_t generation,uintptr_t helper,
 // retain their receiver. The packed vector helper consumes two transitions.
 inline unsigned digital_site(uintptr_t helper,uintptr_t caller) noexcept {
     if(helper==0xa068a0&&caller==0x16e430)return 0;
-    if(helper==0xa06925&&caller==0x16ead8)return 1;
+    if(helper==0xa06920&&caller==0x16ead8)return 1;
     if(helper==0xa068a0&&caller==0x17ab71)return 2;
-    if(helper==0xa06925&&caller==0x17ab59)return 3;
-    if(helper==0xa06a18&&caller==0x16f919)return 4;
-    if(helper==0xa06cb1&&caller==0x16f934)return 5;
-    if(helper==0xa06ad4&&caller==0x169073)return 6;
+    if(helper==0xa06920&&caller==0x17ab59)return 3;
+    if(helper==0xa069b0&&caller==0x16f919)return 4;
+    if(helper==0xa06cb0&&caller==0x16f934)return 5;
+    if(helper==0xa06a60&&caller==0x169073)return 6;
     if(helper==0xa068a0&&caller==0x16db97)return 7;
-    if(helper==0xa06ad4&&caller==0x16fafe)return 8;
-    if(helper==0xa06cb1&&caller==0x16fb19)return 9;
-    if(helper==0xa06ad4&&caller==0x16fb36)return 10;
-    if(helper==0xa06cb1&&caller==0x16fbcf)return 11;
-    if(helper==0xa06ad4&&caller==0x16fbec)return 12;
-    if(helper==0xa06ad4&&caller==0x1715d7)return 13;
-    if(helper==0xa06ad4&&caller==0x171829)return 14;
-    if(helper==0xa06ad4&&caller==0x171844)return 15;
+    if(helper==0xa06a60&&caller==0x16fafe)return 8;
+    if(helper==0xa06cb0&&caller==0x16fb19)return 9;
+    if(helper==0xa06a60&&caller==0x16fb36)return 10;
+    if(helper==0xa06cb0&&caller==0x16fbcf)return 11;
+    if(helper==0xa06a60&&caller==0x16fbec)return 12;
+    if(helper==0xa06a60&&caller==0x1715d7)return 13;
+    if(helper==0xa06a60&&caller==0x171829)return 14;
+    if(helper==0xa06a60&&caller==0x171844)return 15;
     return 16;
 }
 // The original algorithm receives a separate object only at the two shader calls.

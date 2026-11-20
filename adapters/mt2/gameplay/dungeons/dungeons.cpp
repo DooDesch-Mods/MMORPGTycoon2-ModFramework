@@ -506,12 +506,12 @@ uint32_t paint_native(uintptr_t image,uintptr_t dungeon,uintptr_t undo,uintptr_t
                         else {reinterpret_cast<void(*)(uintptr_t)>(image+0x15e560)(r.pending);
                             reinterpret_cast<void(*)(uintptr_t,const void*)>(image+0x15e260)(r.pending,shape);reinterpret_cast<void(*)(uintptr_t,uintptr_t)>(image+0x15e370)(r.pending,fill);
                             reinterpret_cast<void(*)(uintptr_t,uintptr_t)>(image+0x1574b0)(dungeon+0x500,r.pending);r.stroke=r.pending;r.pending=0;
-                            reinterpret_cast<void(*)(uintptr_t)>(image+0x15e48c)(r.stroke);r.painted=area;}
+                            reinterpret_cast<void(*)(uintptr_t)>(image+0x15e480)(r.stroke);r.painted=area;}
                     }
                 }
                 if(!code && r.stroke){r.stage=6;reinterpret_cast<void(*)(uintptr_t)>(image+0x15e2e0)(r.stroke);
                     r.erased=reinterpret_cast<float(*)(uintptr_t,uintptr_t,uintptr_t)>(image+0x158810)(dungeon+0x500,r.stroke+0x18,r.stroke);
-                    reinterpret_cast<void(*)(uintptr_t)>(image+0x15e4fc)(r.stroke);r.stroke=0;}
+                    reinterpret_cast<void(*)(uintptr_t)>(image+0x15e4f0)(r.stroke);r.stroke=0;}
                 if(!code && std::isfinite(r.painted) && std::isfinite(r.erased) && (r.painted>0 || r.erased>0)){
                     r.stage=7;reinterpret_cast<void(*)(void*,const char*)>(image+0xa21c10)(label,"Edit dungeon paint");label_ready=true;
                     reinterpret_cast<void(*)(uintptr_t,const void*,uintptr_t)>(image+0x541790)(undo,label,r.graph);r.committed=true;r.stage=8;
@@ -576,7 +576,7 @@ bool action(Context& c,const std::string& operation,const Json& args,bool& attem
             for(uintptr_t rva:{0xf2880,0xf8f40,0xf4bd0,0xa0d230,0x5466b0,0x544ca0,0x546d20,0x158810,0xa21c10,0x541790,0x11be4a0,0x11c8b80,0xf2610})c.verify_original(rva);
             need(c.read<uintptr_t>(o.dungeon+0x500)==c.image+0x178cff0,"Dungeon embedded Canvas class differs");need(!c.read<uintptr_t>(c.image+0x1a41a80),"Dungeon paint requires idle native Undo graph");const auto undo=c.singleton(0x13eb380);const auto before=undo_stack(c,undo);
             if(operation=="dungeons.paint"){
-                fill_records(args.at("fill_records"));verify_fill_code(c);for(uintptr_t rva:{0xf9ca0,0x158770,0x15e730,0xf22a0,0x15e560,0x15e260,0x15e370,0x1574b0,0x15e48c,0x15e2e0,0x15e4fc})c.verify_original(rva);
+                fill_records(args.at("fill_records"));verify_fill_code(c);for(uintptr_t rva:{0xf9ca0,0x158770,0x15e730,0xf22a0,0x15e560,0x15e260,0x15e370,0x1574b0,0x15e480,0x15e2e0,0x15e4f0})c.verify_original(rva);
                 attempted=true;auto fill=create_fill(c,args.at("fill_records"));PaintReceipt receipt;const auto code=paint_native(c.image,o.dungeon,undo,fill.pointer,&borrowed,receipt);const auto cleanup=fill_dispose_native(c.image,fill.pointer);
                 need(!code && !cleanup && receipt.committed && !receipt.pending && !receipt.stroke && !receipt.shape_cleanup && !receipt.accumulated_cleanup && !receipt.args_cleanup && !receipt.label_cleanup,"Dungeon paint failed SEH="+std::to_string(code)+" stage="+std::to_string(receipt.stage)+" painted="+std::to_string(receipt.painted)+" erased="+std::to_string(receipt.erased)+" required_changed_area>0 fill_cleanup="+std::to_string(cleanup)+" shape_cleanup="+std::to_string(receipt.shape_cleanup)+" accumulated_cleanup="+std::to_string(receipt.accumulated_cleanup)+" args_cleanup="+std::to_string(receipt.args_cleanup)+" label_cleanup="+std::to_string(receipt.label_cleanup)+" pending_stroke="+std::to_string(bool(receipt.pending || receipt.stroke))+"; do not replay");
                 need(owner(c,args).dungeon==o.dungeon,"Dungeon Canvas owner changed during paint");committed_graph(c,undo,before,receipt.graph);result={{"painted_area",receipt.painted},{"erased_area",receipt.erased}};return true;

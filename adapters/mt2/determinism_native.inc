@@ -343,7 +343,7 @@ void install(){
     for(const auto& [offset,size,sha]:std::array<std::tuple<uintptr_t,size_t,const char*>,3>{{
         {0x52c650,272,"5c994df3f5ff771524a66cedc502b9a8b792d97931a5016611d7755337a3bc98"},
         {0x52c760,160,"650d51108b7eb798817a589f6f5c6ce26672656bae839ee1ed4219d3249f31f0"},
-        {0xa06517,192,"7a7ab329d2eb747de62d61f791723eef44f3e850a468747f41708e6d08b981e5"}}}){
+        {0xa06510,192,"7a7ab329d2eb747de62d61f791723eef44f3e850a468747f41708e6d08b981e5"}}}){
         std::string body(size,'\0');SIZE_T copied=0;
         if(!ReadProcessMemory(GetCurrentProcess(),reinterpret_cast<void*>(image+offset),body.data(),size,&copied)||copied!=size||digest(body)!=sha)
             throw std::runtime_error("Exact original Task Pause/Resume or InitWithSeed body differs");
@@ -361,7 +361,7 @@ void install(){
     wait_render::enabled=config.value("wait_render",false);
     building_receipt::install(config);npc_receipt::install(config);rng_trace::install(config);
     original_pause=reinterpret_cast<Go>(image+0x52c650);original_resume=reinterpret_cast<Go>(image+0x52c760);
-    original_seed=reinterpret_cast<Seed>(image+0xa06517);
+    original_seed=reinterpret_cast<Seed>(image+0xa06510);
     hook(reinterpret_cast<void*>(image+0x95f890),reinterpret_cast<void*>(&go),reinterpret_cast<void**>(&original_go));installed=true;
 }
 }

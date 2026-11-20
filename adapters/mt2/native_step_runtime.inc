@@ -465,7 +465,7 @@ void install(const fs::path& game){
     presentation_rng::verify(0x5cf9d0,1376,"d0cffacda82a1c896d1b2eae7200a3b34f8c26b2b500f0b3c13b8885abef9c5f");
     native_routes->catalog("framework.step.resume",0x52c760,true);
     native_services->reserve("framework.step.resume");
-    original_pause=reinterpret_cast<Go>(image+0x52c650);original_resume=reinterpret_cast<Go>(image+0x52c760);original_seed=reinterpret_cast<Seed>(image+0xa06517);
+    original_pause=reinterpret_cast<Go>(image+0x52c650);original_resume=reinterpret_cast<Go>(image+0x52c760);original_seed=reinterpret_cast<Seed>(image+0xa06510);
     hook(reinterpret_cast<void*>(image+0x52c760),reinterpret_cast<void*>(&command_hold::resume_entry),reinterpret_cast<void**>(&original_resume));
     hook(reinterpret_cast<void*>(image+0xa413b0),reinterpret_cast<void*>(&timer),reinterpret_cast<void**>(&timer_step::original_update));
     hook(reinterpret_cast<void*>(image+0x95f890),reinterpret_cast<void*>(&go),reinterpret_cast<void**>(&original_go));installed=true;

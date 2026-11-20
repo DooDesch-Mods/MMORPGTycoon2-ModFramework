@@ -33,7 +33,7 @@ size_t begin(uintptr_t helper,uintptr_t caller,void* source) noexcept {
         const auto index=used++;rows[index]={helper,caller,current_thread,1,0};
         // One bounded diagnostic unwind for each known main-thread gameplay
         // caller. Zero frames or a full buffer do not prove a complete stack.
-        if(current_thread==main_thread&&helper==0xa06ad4&&(caller==image+0x38e878||caller==image+0x3cf984)){
+        if(current_thread==main_thread&&helper==0xa06a60&&(caller==image+0x38e878||caller==image+0x3cf984)){
             auto& row=rows[index];row.stack_attempted=true;
             row.stack_count=CaptureStackBackTrace(0,16,row.stack.data(),nullptr);
         }
@@ -73,9 +73,9 @@ __declspec(noinline) int get_int(void* source,int limit){
     }__finally{if(service)service->character_preview_release(&lease);}
     return result;
 }
-__declspec(noinline) int get_int_range(void* source,int low,int high){return invoke(0xa06925,reinterpret_cast<uintptr_t>(_ReturnAddress()),source,original_int_range,low,high);}
-__declspec(noinline) float get_float_range(void* source,float low,float high){return invoke(0xa06ad4,reinterpret_cast<uintptr_t>(_ReturnAddress()),source,original_float_range,low,high);}
-__declspec(noinline) uint64_t get_vector2_range(void* source,float low,float high){return invoke(0xa06cb1,reinterpret_cast<uintptr_t>(_ReturnAddress()),source,original_vector2_range,low,high);}
+__declspec(noinline) int get_int_range(void* source,int low,int high){return invoke(0xa06920,reinterpret_cast<uintptr_t>(_ReturnAddress()),source,original_int_range,low,high);}
+__declspec(noinline) float get_float_range(void* source,float low,float high){return invoke(0xa06a60,reinterpret_cast<uintptr_t>(_ReturnAddress()),source,original_float_range,low,high);}
+__declspec(noinline) uint64_t get_vector2_range(void* source,float low,float high){return invoke(0xa06cb0,reinterpret_cast<uintptr_t>(_ReturnAddress()),source,original_vector2_range,low,high);}
 #include "determinism_rng_vector_trace.inc"
 void start(){
     if(!installed)return;
@@ -107,21 +107,21 @@ void install(const Json& config){
     for(const auto& [offset,size,sha]:std::array<std::tuple<uintptr_t,size_t,const char*>,4>{{
         {0xa06600,80,"25704349d1825bcf4c063e4d90ae16dc18545bb9f2f43fe9a7afea6f165b9708"},
         {0xa068a0,96,"7041b7ec325591b8d191a54b3ac8d9bd909ee099283d9d210014af498d160c61"},
-        {0xa06925,96,"1b67215a78c9eec6543492b4ce90deca2f45e4c6bb11eeeb4ffd337e44268ca0"},
-        {0xa06ad4,144,"e3736ff7101430ce174fe9199c23226f4622453a8a082c14757cd7fd8868b2a4"}}}){
+        {0xa06920,96,"1b67215a78c9eec6543492b4ce90deca2f45e4c6bb11eeeb4ffd337e44268ca0"},
+        {0xa06a60,144,"e3736ff7101430ce174fe9199c23226f4622453a8a082c14757cd7fd8868b2a4"}}}){
         std::string bytes(size,'\0');SIZE_T copied=0;
         if(!ReadProcessMemory(GetCurrentProcess(),reinterpret_cast<void*>(image+offset),bytes.data(),size,&copied)||copied!=size||digest(bytes)!=sha)
             throw std::runtime_error("Default RNG trace original helper bytes differ rva="+std::to_string(offset));
     }
     hook(reinterpret_cast<void*>(image+0xa06600),reinterpret_cast<void*>(&next),reinterpret_cast<void**>(&original_next));
     hook(reinterpret_cast<void*>(image+0xa068a0),reinterpret_cast<void*>(&get_int),reinterpret_cast<void**>(&original_int));
-    hook(reinterpret_cast<void*>(image+0xa06925),reinterpret_cast<void*>(&get_int_range),reinterpret_cast<void**>(&original_int_range));
-    hook(reinterpret_cast<void*>(image+0xa06ad4),reinterpret_cast<void*>(&get_float_range),reinterpret_cast<void**>(&original_float_range));
+    hook(reinterpret_cast<void*>(image+0xa06920),reinterpret_cast<void*>(&get_int_range),reinterpret_cast<void**>(&original_int_range));
+    hook(reinterpret_cast<void*>(image+0xa06a60),reinterpret_cast<void*>(&get_float_range),reinterpret_cast<void**>(&original_float_range));
     if(config.value("digital_rng",false)){
         std::string bytes(352,'\0');SIZE_T copied=0;
-        if(!ReadProcessMemory(GetCurrentProcess(),reinterpret_cast<void*>(image+0xa06cb1),bytes.data(),bytes.size(),&copied)||copied!=bytes.size()||digest(bytes)!="4e98791d2df51b095e23dcf791f87da5415856da7561a8cb6019e6d423543496")
+        if(!ReadProcessMemory(GetCurrentProcess(),reinterpret_cast<void*>(image+0xa06cb0),bytes.data(),bytes.size(),&copied)||copied!=bytes.size()||digest(bytes)!="4e98791d2df51b095e23dcf791f87da5415856da7561a8cb6019e6d423543496")
             throw std::runtime_error("Digital RNG vector helper original bytes differ");
-        hook(reinterpret_cast<void*>(image+0xa06cb1),reinterpret_cast<void*>(&get_vector2_range),reinterpret_cast<void**>(&original_vector2_range));
+        hook(reinterpret_cast<void*>(image+0xa06cb0),reinterpret_cast<void*>(&get_vector2_range),reinterpret_cast<void**>(&original_vector2_range));
     }
     install_vector_consumers();
     installed=true;
