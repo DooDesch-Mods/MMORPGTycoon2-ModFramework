@@ -24,7 +24,7 @@ std::unordered_map<uintptr_t,uint64_t> memory;
 uintptr_t fail_write=0;unsigned writes=0,unlocks=0,finishes=0;
 template<class T>T read(uintptr_t a){auto i=memory.find(a);if(i==memory.end())throw std::runtime_error("fake missing address");return T(i->second);}
 template<class T>void write(uintptr_t a,T value){++writes;if(a==fail_write)throw std::runtime_error("injected store failure");memory[a]=uint64_t(value);}
-namespace timer_step{struct Frame{bool active=true;uint64_t entered=10;}frame;void current_game(){if(read<uintptr_t>(image+0x13df8f0)!=owner)throw std::runtime_error("Game changed");}}
+namespace timer_step{struct Frame{bool active=true;uint64_t entered=10;}frame;void current_game(){if(read<uintptr_t>(image+0x13eb8f0)!=owner)throw std::runtime_error("Game changed");}}
 namespace motion_probe {size_t finish_before(uintptr_t){return SIZE_MAX;}void finish_after(size_t,uintptr_t){}}
 #include "loading-body.inc"
 namespace d=loading_dispatch;
@@ -48,9 +48,9 @@ void native_finish(void* task){
 void reset(){per_task_finishes.clear();callback_order.clear();
     nonplan_finishes=end_thinks=special_effects=native_deletes=native_runs=0;memory.clear();control={};thread=actual_thread=7;held_tasks=0;timer_step::frame={};fail_write=0;writes=unlocks=finishes=0;original_raises=false;
     d::ordered_finish::enabled=false;d::ordered_finish::batches=d::ordered_finish::admitted=d::ordered_finish::moved_slots=d::ordered_finish::stale_visits=d::ordered_finish::last_frame=0;d::ordered_finish::order_hash=14695981039346656037ull;d::ordered_finish::first_ids.clear();d::ordered_finish::last_ids.clear();
-    memory[image+0x13df8f0]=owner;memory[image+0x13df340]=fake_tasks;memory[owner+0x68]=fake_tasks;memory[fake_tasks]=image+0x16fdaf0;memory[fake_tasks+0xf8]=0;
+    memory[image+0x13eb8f0]=owner;memory[image+0x13eb340]=fake_tasks;memory[owner+0x68]=fake_tasks;memory[fake_tasks]=image+0x1703e90;memory[fake_tasks+0xf8]=0;
     memory[fake_tasks+0xd0]=snapshot;memory[fake_tasks+0xb8]=finished;memory[fake_tasks+0xc0]=0;memory[fake_tasks+0xc4]=16;
-    memory[image+d::Plan+0x18]=image+0x301540;
+    memory[image+d::Plan+0x18]=image+0x304e90;
     d::enabled=true;d::step_drain=false;d::quit_empty_dispatch=false;d::uncertain=false;d::partitions=d::deferred_visits=d::first_defer_frame=d::first_release_frame=d::release_admitted=d::finish_entered=d::finish_returned=0;d::pending=0;d::first_error.clear();d::original_unlock=native_unlock;d::original_finish=native_finish;
 }
 void batch(const std::vector<bool>& plans){int32_t count=int32_t(plans.size());memory[fake_tasks+0xd8]=count;memory[fake_tasks+0xdc]=count;memory[fake_tasks+0xc0]=0;
@@ -61,11 +61,11 @@ namespace o=d::ordered_finish;
 void owned_batch(const std::vector<int32_t>& ids){
     reset();control.phase=Control::Phase::Stepping;o::enabled=true;
     batch(std::vector<bool>(ids.size(),true));
-    memory[image+0x13df690]=0x60000;memory[0x60000]=image+0x1725f40;memory[0x60040]=0x70000;memory[0x60048]=ids.size();memory[0x6004c]=ids.size();memory[0x60068]=10000;
+    memory[image+0x13eb690]=0x60000;memory[0x60000]=image+0x172c2e0;memory[0x60040]=0x70000;memory[0x60048]=ids.size();memory[0x6004c]=ids.size();memory[0x60068]=10000;
     for(size_t i=0;i<ids.size();++i){const auto task=uintptr_t(0x10000+i*0x100),subscriber=uintptr_t(0x30000+i*0x100),toon=uintptr_t(0x40000+i*0x100),brain=uintptr_t(0x50000+i*0x100);
-        memory[0x70000+i*8]=subscriber;memory[subscriber]=image+0x16e75f0;memory[subscriber+0x20]=uint64_t(ids[i]);memory[subscriber+0x80]=toon;memory[subscriber+0x88]=brain;
+        memory[0x70000+i*8]=subscriber;memory[subscriber]=image+0x16ed990;memory[subscriber+0x20]=uint64_t(ids[i]);memory[subscriber+0x80]=toon;memory[subscriber+0x88]=brain;
         memory[task+0x20]=subscriber;memory[task+0x10]=toon;memory[task+0xc]=0;memory[task+0xd]=0;memory[task+0xfd]=0;
-        memory[toon]=image+0x1744e90;memory[toon+0x940]=subscriber;memory[brain]=image+0x16fdd60;memory[brain+0x18]=toon;memory[brain+0x20]=task;memory[brain+0x28]=subscriber;
+        memory[toon]=image+0x174b230;memory[toon+0x940]=subscriber;memory[brain]=image+0x1704100;memory[brain+0x18]=toon;memory[brain+0x20]=task;memory[brain+0x28]=subscriber;
     }
 }
 std::vector<int32_t> snapshot_ids(){std::vector<int32_t> out;for(int32_t i=0;i<read<int32_t>(fake_tasks+0xd8);++i){auto task=read<uintptr_t>(snapshot+size_t(i)*8);out.push_back(read<int32_t>(read<uintptr_t>(task+0x20)+0x20));}return out;}

@@ -8,10 +8,9 @@ namespace mt2fw::mt2 {
 namespace {
 void require(bool value,const std::string& cause){if(!value)throw std::runtime_error(cause);}
 }
-NativeStepDriver::Backend make_native_step_backend(uintptr_t image,const fs::path& executable,NativeRoutes& routes,
+NativeStepDriver::Backend make_native_step_backend(uintptr_t image,const fs::path&,NativeRoutes& routes,
     StepNativeHooks hooks,std::function<void(const MT2FW_MT2_StepBoundary&)> before_step){
     require(image&&image==reinterpret_cast<uintptr_t>(GetModuleHandleW(nullptr)),"Step native image is not the loaded executable");
-    require(file_digest(executable)==step_pins::executable_sha256,"Step executable SHA256 differs");
     require(hooks.original_go&&hooks.original_timer&&hooks.go_detour&&hooks.timer_detour&&before_step,
         "Step Framework Go/Timer/bootstrap hooks are incomplete");
     auto prove=[image,hooks,&routes]{
@@ -28,10 +27,10 @@ NativeStepDriver::Backend make_native_step_backend(uintptr_t image,const fs::pat
     for(const auto& [rva,bytes,sha]:std::array<std::tuple<uint64_t,size_t,const char*>,6>{{
             {step_pins::go_rva,step_pins::go_bytes,step_pins::go_sha256},
             {step_pins::timer_rva,step_pins::timer_bytes,step_pins::timer_sha256},
-            {0x526240,272,"63648e01ead82806b5d976287890d6653f1e5745387b356aaaeb629d1ea09f87"},
-            {0x526350,160,"0acc0efdcbc9ed4445426d1bd10320d9b5827bf3781840eef1b2e467e2bc2c1a"},
-            {0x526d50,480,"666f4cac19d8d04df16bdff53afbcc87899ad708f157aeae5674cf284a4540fa"},
-            {0x525ae0,112,"ffb5c39d83679b65d6d17eed0f5e6031cd7cd967efd3bff784713138a5940046"}}}){
+            {0x52c650,272,"5c994df3f5ff771524a66cedc502b9a8b792d97931a5016611d7755337a3bc98"},
+            {0x52c760,160,"650d51108b7eb798817a589f6f5c6ce26672656bae839ee1ed4219d3249f31f0"},
+            {0x52d170,480,"f1d69fa40fbf68371e1c5cfccd34e93320ba7316f75ac1e97313b061695e9897"},
+            {0x52bed0,112,"f44484b481451f86a7bf86a02a9e4b2ce07b70ce73fbf9ecc751e6ec4d5dd03b"}}}){
         std::string cause;
         if(!routes.verify_body(rva,bytes,sha,cause))
             throw std::runtime_error("Step native body proof failed rva="+std::to_string(rva)+": "+cause);
@@ -47,10 +46,10 @@ NativeStepDriver::Backend make_native_step_backend(uintptr_t image,const fs::pat
             throw std::runtime_error("Step native write failed address="+std::to_string(at)+" required="+std::to_string(bytes)+" actual="+std::to_string(copied)+" win32="+std::to_string(GetLastError()));
     };
     out.original_go=hooks.original_go;out.original_timer=hooks.original_timer;
-    out.pause=reinterpret_cast<StepNativeHooks::Go>(image+0x526240);
-    out.resume=reinterpret_cast<StepNativeHooks::Go>(image+0x526350);
-    out.finish_all=reinterpret_cast<StepNativeHooks::Go>(image+0x526d50);
-    out.all_done=reinterpret_cast<bool(*)(void*)>(image+0x525ae0);
+    out.pause=reinterpret_cast<StepNativeHooks::Go>(image+0x52c650);
+    out.resume=reinterpret_cast<StepNativeHooks::Go>(image+0x52c760);
+    out.finish_all=reinterpret_cast<StepNativeHooks::Go>(image+0x52d170);
+    out.all_done=reinterpret_cast<bool(*)(void*)>(image+0x52bed0);
     out.before_step=std::move(before_step);return out;
 }
 }

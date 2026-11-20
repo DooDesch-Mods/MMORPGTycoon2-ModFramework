@@ -30,7 +30,7 @@ void exit_save(uint32_t operation,const std::string& nonce){
         // QUIT is an intent for this pinned native branch, not a synthetic
         // report that the inner Async Save has already executed.
         require(native_steps->save_request(reinterpret_cast<void*>(bootstrap.mode),MT2FW_MT2_SAVE_QUIT,
-            "autosave",8,quit_save.required,0x4a0690),"Quit Save intent was not retained");return;
+            "autosave",8,quit_save.required,0x4a5b80),"Quit Save intent was not retained");return;
     }
     if(operation==MT2FW_MT2_EXIT_SAVE_COMPLETE){
         quit_save_owner();require(quit_save.route==QuitSave::Route::Managed&&!quit_save.ready&&!quit_save.consumed&&
@@ -80,7 +80,7 @@ void exit_save(uint32_t operation,const std::string& nonce){
 int quit_save_route(void* receiver,uint32_t kind,const std::string& filename,bool option,uintptr_t caller){
     if(!loading_dispatch::quit_empty_dispatch)return 0;
     require(quit_attempted&&!exit_requested&&thread==GetCurrentThreadId()&&
-        reinterpret_cast<uintptr_t>(receiver)==bootstrap.mode&&caller==image+0x4a079a&&
+        reinterpret_cast<uintptr_t>(receiver)==bootstrap.mode&&caller==image+0x4a5c8a&&
         kind==MT2FW_MT2_SAVE_ASYNC&&filename=="autosave"&&!option,
         "Original Quit autosave call differs from its pinned native branch");
     quit_save_owner();

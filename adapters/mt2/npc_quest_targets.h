@@ -13,11 +13,11 @@ namespace mt2fw::game::npc_quest_targets {
 // These observers wrap the engine's existing snapshot calls. They never call
 // Save, Load, Register or a game mutation themselves.
 // The enumerated property inlines the array routines in normal world saves.
-inline constexpr uintptr_t save_property_rva = 0xe3c6e0;
-inline constexpr uintptr_t load_property_rva = 0xe3c0f0;
-inline constexpr uintptr_t load_children_return_rva = 0xe3c1b3;
-inline constexpr uintptr_t load_link_return_rva = 0xe3c56a;
-inline constexpr uintptr_t load_inline_return_rva = 0xe3c638;
+inline constexpr uintptr_t save_property_rva = 0xe481d0;
+inline constexpr uintptr_t load_property_rva = 0xe47be0;
+inline constexpr uintptr_t load_children_return_rva = 0xe47ca3;
+inline constexpr uintptr_t load_link_return_rva = 0xe4805a;
+inline constexpr uintptr_t load_inline_return_rva = 0xe48128;
 using PropertyCall = bool(*)(const void*, void*, void*, void*);
 
 struct Budget { size_t zones = 0, sections = 0, vertices = 0, buildings = 0; };
@@ -107,7 +107,7 @@ bool unchanged(Memory& memory, uintptr_t array, size_t budget, const Bounds& bef
 template<class Memory>
 bool content(Memory& memory, uintptr_t image, uintptr_t object, const Budget& budget, Content& out, std::string& error, int32_t expected_type=1) {
     out = {};
-    if (!typed(memory, image, object, 0x1745ce0, error) ||
+    if (!typed(memory, image, object, 0x174c080, error) ||
         !at(memory, object, 0x24c, out.type, error) || !at(memory, object, 0x250, out.density, error) ||
         !at(memory, object, 0x360, out.level, error) || !at(memory, object, 0x560, out.monster_type, error) ||
         !at(memory, object, 0x56c, out.constructed_day, error)) return false;
@@ -115,17 +115,17 @@ bool content(Memory& memory, uintptr_t image, uintptr_t object, const Budget& bu
     const auto shape = object + 0x2f0;
     const auto array = shape + 0x40;
     Bounds sections;
-    if (!typed(memory, image, shape, 0x16e0140, error) || !typed(memory, image, array, 0x16eb080, error) ||
+    if (!typed(memory, image, shape, 0x16e64e0, error) || !typed(memory, image, array, 0x16f1420, error) ||
         !bounds(memory, array, budget.sections, sections, error)) return false;
     size_t vertices_read = 0;
     std::set<uintptr_t> unique;
     for (int32_t n = 0; n < sections.count; ++n) {
         uintptr_t section = 0;
         if (!at(memory, sections.data, static_cast<size_t>(n) * 8, section, error) ||
-            !typed(memory, image, section, 0x16fef20, error)) return false;
+            !typed(memory, image, section, 0x17052c0, error)) return false;
         if (!unique.insert(section).second) return fail(error, "quest target repeats a shape section");
         Bounds vertices;
-        if (!typed(memory, image, section + 0x40, 0x1746160, error) ||
+        if (!typed(memory, image, section + 0x40, 0x174c500, error) ||
             !bounds(memory, section + 0x40, budget.vertices - vertices_read, vertices, error)) return false;
         std::vector<std::array<uint32_t, 3>> points(static_cast<size_t>(vertices.count));
         for (size_t v = 0; v < points.size(); ++v)
@@ -142,7 +142,7 @@ bool observe_array(Memory& memory, uintptr_t image, uintptr_t array, const Budge
                    LinkId&& link_id, Array& out, std::string& error) {
     out = {}; out.pointer = array;
     Bounds initial;
-    if (!typed(memory, image, array, 0x172e1e0, error) || !bounds(memory, array, budget.zones, initial, error)) return false;
+    if (!typed(memory, image, array, 0x1734580, error) || !bounds(memory, array, budget.zones, initial, error)) return false;
     std::set<uintptr_t> pointers; std::set<uint64_t> uids; std::set<int32_t> ids;
     for (int32_t n = 0; n < initial.count; ++n) {
         Zone zone; zone.saved_child = static_cast<size_t>(n);
@@ -163,7 +163,7 @@ bool owner(Memory& memory, const World& world, uintptr_t& building_manager, uint
     auto read = [&](uintptr_t object, size_t offset, auto& out, std::string& cause) { return at(memory, object, offset, out, cause); };
     if (!region_saved_identity::resolve(world.image, world.map, world.root, world.saved_region, world.region, selected, read, error) ||
         !at(memory, world.region, 0x950, building_manager, error) || !at(memory, world.region, 0x968, zone_manager, error) ||
-        !typed(memory, world.image, building_manager, 0x17183c0, error) || !typed(memory, world.image, zone_manager, 0x16fe170, error)) return false;
+        !typed(memory, world.image, building_manager, 0x171e760, error) || !typed(memory, world.image, zone_manager, 0x1704510, error)) return false;
     uintptr_t building_region = 0, building_root = 0, zone_region = 0;
     if (!at(memory, building_manager, 0x450, building_root, error) || !at(memory, building_manager, 0x458, building_region, error) ||
         !at(memory, zone_manager, 0xf0, zone_region, error)) return false;
@@ -207,7 +207,7 @@ bool read(Memory& memory, const World& world, const SavedPool& saved, const Budg
     out = {};
     if (!validate_saved(memory, world, saved, budget, error)) return false;
     uintptr_t manager = 0;
-    if (!at(memory, world.region, 0x950, manager, error) || !typed(memory, world.image, manager + 0x408, 0x172d7c0, error)) return false;
+    if (!at(memory, world.region, 0x950, manager, error) || !typed(memory, world.image, manager + 0x408, 0x1733b60, error)) return false;
     Bounds initial;
     if (!bounds(memory, manager + 0x408, budget.buildings, initial, error)) return false;
     std::set<std::string> unique;
@@ -231,7 +231,7 @@ bool destination(Memory& memory, const World& world, const SavedPool& saved, con
     if (!pointer) return fail(error, "quest destination is null");
     uintptr_t ap = 0;
     if (!at(memory, pointer, 0, ap, error)) return false;
-    if (ap == world.image + 0x1745ce0) {
+    if (ap == world.image + 0x174c080) {
         if (!validate_saved(memory, world, saved, budget, error)) return false;
         for (const auto& zone : saved.array.zones) if (zone.pointer == pointer) {
             key = zone_key(saved, zone); error.clear(); return true;
@@ -297,7 +297,7 @@ bool child_header(Memory& memory, uintptr_t reader, ChildHeader& out, std::strin
 template<class Memory>
 bool property(Memory& memory, uintptr_t image, uintptr_t object, uintptr_t manager, std::string& error) {
     uint64_t offset = 0; int32_t count = 0;
-    if (!typed(memory, image, object, 0x1740cb0, error) || !typed(memory, image, manager, 0x16fe170, error) ||
+    if (!typed(memory, image, object, 0x1747050, error) || !typed(memory, image, manager, 0x1704510, error) ||
         !at(memory, object, 0x38, offset, error) || !at(memory, object, 0x40, count, error)) return false;
     return (offset == 0x18 && count == 4) || fail(error, "quest Zone enumerated property layout differs");
 }
@@ -335,7 +335,7 @@ bool begin_load(Memory& memory, uintptr_t image, uintptr_t property_object, uint
     if (!reader || !context) return fail(error, "quest Zone load reader/context absent");
     if (!property(memory, image, property_object, manager, error)) return false;
     Bounds initial;
-    if (!typed(memory, image, manager + 0x48, 0x172e1e0, error) ||
+    if (!typed(memory, image, manager + 0x48, 0x1734580, error) ||
         !bounds(memory, manager + 0x48, budget.zones, initial, error)) return false;
     if (initial.count) return fail(error, "quest native load requires initially empty Monster array");
     frame.array = manager + 0x48; frame.reader = reader; frame.context = context;
@@ -345,7 +345,7 @@ template<class Memory>
 bool registered(Memory& memory, uintptr_t image, LoadFrame& frame, uintptr_t caller,
                 uintptr_t context, int32_t id, uintptr_t object, std::string& error) {
     int32_t type = -1; uintptr_t registered_context = 0;
-    if (!typed(memory, image, object, 0x1745ce0, error) || !at(memory, object, 0x24c, type, error) ||
+    if (!typed(memory, image, object, 0x174c080, error) || !at(memory, object, 0x24c, type, error) ||
         !at(memory, object, 8, registered_context, error)) return false;
     if (registered_context != context) return fail(error, "quest loaded Zone object context differs from original registration");
     if (type != 1) return true;

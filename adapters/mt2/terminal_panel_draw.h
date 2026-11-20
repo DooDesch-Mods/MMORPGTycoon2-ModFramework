@@ -41,14 +41,14 @@ struct Native {
 inline Native native_calls(uintptr_t image,std::function<void(uintptr_t,void*,size_t)> read){
     Native n;n.read=std::move(read);
 #define MT2_TERMINAL_CALL(field,rva) n.field=reinterpret_cast<decltype(n.field)>(image+rva)
-    MT2_TERMINAL_CALL(queue_construct,0x9b2d90);MT2_TERMINAL_CALL(queue_destroy,0x9b2f50);
-    MT2_TERMINAL_CALL(list_construct,0x977b10);MT2_TERMINAL_CALL(list_destroy,0x977cb0);
-    MT2_TERMINAL_CALL(start,0x9b3030);MT2_TERMINAL_CALL(projection,0x970940);
-    MT2_TERMINAL_CALL(set_projection,0x9733f0);MT2_TERMINAL_CALL(set_view,0x9732f0);
-    MT2_TERMINAL_CALL(window_draw,0x81dc30);MT2_TERMINAL_CALL(queue_draw,0x9b33f0);
-    MT2_TERMINAL_CALL(end,0x9b3490);MT2_TERMINAL_CALL(clear_state,0x9ba370);
-    MT2_TERMINAL_CALL(set_target,0x9ba9d0);MT2_TERMINAL_CALL(render,0x9bf050);
-    MT2_TERMINAL_CALL(present,0x9b9cf0);
+    MT2_TERMINAL_CALL(queue_construct,0x9bc880);MT2_TERMINAL_CALL(queue_destroy,0x9bca40);
+    MT2_TERMINAL_CALL(list_construct,0x980e60);MT2_TERMINAL_CALL(list_destroy,0x981000);
+    MT2_TERMINAL_CALL(start,0x9bcb20);MT2_TERMINAL_CALL(projection,0x979b80);
+    MT2_TERMINAL_CALL(set_projection,0x97c740);MT2_TERMINAL_CALL(set_view,0x97c640);
+    MT2_TERMINAL_CALL(window_draw,0x826220);MT2_TERMINAL_CALL(queue_draw,0x9bcee0);
+    MT2_TERMINAL_CALL(end,0x9bcf80);MT2_TERMINAL_CALL(clear_state,0x9c3f30);
+    MT2_TERMINAL_CALL(set_target,0x9c4590);MT2_TERMINAL_CALL(render,0x9c8c10);
+    MT2_TERMINAL_CALL(present,0x9c3800);
 #undef MT2_TERMINAL_CALL
     return n;
 }
@@ -57,9 +57,9 @@ template<class T>T get(const Native& n,uintptr_t at){T out{};n.read(at,&out,size
 inline void inspect_tree(const Native& n,const Owner& o,uintptr_t pane,std::set<uintptr_t>& visited,unsigned depth=0){
     require(pane&&depth<8&&visited.size()<192&&visited.insert(pane).second,"Terminal pane tree is absent, cyclic or exceeds its bound");
     const auto type=get<uintptr_t>(n,pane)-o.image;
-    const bool window=pane==o.panel&&type==0x17883d0;
-    const bool view=type==0x1745a80||type==0x16dc930;
-    require(window||view||type==0x1743cc0||type==0x16dc680||type==0x1703290||type==0x16e3ec0,
+    const bool window=pane==o.panel&&type==0x178e770;
+    const bool view=type==0x174be20||type==0x16e2cd0;
+    require(window||view||type==0x174a060||type==0x16e2a20||type==0x1709630||type==0x16ea260,
         "Terminal pane tree contains an unsupported native class");
     if(window||view){
         for(size_t offset:{size_t(0x2d0),size_t(0x300)}){
@@ -77,19 +77,19 @@ inline Surface inspect(const Native& n,const Owner& o,bool visible=true){
     require(o.image&&o.game&&o.mode&&o.panel&&o.panel==o.registered_panel&&o.screen&&o.window,"Terminal panel registry owner is absent or changed");
     require(o.width>0&&o.height>0&&o.width<=16384&&o.height<=16384,"Terminal drawable dimensions are invalid");
     require(o.mode_index==2||o.mode_index==3,"Terminal native Mode is neither Title nor InGame");
-    require(get<uintptr_t>(n,o.image+0x13df8f0)==o.game&&get<uintptr_t>(n,o.game+0x28)==o.mode&&
+    require(get<uintptr_t>(n,o.image+0x13eb8f0)==o.game&&get<uintptr_t>(n,o.game+0x28)==o.mode&&
         get<uintptr_t>(n,o.game+(o.mode_index==2?0x350:0x358))==o.mode&&
-        get<uintptr_t>(n,o.mode)==o.image+(o.mode_index==2?0x16dfbb0:0x16e6730)&&get<uintptr_t>(n,o.image+0x1c4e3a0)==o.screen,
+        get<uintptr_t>(n,o.mode)==o.image+(o.mode_index==2?0x16e5f50:0x16ecad0)&&get<uintptr_t>(n,o.image+0x1c553a0)==o.screen,
         "Terminal native Game, Mode or Screen owner changed");
-    require(get<uintptr_t>(n,o.image+0x1c4dc08)==o.window,"Terminal native Present window differs from retained pixels");
-    require(get<uintptr_t>(n,o.panel)==o.image+0x17883d0,"Terminal panel is not the native base Window");
+    require(get<uintptr_t>(n,o.image+0x1c54c08)==o.window,"Terminal native Present window differs from retained pixels");
+    require(get<uintptr_t>(n,o.panel)==o.image+0x178e770,"Terminal panel is not the native base Window");
     require(get<uintptr_t>(n,o.panel+0x318)==0&&get<int32_t>(n,o.panel+0x3b0)==0,
         "Terminal panel has external logic or attached panes");
     require(!visible||(get<uint8_t>(n,o.panel+0x45f)==1&&get<uint8_t>(n,o.panel+0x69)==1),
         "Terminal panel is not visibly open");
     std::set<uintptr_t> tree;inspect_tree(n,o,o.panel,tree);
     Surface s;s.scene=get<uintptr_t>(n,o.panel+0x60);
-    require(s.scene&&get<uintptr_t>(n,s.scene)==o.image+0x17494e0&&get<uint8_t>(n,s.scene+0xac)==0,
+    require(s.scene&&get<uintptr_t>(n,s.scene)==o.image+0x174f880&&get<uint8_t>(n,s.scene+0xac)==0,
         "Terminal panel does not belong to a native 2D Scene");
     const auto count=get<int32_t>(n,o.screen+0x30);const auto scenes=get<uintptr_t>(n,o.screen+0x10);
     require(scenes&&count>0&&count<=128,"Terminal Screen scene table is invalid");
@@ -103,8 +103,8 @@ inline Surface inspect(const Native& n,const Owner& o,bool visible=true){
     require(stencil==0&&viewport==0&&depth==0,"Terminal Scene requires full-window plain pass: stencil="+
         std::to_string(stencil)+" viewport="+std::to_string(viewport)+" depth_clear="+std::to_string(depth));
     s.camera=get<uintptr_t>(n,s.scene+0x38);s.renderer=get<uintptr_t>(n,o.screen);
-    require(s.camera&&get<uintptr_t>(n,s.camera)==o.image+0x16c2540&&s.renderer&&
-        get<uintptr_t>(n,s.renderer)==o.image+0x171c850,"Terminal camera or renderer class differs");
+    require(s.camera&&get<uintptr_t>(n,s.camera)==o.image+0x16c88e0&&s.renderer&&
+        get<uintptr_t>(n,s.renderer)==o.image+0x1722bf0,"Terminal camera or renderer class differs");
     require(get<uint8_t>(n,s.renderer+0x9a4)==1,"Terminal renderer still has an unfinished native GPU query");
     s.target=get<uintptr_t>(n,s.renderer+0x150);
     require(s.target&&get<uintptr_t>(n,s.target+0x60),"Terminal present target has no existing backing");

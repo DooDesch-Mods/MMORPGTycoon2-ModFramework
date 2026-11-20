@@ -10,7 +10,7 @@ uint64_t partitions=0,deferred_visits=0,first_defer_frame=0,first_release_frame=
 uint64_t release_admitted=0,finish_entered=0,finish_returned=0;
 int32_t pending=0;
 std::string first_error;
-constexpr uintptr_t Plan=0x17037f0,PumpUnlockReturn=0x526be2,PumpFinishReturn=0x526c55;
+constexpr uintptr_t Plan=0x1709b90,PumpUnlockReturn=0x52d002,PumpFinishReturn=0x52d075;
 void require(bool value,const std::string& cause){if(!value)throw std::runtime_error(cause);}
 #ifdef MT2FW_ORDERED_RECOVERY
 struct RecoveryDrain {
@@ -30,7 +30,7 @@ struct RecoveryDrain {
 bool recovery_draining(){
     const auto* scope=RecoveryDrain::current;if(!scope)return false;
     require(native_steps->recovery_snapshot()==&scope->certificate&&scope->certificate.phase==MT2FW_MT2_RECOVERY_PREPARING&&
-        scope->certificate.prepare_attempted==1&&scope->game==owner&&scope->tasks==read<uintptr_t>(image+0x13df340)&&
+        scope->certificate.prepare_attempted==1&&scope->game==owner&&scope->tasks==read<uintptr_t>(image+0x13eb340)&&
         thread==GetCurrentThreadId()&&!control.entered&&!timer_step::frame.active,"Recovery drain owner escaped its no-Go preparation");
     return true;
 }
@@ -41,8 +41,8 @@ uintptr_t manager(){
     require(thread==GetCurrentThreadId(),"Loading dispatch game thread changed");
     require((control.entered&&timer_step::frame.active)||recovery_draining(),"Loading dispatch lacks admitted outer frame or exact Recovery drain");
     timer_step::current_game();
-    const auto tasks=read<uintptr_t>(image+0x13df340);
-    require(tasks&&read<uintptr_t>(owner+0x68)==tasks&&read<uintptr_t>(tasks)==image+0x16fdaf0,"Loading dispatch Task owner/address point changed");
+    const auto tasks=read<uintptr_t>(image+0x13eb340);
+    require(tasks&&read<uintptr_t>(owner+0x68)==tasks&&read<uintptr_t>(tasks)==image+0x1703e90,"Loading dispatch Task owner/address point changed");
     require(!held_tasks&&read<uint8_t>(tasks+0xf8)==0,"Loading dispatch workers are held");
     require(!uncertain,"Loading dispatch previous queue mutation is uncertain");
     return tasks;
@@ -51,7 +51,7 @@ bool plan(uintptr_t task){
     require(task!=0,"Loading dispatch null task");
     if(read<uintptr_t>(task)!=image+Plan)return false;
     require(read<int32_t>(task+8)==2&&read<uint8_t>(task+0xe)==0,"Loading dispatch ToonPlan type/completion differs");
-    require(read<uintptr_t>(image+Plan+0x18)==image+0x301540,"Loading dispatch ToonPlan Finish slot changed");
+    require(read<uintptr_t>(image+Plan+0x18)==image+0x304e90,"Loading dispatch ToonPlan Finish slot changed");
     return true;
 }
 #include "determinism_ordered_finish.inc"
@@ -90,8 +90,8 @@ uint64_t path_children(uintptr_t tasks){
         for(int32_t i=0;i<count;++i){const auto task=read<uintptr_t>(data+size_t(i)*8);
             require(task&&unique.insert(task).second,"Path child queue has absent or duplicate ownership");
             const auto ap=read<uintptr_t>(task);const auto type=read<int32_t>(task+8);
-            require((slot==2||slot==5||slot==6)&&ap==image+0x1714ac0&&type==2&&read<uint8_t>(task+0xe)==0&&
-                read<uintptr_t>(ap+0x18)==image+0x2c4e70,
+            require((slot==2||slot==5||slot==6)&&ap==image+0x171ae60&&type==2&&read<uint8_t>(task+0xe)==0&&
+                read<uintptr_t>(ap+0x18)==image+0x2c8480,
                 "Post-ToonPlan work is not a native Pathfinder child: queue="+std::to_string(offset)+" count="+std::to_string(count)+
                 " addresspoint="+std::to_string(ap>=image?ap-image:ap)+" type="+std::to_string(type));
             ++total;
@@ -158,8 +158,8 @@ void before_unlock(void* mutex){
     if(quit_empty_dispatch){
         require(thread==GetCurrentThreadId()&&control.phase==mt2::determinism::Gate::Phase::Held&&
             !control.entered&&!timer_step::frame.active,"Quit dispatch is outside its held command scope");
-        const auto tasks=read<uintptr_t>(image+0x13df340);
-        require(tasks&&tasks==held_tasks&&read<uintptr_t>(owner+0x68)==tasks&&read<uintptr_t>(tasks)==image+0x16fdaf0&&
+        const auto tasks=read<uintptr_t>(image+0x13eb340);
+        require(tasks&&tasks==held_tasks&&read<uintptr_t>(owner+0x68)==tasks&&read<uintptr_t>(tasks)==image+0x1703e90&&
             reinterpret_cast<uintptr_t>(mutex)==tasks+0xf0,"Quit dispatch Task owner/mutex changed");
         require(read<uint8_t>(tasks+0xf8)==1&&read<int32_t>(tasks+0xa8)==0&&read<int32_t>(tasks+0x90)==0,
             "Quit dispatch workers are not paused/drained");
@@ -232,42 +232,42 @@ void install(const Json& config){
     enabled=config.value("defer_loading_plans",false);ordered_finish::install(config);if(!enabled)return;
     require(config.value("task_barrier",false)&&config.value("bootstrap_boundary",false),"Loading dispatch requires task and bootstrap boundaries");
     for(const auto& [offset,size,sha]:std::array<std::tuple<uintptr_t,size_t,const char*>,22>{{
-        {0x5258b0,48,"1c49f7b3d7e3ee4431d6f520a961ad718b724641fe4854d512890a90cc5935d9"},
-        {0x8819e0,64,"fa3d71ce6e9e7f4de3aa5f0e35cf27540a6bda368fcc202e6b9057e7c6abe7d2"},
-        {0x881b30,672,"f0dea32c427373cf7bfc89c1d1dea5183fddd2f452b03d038427559489202303"},
-        {0xc367a0,16,"499f1f307c1cb989f968a6b7fcaec591e1828877223d0b0e7e8e8b76cde8c9ca"},
-        {0x5258e0,384,"34f36fc926028624a1fb7e1a5ac55effdad48942080b88d408a8a67a3d2c0ae3"},
-        {0x526f30,656,"398f2860081c8e99bee70e184aebae5eed5934776697197f7fad5a7d017d9191"},
-        {0x529240,80,"88d91bffc505162b97c21c5195590f24730fcae9b9d9f1b3631ec968dd94ee58"},
-        {0x5271c0,688,"1130ccf782f91dd0ffcc784111c3909076aa704da106a103b23167c00879c50b"},
-        {0x3034f0,2960,"1ffdfb4f9a2b1583318ce4915e3176897b7309b6a73cf3cbe3448def04b21398"},
-        {0xa0b190,32,"4a8e56e13d3367d83f43f02ba400f0650c0d18efdb30f7fde2443d1077fbc0da"},
-        {0xa0b1b0,16,"7d304000253004e308040d0ce0e08923cca0c770f023accc196425ce1488ba26"},
-        {0xa0b1c0,48,"8bac6f9fd573e2a125dc12da69cdf43bedbab7d789c9db0da6cbe35e51a86633"},
-        {0x528d10,1264,"eeb7c04444721ce57671f50444c8dff7ad54aed2ea91677b0923c64825d02e9a"},
-        {0x302130,2784,"570667edb34e6cfb490fb2c68ac7d7bc717931bda199f27677af9a54679cb957"},
-        {0x2c5150,352,"4ec676eed9155be0d7e8dbff13a88a1ad1574c5444f70e9bad286f105a52085a"},
-        {0x2c4e70,16,"57e801b77079454e0fda719f80df81c8a8ecfbfeb5ee311fd1b43029f3151c88"},
-        {0xa0b0b0,16,"74058e2f7751de28d7fc699eb506c1bd6a4e617385e3c5575abcc495b8a541ef"},
-        {0x526b00,432,"12ca52a501a074d6459b697bf9df2d8c4a7322bed76270b0cfe9dc33b91bd016"},
-        {0xa0b0c0,16,"bb65d9ed8a4b4118a4fe43ddefc29df52a3b6176c7214051853c04163170834d"},
-        {0x528910,704,"37f926e93e7d92ce59925e9e495c1706ffd3261ffc5af95f6619fc742977fc8f"},
-        {0x528bd0,320,"6d81683f78e5b0d0a294bd4e644fc5caf1ca185e09727ac313c0d3feea4a21c0"},
-        {0x301540,48,"184187f03856909527c5ed1b829c6cb52d4ea7322ba6164447b41dbbacd6a167"}}}){
+        {0x52bca0,48,"c360b80e08ab9d4bcb128bfd19a4b49e0231dd50874513ddd1918bc968b69033"},
+        {0x88a7a0,64,"c00f6bfb163738db32a6d1ecbb36d5597e4ec43c5a0f346a933f89f15aeb9d4c"},
+        {0x88a8f0,672,"fe0a9bb2690227fdebc3c90607ca3e61125db70074c82104efd5f7a0c01054cc"},
+        {0xc43050,16,"499f1f307c1cb989f968a6b7fcaec591e1828877223d0b0e7e8e8b76cde8c9ca"},
+        {0x52bcd0,384,"24d300bdcd38782ede1c7d2abbe0f312e719e5170df2c4e413b168be08eac0e4"},
+        {0x52d350,656,"7032628a84fa3aadf1ea0db5dfd2a61b24598742ffa65260d104b7d8ee324dd5"},
+        {0x52f6c0,80,"9f9e9c3e8fda22042d4cc140f3045a409ab7eb5ec7ba83cd8008f28da6fd2241"},
+        {0x52d5e0,688,"fe60322d41bc348ab845c447946183b4632f8b731d755122f51404afe3ab76cc"},
+        {0x306e50,2960,"1ffdfb4f9a2b1583318ce4915e3176897b7309b6a73cf3cbe3448def04b21398"},
+        {0xa15d50,32,"880aca15d3c48a1445edd270fd16c3059182f388373065b47134512bcb5945c3"},
+        {0xa15d70,16,"0cda1e1a74db7014ee00491e24368aacfdcdc4b7ecd7f3a3ebf09a38f0994589"},
+        {0xa15d80,48,"5e5d1112c8eed8b7390cece342b2c264ec6e1629f9edbe72959f1276ee971275"},
+        {0x52f190,1264,"6de4bba2d451254c1734c52df8119f69ceedb7321d0cb3f003bf637585822317"},
+        {0x305a80,2784,"e75f5bccc0b1897a2f000539a81818632e0c32113ad7a5ffd237e86eabf73a39"},
+        {0x2c8760,352,"00ad1db9327c9096d66275838d4bf11ebf9848ad6164240b5c67711c4ba043df"},
+        {0x2c8480,16,"57e801b77079454e0fda719f80df81c8a8ecfbfeb5ee311fd1b43029f3151c88"},
+        {0xa15c70,16,"1b6c7cf1f5a5e33a415cf4c8ee1f30220a18186f45f1e55644059940bf551249"},
+        {0x52cf20,432,"db5e9cc494cc1f60c38e250084967df1e2bebe2f84a2bb18f1fd3a02430aa176"},
+        {0xa15c80,16,"c0f0bce8becfaa6e989b6d4f26882e89fef666eca6ad5b141461597af0a02cf4"},
+        {0x52ed90,704,"0f35b050a174025f709834afba78f53ef14ccf40575b2a1a3a9b16a27eadc8ed"},
+        {0x52f050,320,"6460f08cadac4262089b2ef0e0295dab33bcaa055c680ff8159aacba6ca1b91b"},
+        {0x304e90,48,"a0703198546cfb6c7851aca8acd296958e16bdddd062da7ea1b4ecabbb08c4cd"}}}){
         std::string body(size,'\0');SIZE_T copied=0;
         if(!ReadProcessMemory(GetCurrentProcess(),reinterpret_cast<void*>(image+offset),body.data(),size,&copied)||copied!=size||digest(body)!=sha)
             throw std::runtime_error("Loading dispatch exact native body differs");
     }
-    require(read<uintptr_t>(image+Plan+0x10)==image+0x302130,"Ordered Run exact ToonPlan Run slot differs");
-    native_routes->catalog("framework.save.writer-complete",0x5258b0,true);
+    require(read<uintptr_t>(image+Plan+0x10)==image+0x305a80,"Ordered Run exact ToonPlan Run slot differs");
+    native_routes->catalog("framework.save.writer-complete",0x52bca0,true);
     native_services->reserve("framework.save.writer-complete");
-    hook(reinterpret_cast<void*>(image+0x5258b0),reinterpret_cast<void*>(&save_completion::entry),reinterpret_cast<void**>(&save_completion::original));
-    ordered_run::post=reinterpret_cast<Unlock>(image+0xa0b1b0);
-    path_lock=reinterpret_cast<Unlock>(image+0xa0b0b0);
-    require(read<uintptr_t>(image+0x1714ac0+0x18)==image+0x2c4e70,"Native Pathfinder Finish slot differs");
-    require(read<uintptr_t>(image+Plan+0x18)==image+0x301540,"Loading dispatch exact ToonPlan Finish slot differs");
-    hook(reinterpret_cast<void*>(image+0xa0b0b0),reinterpret_cast<void*>(&ordered_run::lock),reinterpret_cast<void**>(&ordered_run::original_lock));
-    hook(reinterpret_cast<void*>(image+0xa0b0c0),reinterpret_cast<void*>(&unlock),reinterpret_cast<void**>(&original_unlock));
-    hook(reinterpret_cast<void*>(image+0x301540),reinterpret_cast<void*>(&finish),reinterpret_cast<void**>(&original_finish));
+    hook(reinterpret_cast<void*>(image+0x52bca0),reinterpret_cast<void*>(&save_completion::entry),reinterpret_cast<void**>(&save_completion::original));
+    ordered_run::post=reinterpret_cast<Unlock>(image+0xa15d70);
+    path_lock=reinterpret_cast<Unlock>(image+0xa15c70);
+    require(read<uintptr_t>(image+0x171ae60+0x18)==image+0x2c8480,"Native Pathfinder Finish slot differs");
+    require(read<uintptr_t>(image+Plan+0x18)==image+0x304e90,"Loading dispatch exact ToonPlan Finish slot differs");
+    hook(reinterpret_cast<void*>(image+0xa15c70),reinterpret_cast<void*>(&ordered_run::lock),reinterpret_cast<void**>(&ordered_run::original_lock));
+    hook(reinterpret_cast<void*>(image+0xa15c80),reinterpret_cast<void*>(&unlock),reinterpret_cast<void**>(&original_unlock));
+    hook(reinterpret_cast<void*>(image+0x304e90),reinterpret_cast<void*>(&finish),reinterpret_cast<void**>(&original_finish));
 }
 }

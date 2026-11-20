@@ -54,7 +54,8 @@ void prepare() {
             game=module_path(nullptr).parent_path();
             std::ifstream stream(game/"mt2fw.json");if(!stream){record("info","No framework configuration; original game continues");return;}
             Json config;stream>>config;if(!config.value("enabled",true)){record("info","Framework disabled; original game continues");return;}
-            if(file_digest(game/"MT2.exe")!="bbab2dc68babcc644d0a1679548bf1e334b6c52aea669c3f61f6cb9d45c1aaf6") {record("error","Unsupported executable; adapter and mods disabled");return;}
+            // A different build still loads: every hook and pin checks its own code and disables only its feature.
+            if(auto digest=file_digest(game/"MT2.exe");digest!="7efd8ee7b97f78362e7a2f8116b327fa6b756bdce23114b68143c4c9d2dd50eb")record("warn","MT2.exe SHA256 "+digest+" differs from the supported build; features whose game code changed stay disabled");
             auto selected=fs::u8path(config.at("profile").get<std::string>());
             if(!selected.is_absolute())throw std::runtime_error("Framework profile must be absolute");
             auto canonical=fs::weakly_canonical(selected);
@@ -65,7 +66,7 @@ void prepare() {
             }
             fs::create_directories(canonical/"game-data");profile=canonical;data=profile/"game-data";
             auto encoded=data.generic_u8string();data_utf8.assign(reinterpret_cast<const char*>(encoded.data()),encoded.size());data_utf8+='/';
-            enabled=true;record("info","Exact game build accepted; isolated framework profile prepared");
+            enabled=true;record("info","Isolated framework profile prepared");
         }catch(const std::exception& error){enabled=false;record("error",error.what());}
     });
 }

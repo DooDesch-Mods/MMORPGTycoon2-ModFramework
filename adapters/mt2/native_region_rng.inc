@@ -35,7 +35,7 @@ void arm(const mt2::StepPreloadIdentity& identity,const std::vector<Row>& rows){
     receipts.arm(identity.region_rng_mode,rows);mode=identity.region_rng_mode;agreed_seed=*identity.agreed_seed;armed=true;
 }
 std::map<int32_t,uintptr_t> census(){
-    const auto map=read<uintptr_t>(image+0x13df8c0);
+    const auto map=read<uintptr_t>(image+0x13eb8c0);
     mt2fw::game::region_saved_identity::Index index;std::string cause;
     auto at=[](uintptr_t object,size_t offset,auto& out,std::string&){out=read<std::remove_reference_t<decltype(out)>>(object+offset);return true;};
     const bool captured=mt2fw::game::region_saved_identity::capture(image,map,map+0x1c0,index,at,cause);
@@ -45,7 +45,7 @@ std::map<int32_t,uintptr_t> census(){
 uint64_t constructor_call(void* rng,uintptr_t caller)try{
     const auto result=original_constructor(rng);
     std::lock_guard lock(gate);
-    if(armed&&caller==image+0x357d91){
+    if(armed&&caller==image+0x35c5c1){
         const auto receiver=reinterpret_cast<uintptr_t>(rng);require(receiver>0x268,"Region RNG constructor receiver invalid");
         receipts.constructed(receiver-0x268,value(receiver-0x268));
     }
@@ -55,7 +55,7 @@ catch(...){record_failure("Region RNG constructor raised an unknown exception; n
 __declspec(noinline) uint64_t constructor(void* rng){return constructor_call(rng,reinterpret_cast<uintptr_t>(_ReturnAddress()));}
 void finish_call(void* object,uintptr_t caller)try{
     const auto region=reinterpret_cast<uintptr_t>(object);bool observed=false;int32_t id=-1;
-    {std::lock_guard lock(gate);if(armed&&caller==image+0x333a03){
+    {std::lock_guard lock(gate);if(armed&&caller==image+0x337b03){
         require(first_error.empty(),first_error);
         const auto owners=census();receipts.census(owners,initial);
         id=read<int32_t>(region+0x834);const auto expected=receipts.attempt(id,region,value(region));
@@ -77,19 +77,19 @@ void cancel(){std::lock_guard lock(gate);armed=false;}
 void reset(){std::lock_guard lock(gate);require(!armed,"Region RNG reset retains an armed load");receipts={};sealed.clear();mode=0;agreed_seed=0;first_error.clear();}
 void install(){
     native_routes->catalog("framework.step.region-rng-constructor",0x9fbfa0,true);
-    native_routes->catalog("framework.step.region-finish",0x353bd0,true);
+    native_routes->catalog("framework.step.region-finish",0x3588f0,true);
     native_services->reserve("framework.step.region-rng-constructor");
     native_services->reserve("framework.step.region-finish");
     for(const auto& [offset,size,sha]:std::array<std::tuple<uintptr_t,size_t,const char*>,4>{{
         {0x9fbfa0,224,"d47d25c1590b15ecd338ab68eba277eb47523426a9eb2252af5e761e5c4a56a9"},
-        {0x353bd0,1824,"ef149471e855888b7bd8321f347b6292bf81c89144e996d78fde5949ca224f28"},
-        {0x357ce0,1952,"b8c9bc9b510fba38bf161bbf51ab4778692d5c9aad2ef826b9b023229990e58c"},
-        {0x332610,9072,"5c06a00af14840825b6381b1c4f0cffb4f9245475f113fd5b6fc33a46b7aa51a"}}}){
+        {0x3588f0,1824,"b83ab5484bda2308806a65752b19fda9fc6c1b7b8c2cc5ae15a8145c2f980e06"},
+        {0x35c510,1952,"b8db5d3c895d96839ee519613b5dda1880fb9341f819b5c8a78241f588d028da"},
+        {0x336710,9072,"0d1bcab3911112956734c61dd12e345d66540c232306e3682e21b25742af6fd4"}}}){
         std::string body(size,'\0');SIZE_T copied=0;
         require(ReadProcessMemory(GetCurrentProcess(),reinterpret_cast<void*>(image+offset),body.data(),size,&copied)&&copied==size&&digest(body)==sha,
             "Region RNG original load/Finish/constructor/Map body differs");
     }
     hook(reinterpret_cast<void*>(image+0x9fbfa0),reinterpret_cast<void*>(&constructor),reinterpret_cast<void**>(&original_constructor));
-    hook(reinterpret_cast<void*>(image+0x353bd0),reinterpret_cast<void*>(&finish),reinterpret_cast<void**>(&original_finish));
+    hook(reinterpret_cast<void*>(image+0x3588f0),reinterpret_cast<void*>(&finish),reinterpret_cast<void**>(&original_finish));
 }
 }

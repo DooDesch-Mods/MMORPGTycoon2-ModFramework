@@ -29,8 +29,8 @@ bool scan(uintptr_t image,uintptr_t map,uintptr_t root,int32_t requested,uintptr
        !read(map+0x230,0x10,count,error)||!read(map+0x230,0x14,capacity,error)||
        !read(map,0x358,owned,error)||!read(map,0x360,owned_count,error)||
        !read(map,0x364,owned_capacity,error))return false;
-    if(map_ap!=image+0x1742860||root_ap!=image+0x174ad20||root_type!=0||
-       saved_ap!=image+0x16f04e0)return reject("saved region Map, root or array address point differs");
+    if(map_ap!=image+0x1748c00||root_ap!=image+0x17510c0||root_type!=0||
+       saved_ap!=image+0x16f6880)return reject("saved region Map, root or array address point differs");
     if(count<1||count>4096||capacity<count||!data||owned_count<0||owned_count>count||
        owned_capacity<owned_count||(owned_count&&!owned))
         return reject("saved region or owned subset array bounds differ");
@@ -39,7 +39,7 @@ bool scan(uintptr_t image,uintptr_t map,uintptr_t root,int32_t requested,uintptr
         uintptr_t region=0,ap=0,shard=0;int32_t id=-1;
         if(!read(data,size_t(index)*8,region,error)||!read(region,0,ap,error)||
            !read(region,0x70,shard,error)||!read(region,0x834,id,error))return false;
-        if(!region||ap!=image+0x1787930||shard!=root||id<0||
+        if(!region||ap!=image+0x178dcd0||shard!=root||id<0||
            !saved.insert(region).second||!ids.insert(id).second)
             return reject("saved region address point, shard, ID or pointer differs index="+std::to_string(index));
         if(id==requested)selected=region;
@@ -50,7 +50,7 @@ bool scan(uintptr_t image,uintptr_t map,uintptr_t root,int32_t requested,uintptr
         uintptr_t region=0,ap=0,shard=0;
         if(!read(owned,size_t(index)*8,region,error)||!read(region,0,ap,error)||
            !read(region,0x70,shard,error))return false;
-        if(!region||ap!=image+0x1787930||shard!=root||!owned_unique.insert(region).second||
+        if(!region||ap!=image+0x178dcd0||shard!=root||!owned_unique.insert(region).second||
            !saved.contains(region))
             return reject("owned region is duplicate or absent from saved Map.region index="+std::to_string(index));
         if(complete)next.owned_members.push_back(region);

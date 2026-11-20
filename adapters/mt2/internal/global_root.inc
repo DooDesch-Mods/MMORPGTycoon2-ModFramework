@@ -22,22 +22,22 @@ bool read_loaded_root(LoadedRootSnapshot& root,std::string& error) {
         return fail(error,"global_root_mode_state actual="+std::to_string(state)+" required=4");
     struct Guard {uintptr_t rva; const char* bytes; size_t size;};
     const Guard guards[]={
-        {0x334acd,"\x48\x8d\xbb\xc0\x01\x00\x00",7},
-        {0x334adb,"\x48\x89\xf9\xe8\xbd\x35\x1d\x00",8},
-        {0x5080af,"\x48\x8d\x05\x6a\x2c\x24\x01",7},
-        {0x5080d5,"\xc7\x43\x48\x00\x00\x00\x00",7}};
+        {0x338bcd,"\x48\x8d\xbb\xc0\x01\x00\x00",7},
+        {0x338bdb,"\x48\x89\xf9\xe8\x0d\x56\x1d\x00",8},
+        {0x50e1ff,"\x48\x8d\x05\xba\x2e\x24\x01",7},
+        {0x50e225,"\xc7\x43\x48\x00\x00\x00\x00",7}};
     unsigned char bytes[8]{};
     for(const auto& guard:guards) {
         const auto* address=reinterpret_cast<void*>(image.load()+guard.rva);
         if(!readable(address,guard.size)||global_root_copy(address,bytes,guard.size)||std::memcmp(bytes,guard.bytes,guard.size))
             return fail(error,"global_root_build_contract rva="+std::to_string(guard.rva));
     }
-    root.map=singleton(0x13df8c0);
-    if(!has_vtable(root.map,0x1742850))return fail(error,"global_root_map_vtable");
+    root.map=singleton(0x13eb8c0);
+    if(!has_vtable(root.map,0x1748bf0))return fail(error,"global_root_map_vtable");
     const auto map_address=reinterpret_cast<uintptr_t>(root.map);
     if(map_address>(std::numeric_limits<uintptr_t>::max)()-0x1c0)return fail(error,"global_root_map_address_overflow");
     root.shard=reinterpret_cast<void*>(map_address+0x1c0);
-    if(!has_vtable(root.shard,0x174ad10))return fail(error,"global_root_embedded_shard_vtable");
+    if(!has_vtable(root.shard,0x17510b0))return fail(error,"global_root_embedded_shard_vtable");
     int32_t type=-1;
     if(!read_at(root.shard,0x48,type)||type!=0)return fail(error,"global_root_embedded_shard_type actual="+std::to_string(type)+" required=0");
     if(!read_at(root.map,0x358,root.array)||!read_at(root.map,0x360,root.count)||!read_at(root.map,0x364,root.capacity))
@@ -47,7 +47,7 @@ bool read_loaded_root(LoadedRootSnapshot& root,std::string& error) {
     root.regions.clear();root.region_ids.clear();root.regions.reserve(size_t(root.count));root.region_ids.reserve(size_t(root.count));
     for(int32_t i=0;i<root.count;++i){
         void* region=nullptr;void* shard=nullptr;int32_t id=-1;
-        if(!read_at(root.array,size_t(i)*sizeof(void*),region)||!has_vtable(region,0x1787920))
+        if(!read_at(root.array,size_t(i)*sizeof(void*),region)||!has_vtable(region,0x178dcc0))
             return fail(error,"global_root_region_vtable index="+std::to_string(i));
         if(!read_at(region,0x70,shard)||shard!=root.shard)
             return fail(error,"global_root_region_shard index="+std::to_string(i));
@@ -76,7 +76,7 @@ bool read_building_global(uint64_t uid, BuildingState& state, std::string& error
     auto reject = [&](const char* cause) { return fail(error, std::string("building read rejected: ") + cause + target); };
     void* building = nullptr;
     bool object_found = false;
-    const DWORD exception = find_typed_object(uid, 0x1655090, building, &object_found);
+    const DWORD exception = find_typed_object(uid, 0x165a670, building, &object_found);
     if (exception) return fail(error, "building lookup failed: exception=" + std::to_string(exception) + target);
     if (!building) return reject(object_found ? "typed_uid_wrong_type" : "typed_uid_missing");
     void* active_shard = root.shard;
@@ -88,7 +88,7 @@ bool read_building_global(uint64_t uid, BuildingState& state, std::string& error
     if(shard==active_shard&&std::find(root.regions.begin(),root.regions.end(),region)==root.regions.end())
         return reject("global_root_region_not_in_map");
     if (shard != active_shard) {
-        if (!has_vtable(shard, 0x174ad10) || !has_vtable(active_shard, 0x174ad10))
+        if (!has_vtable(shard, 0x17510b0) || !has_vtable(active_shard, 0x17510b0))
             return reject("outer_shard_mismatch: shard_vtable_invalid");
         int32_t shard_type = -1;
         if (!read_at(shard, 0x48, shard_type)) return reject("dungeon_shard_type_unreadable");
@@ -99,7 +99,7 @@ bool read_building_global(uint64_t uid, BuildingState& state, std::string& error
         void* dungeon = nullptr;
         void* instance = nullptr;
         if (shard_type == 2) {
-            if (!read_at(shard, 0x20, instance) || !has_vtable(instance, 0x1719440))
+            if (!read_at(shard, 0x20, instance) || !has_vtable(instance, 0x171f7e0))
                 return reject("dungeon_instance_receiver_invalid");
             void* typed_instance = nullptr;
             const DWORD instance_exception = cast_dungeon_instance(instance, typed_instance);
@@ -115,7 +115,7 @@ bool read_building_global(uint64_t uid, BuildingState& state, std::string& error
         } else if (!read_at(shard, 0x18, dungeon)) {
             return reject("dungeon_receiver_invalid");
         }
-        if (!has_vtable(dungeon, 0x16c0550))
+        if (!has_vtable(dungeon, 0x16c68f0))
             return reject("dungeon_receiver_invalid");
         void* typed_dungeon = nullptr;
         const DWORD dungeon_exception = cast_dungeon(dungeon, typed_dungeon);
@@ -130,7 +130,7 @@ bool read_building_global(uint64_t uid, BuildingState& state, std::string& error
         if (shard_type == 2) {
             int32_t template_type = -1;
             void* template_owner = nullptr;
-            if (reverse_shard == shard || !has_vtable(reverse_shard, 0x174ad10) ||
+            if (reverse_shard == shard || !has_vtable(reverse_shard, 0x17510b0) ||
                 !read_at(reverse_shard, 0x48, template_type) || template_type != 1 ||
                 !read_at(reverse_shard, 0x18, template_owner) || template_owner != dungeon)
                 return reject("dungeon_instance_template_shard_reciprocity_mismatch");
@@ -160,7 +160,7 @@ bool read_building_global(uint64_t uid, BuildingState& state, std::string& error
         uint64_t exterior_uid = 0;
         if (!read_at(exterior, 0x18, exterior_uid)) return reject("dungeon_exterior_uid_unreadable");
         void* typed_exterior = nullptr;
-        const DWORD exterior_exception = find_typed_object(exterior_uid, 0x1655090, typed_exterior);
+        const DWORD exterior_exception = find_typed_object(exterior_uid, 0x165a670, typed_exterior);
         if (exterior_exception) return fail(error, "dungeon exterior lookup failed: exception=" + std::to_string(exterior_exception) + target);
         if (typed_exterior != exterior) return reject("dungeon_exterior_registry_mismatch");
         void* reverse_dungeon = nullptr;
@@ -192,7 +192,7 @@ bool read_building_global(uint64_t uid, BuildingState& state, std::string& error
     if(!read_loaded_root(final_root,error))return false;
     if(!same_loaded_root(root,final_root))return reject("global_root_changed_during_read");
     void* final_building=nullptr;
-    const DWORD final_exception=find_typed_object(uid,0x1655090,final_building);
+    const DWORD final_exception=find_typed_object(uid,0x165a670,final_building);
     if(final_exception)return fail(error,"global building final lookup exception="+std::to_string(final_exception)+target);
     if(final_building!=building)return reject("global_root_final_registry_mismatch");
     void* final_shard=nullptr;void* final_region=nullptr;uint64_t final_uid=0;

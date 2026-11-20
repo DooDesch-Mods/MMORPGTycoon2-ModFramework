@@ -8,27 +8,27 @@ struct RecordCall {RecordOp op;uintptr_t target=0,input=0,result=0;int32_t numbe
 uint32_t record_native(uintptr_t image,RecordCall& c) {
     __try {
         switch(c.op){
-        case RecordOp::Allocate:c.result=reinterpret_cast<uintptr_t(*)(size_t)>(image+0xa02670)(0x78);break;
-        case RecordOp::Construct:reinterpret_cast<void(*)(uintptr_t)>(image+0x9667c0)(c.target);break;
-        case RecordOp::Destroy:reinterpret_cast<void(*)(uintptr_t)>(image+0x9676a0)(c.target);break;
-        case RecordOp::Free:reinterpret_cast<void(*)(uintptr_t)>(image+0xa01260)(c.target);break;
-        case RecordOp::Count:reinterpret_cast<void(*)(uintptr_t,int32_t)>(image+0x964b50)(c.target,c.number);break;
-        case RecordOp::Attach:reinterpret_cast<void(*)(uintptr_t,uintptr_t)>(image+0x964920)(c.target,c.input);break;
-        case RecordOp::Label:reinterpret_cast<void(*)(uintptr_t,uintptr_t)>(image+0x96d370)(c.target,c.input);break;
-        case RecordOp::String:reinterpret_cast<void(*)(uintptr_t,uintptr_t)>(image+0x96d360)(c.target,c.input);break;
-        case RecordOp::Type:reinterpret_cast<void(*)(uintptr_t,int32_t)>(image+0x96d3a0)(c.target,c.number);break;
-        case RecordOp::Integer:reinterpret_cast<void(*)(uintptr_t,int32_t)>(image+0x96d380)(c.target,c.number);break;
-        case RecordOp::Float:reinterpret_cast<void(*)(uintptr_t,float)>(image+0x96d390)(c.target,c.value);break;
+        case RecordOp::Allocate:c.result=reinterpret_cast<uintptr_t(*)(size_t)>(image+0xa0d230)(0x78);break;
+        case RecordOp::Construct:reinterpret_cast<void(*)(uintptr_t)>(image+0x96f9e0)(c.target);break;
+        case RecordOp::Destroy:reinterpret_cast<void(*)(uintptr_t)>(image+0x9708c0)(c.target);break;
+        case RecordOp::Free:reinterpret_cast<void(*)(uintptr_t)>(image+0xa0be20)(c.target);break;
+        case RecordOp::Count:reinterpret_cast<void(*)(uintptr_t,int32_t)>(image+0x96dd70)(c.target,c.number);break;
+        case RecordOp::Attach:reinterpret_cast<void(*)(uintptr_t,uintptr_t)>(image+0x96db40)(c.target,c.input);break;
+        case RecordOp::Label:reinterpret_cast<void(*)(uintptr_t,uintptr_t)>(image+0x976590)(c.target,c.input);break;
+        case RecordOp::String:reinterpret_cast<void(*)(uintptr_t,uintptr_t)>(image+0x976580)(c.target,c.input);break;
+        case RecordOp::Type:reinterpret_cast<void(*)(uintptr_t,int32_t)>(image+0x9765c0)(c.target,c.number);break;
+        case RecordOp::Integer:reinterpret_cast<void(*)(uintptr_t,int32_t)>(image+0x9765a0)(c.target,c.number);break;
+        case RecordOp::Float:reinterpret_cast<void(*)(uintptr_t,float)>(image+0x9765b0)(c.target,c.value);break;
         }return 0;
     }__except(EXCEPTION_EXECUTE_HANDLER){return GetExceptionCode();}
 }
 void record_call(Context& c,RecordCall call) {seh(record_native(c.image,call),"Fill Record operation");}
 uint32_t fill_string_native(uintptr_t image,uintptr_t target,const char* data,size_t size,bool label,uint32_t& cleanup) {
     alignas(8) unsigned char text[32]{};bool constructed=false;uint32_t code=0;
-    __try{reinterpret_cast<void(*)(void*,const char*,size_t,uintptr_t)>(image+0x11c0260)(text,data,size,0);constructed=true;
-        reinterpret_cast<void(*)(uintptr_t,const void*)>(image+(label?0x96d370:0x96d360))(target,text);
+    __try{reinterpret_cast<void(*)(void*,const char*,size_t,uintptr_t)>(image+0x11cbc00)(text,data,size,0);constructed=true;
+        reinterpret_cast<void(*)(uintptr_t,const void*)>(image+(label?0x976590:0x976580))(target,text);
     }__except(EXCEPTION_EXECUTE_HANDLER){code=GetExceptionCode();}
-    if(constructed){__try{reinterpret_cast<void(*)(void*)>(image+0x11bd1e0)(text);}__except(EXCEPTION_EXECUTE_HANDLER){cleanup=GetExceptionCode();}}return code;
+    if(constructed){__try{reinterpret_cast<void(*)(void*)>(image+0x11c8b80)(text);}__except(EXCEPTION_EXECUTE_HANDLER){cleanup=GetExceptionCode();}}return code;
 }
 void set_fill_token(Context& c,uintptr_t target,const FillToken& token) {
     if(token.type==1 || token.type==2){uint32_t cleanup=0;const auto code=fill_string_native(c.image,target,token.text.data(),token.text.size(),token.type==1,cleanup);need(!code && !cleanup,"Dungeon Fill native text copy failed SEH="+std::to_string(code)+" cleanup="+std::to_string(cleanup));}
@@ -40,29 +40,29 @@ struct FillLoad {uintptr_t root=0;bool context=false;uint32_t cleanup=0;};
 uint32_t fill_load_native(uintptr_t image,FillOwner& owner,FillLoad& receipt) {
     alignas(8) uintptr_t context=0;uint32_t code=0;
     __try {
-        owner.pointer=reinterpret_cast<uintptr_t(*)()>(image+0xd96100)();owner.constructed=owner.pointer!=0;
+        owner.pointer=reinterpret_cast<uintptr_t(*)()>(image+0xda18e0)();owner.constructed=owner.pointer!=0;
         if(!owner.pointer)return ERROR_NOT_ENOUGH_MEMORY;
-        reinterpret_cast<void(*)(void*)>(image+0x89e940)(&context);receipt.context=true;
-        reinterpret_cast<void(*)(uintptr_t,uintptr_t,void*)>(image+0xce7af0)(owner.pointer,receipt.root,&context);
+        reinterpret_cast<void(*)(void*)>(image+0x8a7a60)(&context);receipt.context=true;
+        reinterpret_cast<void(*)(uintptr_t,uintptr_t,void*)>(image+0xcf3210)(owner.pointer,receipt.root,&context);
     }__except(EXCEPTION_EXECUTE_HANDLER){owner.unknown=true;code=GetExceptionCode();}
-    if(receipt.context && !owner.unknown){__try{reinterpret_cast<void(*)(void*)>(image+0x89e480)(&context);}__except(EXCEPTION_EXECUTE_HANDLER){receipt.cleanup=GetExceptionCode();owner.unknown=true;}}return code;
+    if(receipt.context && !owner.unknown){__try{reinterpret_cast<void(*)(void*)>(image+0x8a75a0)(&context);}__except(EXCEPTION_EXECUTE_HANDLER){receipt.cleanup=GetExceptionCode();owner.unknown=true;}}return code;
 }
 uint32_t fill_dispose_native(uintptr_t image,uintptr_t fill) {
-    __try{reinterpret_cast<void(*)(uintptr_t)>(image+0x157f70)(fill);return 0;}__except(EXCEPTION_EXECUTE_HANDLER){return GetExceptionCode();}
+    __try{reinterpret_cast<void(*)(uintptr_t)>(image+0x159060)(fill);return 0;}__except(EXCEPTION_EXECUTE_HANDLER){return GetExceptionCode();}
 }
 struct FillCapture {alignas(8) unsigned char record[0x78]{};alignas(8) unsigned char context[0x10]{};bool record_ready=false,context_ready=false;};
 uint32_t fill_save_native(uintptr_t image,uintptr_t fill,FillCapture& capture) {
-    __try{reinterpret_cast<void(*)(void*)>(image+0x9667c0)(capture.record);capture.record_ready=true;
-        reinterpret_cast<void(*)(void*)>(image+0x89e580)(capture.context);capture.context_ready=true;
-        reinterpret_cast<void(*)(uintptr_t,void*)>(image+0x10ee6f0)(fill,capture.context);
-        reinterpret_cast<void(*)(uintptr_t,void*,void*)>(image+0x10ee750)(fill,capture.record,capture.context);return 0;
+    __try{reinterpret_cast<void(*)(void*)>(image+0x96f9e0)(capture.record);capture.record_ready=true;
+        reinterpret_cast<void(*)(void*)>(image+0x8a76a0)(capture.context);capture.context_ready=true;
+        reinterpret_cast<void(*)(uintptr_t,void*)>(image+0x10fa090)(fill,capture.context);
+        reinterpret_cast<void(*)(uintptr_t,void*,void*)>(image+0x10fa0f0)(fill,capture.record,capture.context);return 0;
     }__except(EXCEPTION_EXECUTE_HANDLER){return GetExceptionCode();}
 }
 uint32_t fill_context_dispose(uintptr_t image,FillCapture& capture) {
-    __try{reinterpret_cast<void(*)(void*)>(image+0x89e5f0)(capture.context);return 0;}__except(EXCEPTION_EXECUTE_HANDLER){return GetExceptionCode();}
+    __try{reinterpret_cast<void(*)(void*)>(image+0x8a7710)(capture.context);return 0;}__except(EXCEPTION_EXECUTE_HANDLER){return GetExceptionCode();}
 }
 Json fill_saved(Context& c,uintptr_t fill) {
-    need(c.read<uintptr_t>(fill)==c.image+0x1743680,"Dungeon detached Fill class differs");FillCapture capture;const auto code=fill_save_native(c.image,fill,capture);std::string cause;Json output=Json::array();
+    need(c.read<uintptr_t>(fill)==c.image+0x1749a20,"Dungeon detached Fill class differs");FillCapture capture;const auto code=fill_save_native(c.image,fill,capture);std::string cause;Json output=Json::array();
     try {
         seh(code,"Fill Save");const auto table=c.read<uintptr_t>(uintptr_t(capture.context));need(table && !c.read<uint64_t>(table+0x18),"Dungeon Fill detached save contains native object references");
         struct Pending {uintptr_t p;int64_t parent;size_t index;};std::vector<Pending> pending{{uintptr_t(capture.record),-1,0}};std::set<uintptr_t> seen;size_t total_tokens=0,text_bytes=0;
@@ -78,7 +78,7 @@ Json fill_saved(Context& c,uintptr_t fill) {
     need(cause.empty(),cause);return output;
 }
 void verify_fill_code(Context& c) {
-    for(uintptr_t rva:{0xa02670,0xa01260,0x9667c0,0x9676a0,0x11c0260,0x11bd1e0,0x964920,0x96d370,0x96d360,0x964b50,0x96d380,0x96d3a0,0x96d390,0xd96100,0x89e940,0xce7af0,0x89e480,0x157f70,0x89e580,0x89e5f0,0x10ee6f0,0x10ee750})c.verify_original(rva);
+    for(uintptr_t rva:{0xa0d230,0xa0be20,0x96f9e0,0x9708c0,0x11cbc00,0x11c8b80,0x96db40,0x976590,0x976580,0x96dd70,0x9765a0,0x9765c0,0x9765b0,0xda18e0,0x8a7a60,0xcf3210,0x8a75a0,0x159060,0x8a76a0,0x8a7710,0x10fa090,0x10fa0f0})c.verify_original(rva);
 }
 FillOwner create_fill(Context& c,const Json& source) {
     const auto rows=fill_records(source);std::vector<uintptr_t> records,detached;bool decoding_unknown=false;FillOwner owner;std::string cause;

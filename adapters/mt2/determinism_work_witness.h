@@ -59,11 +59,11 @@ private:
 public:
     WorkWitness(Read read,uintptr_t base,uintptr_t owner,std::map<uintptr_t,std::string> saved_buildings={}):memory(std::move(read)),image(base),game(owner),building_keys(std::move(saved_buildings)){
         need(image&&image<=UINTPTR_MAX-0x2000000,"image range invalid");
-        need(ptr(image,0x13df8f0)==game,"current Game owner differs");type(game,0x1743740,"Game");
-        state=ptr(image,0x13df2a0);type(state,0x16de920,"GameState");
+        need(ptr(image,0x13eb8f0)==game,"current Game owner differs");type(game,0x1749ae0,"Game");
+        state=ptr(image,0x13eb2a0);type(state,0x16e4cc0,"GameState");
     }
     Json clock(){
-        const auto owner=ptr(image,0x13df9a0);need(ptr(state,0x158)==owner,"Clock current GameState owner differs");type(owner,0x17499d0,"Clock");
+        const auto owner=ptr(image,0x13eb9a0);need(ptr(state,0x158)==owner,"Clock current GameState owner differs");type(owner,0x174fd70,"Clock");
         Json out;
         const std::array<const char*,6> names{"year","month","day","flat_day","seconds","saved_days_per_month"};
         for(size_t i=0;i<names.size();++i)out[names[i]]=at<int32_t>(offset(owner,0x38+i*4));
@@ -79,23 +79,23 @@ public:
         if(virtual_dispatch)need(ptr(ap,0x10)==callback,"dispatch vtable callback differs");
         const auto ap_rva=code(ap),callback_rva=code(callback);
         if(dispatch_keys.contains(receiver)){
-            const bool quest=ap_rva==0x174acf0,path=ap_rva==0x1744268;
-            need((quest&&callback_rva==0x4d9260)||(path&&callback_rva==0x43e7d0),"Fixture dispatch class/callback differs");
+            const bool quest=ap_rva==0x1751090,path=ap_rva==0x174a608;
+            need((quest&&callback_rva==0x4df120)||(path&&callback_rva==0x4435b0),"Fixture dispatch class/callback differs");
             const auto adjustment=quest?0x28U:0x210U;need(receiver>=adjustment,"Fixture dispatch base adjustment invalid");
-            type(receiver-adjustment,quest?0x174ac10:0x1743f10,quest?"Quest":"Path");
+            type(receiver-adjustment,quest?0x1750fb0:0x174a2b0,quest?"Quest":"Path");
             return {{"resolved",true},{"owner",known(dispatch_keys.at(receiver),receiver)},{"class_rva",ap_rva},{"callback_rva",callback_rva}};
         }
-        const auto software=ptr(image,0x13df500);
+        const auto software=ptr(image,0x13eb500);
         if(receiver==offset(software,0x18)){
-            type(software,0x1715450,"Software");
+            type(software,0x171b7f0,"Software");
             return {{"resolved",true},{"owner",known("software/ticker",receiver)},{"class_rva",ap_rva},{"callback_rva",callback_rva}};
         }
-        if(ap_rva==0x1705a60){
-            if(virtual_dispatch)need(callback_rva==0x975b0,"CharacterType native dispatch callback differs");
-            need(receiver>0x20,"CharacterType base adjustment invalid");const auto full=receiver-0x20;type(full,0x1705990,"CharacterType");
+        if(ap_rva==0x170be00){
+            if(virtual_dispatch)need(callback_rva==0x982a0,"CharacterType native dispatch callback differs");
+            need(receiver>0x20,"CharacterType base adjustment invalid");const auto full=receiver-0x20;type(full,0x170bd30,"CharacterType");
             const auto kind=at<int32_t>(offset(full,0x2c)),id=at<int32_t>(offset(full,0x30));
             need(kind>=0&&kind<5&&id>=0,"CharacterType key invalid");
-            const auto manager=ptr(state,0x168);need(manager==ptr(image,0x13df7a0),"CharacterType manager singleton differs");type(manager,0x1732430,"CharacterType manager");
+            const auto manager=ptr(state,0x168);need(manager==ptr(image,0x13eb7a0),"CharacterType manager singleton differs");type(manager,0x17387d0,"CharacterType manager");
             const auto header=offset(manager,0x80+size_t(kind)*0x50),data=ptr(header,8);
             const auto count=at<int32_t>(offset(header,0x10)),capacity=at<int32_t>(offset(header,0x14));
             need(count>=0&&count<=100000&&capacity>=count&&id<count&&data,"CharacterType manager extent/key differs");
@@ -104,24 +104,24 @@ public:
             return {{"resolved",true},{"owner",known("character_type/"+std::to_string(kind)+"/"+std::to_string(id)+"/ticker",receiver)},
                 {"class_rva",ap_rva},{"callback_rva",callback_rva},{"destroyed",bool(destroyed)}};
         }
-        if(ap_rva==0x171bf20){
-            if(virtual_dispatch)need(callback_rva==0x4f5350,"ScenarioManager native dispatch callback differs");
+        if(ap_rva==0x17222c0){
+            if(virtual_dispatch)need(callback_rva==0x4fb2f0,"ScenarioManager native dispatch callback differs");
             need(receiver>0x38,"ScenarioManager base adjustment invalid");const auto full=receiver-0x38;
-            need(ptr(state,0x1f0)==full,"ScenarioManager current GameState owner differs");type(full,0x171be40,"ScenarioManager");
+            need(ptr(state,0x1f0)==full,"ScenarioManager current GameState owner differs");type(full,0x17221e0,"ScenarioManager");
             return {{"resolved",true},{"owner",known("scenario_manager/ticker",receiver)},{"class_rva",ap_rva},{"callback_rva",callback_rva}};
         }
-        if(ap_rva==0x16d9780||ap_rva==0x16d9700){
-            if(virtual_dispatch)need(callback_rva==(ap_rva==0x16d9780?0x40b820U:0x40bb00U),"Building native dispatch callback differs");
-            const auto adjustment=ap_rva==0x16d9780?0x220U:0x30U;
-            need(receiver>=adjustment,"Building base adjustment invalid");const auto full=receiver-adjustment;type(full,0x16d93c0,"Building");
+        if(ap_rva==0x16dfb20||ap_rva==0x16dfaa0){
+            if(virtual_dispatch)need(callback_rva==(ap_rva==0x16dfb20?0x40b820U:0x40bb00U),"Building native dispatch callback differs");
+            const auto adjustment=ap_rva==0x16dfb20?0x220U:0x30U;
+            need(receiver>=adjustment,"Building base adjustment invalid");const auto full=receiver-adjustment;type(full,0x16df760,"Building");
             if(!building_keys.contains(full))return unresolved(ap_rva,callback_rva,"Building receiver lacks fixture-proven saved key");
-            const auto key=building_keys.at(full)+(ap_rva==0x16d9780?"/ticker":"/updater");
+            const auto key=building_keys.at(full)+(ap_rva==0x16dfb20?"/ticker":"/updater");
             return {{"resolved",true},{"owner",known(key,receiver)},{"class_rva",ap_rva},{"callback_rva",callback_rva}};
         }
         return unresolved(ap_rva,callback_rva,"Dispatch receiver lacks a proven canonical owner route");
     }
     Json updates(){
-        const auto manager=ptr(image,0x13df4a0);need(ptr(game,0x70)==manager,"UpdateManager game owner differs");type(manager,0x1709650,"UpdateManager");
+        const auto manager=ptr(image,0x13eb4a0);need(ptr(game,0x70)==manager,"UpdateManager game owner differs");type(manager,0x170f9f0,"UpdateManager");
         const auto paused=at<uint8_t>(offset(manager,0x68));need(paused<=1,"UpdateManager pause flag invalid");
         Json out={{"paused",bool(paused)}},local;
         const std::array<const char*,4> names{"entities","pending_entities","callbacks","pending_callbacks"};
@@ -143,7 +143,7 @@ public:
     }
     Json tick_clock(unsigned slot){
         need(slot<4,"TickClock slot invalid");
-        const auto ticks=ptr(image,0x13df350);need(ptr(game,0x150)==ticks,"TickManager game owner differs");type(ticks,0x16fdc40,"TickManager");
+        const auto ticks=ptr(image,0x13eb350);need(ptr(game,0x150)==ticks,"TickManager game owner differs");type(ticks,0x1703fe0,"TickManager");
         const auto clock=ptr(ticks,8+size_t(slot)*8),data=ptr(clock,8);
         const auto count=at<int32_t>(offset(clock,0x10)),capacity=at<int32_t>(offset(clock,0x14));
         need(count>=0&&count<=100000&&capacity>=count&&(!count||data),"TickClock extent invalid");
@@ -161,7 +161,7 @@ public:
         need(expected&&building_keys.size()==expected,"fixture Building receipt count differs");
         Json rows=Json::object(),local=Json::object();
         for(const auto& [object,key]:building_keys){
-            need(!key.empty()&&!rows.contains(key),"fixture Building key is empty/ambiguous");type(object,0x16d93c0,"Building");
+            need(!key.empty()&&!rows.contains(key),"fixture Building key is empty/ambiguous");type(object,0x16df760,"Building");
             const auto pose=at<std::array<uint32_t,10>>(offset(object,0x100));
             for(const auto value:pose)need((value&0x7f800000U)!=0x7f800000U,"Building pose is not finite");
             rows[key]=pose;local[key]=object;
@@ -170,9 +170,9 @@ public:
     }
     // Raw fields used by tutorial_development_read.cpp::project. No native getters.
     Json development_project(){
-        const auto lounge=ptr(image,0x13df290),software=ptr(image,0x13df500);
-        need(ptr(state,0x180)==lounge,"DevLounge current GameState owner differs");type(lounge,0x16de6c0,"DevLounge");
-        need(ptr(state,0x1c8)==software,"Software current GameState owner differs");type(software,0x1715450,"Software");
+        const auto lounge=ptr(image,0x13eb290),software=ptr(image,0x13eb500);
+        need(ptr(state,0x180)==lounge,"DevLounge current GameState owner differs");type(lounge,0x16e4a60,"DevLounge");
+        need(ptr(state,0x1c8)==software,"Software current GameState owner differs");type(software,0x171b7f0,"Software");
         auto finite_bits=[&](uintptr_t p){const auto value=at<uint32_t>(p);need((value&0x7f800000U)!=0x7f800000U,"development scalar is not finite");return value;};
         const auto project=ptr(lounge,0xa8);
         Json out={{"project_present",project!=0},{"kind",nullptr},{"project_key",nullptr},
@@ -182,7 +182,7 @@ public:
             {"major_version",at<int32_t>(offset(software,0x88))},
             {"rating_bits",finite_bits(offset(software,0x314))},{"fun_bits",finite_bits(offset(software,0x318))}};
         if(project){
-            type(project,0x16e48c0,"DevProject");const auto kind=at<int32_t>(offset(project,0x18));need(kind>=0&&kind<=3,"DevProject kind outside 0..3");
+            type(project,0x16eac60,"DevProject");const auto kind=at<int32_t>(offset(project,0x18));need(kind>=0&&kind<=3,"DevProject kind outside 0..3");
             const auto data=ptr(project,0x20);const auto size=at<uint64_t>(offset(project,0x28));need(size<=200,"DevProject key exceeds 200 bytes");
             const auto raw=bytes(data,size_t(size)+1);need(raw.back()==0,"DevProject key terminator differs");
             std::string key;for(size_t i=0;i<size;++i){need(raw[i]>=32&&raw[i]!=127,"DevProject key contains control byte");key.push_back(char(raw[i]));}
@@ -192,7 +192,7 @@ public:
     }
     // Pause drains running/waiting tasks, but not PumpFinishedTasks callbacks.
     Json finished_tasks(){
-        const auto tasks=ptr(image,0x13df340);need(ptr(game,0x68)==tasks,"TaskManager game owner differs");type(tasks,0x16fdaf0,"TaskManager");
+        const auto tasks=ptr(image,0x13eb340);need(ptr(game,0x68)==tasks,"TaskManager game owner differs");type(tasks,0x1703e90,"TaskManager");
         const auto data=ptr(tasks,0xb8);const auto count=at<int32_t>(offset(tasks,0xc0));
         need(count>=0&&count<=100000&&(!count||data),"finished Task queue extent invalid");
         missing.insert("finished Task callback owners/state are not captured under their native mutex");
@@ -242,8 +242,8 @@ public:
             bool copy(uintptr_t p,void* out,size_t n,std::string&){auto value=read(p,n);std::memcpy(out,value.data(),n);return true;}
         } port{[&](uintptr_t p,size_t n){return bytes(p,n);}};
         auto read=[&](uintptr_t p,size_t n,auto& value,std::string&){value=at<std::remove_reference_t<decltype(value)>>(offset(p,n));return true;};
-        const auto world=ptr(state,0x160);need(world==ptr(image,0x13df9c0),"Subscriber current World singleton differs");type(world,0x174aef0,"World");
-        const auto map=ptr(world,0x158);need(map==ptr(image,0x13df8c0),"Subscriber current Map singleton differs");type(map,0x1742860,"Map");
+        const auto world=ptr(state,0x160);need(world==ptr(image,0x13eb9c0),"Subscriber current World singleton differs");type(world,0x1751290,"World");
+        const auto map=ptr(world,0x158);need(map==ptr(image,0x13eb8c0),"Subscriber current Map singleton differs");type(map,0x1748c00,"Map");
         const auto root=offset(map,0x1c0);region_identity::Index regions;std::string error;
         need(region_identity::capture(image,map,root,regions,read,error),error);
         std::map<uintptr_t,std::pair<uintptr_t,std::vector<uintptr_t>>> managers;
@@ -298,8 +298,8 @@ public:
             std::function<Bytes(uintptr_t,size_t)> read;
             bool copy(uintptr_t p,void* out,size_t n,std::string&)override{auto b=read(p,n);std::memcpy(out,b.data(),n);return true;}
         } port;port.read=[&](uintptr_t p,size_t n){return bytes(p,n);};
-        const auto world=ptr(state,0x160);type(world,0x174aef0,"World");need(world==ptr(image,0x13df9c0),"NPC World singleton differs");
-        const auto map=ptr(world,0x158);type(map,0x1742860,"Map");need(map==ptr(image,0x13df8c0),"NPC Map singleton differs");
+        const auto world=ptr(state,0x160);type(world,0x1751290,"World");need(world==ptr(image,0x13eb9c0),"NPC World singleton differs");
+        const auto map=ptr(world,0x158);type(map,0x1748c00,"Map");need(map==ptr(image,0x13eb8c0),"NPC Map singleton differs");
         auto read=[&](uintptr_t p,size_t n,auto& value,std::string&){value=at<std::remove_reference_t<decltype(value)>>(offset(p,n));return true;};
         mt2fw::game::region_saved_identity::Index index;std::string error;
         need(mt2fw::game::region_saved_identity::capture(image,map,offset(map,0x1c0),index,read,error),error);
@@ -334,14 +334,14 @@ public:
             for(int32_t i=0;i<count;++i){auto p=ptr(data,size_t(i)*8);need(p&&seen.insert(p).second,"Fixture dispatch array member duplicate/null");result.push_back(p);}return result;
         };
         std::set<std::string> keys;std::set<uintptr_t> quest_pointers;
-        const auto quest_manager=ptr(image,0x13df410);std::string error;
+        const auto quest_manager=ptr(image,0x13eb410);std::string error;
         for(const auto& [npc,key]:npc_keys){
             need(key==std::string(fixture_dispatch_sha)+":world:npc:34"||key==std::string(fixture_dispatch_sha)+":world:npc:39","Fixture dispatch NPC key differs");
-            type(npc,0x1742980,"NPC");need(at<int32_t>(offset(npc,0x80c))==0,"Fixture dispatch NPC is not QuestGiver");
+            type(npc,0x1748d20,"NPC");need(at<int32_t>(offset(npc,0x80c))==0,"Fixture dispatch NPC is not QuestGiver");
             const auto proxy=ptr(npc,0x28);need(ptr(proxy)==offset(npc,0x20),"Quest NPC weak owner differs");
             const auto members=array(npc,0x868,100000);need(members.size()==2,"Fixture requires two persisted Quests per NPC");
             std::set<int32_t> sequences;
-            for(auto quest:members){type(quest,0x174ac10,"Quest");need(quest_pointers.insert(quest).second,"Quest belongs to multiple saved NPCs");
+            for(auto quest:members){type(quest,0x1750fb0,"Quest");need(quest_pointers.insert(quest).second,"Quest belongs to multiple saved NPCs");
                 const auto sequence=at<int32_t>(offset(quest,0x84));need(sequence>=0&&sequence<2&&sequences.insert(sequence).second,"Quest persisted sequence ID invalid/duplicate");
                 need(ptr(quest,0xb8)==npc&&ptr(quest,0xc0)==proxy&&ptr(proxy)==offset(npc,0x20),"Quest reciprocal weak owner differs");
                 need(quests::manager_member(port,image,quest_manager,quest,error),error);
@@ -349,8 +349,8 @@ public:
                 need(keys.insert(owner_key).second&&dispatch_keys.emplace(offset(quest,0x28),owner_key).second,"Quest canonical dispatch key repeats");
             }
         }
-        const auto world=ptr(state,0x160);type(world,0x174aef0,"World");need(world==ptr(image,0x13df9c0),"Path World singleton differs");
-        const auto map=ptr(world,0x158);type(map,0x1742860,"Map");need(map==ptr(image,0x13df8c0),"Path Map singleton differs");
+        const auto world=ptr(state,0x160);type(world,0x1751290,"World");need(world==ptr(image,0x13eb9c0),"Path World singleton differs");
+        const auto map=ptr(world,0x158);type(map,0x1748c00,"Map");need(map==ptr(image,0x13eb8c0),"Path Map singleton differs");
         auto read=[&](uintptr_t p,size_t n,auto& value,std::string&){value=at<std::remove_reference_t<decltype(value)>>(offset(p,n));return true;};
         mt2fw::game::region_saved_identity::Index regions;
         need(mt2fw::game::region_saved_identity::capture(image,map,offset(map,0x1c0),regions,read,error),error);
@@ -364,7 +364,7 @@ public:
         std::set<uintptr_t> node_set(nodes.begin(),nodes.end());std::map<uintptr_t,std::set<uintptr_t>> expected_edges;
         std::map<size_t,uintptr_t> saved_nodes;std::map<uintptr_t,size_t> node_ids;
         std::set<size_t> matched;
-        for(auto path:paths){type(path,0x1743f10,"Path");
+        for(auto path:paths){type(path,0x174a2b0,"Path");
             need(at<int32_t>(offset(path,0x21c))==0&&at<uint8_t>(offset(path,0x46e))==0,"Path type/preview differs");
             need(ptr(path,0x170)==offset(map,0x1c0)&&ptr(path,0x178)==region&&ptr(path,0x2f8)==region,"Path reciprocal saved Region differs");
             const auto start=at<std::array<uint32_t,3>>(offset(path,0x278)),end=at<std::array<uint32_t,3>>(offset(path,0x284));
@@ -372,7 +372,7 @@ public:
             for(size_t i=0;i<fixture_paths.size();++i)if(start==fixture_paths[i][0]&&end==fixture_paths[i][1]){need(match==fixture_paths.size(),"Immutable Path geometry ambiguous");match=i;}
             need(match<fixture_paths.size()&&matched.insert(match).second,"Path geometry missing/changed/duplicate");
             size_t endpoint_index=0;
-            for(size_t off:{size_t(0x268),size_t(0x270)}){const auto node=ptr(path,off);need(node_set.contains(node),"Path endpoint absent from owned Intersection bucket");type(node,0x1700a10,"Intersection");
+            for(size_t off:{size_t(0x268),size_t(0x270)}){const auto node=ptr(path,off);need(node_set.contains(node),"Path endpoint absent from owned Intersection bucket");type(node,0x1706db0,"Intersection");
                 need(at<int32_t>(offset(node,0x298))==0&&ptr(node,0x170)==offset(map,0x1c0)&&ptr(node,0x178)==region,"Intersection reciprocal owner/type differs");
                 const size_t saved_id=endpoint_index?42+match:41;
                 const auto [saved_it,saved_new]=saved_nodes.emplace(saved_id,node);

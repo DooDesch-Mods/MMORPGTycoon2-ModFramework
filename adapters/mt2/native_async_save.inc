@@ -5,7 +5,7 @@ namespace async_save {
 using Queue=void(*)(void*,void*);
 Queue original_queue=nullptr;
 Go original_run=nullptr,original_finish=nullptr,original_writer_run=nullptr,original_writer_finish=nullptr,original_pump=nullptr,dispatch=nullptr;
-constexpr uintptr_t SaveTask=0x16dbca0,WriterTask=0x1733bb0;
+constexpr uintptr_t SaveTask=0x16e2040,WriterTask=0x1739f50;
 struct Capture {
     uintptr_t game=0,mode=0,tasks=0;DWORD thread=0;bool absolute=false;
     std::string filename,target;
@@ -33,10 +33,10 @@ std::string text_at(uintptr_t object){
 Capture& held_owner(){
     auto* value=published.load(std::memory_order_acquire);
     require(value&&retained.get()==value&&value->thread==thread&&thread==GetCurrentThreadId(),"Async Save lacks its retained main-thread owner");
-    require(value->game==owner&&read<uintptr_t>(owner+0x28)==value->mode&&read<uintptr_t>(value->mode)==image+0x16e6730&&
+    require(value->game==owner&&read<uintptr_t>(owner+0x28)==value->mode&&read<uintptr_t>(value->mode)==image+0x16ecad0&&
         value->tasks==held_tasks&&tasks()==value->tasks,"Async Save native Game/Mode/Task owner changed");
-    const auto state=read<uintptr_t>(value->mode+0x58),clock=read<uintptr_t>(image+0x13df9a0);
-    require(state&&clock&&read<uintptr_t>(state+0x158)==clock&&read<uintptr_t>(clock)==image+0x17499d0&&
+    const auto state=read<uintptr_t>(value->mode+0x58),clock=read<uintptr_t>(image+0x13eb9a0);
+    require(state&&clock&&read<uintptr_t>(state+0x158)==clock&&read<uintptr_t>(clock)==image+0x174fd70&&
         read<uint32_t>(clock+0x58)==0&&read<uint32_t>(clock+0x5c)==0,"Async Save prepared Clock owner/selected/pause scale differs");
     held();return *value;
 }
@@ -67,7 +67,7 @@ void save_task(Capture& value,uintptr_t task){
 uintptr_t live_writer_file(Capture& value,uintptr_t task){
     const auto file=read<uintptr_t>(task+0x10);
     require(file,"Async stream writer live file is null");
-    require(read<uintptr_t>(file)==image+0x1742fd0,"Async stream writer live file address point differs");
+    require(read<uintptr_t>(file)==image+0x1749370,"Async stream writer live file address point differs");
     require(text_at(file+8)==value.target,"Async stream writer exact original target differs");
     const auto mode=read<int32_t>(file+0x70);
     require(mode==4,"Async stream writer file mode differs: actual="+std::to_string(mode)+" required=4");
@@ -105,12 +105,12 @@ void run_writer(void* task){
 }
 void queue(void* manager,void* task,uintptr_t caller){
     auto* value=published.load(std::memory_order_acquire);
-    if(value&&caller==image+0x4a052d){
+    if(value&&caller==image+0x4a5a1d){
         auto& owned=held_owner();require(&owned==value&&reinterpret_cast<uintptr_t>(manager)==value->tasks,"Async SaveTask queue manager differs");
         save_task(*value,reinterpret_cast<uintptr_t>(task));uintptr_t absent=0;
         require(value->task.compare_exchange_strong(absent,reinterpret_cast<uintptr_t>(task)),"Async SaveTask queued more than once");
     }else if(value&&worker_scope==value){
-        require(caller==image+0x881d48&&reinterpret_cast<uintptr_t>(manager)==value->tasks&&GetCurrentThreadId()==value->worker.load(),
+        require(caller==image+0x88ab08&&reinterpret_cast<uintptr_t>(manager)==value->tasks&&GetCurrentThreadId()==value->worker.load(),
             "Async Save worker queued a foreign task/caller");
         writer_task(*value,reinterpret_cast<uintptr_t>(task));uintptr_t absent=0;
         require(value->writer.compare_exchange_strong(absent,reinterpret_cast<uintptr_t>(task)),"Async Save queued more than one stream writer");
@@ -129,7 +129,7 @@ void run(void* task){
 }
 bool writer_complete(void* task,uintptr_t caller,Go original){
     auto* value=published.load(std::memory_order_acquire);
-    if(!value||worker_scope!=value||caller!=image+0x8819fb)return false;
+    if(!value||worker_scope!=value||caller!=image+0x88a7bb)return false;
     require(value->writer.load()==reinterpret_cast<uintptr_t>(task)&&GetCurrentThreadId()==value->worker.load()&&
         value->run_entered==1&&value->run_returned==0&&value->writer_completed==0,"Async writer Complete owner/count differs");
     writer_task(*value,reinterpret_cast<uintptr_t>(task));original(task);
@@ -140,7 +140,7 @@ bool writer_complete(void* task,uintptr_t caller,Go original){
 void finish(void* task,uintptr_t caller){
     auto* value=published.load(std::memory_order_acquire);
     if(!value||value->task.load()!=reinterpret_cast<uintptr_t>(task)){original_finish(task);return;}
-    auto& owned=held_owner();require(&owned==value&&value->pumping&&value->unlock_seen&&caller==image+0x526c55&&
+    auto& owned=held_owner();require(&owned==value&&value->pumping&&value->unlock_seen&&caller==image+0x52d075&&
         value->copied_task==reinterpret_cast<uintptr_t>(task)&&value->run_returned==1&&value->writer_completed==1&&
         value->finish_entered++==0,"Async SaveTask Finish lacks its exact completed copied task");
     save_task(*value,reinterpret_cast<uintptr_t>(task));original_finish(task);++value->finish_returned;
@@ -149,7 +149,7 @@ __declspec(noinline) void finish_entry(void* task){finish(task,reinterpret_cast<
 void finish_writer(void* task,uintptr_t caller){
     auto* value=published.load(std::memory_order_acquire);
     if(!value||value->writer.load()!=reinterpret_cast<uintptr_t>(task)){original_writer_finish(task);return;}
-    auto& owned=held_owner();require(&owned==value&&value->pumping&&value->unlock_seen&&caller==image+0x526c55&&
+    auto& owned=held_owner();require(&owned==value&&value->pumping&&value->unlock_seen&&caller==image+0x52d075&&
         value->copied_task==reinterpret_cast<uintptr_t>(task)&&value->writer_finish_returned==0&&value->writer_run_returned==1,
         "Async writer Finish lacks its exact copied task");
     writer_task(*value,reinterpret_cast<uintptr_t>(task));original_writer_finish(task);++value->writer_finish_returned;
@@ -179,7 +179,7 @@ bool before_unlock(void* mutex){
                 if(value.copied_noop_finish){
                     // Pump compares this exact slot with the base no-op and
                     // publishes completion without calling Finish at all.
-                    require(read<uintptr_t>(read<uintptr_t>(task)+0x18)==image+0xc367a0&&
+                    require(read<uintptr_t>(read<uintptr_t>(task)+0x18)==image+0xc43050&&
                         read<uint8_t>(task+0xe)==0&&value.writer_run_entered==1&&value.writer_run_returned==1&&
                         value.writer_finish_returned==0,
                         "Async Save copied writer lacks its exact native no-op Finish branch");
@@ -247,20 +247,20 @@ void retire(){
 
 void install(){
     for(const auto& [rva,bytes,sha]:std::array<std::tuple<uintptr_t,size_t,const char*>,10>{{
-        {0xc15ac0,2672,"4dd93e72eae28e7493bf970db61c2320e205b28b8adafce2dfaff70b50a5d668"},
-        {0x881ac0,112,"7c058de8178a5b5e3ac91bd4d64c5ae9276983a6863f184e8f98d09cc15a3284"},
-        {0x5258e0,384,"34f36fc926028624a1fb7e1a5ac55effdad48942080b88d408a8a67a3d2c0ae3"},
-        {0xb1f260,208,"30caad5ea0dad7bb968e8b0b4f5584379232fc62053140abe538b836c1c3d2a1"},
-        {0xb1f330,32,"8ec6771455dea60801b4c54c815ab21b02f5da3632a9efc39fe7f847149c2148"},
-        {0xc367a0,16,"499f1f307c1cb989f968a6b7fcaec591e1828877223d0b0e7e8e8b76cde8c9ca"},
-        {0x526b00,432,"12ca52a501a074d6459b697bf9df2d8c4a7322bed76270b0cfe9dc33b91bd016"},
-        {0x4a0490,240,"605ae7ba90817d201b07235fee899416b8a69f16316bb6ce55bab1caa5fcfea2"},
-        {0x881b30,672,"f0dea32c427373cf7bfc89c1d1dea5183fddd2f452b03d038427559489202303"},
-        {0x526ce0,112,"82d0a5a46e233f07dfe6924a98cfef8c7c1ae2a4d850fe2e65363655205fc142"}
+        {0xc22240,2672,"a171ed121bc7c356a6ee18d7e3bed317280178f24a7206b3e1afa33ebfd2acbd"},
+        {0x88a880,112,"7e9343e270d2fd4cee5a5cd50977132b3ed2f017cf4b265eb544103a60390b90"},
+        {0x52bcd0,384,"24d300bdcd38782ede1c7d2abbe0f312e719e5170df2c4e413b168be08eac0e4"},
+        {0xb2a620,208,"95354dd8a88f49e79c272b4400eadce136766dfa5829310d56288501610d9e02"},
+        {0xb2a6f0,32,"af4654b88b004c5de479e495f9c3f0a8ce781a40c55270c4e845b3bc1cb8ce65"},
+        {0xc43050,16,"499f1f307c1cb989f968a6b7fcaec591e1828877223d0b0e7e8e8b76cde8c9ca"},
+        {0x52cf20,432,"db5e9cc494cc1f60c38e250084967df1e2bebe2f84a2bb18f1fd3a02430aa176"},
+        {0x4a5980,240,"19fdb8754f519598bfc8ef0e0fa2689c095152ba118d875d358d6adf681213d3"},
+        {0x88a8f0,672,"fe0a9bb2690227fdebc3c90607ca3e61125db70074c82104efd5f7a0c01054cc"},
+        {0x52d100,112,"fa95f987d0847ba6a3cff9284b9e04e99559bd45c14a32ed83a085407091054c"}
     }}){std::string cause;const bool valid=native_routes->verify_body(rva,bytes,sha,cause);
         require(valid,"Async Save original body pin differs rva="+std::to_string(rva)+": "+cause);}
-    dispatch=reinterpret_cast<Go>(image+0x526ce0);
-    require(read<uintptr_t>(image+SaveTask+0x10)==image+0xb1f260&&read<uintptr_t>(image+SaveTask+0x18)==image+0xb1f330,
+    dispatch=reinterpret_cast<Go>(image+0x52d100);
+    require(read<uintptr_t>(image+SaveTask+0x10)==image+0xb2a620&&read<uintptr_t>(image+SaveTask+0x18)==image+0xb2a6f0,
         "Async SaveTask original virtual slots differ");
     const auto attach=[](const char* key,uintptr_t rva,void* detour,void** original){
         native_routes->catalog(key,rva,true);native_services->reserve(key);auto* target=reinterpret_cast<void*>(image+rva);
@@ -269,11 +269,11 @@ void install(){
         std::string cause;const bool published=native_routes->publish_framework_hook(target,detour,*original,cause);
         require(published,std::string("Async Save hook publication failed: ")+key+" "+cause);
     };
-    attach("framework.save.async-queue",0x5258e0,reinterpret_cast<void*>(&queue_entry),reinterpret_cast<void**>(&original_queue));
-    attach("framework.save.async-run",0xb1f260,reinterpret_cast<void*>(&run),reinterpret_cast<void**>(&original_run));
-    attach("framework.save.async-finish",0xb1f330,reinterpret_cast<void*>(&finish_entry),reinterpret_cast<void**>(&original_finish));
-    attach("framework.save.async-writer-run",0xc15ac0,reinterpret_cast<void*>(&run_writer),reinterpret_cast<void**>(&original_writer_run));
-    attach("framework.save.async-writer-finish",0xc367a0,reinterpret_cast<void*>(&writer_finish_entry),reinterpret_cast<void**>(&original_writer_finish));
-    attach("framework.save.async-pump",0x526b00,reinterpret_cast<void*>(&pump_native),reinterpret_cast<void**>(&original_pump));
+    attach("framework.save.async-queue",0x52bcd0,reinterpret_cast<void*>(&queue_entry),reinterpret_cast<void**>(&original_queue));
+    attach("framework.save.async-run",0xb2a620,reinterpret_cast<void*>(&run),reinterpret_cast<void**>(&original_run));
+    attach("framework.save.async-finish",0xb2a6f0,reinterpret_cast<void*>(&finish_entry),reinterpret_cast<void**>(&original_finish));
+    attach("framework.save.async-writer-run",0xc22240,reinterpret_cast<void*>(&run_writer),reinterpret_cast<void**>(&original_writer_run));
+    attach("framework.save.async-writer-finish",0xc43050,reinterpret_cast<void*>(&writer_finish_entry),reinterpret_cast<void**>(&original_writer_finish));
+    attach("framework.save.async-pump",0x52cf20,reinterpret_cast<void*>(&pump_native),reinterpret_cast<void**>(&original_pump));
 }
 }

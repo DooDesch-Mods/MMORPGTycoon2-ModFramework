@@ -20,7 +20,7 @@ Runtime* runtime=&fixture_runtime;
 std::mutex gate;
 bool running=true,prepared=true,native_valid=true;
 DWORD engine_thread=7;
-uintptr_t fixture_caller=0x104a2c3a;
+uintptr_t fixture_caller=0x104a812a;
 int prepares=0,original_calls=0,checks=0;
 bool actual_absolute=false,had_scope=false,write_failed=false,twice=false;
 const void* actual_filename=nullptr;
@@ -55,7 +55,7 @@ void original_impl(void*,const void* filename,bool absolute){
 }
 void reset(){
     expect(initial_save_scope==nullptr,"scope restored after native return");fixture_runtime={};runtime=&fixture_runtime;
-    running=prepared=native_valid=true;engine_thread=7;fixture_caller=0x104a2c3a;
+    running=prepared=native_valid=true;engine_thread=7;fixture_caller=0x104a812a;
     prepares=original_calls=0;actual_absolute=had_scope=write_failed=twice=false;actual_filename=nullptr;
     failure.clear();attached=Json();write_name="save/Fresh/initial_state.vrz";
 }

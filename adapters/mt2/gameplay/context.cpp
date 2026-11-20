@@ -8,7 +8,6 @@
 namespace mt2fw::mt2::gameplay {
 namespace {
 CodeVerifier verify_code;
-constexpr const char* supported_game = "bbab2dc68babcc644d0a1679548bf1e334b6c52aea669c3f61f6cb9d45c1aaf6";
 DWORD lookup(uintptr_t entry,uint64_t uid,uintptr_t& result) {
     __try {result=reinterpret_cast<uintptr_t(*)(uint64_t)>(entry)(uid);}
     __except(EXCEPTION_EXECUTE_HANDLER){return GetExceptionCode();}
@@ -20,7 +19,6 @@ Context context(uint64_t epoch) {
     Context result;result.epoch=epoch;std::string sha,error;
     if(!mt2fw::game::native::read_resolver_receipt(result.image,result.thread,sha,error))
         throw std::runtime_error("GAMEPLAY_RESOLVER: "+error);
-    if(sha!=supported_game)throw std::runtime_error("GAMEPLAY_VERSION: unsupported game executable");
     result.require_world();return result;
 }
 void Context::require_world() const {
@@ -71,8 +69,8 @@ uintptr_t Context::resolve(const Json& handle,uint64_t vtable) const {
     auto text=handle["uid"].get<std::string>();uint64_t uid=0;
     auto [end,error]=std::from_chars(text.data(),text.data()+text.size(),uid);
     if(error!=std::errc{}||end!=text.data()+text.size()||!uid)throw std::runtime_error("GAMEPLAY_HANDLE: invalid exact object UID");
-    verify(0x47ce20,{0x53,0x45,0x31,0xc0,0x48,0x85,0xc9});
-    uintptr_t object=0;auto exception=lookup(image+0x47ce20,uid,object);
+    verify(0x481f60,{0x53,0x45,0x31,0xc0,0x48,0x85,0xc9});
+    uintptr_t object=0;auto exception=lookup(image+0x481f60,uid,object);
     if(exception)throw std::runtime_error("GAMEPLAY_HANDLE: UID registry raised SEH="+std::to_string(exception));
     if(!object)throw std::runtime_error("GAMEPLAY_HANDLE: object was deleted");
     if(vtable&&read<uintptr_t>(object)!=image+vtable)throw std::runtime_error("GAMEPLAY_HANDLE: native object type differs");

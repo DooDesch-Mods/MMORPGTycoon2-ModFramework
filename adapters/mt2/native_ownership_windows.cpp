@@ -5,7 +5,7 @@
 
 namespace mt2fw::mt2 {
 namespace {
-constexpr uint32_t free_slot_rva=0x1c52a00,malloc_slot_rva=0x1c52a70;
+constexpr uint32_t free_slot_rva=0x1c59a00,malloc_slot_rva=0x1c59a70;
 DWORD copy_memory(uintptr_t address,void* output,size_t length){__try{std::memcpy(output,reinterpret_cast<void*>(address),length);return 0;}__except(EXCEPTION_EXECUTE_HANDLER){return GetExceptionCode();}}
 void require(bool value,const std::string& cause){if(!value)throw std::runtime_error(cause);}
 std::string win32(const char* operation){return std::string(operation)+" win32="+std::to_string(GetLastError());}
@@ -68,7 +68,7 @@ struct HeapImports {
         }throw std::runtime_error(std::string("CRT named export is absent: ")+symbol);
     }
     void prepare(){
-        if(ready)return;require(file_digest(executable)=="bbab2dc68babcc644d0a1679548bf1e334b6c52aea669c3f61f6cb9d45c1aaf6","Free ownership executable SHA differs");
+        if(ready)return;
         named_import(image,"free",free_slot_rva);named_import(image,"malloc",malloc_slot_rva);auto imported=GetModuleHandleW(L"msvcrt.dll");require(imported!=nullptr,win32("Imported CRT module"));
         proof.imported_crt=module(reinterpret_cast<uintptr_t>(imported));proof.free_export=exported(imported,"free",proof.free_provider);proof.malloc_export=exported(imported,"malloc",proof.malloc_provider);proof.slot=image+free_slot_rva;proof.malloc_slot=image+malloc_slot_rva;ready=true;
     }

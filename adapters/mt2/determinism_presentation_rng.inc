@@ -42,7 +42,7 @@ bool puppet_installed=false;
 __declspec(noinline) void puppet_constructor(void* puppet,void* actor,bool preview,bool in_world){
     const auto caller=reinterpret_cast<uintptr_t>(_ReturnAddress());
     const bool previous=puppet_scope.active;
-    puppet_scope.active=armed.load(std::memory_order_acquire)&&caller==image+0x4008f9;
+    puppet_scope.active=armed.load(std::memory_order_acquire)&&caller==image+0x4054b9;
     __try {original_puppet_constructor(puppet,actor,preview,in_world);}
     __finally {puppet_scope.active=previous;}
 }
@@ -73,7 +73,7 @@ std::mutex building_widget_failure_mutex;
 std::string building_widget_failure;
 
 bool admit_building_widget(const void* building,uintptr_t caller){
-    if(!armed.load(std::memory_order_acquire)||caller!=image+0x409a54||!building_widget_owner)return false;
+    if(!armed.load(std::memory_order_acquire)||caller!=image+0x40e614||!building_widget_owner)return false;
     try{std::string cause;const bool admitted=building_widget_owner(building,cause);
         if(!admitted&&!cause.empty()){std::lock_guard lock(building_widget_failure_mutex);if(building_widget_failure.empty())building_widget_failure=cause;}
         return admitted;
@@ -95,80 +95,80 @@ void verify(uintptr_t offset,size_t size,const char* expected){
     if(digest(bytes)!=expected)throw std::runtime_error("Presentation RNG original code differs rva="+std::to_string(offset));
 }
 void verify_digital(){
-    verify(0x16e0f0,432,"9446082a9b7476b35ce56be9953311d8f56af52fdc9a75a9a0812de105afcc80");
-    verify(0x16f4e0,2608,"e2ae82831a421c13459f20498381209beaf2b0620c356110c12efb2fbbf71a07");
-    verify(0x16bf10,1760,"16e3cd546d9379ea9b37e5b12799f4b3d2570eabe7fb135b918ed0417714867c");
-    verify(0x16cad0,208,"c81bd219118ed1cb6e2494a9f67a6db3fa3adb01c388fa5eec2f514ed5f0e64d");
-    verify(0x16cba0,2864,"b3e0fea6b120660dd31a5d6bd884ef4fae5849749df94db9f87cc9c53df482a0");
-    verify(0x178bf0,3776,"aa67dd1bb03f54e7c61c60e00b41caebe731c4f1fffdbec03e44ac0fafc261f1");
-    verify(0x16df20,240,"9da5e6bbcb1ab64df96fab62e21f246913578dd30d5799237c07c36464b939a6");
-    verify(0x167700,112,"3a32f6687e24518e5d1e920efcebcfbf2b4940073c6ffb3828a64da13e5e76dd");
+    verify(0x16fac0,432,"20e8bebe65da285f929449f89b763e5afe4e19a10f61c7d18b1a5eb24f323fc2");
+    verify(0x170eb0,2608,"01960afef08d26d400395426e7a2a96690d57145f83ffec40edc1f82b7bc0db5");
+    verify(0x16d830,1760,"a6166024bd3173e40ec626688af27c01752ecd87f2f03f9a97e07e25c487ce93");
+    verify(0x16e3f0,208,"1c3ac6900715f0dc752d25b111d2f42d123c40dac632c221702cd30b004b274b");
+    verify(0x16e4c0,2864,"b3e0fea6b120660dd31a5d6bd884ef4fae5849749df94db9f87cc9c53df482a0");
+    verify(0x17a610,3776,"aa67dd1bb03f54e7c61c60e00b41caebe731c4f1fffdbec03e44ac0fafc261f1");
+    verify(0x16f8f0,240,"2612d82a8f6620a8d2e84360783e51d124dcdc71b9a9a76c370c726b6b02997d");
+    verify(0x169020,112,"4661bcdd9ba9ff1fe6c65f85621c52cf2d77e9aecee824bfa4ea9e8c6f44a81f");
 }
 core::Selection select_digital(uintptr_t helper,uintptr_t caller,void* source){
     const auto caller_rva=caller>=image?caller-image:0;
     if(building_widget_installed&&armed.load(std::memory_order_acquire)&&building_widget_scope.matches(helper,caller_rva)){
         try{
-            if(read<uintptr_t>(image+0x164b250)!=image+0x1c4e7a0)
+            if(read<uintptr_t>(image+0x1650830)!=image+0x1c557a0)
                 throw std::runtime_error("Building widget RNG Default object differs");
         }catch(const std::exception& problem){std::lock_guard lock(building_widget_failure_mutex);if(building_widget_failure.empty())building_widget_failure=problem.what();throw;}
         return core::select_building_widget(true,generation.load(std::memory_order_acquire),building_widget_scope,
-            helper,caller_rva,source,reinterpret_cast<void*>(image+0x1c4e7a0),building_widget_local,building_widget_count,
+            helper,caller_rva,source,reinterpret_cast<void*>(image+0x1c557a0),building_widget_local,building_widget_count,
             [](void* target,uint64_t seed){original_seed(target,seed);});
     }
     if(respawn_installed&&armed.load(std::memory_order_acquire)&&respawn_query.matches(helper,caller_rva)){
         try{
-            if(read<uintptr_t>(image+0x164b250)!=image+0x1c4e7a0)
+            if(read<uintptr_t>(image+0x1650830)!=image+0x1c557a0)
                 throw std::runtime_error("NPC validity RNG Default object differs");
         }catch(const std::exception& problem){
             std::lock_guard lock(failure_mutex);if(failure.empty())failure=problem.what();
             throw;
         }
         return core::select_respawn(true,generation.load(std::memory_order_acquire),respawn_query,
-            helper,caller_rva,source,reinterpret_cast<void*>(image+0x1c4e7a0),respawn_local,respawn_count,
+            helper,caller_rva,source,reinterpret_cast<void*>(image+0x1c557a0),respawn_local,respawn_count,
             [](void* target,uint64_t seed){original_seed(target,seed);});
     }
     if(puppet_installed&&armed.load(std::memory_order_acquire)&&puppet_scope.matches(helper,caller_rva)){
         try{
-            if(read<uintptr_t>(image+0x164b250)!=image+0x1c4e7a0)
+            if(read<uintptr_t>(image+0x1650830)!=image+0x1c557a0)
                 throw std::runtime_error("Blueprint Puppet RNG Default object differs");
         }catch(const std::exception& problem){
             std::lock_guard lock(failure_mutex);if(failure.empty())failure=problem.what();
             throw;
         }
         return core::select_blueprint_puppet(true,generation.load(std::memory_order_acquire),puppet_scope,
-            helper,caller_rva,source,reinterpret_cast<void*>(image+0x1c4e7a0),puppet_local,puppet_count,
+            helper,caller_rva,source,reinterpret_cast<void*>(image+0x1c557a0),puppet_local,puppet_count,
             [](void* target,uint64_t seed){original_seed(target,seed);});
     }
     if(scenery_pattern_installed&&armed.load(std::memory_order_acquire)&&scenery_pattern_scope.matches(helper,caller_rva)){
         try{
-            if(read<uintptr_t>(image+0x164b250)!=image+0x1c4e7a0)
+            if(read<uintptr_t>(image+0x1650830)!=image+0x1c557a0)
                 throw std::runtime_error("Scenery pattern RNG Default object differs");
         }catch(const std::exception& problem){
             std::lock_guard lock(failure_mutex);if(failure.empty())failure=problem.what();
             throw;
         }
         return core::select_scenery_pattern(true,generation.load(std::memory_order_acquire),scenery_pattern_scope,
-            helper,caller_rva,source,reinterpret_cast<void*>(image+0x1c4e7a0),scenery_pattern_local,scenery_pattern_count,
+            helper,caller_rva,source,reinterpret_cast<void*>(image+0x1c557a0),scenery_pattern_local,scenery_pattern_count,
             [](void* target,uint64_t seed){original_seed(target,seed);});
     }
     if(character_jump_installed&&armed.load(std::memory_order_acquire)&&core::character_jump_site(helper,caller_rva)){
         try{
-            if(read<uintptr_t>(image+0x164b250)!=image+0x1c4e7a0)
+            if(read<uintptr_t>(image+0x1650830)!=image+0x1c557a0)
                 throw std::runtime_error("Character jump RNG Default object differs");
         }catch(const std::exception& problem){
             std::lock_guard lock(failure_mutex);if(failure.empty())failure=problem.what();
             throw;
         }
         return core::select_character_jump(true,generation.load(std::memory_order_acquire),helper,caller_rva,
-            source,reinterpret_cast<void*>(image+0x1c4e7a0),character_jump_local,character_jump_count,
+            source,reinterpret_cast<void*>(image+0x1c557a0),character_jump_local,character_jump_count,
             [](void* target,uint64_t seed){original_seed(target,seed);});
     }
     const auto index=caller>=image?core::digital_site(helper,caller-image):16;
     if(!digital_enabled||!armed.load(std::memory_order_acquire)||index==16)return {source};
     auto& count=digital_counts[index];++count.matched;
-    if(reinterpret_cast<uintptr_t>(source)!=image+0x1c4e7a0){++count.nondefault;return {source};}
+    if(reinterpret_cast<uintptr_t>(source)!=image+0x1c557a0){++count.nondefault;return {source};}
     try{
-        if(read<uintptr_t>(image+0x164b250)!=image+0x1c4e7a0)
+        if(read<uintptr_t>(image+0x1650830)!=image+0x1c557a0)
             throw std::runtime_error("Digital RNG Default object differs");
     }catch(const std::exception& problem){
         std::lock_guard lock(failure_mutex);if(failure.empty())failure=problem.what();
@@ -183,29 +183,29 @@ core::Selection select_digital(uintptr_t helper,uintptr_t caller,void* source){
     ++count.attempted;return {&local.random,&count};
 }
 void verify_callers(){
-    verify(0x81b210,1056,"2f69d9bf7965213a610ea9c2bf94340f83b9a3931c47d81e10aa39dfe68f9658");
-    verify(0x841010,336,"5ffc0ae6d8befcb828e54b8647657e14c4685a5bfff447848527b22fb21d1ec5");
-    verify(0x9fc090,192,"7a7ab329d2eb747de62d61f791723eef44f3e850a468747f41708e6d08b981e5");
+    verify(0x823800,1056,"691c6c37dd91e81a65cc345bb1bff9ceec3a1b161c5eb5c3949757eed1c90bc2");
+    verify(0x8496d0,336,"1d769709877af7bc542c2a940cca47628aa5e4ad056516e47a2eedac197fc99d");
+    verify(0xa06517,192,"7a7ab329d2eb747de62d61f791723eef44f3e850a468747f41708e6d08b981e5");
 }
 __declspec(noinline) float get_float(void* source,float limit){
     const auto caller=reinterpret_cast<uintptr_t>(_ReturnAddress());
     const auto selected=caller>=image?core::site(caller-image):core::Site::Other;
-    if(!armed.load(std::memory_order_acquire)||selected==core::Site::Other)return rng_trace::invoke(0x9fc430,caller,source,original_float,limit);
+    if(!armed.load(std::memory_order_acquire)||selected==core::Site::Other)return rng_trace::invoke(0xa06a18,caller,source,original_float,limit);
     uintptr_t current=0;
     try{
-        current=read<uintptr_t>(image+0x164b250);
-        if(current!=image+0x1c4e7a0)throw std::runtime_error("Presentation RNG Default object differs");
+        current=read<uintptr_t>(image+0x1650830);
+        if(current!=image+0x1c557a0)throw std::runtime_error("Presentation RNG Default object differs");
     }catch(const std::exception& problem){
         {std::lock_guard lock(failure_mutex);if(failure.empty())failure=problem.what();}
         // Admission failed before any redirected native call. Preserve vanilla
         // behavior once and fail the experiment at its next held observation.
-        return rng_trace::invoke(0x9fc430,caller,source,original_float,limit);
+        return rng_trace::invoke(0xa06a18,caller,source,original_float,limit);
     }
     const auto epoch=generation.load(std::memory_order_acquire);
     auto& count=counts[selected==core::Site::Window?0:1];
     return core::dispatch(true,epoch,selected,source,reinterpret_cast<void*>(current),limit,local,count,
         [](void* state,uint64_t seed){original_seed(state,seed);},
-        [caller](void* state,float max){return rng_trace::invoke(0x9fc430,caller,state,original_float,max);});
+        [caller](void* state,float max){return rng_trace::invoke(0xa06a18,caller,state,original_float,max);});
 }
 void install(const Json& config){
     digital_enabled=config.value("digital_rng",false);
@@ -214,47 +214,47 @@ void install(const Json& config){
     if(!config.value("presentation_rng",false))return;
     if(digital_enabled)verify_digital();
     verify_callers();
-    verify(0x9fc430,128,"5f2e7755f953a9e5755c9af6e38b4b86c8c134223a76525845487a3187ca39e0");
-    original_seed=reinterpret_cast<Seed>(image+0x9fc090);
-    hook(reinterpret_cast<void*>(image+0x9fc430),reinterpret_cast<void*>(&get_float),reinterpret_cast<void**>(&original_float));
+    verify(0xa06a18,128,"5f2e7755f953a9e5755c9af6e38b4b86c8c134223a76525845487a3187ca39e0");
+    original_seed=reinterpret_cast<Seed>(image+0xa06517);
+    hook(reinterpret_cast<void*>(image+0xa06a18),reinterpret_cast<void*>(&get_float),reinterpret_cast<void**>(&original_float));
     if(config.value("rng_trace",false)){
         if(building_widget_owner){
-            verify(0x409800,720,"10bcc771eb3058afaf77564a8eb864aada002300cec8266a5b0aba99b53ce92f");
-            verify(0x408ac0,1216,"a0f051e1e28377b7f2b8d4e0c4fba5c17851a17ecb0eadca33edc8a14281f28e");
-            verify(0xda660,208,"2c2b0119f0986fd7fecdbbe621d6075696ffd2a0b185bf614a87b0702abfcdf8");
-            verify(0x47ce20,16,"bbda1b5c6a1bf4cdfc61c7f519f5df3ae7a710e548db36c0d3ac1e8d3d70f995");
-            native_routes->catalog("framework.rng.building-widget-query",0x408ac0,true);
+            verify(0x40e3c0,720,"c83326c0ff184f077069d7cc9c99c2d464a3e0363ead78329f06ad3d1856c9ad");
+            verify(0x40d680,1216,"104451abf60152865c2a81158e7a157b12eb852cde3a86208b48d491fbc84360");
+            verify(0xdb690,208,"e5c7f84c914dbbcd15d457260beb0482f0a71f5948f07abfff2f4044eda52bc4");
+            verify(0x481f60,16,"936e2840e93a6f4f62da4c5a7876b41f3a3c06898ceb0649636619f82794d3a0");
+            native_routes->catalog("framework.rng.building-widget-query",0x40d680,true);
             native_services->reserve("framework.rng.building-widget-query");
-            hook(reinterpret_cast<void*>(image+0x408ac0),reinterpret_cast<void*>(&get_pad_entrance),reinterpret_cast<void**>(&original_get_pad_entrance));
+            hook(reinterpret_cast<void*>(image+0x40d680),reinterpret_cast<void*>(&get_pad_entrance),reinterpret_cast<void**>(&original_get_pad_entrance));
             building_widget_installed=true;
         }
-        verify(0x24e790,208,"2f485cb1039a25e9dd20e8fd9b970b0a25dc6d2a1d0747608de50a784655bbfa");
-        verify(0x5c3d80,368,"462f80355467d9fb90a4d2c9c6278fc83f7aa8645ea5a2741d1cbf79960ef614");
-        verify(0x5c4210,992,"8fb0187211bf62aa9985c6e9d4de015e0f64a068c04cb107daf4d40009905bf4");
-        hook(reinterpret_cast<void*>(image+0x24e790),reinterpret_cast<void*>(&find_respawn),
+        verify(0x2516d0,208,"08fb0d7c91beda6565b2e3789927f0bfda78f007b626a57dbe758bfa13f640cc");
+        verify(0x5ca510,368,"462f80355467d9fb90a4d2c9c6278fc83f7aa8645ea5a2741d1cbf79960ef614");
+        verify(0x5ca960,992,"3c3b07e135df49694e3e6e1529f75da93a882b0f293f967e70034c6417986aea");
+        hook(reinterpret_cast<void*>(image+0x2516d0),reinterpret_cast<void*>(&find_respawn),
             reinterpret_cast<void**>(&original_find_respawn));
         respawn_installed=true;
-        verify(0x34980,192,"3073d793c1e2149e07487db8e4afbdf2ceccd24c08e48360dd6e2dfc5b363c1f");
-        verify(0x400830,672,"49fa0a863a565751254e2c0c4b2dc311c28e7a79d3e0d180c96b92e325d32db0");
-        verify(0x3b3cd0,1536,"862fc78da9db15614bfda44651f0287421bb9e891306a2fe7dcaa4bc658e9af6");
-        hook(reinterpret_cast<void*>(image+0x34980),reinterpret_cast<void*>(&puppet_constructor),
+        verify(0x34b60,192,"882fb64f69170f94d00a9d976932c162434eac97e5f354dd5fb1e23f0fb7b5fa");
+        verify(0x4053f0,672,"cc8439a8360821887c2f717e058a9b31ad46cdc370d6619678c966d1eda491e9");
+        verify(0x3b87e0,1536,"f94aa85df15091fa474d2d8f7992c789a46891e3689b2873051236bdcd1c16b9");
+        hook(reinterpret_cast<void*>(image+0x34b60),reinterpret_cast<void*>(&puppet_constructor),
             reinterpret_cast<void**>(&original_puppet_constructor));
         puppet_installed=true;
-        verify(0x5d3520,3024,"75a655abfab68c1ae9ca54429ec5ee7a6a00900f61929b9046e08bbf7134c9af");
-        verify(0x18e3b0,64,"032bd5ac7bd37c80d7db821b1a364c354fb070fb7ce8a25735783a50626b3910");
-        verify(0x18ecb0,64,"143c94ce419aae00a141e3f3976d94d3ca89e6fd8d6f6a5ff04828238bbd8cb6");
-        verify(0x18f8f0,64,"e8df3649827ff3def597140ef869ee80f5df3e9429bc5556c42633ebfdc4d7a7");
-        verify(0x9fa720,336,"50ed5d2329f66a2ea85a589635ada3fa228dab9810ae71ebb5e7a2ef3d6c7315");
-        hook(reinterpret_cast<void*>(image+0x9fa720),reinterpret_cast<void*>(&perlin_constructor),
+        verify(0x5d9c70,3024,"f56c4cc831dd024f61abcb7ba6ba815a011826b6b6fe258b31b7447371e587e5");
+        verify(0x18fe70,64,"b2f448db96cc5d8babf5d27907e7a470672888c1dd19df1e2f06fb258741cdea");
+        verify(0x190770,64,"7c493147c1de0e71d3cd8d97c87462251273a6cf9f4de964dad624a51d626b5a");
+        verify(0x1913b0,64,"fb21bcf59dd6911ea91042fc2a65a77ff66870f106013c852b77131a92adbfbd");
+        verify(0xa04b70,336,"8f5d850caee46d9ddde3703377d3a680d09adde1dda1e2577cccf26e42da6747");
+        hook(reinterpret_cast<void*>(image+0xa04b70),reinterpret_cast<void*>(&perlin_constructor),
             reinterpret_cast<void**>(&original_perlin_constructor));
         scenery_pattern_installed=true;
-        verify(0x235f0,384,"7a4f6af8d3a08e81f68fb4f990d997dca3f1821b276ba5fd5aefca062f642847");
-        verify(0x23a30,272,"5bd9cd4ba26c721eedb3b0d61cad16f4450f63ce73488fb10d3644359d0c19e6");
-        verify(0x257a0,32,"501d9889ec223b3669f63221dc9cec0f3080e55d9bc779a6b07516522220fc64");
-        verify(0x257c0,16,"5b609f249ba3ad6b38453541b3877326f5688e9f5446347f4ab2a05b0db6fd14");
-        verify(0x28730,16,"ab959da4e1674818e4fe45d08d20cffb350efc7cc7c22adb8f392806bbb78352");
-        verify(0x28750,16,"cdad0737793e845c4cfac4b6dfbf1144119d7cd8d3fa915dbb8fe1cd93be6142");
-        verify(0x3a0350,6816,"e994c1ef7cf8ff10fe463e8def99af65798238dce88481dbd3dc82838c828b79");
+        verify(0x23790,384,"c0a59fc275248c75745c462511a255ce34a8f071294216a849194db8d65df02d");
+        verify(0x23bd0,272,"a3f19ba56e1c77a3a9e4cb19508318c4253ede582dac2c6660ff97603a5f75dc");
+        verify(0x25940,32,"501d9889ec223b3669f63221dc9cec0f3080e55d9bc779a6b07516522220fc64");
+        verify(0x25960,16,"5b609f249ba3ad6b38453541b3877326f5688e9f5446347f4ab2a05b0db6fd14");
+        verify(0x288d0,16,"ab959da4e1674818e4fe45d08d20cffb350efc7cc7c22adb8f392806bbb78352");
+        verify(0x288f0,16,"cdad0737793e845c4cfac4b6dfbf1144119d7cd8d3fa915dbb8fe1cd93be6142");
+        verify(0x3a4e50,6816,"2c83236299d0f9f98cda64d612d4ddf02d3aab8b8543e25b6744c2628e56cfc5");
         character_jump_installed=true;
     }
     if(digital_enabled||respawn_installed||puppet_installed||scenery_pattern_installed||character_jump_installed||building_widget_installed)rng_trace::select_source=&select_digital;
@@ -264,7 +264,7 @@ void arm(){
     if(!installed)return;
     if(armed.load(std::memory_order_acquire))throw std::runtime_error("Presentation RNG already armed");
     verify_callers();
-    if(read<uintptr_t>(image+0x164b250)!=image+0x1c4e7a0)throw std::runtime_error("Presentation RNG arm Default object differs");
+    if(read<uintptr_t>(image+0x1650830)!=image+0x1c557a0)throw std::runtime_error("Presentation RNG arm Default object differs");
     if(digital_enabled)verify_digital();
     generation.fetch_add(1,std::memory_order_release);
     armed.store(true,std::memory_order_release);

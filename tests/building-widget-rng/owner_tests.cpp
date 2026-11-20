@@ -14,12 +14,12 @@ struct Lifecycle {bool bootstrap_held=true;uint64_t generation=4;} lifecycle;
 uintptr_t image=0x100000,owner=10;std::map<uintptr_t,uint64_t> memory;uintptr_t lookup_result=60;unsigned lookup_exception=0;
 void require(bool ok,const std::string& why){if(!ok)throw std::runtime_error(why);}
 template<class T>T read(uintptr_t address){if(!memory.contains(address))throw std::runtime_error("native read failed");return T(memory.at(address));}
-uint32_t building_widget_lookup(uintptr_t entry,uint64_t uid,uintptr_t& result){require(entry==image+0x47ce20&&uid==90,"lookup identity changed");result=lookup_result;return lookup_exception;}
+uint32_t building_widget_lookup(uintptr_t entry,uint64_t uid,uintptr_t& result){require(entry==image+0x481f60&&uid==90,"lookup identity changed");result=lookup_result;return lookup_exception;}
 #include "widget_owner_actual.inc"
 void need(bool ok,const char* why){if(!ok)throw std::runtime_error(why);}
 void reset(){current_thread=thread=7;configured=true;driver_value.active=true;steps.value=Receipt{};bootstrap=Bootstrap{};lifecycle=Lifecycle{};owner=10;
-    lookup_result=60;lookup_exception=0;memory={{image+0x13df8f0,10},{10+0x28,20},{20+0x58,30},{30+0x160,40},{40+0x158,50},
-        {60,image+0x16d93c0},{60+0x18,90},{60+0x170,80},{image+0x13df440,70},{70+0x60,80}};}
+    lookup_result=60;lookup_exception=0;memory={{image+0x13eb8f0,10},{10+0x28,20},{20+0x58,30},{30+0x160,40},{40+0x158,50},
+        {60,image+0x16df760},{60+0x18,90},{60+0x170,80},{image+0x13eb440,70},{70+0x60,80}};}
 int main()try{std::string e;reset();need(building_widget_owner((void*)60,e)&&e.empty(),"current Building owner rejected");
     steps.value.phase=MT2FW_MT2_STEP_ENTERED;need(building_widget_owner((void*)60,e),"entered owner rejected");
     reset();current_thread=8;need(!building_widget_owner((void*)60,e)&&e.empty(),"wrong thread did not pass through");

@@ -20,7 +20,7 @@ template<class Read>bool census(uintptr_t image,uintptr_t region,const std::arra
     if(range[0]<0||(range[0]==0&&range[1]!=0)||range[1]<range[0]||range[1]>INT32_MAX/10-10)return fail("region level census range outside domain");
     Census result;std::set<uintptr_t> unique;std::set<uint64_t> uids;
     struct Family {size_t offset,owner,first;uintptr_t ap,actor_ap;int buckets;};
-    constexpr Family families[]{{0x998,0xc8,0x40,0x16e6aa0,0x1742980,3},{0x988,0x80,0x40,0x1714100,0x16c0770,1},{0x968,0xf0,0x20,0x16fe170,0x1745ce0,4}};
+    constexpr Family families[]{{0x998,0xc8,0x40,0x16ece40,0x1748d20,3},{0x988,0x80,0x40,0x171a4a0,0x16c6b10,1},{0x968,0xf0,0x20,0x1704510,0x174c080,4}};
     for(size_t family=0;family<3;++family){const auto& f=families[family];uintptr_t manager=0,ap=0,owner=0;
         if(!read(region,f.offset,manager,e)||!read(manager,0,ap,e)||!read(manager,f.owner,owner,e))return false;
         if(ap!=image+f.ap||owner!=region)return fail("region level manager class/owner differs family="+std::to_string(family));

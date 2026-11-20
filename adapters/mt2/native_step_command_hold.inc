@@ -1,7 +1,7 @@
 // Road, Wall and Pass completion nest Pause/Resume inside the admitted command.
 // Their Resume calls must leave the outer ordered hold in place until the next Go.
 namespace command_hold {
-constexpr uintptr_t RoadResumeReturn=0x5cbfff,WallResumeReturn=0x5ebf8b,PassResumeReturn=0x5c94b5;
+constexpr uintptr_t RoadResumeReturn=0x5d274f,WallResumeReturn=0x5f26db,PassResumeReturn=0x5cfc05;
 uint64_t preserved=0,wall_preserved=0,pass_preserved=0;
 void reject(const char* kind,const std::string& cause){
     if(failure.empty())failure=std::string("Step nested ")+kind+" Resume: "+cause;

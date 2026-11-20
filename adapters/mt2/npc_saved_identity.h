@@ -11,9 +11,9 @@ using read::bounds;
 using read::unchanged;
 using read::fail;
 using read::Bounds;
-inline constexpr uintptr_t save_property_rva = 0xe3af60, load_property_rva = 0xe3aeb0;
-inline constexpr uintptr_t load_children_return_rva = 0xc0f116;
-inline constexpr uintptr_t load_link_return_rva = 0xc0f457, load_inline_return_rva = 0xc0f515;
+inline constexpr uintptr_t save_property_rva = 0xe46a50, load_property_rva = 0xe469a0;
+inline constexpr uintptr_t load_children_return_rva = 0xc1b856;
+inline constexpr uintptr_t load_link_return_rva = 0xc1bb97, load_inline_return_rva = 0xc1bc55;
 inline constexpr size_t maximum_npcs = 100000;
 struct Record {
     uintptr_t pointer = 0;
@@ -41,24 +41,24 @@ inline std::string key(const std::string& sha, int32_t region, const Record& rec
 template<class Memory>
 bool property(Memory& memory, uintptr_t image, uintptr_t object, uintptr_t manager, std::string& error) {
     uint64_t offset = 0; int32_t count = 0;
-    if (!typed(memory, image, object, 0x1740bd0, error) || !typed(memory, image, manager, 0x16e6aa0, error) ||
+    if (!typed(memory, image, object, 0x1746f70, error) || !typed(memory, image, manager, 0x16ece40, error) ||
         !at(memory, object, 0x38, offset, error) || !at(memory, object, 0x40, count, error)) return false;
-    return (object == image + 0x13bf5c0 && offset == 0x38 && count == 3) || fail(error, "NPC saved property layout differs");
+    return (object == image + 0x13cb5c0 && offset == 0x38 && count == 3) || fail(error, "NPC saved property layout differs");
 }
 template<class Memory, class LinkId>
 bool observe(Memory& memory, uintptr_t image, uintptr_t manager, LinkId&& links, Pool& out, std::string& error) {
     Pool result; result.manager = manager;
     std::set<uintptr_t> pointers; std::set<uint64_t> uids; std::set<int32_t> ids;
-    if (!typed(memory, image, manager, 0x16e6aa0, error)) return false;
+    if (!typed(memory, image, manager, 0x16ece40, error)) return false;
     for (int32_t type = 0; type < 3; ++type) {
         const auto array = manager + 0x38 + static_cast<size_t>(type) * 0x30;
         Bounds initial;
-        if (!typed(memory, image, array, 0x172de80, error) || !bounds(memory, array, maximum_npcs, initial, error)) return false;
+        if (!typed(memory, image, array, 0x1734220, error) || !bounds(memory, array, maximum_npcs, initial, error)) return false;
         if (result.records.size() + static_cast<size_t>(initial.count) > maximum_npcs) return fail(error, "NPC snapshot count exceeds bound");
         for (int32_t n = 0; n < initial.count; ++n) {
             Record row; row.child = n;
             if (!at(memory, initial.data, static_cast<size_t>(n) * 8, row.pointer, error) ||
-                !typed(memory, image, row.pointer, 0x1742980, error) ||
+                !typed(memory, image, row.pointer, 0x1748d20, error) ||
                 !at(memory, row.pointer, 0x18, row.uid, error) || !at(memory, row.pointer, 0x80c, row.type, error) ||
                 !links(row.pointer, row.link_id, error)) return false;
             if (!row.uid || row.type != type || row.link_id < 0 || !pointers.insert(row.pointer).second ||
@@ -157,7 +157,7 @@ bool begin_load(Memory& memory, uintptr_t image, uintptr_t prop, uintptr_t manag
     if (!reader || !context || !property(memory, image, prop, manager, error)) return fail(error, error.empty() ? "NPC load reader/context absent" : error);
     for (size_t type = 0; type < 3; ++type) {
         Bounds initial; const auto array = manager + 0x38 + type * 0x30;
-        if (!typed(memory, image, array, 0x172de80, error) || !bounds(memory, array, maximum_npcs, initial, error)) return false;
+        if (!typed(memory, image, array, 0x1734220, error) || !bounds(memory, array, maximum_npcs, initial, error)) return false;
         if (initial.count) return fail(error, "NPC native load requires initially empty arrays");
     }
     frame.manager = manager; frame.reader = reader; frame.context = context; return true;
@@ -166,7 +166,7 @@ template<class Memory>
 bool registered(Memory& memory, uintptr_t image, LoadFrame& frame, uintptr_t caller,
                 uintptr_t context, int32_t id, uintptr_t object, std::string& error) {
     int32_t type = -1; uintptr_t actual_context = 0;
-    if (!typed(memory, image, object, 0x1742980, error) || !at(memory, object, 0x80c, type, error) ||
+    if (!typed(memory, image, object, 0x1748d20, error) || !at(memory, object, 0x80c, type, error) ||
         !at(memory, object, 8, actual_context, error)) return false;
     if (context != actual_context) return fail(error, "NPC registered object context differs");
     return frame.registered(caller, context, id, object, type, error);

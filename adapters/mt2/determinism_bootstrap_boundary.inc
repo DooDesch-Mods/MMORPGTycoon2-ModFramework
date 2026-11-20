@@ -14,7 +14,7 @@ bool enabled=false,pending=false,branch_changed=false,uncertain=false;
 uintptr_t load_mode=0;
 uint64_t deferred=0,resumed=0,load_frame=0;
 std::string first_error;
-constexpr uintptr_t Branch=0x4a25dc,Next=Branch+5,Continue=0x4a1c36,Epilogue=0x4a1fdf;
+constexpr uintptr_t Branch=0x4a7acc,Next=Branch+5,Continue=0x4a7126,Epilogue=0x4a74cf;
 constexpr int32_t OriginalDelta=int32_t(int64_t(Continue)-int64_t(Next)),HeldDelta=int32_t(int64_t(Epilogue)-int64_t(Next));
 void require(bool value,const char* cause){if(!value)throw std::runtime_error(cause);}
 #include "determinism_reveal_boundary.inc"
@@ -41,12 +41,12 @@ uintptr_t current_mode(){
     require(control.entered&&timer_step::frame.active,"Bootstrap lacks admitted original outer frame");
     timer_step::current_game();
     const auto mode=read<uintptr_t>(owner+0x28);
-    require(mode&&mode==read<uintptr_t>(image+0x13df320)&&read<uintptr_t>(mode)==image+0x16e6730,"Bootstrap Mode owner/address point changed");
+    require(mode&&mode==read<uintptr_t>(image+0x13eb320)&&read<uintptr_t>(mode)==image+0x16ecad0,"Bootstrap Mode owner/address point changed");
     return mode;
 }
 void scene_state(bool value){
     require(read<uint8_t>(owner+0x33d)==uint8_t(value),"Bootstrap Game scene-enable readback differs");
-    const auto system=read<uintptr_t>(image+0x1c4eb40);
+    const auto system=read<uintptr_t>(image+0x1c55b40);
     require(system,"Bootstrap System is absent");
     const auto screen=read<uintptr_t>(system+0x70);
     require(screen,"Bootstrap Screen is absent");
@@ -96,14 +96,14 @@ void restore_render_requests(){
 }
 
 void enable_call(void* receiver,bool world,bool ui,uintptr_t caller){
-    if(!enabled||!control.active()||caller!=image+0x4a23e7){original_enable(receiver,world,ui);return;}
+    if(!enabled||!control.active()||caller!=image+0x4a78d7){original_enable(receiver,world,ui);return;}
     try{
         require(control.phase==mt2::determinism::Gate::Phase::Loading,"Bootstrap load transition outside Loading");
         require(world&&ui&&!pending&&!deferred&&!uncertain,"Bootstrap load scene enable repeated or has unexpected arguments");
         load_mode=current_mode();
         require(load_mode==reinterpret_cast<uintptr_t>(receiver)&&read<int32_t>(load_mode+0x2c4)==3,"Bootstrap load transition Mode state differs");
-        const auto map=read<uintptr_t>(image+0x13df8c0);
-        require(map&&read<uintptr_t>(map)==image+0x1742860&&read<uint8_t>(map+0x47f)==1,"Bootstrap Map is not ready at native scene enable");
+        const auto map=read<uintptr_t>(image+0x13eb8c0);
+        require(map&&read<uintptr_t>(map)==image+0x1748c00&&read<uint8_t>(map+0x47f)==1,"Bootstrap Map is not ready at native scene enable");
         render_requested=render_consumed=0;render_captured=render_returned=render_restored=false;
         change_branch(OriginalDelta,HeldDelta);branch_changed=true;pending=true;
         load_frame=timer_step::frame.entered;++deferred;
@@ -146,25 +146,25 @@ Json status(){return {{"reveal_branch_changed",reveal::changed},{"reveal_branch_
 void install(const Json& config){
     enabled=config.value("bootstrap_boundary",false);if(!enabled)return;
     for(const auto& [offset,size,sha]:std::array<std::tuple<uintptr_t,size_t,const char*>,11>{{
-        {0x32e890,5264,"5e6f092c80fc48bbb0fedc56b386af43f47040ccf3829989c25d9e97a2852db7"},
-        {0x463b00,480,"a426f23bc36d8cfd8cb1c30c36f0405487427662fb31d7a72a4a67b9750c244d"},
-        {0x4620f0,4896,"bb60f623fdabd089066ea6b34c52f3d4434a3959f962df25b507da35188a410f"},
-        {0x9c9070,880,"4cf61560e5223f1a9193b9f1af4685d40caa1bce41ea7511690b529052c1823e"},
-        {0x352e90,800,"437996bb45d32ca45a271f2264c02d57468675b47ada0474559308d605913ac4"},
-        {0x4a1bb0,5088,"933bbb87425a467d54e25ba1290fd55c0232e72a68d07c2039d7822f8d691b89"},
-        {0x45fa90,160,"ba277a774772d87ecee03e56e833044a41bcd07480df0ba157efe60ea28c586a"},
-        {0x49f410,64,"aab9253aa0bd3aac82cb7c1a4b803fe5400d08164d901bbfd3a1ecdc5da8e1d5"},
-        {0x45fa30,96,"33467a92b2fc5c7acbabb9bc95c65cf87b9bae246f433153160d894213c48ea3"},
-        {0x9ca3a0,80,"a18e9111c7c1ea1143c06644859585a09386cc712d80995b295c66f11e559ced"},
-        {0x9c9740,912,"23abaece7b33fcc78e85483bdd0751b11d4a3e8ab59ca3c6f0f7649c584f34a4"}}}){
+        {0x332920,5264,"55ca106d58de5c32fdc1fc661706a1ecf3662ef4144040141475375e8dbb43c4"},
+        {0x468b20,480,"b88eeed9d89b938a0df3fe190dae394f2453c00a9f472555a7f61b06a8dabb58"},
+        {0x467110,4896,"19ef1bbee72dae00858c5d2cb1c1c11280364531abb86ef57b73cb0fa70cf92c"},
+        {0x9d2c30,880,"67927fcbd1b078e2a29d402a4af4c6096d592c2dc3029d17bb2be45854a48ae0"},
+        {0x357bb0,800,"b02524d9b067e34f1875d2363122db019ce90ae4091f4214c0f04d2c91812acb"},
+        {0x4a70a0,5088,"889f8e62727788ecc562f11485419b093cafb50de7164941e5bfc93aef24f757"},
+        {0x464ab0,160,"d62d7da7076f4ec57f0f7adfef670a545328d181f0a63cb7aa7355f1823f41c2"},
+        {0x4a4900,64,"4119e38e26a2a764078104484cf73d8b11d699ec149fcb473a6858efff323c6e"},
+        {0x464a50,96,"dc3a0f5574b82a0b54b8162f93802f3b4f4779d8fcfe65e3e4e1cfa004445abc"},
+        {0x9d3f60,80,"35b5eea29601158eebeb53137155f4b564a454e8231884781e246825df535a03"},
+        {0x9d3300,912,"26a74f2482008368a315108428c18f1cb90995f7dda6e9556eeda4f9ea2234d3"}}}){
         std::string body(size,'\0');SIZE_T copied=0;
         if(!ReadProcessMemory(GetCurrentProcess(),reinterpret_cast<void*>(image+offset),body.data(),size,&copied)||copied!=size||digest(body)!=sha)
             throw std::runtime_error("Bootstrap exact Mode/scene native body differs");
     }
     reveal::branch_is(0x72);branch_is(OriginalDelta);
-    game_scenes=reinterpret_cast<Scenes>(image+0x45fa30);
-    get_scene=reinterpret_cast<GetScene>(image+0x9ca3a0);
-    hook(reinterpret_cast<void*>(image+0x49f410),reinterpret_cast<void*>(&enable),reinterpret_cast<void**>(&original_enable));
-    hook(reinterpret_cast<void*>(image+0x463b00),reinterpret_cast<void*>(&draw),reinterpret_cast<void**>(&original_draw));
+    game_scenes=reinterpret_cast<Scenes>(image+0x464a50);
+    get_scene=reinterpret_cast<GetScene>(image+0x9d3f60);
+    hook(reinterpret_cast<void*>(image+0x4a4900),reinterpret_cast<void*>(&enable),reinterpret_cast<void**>(&original_enable));
+    hook(reinterpret_cast<void*>(image+0x468b20),reinterpret_cast<void*>(&draw),reinterpret_cast<void**>(&original_draw));
 }
 }

@@ -36,7 +36,6 @@ struct GameCode {
     std::vector<unsigned char> bytes;
     std::vector<Section> sections;
     explicit GameCode(const fs::path& path){
-        if(file_digest(path)!="bbab2dc68babcc644d0a1679548bf1e334b6c52aea669c3f61f6cb9d45c1aaf6")throw std::runtime_error("Native route executable hash differs");
         std::ifstream stream(path,std::ios::binary);bytes.assign(std::istreambuf_iterator<char>(stream),{});if(!stream.eof()&&stream.fail())throw std::runtime_error("Native route executable read failed");
         auto read=[&](size_t offset,void* result,size_t size){if(offset>bytes.size()||size>bytes.size()-offset)throw std::runtime_error("Native route PE bounds invalid");std::memcpy(result,bytes.data()+offset,size);};
         IMAGE_DOS_HEADER dos{};read(0,&dos,sizeof(dos));if(dos.e_magic!=IMAGE_DOS_SIGNATURE||dos.e_lfanew<=0)throw std::runtime_error("Native route DOS header differs");

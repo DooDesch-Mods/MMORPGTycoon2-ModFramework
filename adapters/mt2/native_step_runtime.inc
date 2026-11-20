@@ -72,14 +72,14 @@ bool building_widget_owner(const void* building,std::string& error)try{
         receipt.world_epoch==bootstrap.world_epoch&&receipt.generation==bootstrap.identity.generation&&
         lifecycle.generation==bootstrap.identity.generation&&owner==bootstrap.game,
         "Building widget ordered lease/session/world identity differs");
-    require(owner&&read<uintptr_t>(image+0x13df8f0)==owner&&read<uintptr_t>(owner+0x28)==bootstrap.mode&&
+    require(owner&&read<uintptr_t>(image+0x13eb8f0)==owner&&read<uintptr_t>(owner+0x28)==bootstrap.mode&&
         read<uintptr_t>(bootstrap.mode+0x58)==bootstrap.state&&read<uintptr_t>(bootstrap.state+0x160)==bootstrap.world&&
         read<uintptr_t>(bootstrap.world+0x158)==bootstrap.map,"Building widget ordered current World chain differs");
-    const auto pointer=reinterpret_cast<uintptr_t>(building);if(!pointer||read<uintptr_t>(pointer)!=image+0x16d93c0)return false;
-    const auto manager=read<uintptr_t>(image+0x13df440);require(manager,"Building widget current Shard manager absent");
+    const auto pointer=reinterpret_cast<uintptr_t>(building);if(!pointer||read<uintptr_t>(pointer)!=image+0x16df760)return false;
+    const auto manager=read<uintptr_t>(image+0x13eb440);require(manager,"Building widget current Shard manager absent");
     const auto root=read<uintptr_t>(manager+0x60);require(root,"Building widget current root Shard absent");
     const auto uid=read<uint64_t>(pointer+0x18);if(!uid||read<uintptr_t>(pointer+0x170)!=root)return false;
-    uintptr_t found=0;const auto exception=building_widget_lookup(image+0x47ce20,uid,found);
+    uintptr_t found=0;const auto exception=building_widget_lookup(image+0x481f60,uid,found);
     require(!exception,"Building widget native UID lookup failed SEH="+std::to_string(exception));
     if(found!=pointer)return false;
     require(read<uint64_t>(found+0x18)==uid,"Building widget native full UID changed");
@@ -88,10 +88,10 @@ bool building_widget_owner(const void* building,std::string& error)try{
 catch(...){error="Building widget owner proof raised unknown exception";return false;}
 
 uintptr_t tasks(){
-    require(thread==GetCurrentThreadId()&&owner&&read<uintptr_t>(image+0x13df8f0)==owner&&read<uintptr_t>(owner)==image+0x1743740,
+    require(thread==GetCurrentThreadId()&&owner&&read<uintptr_t>(image+0x13eb8f0)==owner&&read<uintptr_t>(owner)==image+0x1749ae0,
         "Step lifecycle Game/thread changed");
-    const auto value=read<uintptr_t>(image+0x13df340);
-    require(value&&read<uintptr_t>(owner+0x68)==value&&read<uintptr_t>(value)==image+0x16fdaf0,"Step lifecycle Task owner changed");return value;
+    const auto value=read<uintptr_t>(image+0x13eb340);
+    require(value&&read<uintptr_t>(owner+0x68)==value&&read<uintptr_t>(value)==image+0x1703e90,"Step lifecycle Task owner changed");return value;
 }
 void held(){
     require(held_tasks&&tasks()==held_tasks&&read<uint8_t>(held_tasks+0xf8)==1&&read<int32_t>(held_tasks+0xa8)==0&&read<int32_t>(held_tasks+0x90)==0,
@@ -136,7 +136,7 @@ void release_workers(){
     require(read<uint8_t>(held_tasks+0xf8)==0,"Step lifecycle Resume was not acknowledged");
     held_tasks=0;lifecycle.workers_held=0;
 }
-uintptr_t rng(){const auto value=read<uintptr_t>(image+0x164b250);require(value==image+0x1c4e7a0,"Step Default RNG receiver changed");return value;}
+uintptr_t rng(){const auto value=read<uintptr_t>(image+0x1650830);require(value==image+0x1c557a0,"Step Default RNG receiver changed");return value;}
 void publish(){if(driver&&driver->frozen())native_steps->lifecycle(lifecycle);}
 void retain_failure(){
     // Preserve the observed hold ACK even when the original operation failed.
@@ -235,7 +235,7 @@ void certify(const mt2::StepNativeObservation& observed){
     const auto count=read<int32_t>(held_tasks+0xc0);const auto data=read<uintptr_t>(held_tasks+0xb8);
     require(count==loading_dispatch::pending&&count>=0&&(!count||data),"Step certificate retained plan count differs");
     for(int32_t i=0;i<count;++i){const auto task=read<uintptr_t>(data+size_t(i)*8);require(loading_dispatch::plan(task),"Step certificate retained non-plan callback");
-        const auto subscriber=read<uintptr_t>(task+0x20);require(subscriber&&read<uintptr_t>(subscriber)==image+0x16e75f0,"Step certificate plan owner differs");
+        const auto subscriber=read<uintptr_t>(task+0x20);require(subscriber&&read<uintptr_t>(subscriber)==image+0x16ed990,"Step certificate plan owner differs");
         pending.push_back(read<int32_t>(subscriber+0x20));}
     std::sort(pending.begin(),pending.end());
     // This is an explicit observed-state certificate, not a full-world hash.
@@ -453,21 +453,21 @@ void go(void* game){
 void install(const fs::path& game){
     if(lab::enabled())return;
     image=reinterpret_cast<uintptr_t>(GetModuleHandleW(nullptr));executable=game/"MT2.exe";
-    native_routes->catalog("framework.step.go",0x956730,true);native_routes->catalog("framework.step.timer",0xa36300,true);
+    native_routes->catalog("framework.step.go",0x95f890,true);native_routes->catalog("framework.step.timer",0xa413b0,true);
     native_services->reserve("framework.step.go");native_services->reserve("framework.step.timer");
     const Json config={{"defer_loading_plans",true},{"task_barrier",true},{"bootstrap_boundary",true},{"presentation_rng",true},{"digital_rng",true},{"rng_trace",true}};
     presentation_rng::building_widget_owner=&building_widget_owner;
     loading_dispatch::install(config);task_boundary::install(config);bootstrap_boundary::install(config);presentation_rng::install(config);rng_trace::install(config);
     region_rng_load::install();
     verify_exit_bodies();
-    presentation_rng::verify(0x5cbc90,1568,"be08e431cc80e32f2221116ffa72422b752873a767cf69dc2b890e69a9f6eb35");
-    presentation_rng::verify(0x5ebd20,1536,"9cc67821c5fbcd7dc598f59a5d70bb6fc130b8ce318426476f5da9e1a0f1076d");
-    presentation_rng::verify(0x5c9280,1376,"3cb9d22045b77ceaddd0fde3f375e8ee7a3c9cb51d828eb28702c527d1a65459");
-    native_routes->catalog("framework.step.resume",0x526350,true);
+    presentation_rng::verify(0x5d23e0,1568,"756d4c93e9f2df8c7d0e662f656496956fbe2c5f1c58624fb08c1971f63f2523");
+    presentation_rng::verify(0x5f2470,1536,"a394eeaaae14b612ed39baa06b28f2fc3ff477e060d2dd70d4b10db482fed591");
+    presentation_rng::verify(0x5cf9d0,1376,"d0cffacda82a1c896d1b2eae7200a3b34f8c26b2b500f0b3c13b8885abef9c5f");
+    native_routes->catalog("framework.step.resume",0x52c760,true);
     native_services->reserve("framework.step.resume");
-    original_pause=reinterpret_cast<Go>(image+0x526240);original_resume=reinterpret_cast<Go>(image+0x526350);original_seed=reinterpret_cast<Seed>(image+0x9fc090);
-    hook(reinterpret_cast<void*>(image+0x526350),reinterpret_cast<void*>(&command_hold::resume_entry),reinterpret_cast<void**>(&original_resume));
-    hook(reinterpret_cast<void*>(image+0xa36300),reinterpret_cast<void*>(&timer),reinterpret_cast<void**>(&timer_step::original_update));
-    hook(reinterpret_cast<void*>(image+0x956730),reinterpret_cast<void*>(&go),reinterpret_cast<void**>(&original_go));installed=true;
+    original_pause=reinterpret_cast<Go>(image+0x52c650);original_resume=reinterpret_cast<Go>(image+0x52c760);original_seed=reinterpret_cast<Seed>(image+0xa06517);
+    hook(reinterpret_cast<void*>(image+0x52c760),reinterpret_cast<void*>(&command_hold::resume_entry),reinterpret_cast<void**>(&original_resume));
+    hook(reinterpret_cast<void*>(image+0xa413b0),reinterpret_cast<void*>(&timer),reinterpret_cast<void**>(&timer_step::original_update));
+    hook(reinterpret_cast<void*>(image+0x95f890),reinterpret_cast<void*>(&go),reinterpret_cast<void**>(&original_go));installed=true;
 }
 }

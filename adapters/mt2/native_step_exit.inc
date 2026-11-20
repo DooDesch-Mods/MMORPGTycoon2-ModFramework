@@ -77,12 +77,12 @@ mt2::NativeStepKernel::Proof exit_proof(){
         status.quitting||(status.saves_in_progress!=0&&status.saves_in_progress!=-1)||
         (status.edit_operations!=0&&status.edit_operations!=-1))return proof;
     const auto title=read<uintptr_t>(owner+0x350);
-    require(title&&read<uintptr_t>(owner+0x28)==title&&read<uintptr_t>(title)==image+0x16dfbb0,
+    require(title&&read<uintptr_t>(owner+0x28)==title&&read<uintptr_t>(title)==image+0x16e5f50,
         "Step exited-world Title owner/address point differs");
     // Original Deinit deletes GameState and clears Mode+58. The three native
     // singleton destructors clear these slots; a changed pointer is not enough.
-    if(read<uintptr_t>(bootstrap.mode+0x58)||read<uintptr_t>(image+0x13df2a0)||
-        read<uintptr_t>(image+0x13df9c0)||read<uintptr_t>(image+0x13df8c0))return proof;
+    if(read<uintptr_t>(bootstrap.mode+0x58)||read<uintptr_t>(image+0x13eb2a0)||
+        read<uintptr_t>(image+0x13eb9c0)||read<uintptr_t>(image+0x13eb8c0))return proof;
     held();
     if(read<int32_t>(held_tasks+0xc0)||!task_boundary::all_done(reinterpret_cast<void*>(held_tasks)))return proof;
     require(!loading_dispatch::uncertain&&!bootstrap_boundary::uncertain&&!bootstrap_boundary::reveal::uncertain&&!bootstrap_boundary::branch_changed,

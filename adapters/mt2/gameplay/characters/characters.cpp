@@ -54,12 +54,12 @@ std::vector<uintptr_t> pointers(Context& c, uintptr_t header, size_t maximum = 1
 bool flag(Context& c, uintptr_t address) { auto value = c.read<uint8_t>(address); require(value <= 1, "character native boolean differs"); return value != 0; }
 struct Definition {uintptr_t object; int32_t kind, index; uint64_t uid; bool deleted;};
 std::vector<Definition> definitions(Context& c) {
-    c.require_world(); auto manager = c.singleton(0x13df7a0); ap(c, manager, 0x1732430);
+    c.require_world(); auto manager = c.singleton(0x13eb7a0); ap(c, manager, 0x17387d0);
     std::vector<Definition> out; std::set<uint64_t> uids;
     for (int32_t kind = 0; kind < 5; ++kind) {
         auto members = pointers(c, manager + 0x88 + size_t(kind) * 0x50);
         for (size_t i = 0; i < members.size(); ++i) {
-            auto p = members[i]; ap(c, p, 0x1705990); auto uid = c.read<uint64_t>(p + 0x18); bool deleted = flag(c, p + 0x490);
+            auto p = members[i]; ap(c, p, 0x170bd30); auto uid = c.read<uint64_t>(p + 0x18); bool deleted = flag(c, p + 0x490);
             require(c.read<int32_t>(p + 0x2c) == kind && c.read<int32_t>(p + 0x30) == int32_t(i) &&
                     (uid || deleted) && (!uid || uids.insert(uid).second), "character definition lifetime/kind/index differs");
             out.push_back({p, kind, int32_t(i), uid, deleted});
@@ -74,7 +74,7 @@ Definition select(Context& c, const Json& value) {
     auto uid = records::text(value.at("uid"), 20); auto kind = records::integer(value.at("kind")); auto index = records::integer(value.at("index"));
     for (const auto& d : definitions(c)) if (d.kind == kind && d.index == index) {
         require(!d.deleted && d.uid && uid == std::to_string(d.uid), "character definition handle is deleted or its exact UID changed");
-        require(c.resolve(value, 0x1705990) == d.object, "character definition UID registry differs from its manager slot"); return d;
+        require(c.resolve(value, 0x170bd30) == d.object, "character definition UID registry differs from its manager slot"); return d;
     }
     throw std::runtime_error("character definition handle is absent from the current manager");
 }
@@ -82,12 +82,12 @@ Json stats(Context& c, const Definition& d) {
     Json attributes = Json::array();
     for (size_t offset : {size_t(0x58), size_t(0x88)}) {
         auto members = pointers(c, d.object + offset); require(members.size() >= 3, "character attributes are incomplete"); Json values = Json::array();
-        for (size_t i = 0; i < 3; ++i) { ap(c, members[i], 0x172e8d0); float v = c.read<float>(members[i] + 0x28); require(std::isfinite(v), "character attribute is non-finite"); values.push_back(v); }
+        for (size_t i = 0; i < 3; ++i) { ap(c, members[i], 0x1734c70); float v = c.read<float>(members[i] + 0x28); require(std::isfinite(v), "character attribute is non-finite"); values.push_back(v); }
         attributes.push_back(values);
     }
     float speed = c.read<float>(d.object + 0x120); require(std::isfinite(speed), "character speed is non-finite");
     auto phases = pointers(c, d.object + 0x160); int32_t health = 0;
-    if (!phases.empty()) { ap(c, phases[0], 0x16ddb00); health = c.read<int32_t>(phases[0] + 0x58); }
+    if (!phases.empty()) { ap(c, phases[0], 0x16e3ea0); health = c.read<int32_t>(phases[0] + 0x58); }
     return {{"attributes", attributes}, {"speed", speed}, {"boss_phases", phases.size()}, {"boss_health", health}};
 }
 Json row(Context& c, const Definition& d) {
@@ -95,7 +95,7 @@ Json row(Context& c, const Definition& d) {
                 {"deleted", d.deleted}, {"edited", flag(c, d.object + 0x491)}, {"released", flag(c, d.object + 0x492)}};
     auto parent = c.read<uintptr_t>(d.object + 0x4a0); out["parent"] = nullptr;
     if (parent && !d.deleted) {
-        ap(c, parent, 0x1705990); require(!flag(c, parent + 0x490), "character variant has a deleted parent");
+        ap(c, parent, 0x170bd30); require(!flag(c, parent + 0x490), "character variant has a deleted parent");
         out["parent"] = handle(c, {parent, c.read<int32_t>(parent + 0x2c), c.read<int32_t>(parent + 0x30), c.read<uint64_t>(parent + 0x18), false});
     }
     if (!d.deleted) out["stats"] = stats(c, d);
@@ -103,7 +103,7 @@ Json row(Context& c, const Definition& d) {
 }
 constexpr std::array<size_t, 8> string_offsets{0x48, 0x68, 0x88, 0xa8, 0xc8, 0xf8, 0x118, 0x138};
 Json ability_record(Context& c, uintptr_t p) {
-    ap(c, p, 0x171c930); Json strings = Json::array();
+    ap(c, p, 0x1722cd0); Json strings = Json::array();
     for (auto offset : string_offsets) strings.push_back(c.text(p + offset, 4096));
     Json out = {{"text", strings}, {"item_value", c.read<float>(p + 0xe8)}, {"item_kind", c.read<int32_t>(p + 0xec)},
                 {"item_flag", flag(c, p + 0xf0)}, {"selectors", c.read<std::array<int32_t, 5>>(p + 0x15c)},
@@ -114,7 +114,7 @@ Json ability_record(Context& c, uintptr_t p) {
     for (size_t group = 0; group < 2; ++group) {
         Json values = Json::array(); auto members = pointers(c, p + (group ? 0x1c8 : 0x198), 64);
         for (auto effect : members) {
-            ap(c, effect, 0x1704e90); require(c.read<uint64_t>(effect + 0x18) && seen.insert(effect).second, "ability effect lifetime/ownership differs");
+            ap(c, effect, 0x170b230); require(c.read<uint64_t>(effect + 0x18) && seen.insert(effect).second, "ability effect lifetime/ownership differs");
             values.push_back({{"integers", c.read<std::array<int32_t, 3>>(effect + 0x20)}, {"values", c.read<std::array<float, 2>>(effect + 0x2c)}, {"count", c.read<int32_t>(effect + 0x34)}});
         }
         out[group ? "effects" : "costs"] = values;
@@ -125,7 +125,7 @@ struct Ability {uintptr_t object; uint64_t uid; int32_t slot;};
 std::vector<Ability> abilities(Context& c, const Definition& owner) {
     std::vector<Ability> out; auto members = pointers(c, owner.object + 0x130);
     for (size_t i = 0; i < members.size(); ++i) {
-        ap(c, members[i], 0x171c930); auto uid = c.read<uint64_t>(members[i] + 0x18);
+        ap(c, members[i], 0x1722cd0); auto uid = c.read<uint64_t>(members[i] + 0x18);
         require(uid != 0, "ability has a zero full UID"); auto proxy = c.read<uintptr_t>(members[i] + 0x40);
         require(!proxy || c.read<uintptr_t>(proxy) == members[i], "ability weak proxy is expired");
         out.push_back({members[i], uid, int32_t(i)});
@@ -138,7 +138,7 @@ Json ability_handle(Context& c, const Definition& owner, const Ability& a) {
 Ability select_ability(Context& c, const Definition& owner, const Json& h) {
     require(h.at("epoch").get<uint64_t>() == c.epoch && h.at("owner") == handle(c, owner), "ability owner/epoch differs");
     auto slot = records::integer(h.at("slot")); auto uid = records::text(h.at("uid"), 20);
-    for (const auto& a : abilities(c, owner)) if (a.slot == slot) { require(uid == std::to_string(a.uid), "ability slot was replaced or shifted"); require(c.resolve(h, 0x171c930) == a.object, "ability UID registry differs from its current owner slot"); return a; }
+    for (const auto& a : abilities(c, owner)) if (a.slot == slot) { require(uid == std::to_string(a.uid), "ability slot was replaced or shifted"); require(c.resolve(h, 0x1722cd0) == a.object, "ability UID registry differs from its current owner slot"); return a; }
     throw std::runtime_error("ability handle is absent");
 }
 Json ability_rows(Context& c, const Definition& owner) {
@@ -147,10 +147,10 @@ Json ability_rows(Context& c, const Definition& owner) {
 }
 Json pose(Context& c, uintptr_t p) {return {{"rotation", c.read<std::array<float, 4>>(p)}, {"position", c.read<std::array<float, 3>>(p + 0x10)}, {"scale", c.read<std::array<float, 3>>(p + 0x1c)}};}
 Json costume(Context& c, uintptr_t p) {
-    ap(c, p, 0x16c0210); Json parts = Json::array();
+    ap(c, p, 0x16c65b0); Json parts = Json::array();
     for (auto part : pointers(c, p + 0x60, 128)) {
-        ap(c, part, 0x1736c70); Json attachments = Json::array(), colors = Json::array();
-        for (auto a : pointers(c, part + 0xd0, 128)) { ap(c, a, 0x17229b0); attachments.push_back({{"name", c.text(a + 0x18, 4096)}, {"pose", pose(c, a + 0x38)}}); }
+        ap(c, part, 0x173d010); Json attachments = Json::array(), colors = Json::array();
+        for (auto a : pointers(c, part + 0xd0, 128)) { ap(c, a, 0x1728d50); attachments.push_back({{"name", c.text(a + 0x18, 4096)}, {"pose", pose(c, a + 0x38)}}); }
         auto color_data = c.read<uintptr_t>(part + 0x100); auto count = c.read<int32_t>(part + 0x108); auto cap = c.read<int32_t>(part + 0x10c);
         require(count >= 0 && count <= 128 && cap >= count && (!count || color_data), "costume colors have invalid bounds");
         for (int32_t i = 0; i < count; ++i) colors.push_back(c.read<std::array<float, 4>>(color_data + size_t(i) * 16));
@@ -172,21 +172,21 @@ void prepare_ability(Context& c, uintptr_t draft, const Json& value) {
         const auto& desired = value.at(group ? "effects" : "costs"); size_t header = group ? 0x1c8 : 0x198;
         auto current = pointers(c, draft + header, 64);
         while (current.size() > desired.size()) {
-            call<void>(c, group ? 0x14dd0 : 0x14d40, reinterpret_cast<void*>(draft), reinterpret_cast<void*>(current.back()));
+            call<void>(c, group ? 0x14f60 : 0x14ed0, reinterpret_cast<void*>(draft), reinterpret_cast<void*>(current.back()));
             auto next = pointers(c, draft + header, 64); require(next.size() + 1 == current.size(), "ability native effect removal did not advance"); current = std::move(next);
         }
         while (current.size() < desired.size()) {
-            auto effect = call<uintptr_t>(c, 0xa02670, size_t(0x38)); require(effect != 0, "ability native effect allocation failed");
-            call<void>(c, 0x67e0, reinterpret_cast<void*>(effect)); call<void>(c, group ? 0x14d10 : 0x14ce0, reinterpret_cast<void*>(draft), reinterpret_cast<void*>(effect));
+            auto effect = call<uintptr_t>(c, 0xa0d230, size_t(0x38)); require(effect != 0, "ability native effect allocation failed");
+            call<void>(c, 0x6800, reinterpret_cast<void*>(effect)); call<void>(c, group ? 0x14ea0 : 0x14e70, reinterpret_cast<void*>(draft), reinterpret_cast<void*>(effect));
             auto next = pointers(c, draft + header, 64); require(next.size() == current.size() + 1, "ability native effect addition did not advance"); current = std::move(next);
         }
         for (size_t i = 0; i < desired.size(); ++i) {
             std::array<unsigned char, 0x38> source{}; auto p = uintptr_t(source.data());
             put(p, 0x20, records::array<3, int32_t>(desired[i].at("integers"))); put(p, 0x2c, records::array<2>(desired[i].at("values"))); put(p, 0x34, records::integer(desired[i].at("count")));
-            call<void*>(c, 0x6820, reinterpret_cast<void*>(current[i]), source.data());
+            call<void*>(c, 0x6840, reinterpret_cast<void*>(current[i]), source.data());
         }
     }
-    for (size_t i = 0; i < 8; ++i) { auto s = records::text(value.at("text")[i]); Text text{s.data(), s.size()}; call<void>(c, 0x11bfce0, reinterpret_cast<void*>(draft + string_offsets[i]), &text); }
+    for (size_t i = 0; i < 8; ++i) { auto s = records::text(value.at("text")[i]); Text text{s.data(), s.size()}; call<void>(c, 0x11cb680, reinterpret_cast<void*>(draft + string_offsets[i]), &text); }
     put(draft, 0xe8, records::number(value.at("item_value"))); put(draft, 0xec, records::integer(value.at("item_kind"))); put(draft, 0xf0, uint8_t(value.at("item_flag").get<bool>()));
     put(draft, 0x15c, records::array<5, int32_t>(value.at("selectors"))); put(draft, 0x170, records::array<4>(value.at("color"))); put(draft, 0x180, records::array<3>(value.at("timing")));
     for (size_t i = 0; i < 5; ++i) put(draft, 0x1f0 + i, uint8_t(value.at("flags")[i].get<bool>()));
@@ -194,7 +194,7 @@ void prepare_ability(Context& c, uintptr_t draft, const Json& value) {
 }
 void transform(Context& c, uintptr_t p, const Json& value) {
     auto r = records::array<4>(value.at("rotation")); auto t = records::array<3>(value.at("position")); auto s = records::array<3>(value.at("scale"));
-    call<void>(c, 0x9ff370, reinterpret_cast<void*>(p), r.data(), t.data(), s.data());
+    call<void>(c, 0xa09f30, reinterpret_cast<void*>(p), r.data(), t.data(), s.data());
 }
 struct BorrowedCostume {
     std::array<unsigned char, 0xc8> object{};
@@ -210,12 +210,12 @@ struct BorrowedCostume {
         const auto& input = value.at("parts"); parts.resize(input.size()); part_pointers.resize(input.size()); attachments.resize(input.size()); attachment_pointers.resize(input.size()); colors.resize(input.size());
         // Every borrowed string keeps a stable allocation until native deep assignment returns.
         size_t count = 2 + input.size() * 2; for (const auto& part : input) count += part.at("attachments").size(); strings.reserve(count);
-        auto p = uintptr_t(object.data()); put(p, 0, c.image + 0x16c0210); string(p, 0x18, value.at("name")); string(p, 0x38, value.at("skeleton")); put(p, 0xbc, 1.f); put(p, 0xc0, uint8_t(value.at("flag").get<bool>()));
+        auto p = uintptr_t(object.data()); put(p, 0, c.image + 0x16c65b0); string(p, 0x18, value.at("name")); string(p, 0x38, value.at("skeleton")); put(p, 0xbc, 1.f); put(p, 0xc0, uint8_t(value.at("flag").get<bool>()));
         for (size_t i = 0; i < input.size(); ++i) {
-            auto part = uintptr_t(parts[i].data()); const auto& source = input[i]; put(part, 0, c.image + 0x1736c70); string(part, 0x18, source.at("bone")); string(part, 0x38, source.at("model"));
+            auto part = uintptr_t(parts[i].data()); const auto& source = input[i]; put(part, 0, c.image + 0x173d010); string(part, 0x18, source.at("bone")); string(part, 0x38, source.at("model"));
             transform(c, part + 0x58, source.at("pose")); put(part, 0xc4, records::number(source.at("model_scale")));
             const auto& attached = source.at("attachments"); attachments[i].resize(attached.size()); attachment_pointers[i].resize(attached.size());
-            for (size_t n = 0; n < attached.size(); ++n) { auto a = uintptr_t(attachments[i][n].data()); put(a, 0, c.image + 0x17229b0); string(a, 0x18, attached[n].at("name")); transform(c, a + 0x38, attached[n].at("pose")); attachment_pointers[i][n] = a; }
+            for (size_t n = 0; n < attached.size(); ++n) { auto a = uintptr_t(attachments[i][n].data()); put(a, 0, c.image + 0x1728d50); string(a, 0x18, attached[n].at("name")); transform(c, a + 0x38, attached[n].at("pose")); attachment_pointers[i][n] = a; }
             for (const auto& color : source.at("colors")) colors[i].push_back(records::array<4>(color));
             array(part, 0xd0, uintptr_t(attachment_pointers[i].data()), attachment_pointers[i].size()); array(part, 0x100, uintptr_t(colors[i].data()), colors[i].size()); part_pointers[i] = part;
         }
@@ -223,8 +223,8 @@ struct BorrowedCostume {
     }
 };
 void verify_stat(Context& c) {
-    c.verify_hash(0x4a9f0, 531, "783f85ef829dc176527018608ba559ee11badb2b2916e3d5355ca7d95569aea2");
-    c.verify_hash(0x97350, 120, "6fe9d0db120218bd614ce720f9a7d2963f5dbd9a25e5b44b954f4c7f33fdd775");
+    c.verify_hash(0x4ada0, 611, "9c9870730fc83519ae6f2cc9393ffaf5f5dff7179c1c92077e7b25951aa3cd52");
+    c.verify_hash(0x98040, 120, "ada08d3dc247ae1c6d3e8509b361fba6452b67ad210e392732caa4d57156d424");
 }
 void delete_object(Context& c, uintptr_t p) {
     if (!p) return; auto vtable = c.read<uintptr_t>(p); auto destroy = c.read<uintptr_t>(vtable + 8);
@@ -240,11 +240,11 @@ struct PrivateAbility {
     void cleanup(Context& c) {
         require(!cleanup_attempted, "private ability cleanup already attempted; replay forbidden"); cleanup_attempted = true;
         // The native Slot owns its docked Icon and deletes it in its destructor.
-        if (slot_constructed) { uintptr_t docked = 0; std::memcpy(&docked, slot.data() + 0x380, 8); require(!docked || docked == icon, "private ability Slot owns a foreign Icon"); call<void>(c, 0x568970, slot.data()); slot_constructed = false; if (docked) { icon = 0; icon_constructed = false; } }
-        if (icon) { if (icon_constructed) delete_object(c, icon); else call<void>(c, 0x1264b60, reinterpret_cast<void*>(icon), size_t(0x410)); icon = 0; }
-        if (source) { if (source_constructed) delete_object(c, source); else call<void>(c, 0x1264b60, reinterpret_cast<void*>(source), size_t(0x210)); source = 0; }
-        if (record_constructed) { call<void>(c, 0x9676a0, record.data()); record_constructed = false; }
-        if (source_uid) require(!call<uintptr_t>(c, 0x47ce20, source_uid), "private copied ability UID survived native cleanup");
+        if (slot_constructed) { uintptr_t docked = 0; std::memcpy(&docked, slot.data() + 0x380, 8); require(!docked || docked == icon, "private ability Slot owns a foreign Icon"); call<void>(c, 0x56f000, slot.data()); slot_constructed = false; if (docked) { icon = 0; icon_constructed = false; } }
+        if (icon) { if (icon_constructed) delete_object(c, icon); else call<void>(c, 0x1270520, reinterpret_cast<void*>(icon), size_t(0x410)); icon = 0; }
+        if (source) { if (source_constructed) delete_object(c, source); else call<void>(c, 0x1270520, reinterpret_cast<void*>(source), size_t(0x210)); source = 0; }
+        if (record_constructed) { call<void>(c, 0x9708c0, record.data()); record_constructed = false; }
+        if (source_uid) require(!call<uintptr_t>(c, 0x481f60, source_uid), "private copied ability UID survived native cleanup");
     }
 };
 bool owns(const std::string& operation) {return operation.rfind("characters.", 0) == 0;}
@@ -289,12 +289,12 @@ struct ImportImage {
         require(!cleanup_attempted, "character import cleanup already attempted; replay forbidden"); cleanup_attempted = true;
         std::string original;
         if (borrowed_created) {
-            try {native([&] {call<void>(c, 0xa065d0, borrowed.data());}); borrowed_created = false;}
+            try {native([&] {call<void>(c, 0xa11190, borrowed.data());}); borrowed_created = false;}
             catch (const std::exception& e) {original = e.what();}
         }
         if (image_unknown) {if (!original.empty()) original += "; "; original += "character import image construction/encoding is unknown; unsafe destruction was skipped";}
         if (image_created && !image_unknown) {
-            try {native([&] {call<void>(c, 0xa113d0, image.data());}); image_created = false;}
+            try {native([&] {call<void>(c, 0xa1c040, image.data());}); image_created = false;}
             catch (const std::exception& e) {if (!original.empty()) original += "; "; original += e.what();}
         }
         require(original.empty(), original);
@@ -303,21 +303,21 @@ struct ImportImage {
 Json import_prefab(Context& c, const Definition& owner, const Json& args, bool& attempted) {
     auto compressed = records::compressed(records::text(args.at("compressed_record"), 60000));
     pins(c, character_import_pins); pins(c, character_rename_pins); auto expected_name = validate_import(c, compressed);
-    c.verify_hash(0xd8e690, 64, "b8c87e439b35d59b00b827db8154cd2db3225e1ecef22da0beb2285497e6e017");
-    c.verify_hash(0x75fa40, 64, "583454048954ee8c3c57c88fa6cffa8fc45d2c851ae21b75bf610eeffa46eb42");
-    c.verify_hash(0x7f80a0, 128, "71c4b1105268ad20e522a8a6e4e93aa0afede1a62423e25dc2b8986656c1b01c");
+    c.verify_hash(0xd99e70, 64, "97f405d93857018c45cf77722c76b48a2531f82a1ec608ebeea229e21ce242d9");
+    c.verify_hash(0x767560, 64, "92588e8ef9cba5313d9c153951bed463a11fffe4d33e57e79052004c200b1dbd");
+    c.verify_hash(0x8005f0, 128, "4c59617bfa4468efadfca2b6788bfe763b412fda3ede2faac8de8ea2d83bde82");
     Text name{"info_charactertype", 18}; uintptr_t outer = 0;
-    native([&] {outer = call<uintptr_t>(c, 0x81aa90, &name);});
-    require(outer != 0, "native character design component is not initialized"); ap(c, outer, 0x173a7f0);
-    auto view = c.read<uintptr_t>(outer + 0x4e8); ap(c, view, 0x1736770);
-    auto saved = c.read<uintptr_t>(view + 0x460); auto saved_base = c.read<uintptr_t>(view + 0x458); auto pane = c.read<uintptr_t>(view + 0x3b8); ap(c, pane, 0x1731f40);
+    native([&] {outer = call<uintptr_t>(c, 0x823080, &name);});
+    require(outer != 0, "native character design component is not initialized"); ap(c, outer, 0x1740b90);
+    auto view = c.read<uintptr_t>(outer + 0x4e8); ap(c, view, 0x173cb10);
+    auto saved = c.read<uintptr_t>(view + 0x460); auto saved_base = c.read<uintptr_t>(view + 0x458); auto pane = c.read<uintptr_t>(view + 0x3b8); ap(c, pane, 0x17382e0);
     auto notice = c.read<uintptr_t>(pane + 0x358); auto editor = c.read<uintptr_t>(view + 0x360);
     auto multi = c.read<uintptr_t>(view + 0x358); std::string page;
     if (multi) {auto active_page = c.read<uintptr_t>(multi + 0x410); if (active_page) page = c.text(active_page + 0x1b0, 1024);}
     if (saved && editor && page == "general_edit_name") require(c.text(editor + 0x2d0, 1024) == c.text(saved + 0xb0, 1024), "character name editor has unsaved input");
     auto costume_editor = c.read<uintptr_t>(view + 0x3b0);
     if (costume_editor) {
-        ap(c, costume_editor, 0x1722a70); auto live = c.read<uintptr_t>(costume_editor + 0x318), draft = c.read<uintptr_t>(costume_editor + 0x320);
+        ap(c, costume_editor, 0x1728e10); auto live = c.read<uintptr_t>(costume_editor + 0x318), draft = c.read<uintptr_t>(costume_editor + 0x320);
         if (live && draft) require(costume(c, live) == costume(c, draft), "character costume editor has unsaved input");
     }
     // The normal UI creates this named component before Show/Raise. No visible
@@ -326,29 +326,29 @@ Json import_prefab(Context& c, const Definition& owner, const Json& args, bool& 
     uintptr_t notification = 0;
     attempted = true;
     try {
-        try {native([&] {call<void>(c, 0xa10c40, input.image.data(), uint32_t(512), uint32_t(512)); input.image_created = true;});}
+        try {native([&] {call<void>(c, 0xa1b8b0, input.image.data(), uint32_t(512), uint32_t(512)); input.image_created = true;});}
         catch (...) {input.image_unknown = true; throw;}
         std::array<float, 4> opaque{0, 0, 0, 1};
-        try {native([&] {call<void>(c, 0xa11640, input.image.data(), opaque.data()); call<void>(c, 0xa066d0, input.borrowed.data(), compressed.data(), int32_t(compressed.size())); input.borrowed_created = true; call<void>(c, 0x8814e0, input.image.data(), input.borrowed.data());});}
+        try {native([&] {call<void>(c, 0xa1c2b0, input.image.data(), opaque.data()); call<void>(c, 0xa11290, input.borrowed.data(), compressed.data(), int32_t(compressed.size())); input.borrowed_created = true; call<void>(c, 0x88a2a0, input.image.data(), input.borrowed.data());});}
         catch (...) {input.image_unknown = true; throw;}
-        uintptr_t store = 0; native([&] {store = call<uintptr_t>(c, 0x880c90, input.image.data());});
+        uintptr_t store = 0; native([&] {store = call<uintptr_t>(c, 0x889a50, input.image.data());});
         require(store != 0, "character import original image roundtrip returned no Store");
         std::string roundtrip_error;
         try {
-            ap(c, store, 0x1749500); auto buffer = c.read<uintptr_t>(store + 8); auto written = c.read<uintptr_t>(store + 0x28); auto read = c.read<uintptr_t>(store + 0x20);
+            ap(c, store, 0x174f8a0); auto buffer = c.read<uintptr_t>(store + 8); auto written = c.read<uintptr_t>(store + 0x28); auto read = c.read<uintptr_t>(store + 0x20);
             require(buffer && read == buffer && written >= buffer && written - buffer == compressed.size(), "character import image roundtrip extent differs");
             std::vector<uint8_t> actual(compressed.size()); c.read_bytes(buffer, actual.data(), actual.size()); require(actual == compressed, "character import image roundtrip bytes differ");
         } catch (const std::exception& e) {roundtrip_error = e.what();}
-        try {native([&] {call<void>(c, 0xa06600, reinterpret_cast<void*>(store));});}
+        try {native([&] {call<void>(c, 0xa111c0, reinterpret_cast<void*>(store));});}
         catch (const std::exception& e) {if (!roundtrip_error.empty()) roundtrip_error += "; "; roundtrip_error += e.what();}
         require(roundtrip_error.empty(), roundtrip_error);
         // This factory does not read its receiver. It constructs an unparented
         // native NotificationPane, whose text provides the original outcome.
-        native([&] {notification = call<uintptr_t>(c, 0xd8e690, static_cast<void*>(nullptr));});
-        require(notification != 0, "character import private outcome pane allocation failed"); ap(c, notification, 0x171f240);
+        native([&] {notification = call<uintptr_t>(c, 0xd99e70, static_cast<void*>(nullptr));});
+        require(notification != 0, "character import private outcome pane allocation failed"); ap(c, notification, 0x17255e0);
         presentation_changed = true;
         native([&] {put(pane, 0x358, notification); put(view, 0x460, owner.object);});
-        native([&] {call<void>(c, 0x689510, reinterpret_cast<void*>(view), input.image.data());});
+        native([&] {call<void>(c, 0x690720, reinterpret_cast<void*>(view), input.image.data());});
         acknowledgment = c.text(notification + 0x2c8, 4096);
     } catch (const std::exception& e) {original = e.what();}
     if (presentation_changed) {
@@ -356,9 +356,9 @@ Json import_prefab(Context& c, const Definition& owner, const Json& args, bool& 
             // Detach the owned outcome pane before any native presentation work.
             native([&] {put(pane, 0x358, notice);});
             if (saved) {
-                native([&] {call<void>(c, 0x689100, reinterpret_cast<void*>(view), reinterpret_cast<void*>(saved));});
+                native([&] {call<void>(c, 0x690310, reinterpret_cast<void*>(view), reinterpret_cast<void*>(saved));});
                 require(c.read<uintptr_t>(view + 0x460) == saved && c.read<uintptr_t>(view + 0x458) == saved_base, "character import native selection restoration differs");
-                if (multi && !page.empty()) {Text label{page.data(), page.size()}; native([&] {call<void>(c, 0x756470, reinterpret_cast<void*>(multi), &label);});}
+                if (multi && !page.empty()) {Text label{page.data(), page.size()}; native([&] {call<void>(c, 0x75def0, reinterpret_cast<void*>(multi), &label);});}
             }
             require(c.read<uintptr_t>(pane + 0x358) == notice, "character import native notice restoration differs");
         }
@@ -367,7 +367,7 @@ Json import_prefab(Context& c, const Definition& owner, const Json& args, bool& 
     if (notification) {
         try {
             require(c.read<uintptr_t>(pane + 0x358) != notification, "character import outcome pane remains referenced; its allocation was retained");
-            native([&] {call<void>(c, 0xbf9d30, reinterpret_cast<void*>(notification));});
+            native([&] {call<void>(c, 0xc06440, reinterpret_cast<void*>(notification));});
         } catch (const std::exception& e) {if (!original.empty()) original += "; "; original += "character import outcome cleanup failed: "; original += e.what();}
     }
     try {input.cleanup(c);} catch (const std::exception& e) {if (!original.empty()) original += "; "; original += e.what();}
@@ -405,10 +405,10 @@ bool action(Context& c, const std::string& operation, const Json& args, bool& at
         if (operation == "characters.create") {
             auto kind = args.contains("kind") ? records::integer(args.at("kind")) : owner.kind;
             require(kind >= 0 && kind < 5 && !c.read<uintptr_t>(owner.object + 0x4a0), "character creation requires a base collection owner and kind 0 through 4");
-            auto collection = c.read<uintptr_t>(owner.object + 0x498); ap(c, collection, 0x173a6f0);
-            c.verify_hash(0x9b7a0, 770, "ea6fe59e2880c0f105429dcbb30b8319d9cc5580a009e7ac694818f68602397e");
+            auto collection = c.read<uintptr_t>(owner.object + 0x498); ap(c, collection, 0x1740a90);
+            c.verify_hash(0x9c480, 770, "1b35feb632f1a65d6673bb68bee2faf75b9af307682a610a55a4d01f89a1c4ed");
             auto initial = definitions(c); uint64_t id = 0; attempted = true;
-            native([&] {id = call<uint64_t>(c, 0x9b7a0, reinterpret_cast<void*>(collection), kind);});
+            native([&] {id = call<uint64_t>(c, 0x9c480, reinterpret_cast<void*>(collection), kind);});
             auto created_kind = int32_t(uint32_t(id)); auto created_index = int32_t(uint32_t(id >> 32));
             for (const auto& d : definitions(c)) if (d.kind == created_kind && d.index == created_index && !d.deleted) {
                 require(d.kind == kind && c.read<uintptr_t>(d.object + 0x498) == collection && !c.read<uintptr_t>(d.object + 0x4a0) &&
@@ -420,9 +420,9 @@ bool action(Context& c, const std::string& operation, const Json& args, bool& at
         if (operation == "characters.create_variant") {
             pins(c, character_membership_pins); require(!c.read<uintptr_t>(owner.object + 0x4a0), "only a base character type can create a variant");
             auto name = records::text(args.at("name"), 1024); require(!name.empty(), "character name cannot be empty"); Text input{name.data(), name.size()}; bool used = false;
-            native([&] {used = call<bool>(c, 0x9e690, reinterpret_cast<void*>(c.singleton(0x13df7a0)), &input);}); require(!used, "character name is already in use");
+            native([&] {used = call<bool>(c, 0x9f390, reinterpret_cast<void*>(c.singleton(0x13eb7a0)), &input);}); require(!used, "character name is already in use");
             auto initial = definitions(c); int32_t ordinal = -1; attempted = true;
-            native([&] { ordinal = call<int32_t>(c, 0x97a90, reinterpret_cast<void*>(owner.object), &input); });
+            native([&] { ordinal = call<int32_t>(c, 0x98780, reinterpret_cast<void*>(owner.object), &input); });
             require(ordinal >= 0, "native variant creation returned a negative ordinal");
             for (const auto& d : definitions(c)) if (!d.deleted && c.read<uintptr_t>(d.object + 0x4a0) == owner.object && c.text(d.object + 0xb0, 1024) == name) {
                 bool old = std::any_of(initial.begin(), initial.end(), [&](const auto& a) {return !a.deleted && a.uid == d.uid;}); require(!old, "variant readback retained an existing lifetime");
@@ -431,14 +431,14 @@ bool action(Context& c, const std::string& operation, const Json& args, bool& at
             throw std::runtime_error("native variant creation returned without a matching new definition");
         }
         if (operation == "characters.remove") {
-            pins(c, character_membership_pins); auto collection = c.read<uintptr_t>(owner.object + 0x498); ap(c, collection, 0x173a6f0);
+            pins(c, character_membership_pins); auto collection = c.read<uintptr_t>(owner.object + 0x498); ap(c, collection, 0x1740a90);
             bool member = false;
             for (auto record : pointers(c, collection + 0x48 + size_t(owner.kind) * 0x30)) {
-                ap(c, record, 0x1740fa0);
+                ap(c, record, 0x1747340);
                 if (c.read<int32_t>(record + 0x18) == owner.kind && c.read<int32_t>(record + 0x1c) == owner.index) member = true;
             }
             require(member, "character is absent from its current owning collection");
-            attempted = true; native([&] {call<void>(c, 0x9bb90, reinterpret_cast<void*>(collection), reinterpret_cast<void*>(owner.object));});
+            attempted = true; native([&] {call<void>(c, 0x9c870, reinterpret_cast<void*>(collection), reinterpret_cast<void*>(owner.object));});
             require(flag(c, owner.object + 0x490) && !c.read<uint64_t>(owner.object + 0x18), "native character removal did not retire the definition UID");
             result = {{"removed", true}, {"handle", args.at("handle")}}; return true;
         }
@@ -446,8 +446,8 @@ bool action(Context& c, const std::string& operation, const Json& args, bool& at
             pins(c, character_rename_pins); auto name = records::text(args.at("name"), 1024); require(!name.empty(), "character name cannot be empty");
             if (name == before.at("name").get<std::string>()) {result = before; return true;}
             Text input{name.data(), name.size()}; bool used = false;
-            native([&] { used = call<bool>(c, 0x9e690, reinterpret_cast<void*>(c.singleton(0x13df7a0)), &input); }); require(!used, "character name is already in use");
-            attempted = true; native([&] {call<void>(c, 0x94dd0, reinterpret_cast<void*>(owner.object), &input);});
+            native([&] { used = call<bool>(c, 0x9f390, reinterpret_cast<void*>(c.singleton(0x13eb7a0)), &input); }); require(!used, "character name is already in use");
+            attempted = true; native([&] {call<void>(c, 0x95ac0, reinterpret_cast<void*>(owner.object), &input);});
             result = row(c, owner); require(result.at("name") == name && result.at("definition_name") == name && result.at("edited") == true, "native SetName readback differs"); return true;
         }
         if (operation == "characters.set_stat") {
@@ -464,27 +464,27 @@ bool action(Context& c, const std::string& operation, const Json& args, bool& at
             attempted = true; native([&] {
                 if (index == 3) put(owner.object, 0x120, value);
                 else if (index == 0 && owner.kind == 4) {if (phase) put(phase, 0x58, int32_t(value));}
-                else for (size_t i = 0; i < 2; ++i) call<void>(c, 0x4a9f0, reinterpret_cast<void*>(attributes[i]), index == 0 && i ? value * 2.f : value);
-                call<void>(c, 0x97350, reinterpret_cast<void*>(owner.object));
+                else for (size_t i = 0; i < 2; ++i) call<void>(c, 0x4ada0, reinterpret_cast<void*>(attributes[i]), index == 0 && i ? value * 2.f : value);
+                call<void>(c, 0x98040, reinterpret_cast<void*>(owner.object));
             });
             result = stats(c, owner); require(result == expected, "native character stat/synchronized variant readback differs"); return true;
         }
         if (operation == "characters.set_appearance") {
-            auto desired = args.at("record"); records::costume(desired); pins(c, costume_edit_pins); auto live = c.read<uintptr_t>(owner.object + 0xf0); ap(c, live, 0x16c0210);
+            auto desired = args.at("record"); records::costume(desired); pins(c, costume_edit_pins); auto live = c.read<uintptr_t>(owner.object + 0xf0); ap(c, live, 0x16c65b0);
             BorrowedCostume input; attempted = true;
-            native([&] {input.build(c, desired); call<void>(c, 0x94b80, reinterpret_cast<void*>(owner.object)); call<void*>(c, 0x29f40, reinterpret_cast<void*>(live), input.object.data()); call<void>(c, 0x2d020, reinterpret_cast<void*>(live)); call<void>(c, 0x94bd0, reinterpret_cast<void*>(owner.object));});
+            native([&] {input.build(c, desired); call<void>(c, 0x95870, reinterpret_cast<void*>(owner.object)); call<void*>(c, 0x2a0e0, reinterpret_cast<void*>(live), input.object.data()); call<void>(c, 0x2d1c0, reinterpret_cast<void*>(live)); call<void>(c, 0x958c0, reinterpret_cast<void*>(owner.object));});
             result = costume(c, live); require(result == desired, "native costume assignment/notification readback differs"); return true;
         }
         if (operation == "characters.set_weapon_category") {
             pins(c, costume_edit_pins); auto category = records::text(args.at("category")); require(!category.empty() && args.at("enabled").is_boolean(), "weapon category/enabled input differs"); bool enabled = args.at("enabled").get<bool>();
             auto expected = categories(c, owner.object); auto found = std::find(expected.begin(), expected.end(), category);
             if (enabled && found == expected.end()) expected.push_back(category); else if (!enabled && found != expected.end()) {*found = expected.back(); expected.pop_back();}
-            Text input{category.data(), category.size()}; attempted = true; native([&] {call<void>(c, enabled ? 0x91060 : 0x910e0, reinterpret_cast<void*>(owner.object + 0x38), &input);});
+            Text input{category.data(), category.size()}; attempted = true; native([&] {call<void>(c, enabled ? 0x91d50 : 0x91dd0, reinterpret_cast<void*>(owner.object + 0x38), &input);});
             auto actual = categories(c, owner.object); require(actual == expected, "native weapon category readback differs"); result = actual; return true;
         }
         if (operation == "characters.set_ability") {
             pins(c, ability_edit_pins); auto a = select_ability(c, owner, args.at("ability")); auto desired = args.at("record"); records::ability(desired); require(!desired.at("effects").empty(), "an authored ability must retain an effect");
-            attempted = true; native([&] {prepare_ability(c, a.object, desired); call<void>(c, 0x14e90, reinterpret_cast<void*>(a.object)); call<void>(c, 0x97210, reinterpret_cast<void*>(owner.object));});
+            attempted = true; native([&] {prepare_ability(c, a.object, desired); call<void>(c, 0x15020, reinterpret_cast<void*>(a.object)); call<void>(c, 0x97f00, reinterpret_cast<void*>(owner.object));});
             result = ability_record(c, a.object); require(result == desired, "native ability normalization/owner notification readback differs"); return true;
         }
         if (operation == "characters.import") {
@@ -502,17 +502,17 @@ bool action(Context& c, const std::string& operation, const Json& args, bool& at
         attempted = true;
         try {
             native([&] {
-                if (create) {put(uintptr_t(objects->view.data()), 0x340, owner.object); call<void>(c, 0x967370, objects->record.data(), text.c_str()); objects->record_constructed = true;}
+                if (create) {put(uintptr_t(objects->view.data()), 0x340, owner.object); call<void>(c, 0x970590, objects->record.data(), text.c_str()); objects->record_constructed = true;}
                 else {
                     uintptr_t prototype = selected.object;
-                    if (copy) { objects->source = call<uintptr_t>(c, 0xa02670, size_t(0x210)); require(objects->source != 0, "private ability allocation failed"); call<void>(c, 0x15350, reinterpret_cast<void*>(objects->source)); objects->source_constructed = true; objects->source_uid = c.read<uint64_t>(objects->source + 0x18); prepare_ability(c, objects->source, prefab); prototype = objects->source; }
-                    objects->icon = call<uintptr_t>(c, 0xa02670, size_t(0x410)); require(objects->icon != 0, "private ability Icon allocation failed");
-                    call<void>(c, 0x565ad0, reinterpret_cast<void*>(objects->icon), reinterpret_cast<void*>(prototype), copy ? nullptr : reinterpret_cast<void*>(owner.object)); objects->icon_constructed = true;
-                    if (!remove) {call<void>(c, 0x566940, objects->slot.data(), int32_t(96), int32_t(96), reinterpret_cast<void*>(owner.object)); objects->slot_constructed = true; put(uintptr_t(objects->slot.data()), 0x348, display); put(uintptr_t(objects->slot.data()), 0x34c, level);}
+                    if (copy) { objects->source = call<uintptr_t>(c, 0xa0d230, size_t(0x210)); require(objects->source != 0, "private ability allocation failed"); call<void>(c, 0x154e0, reinterpret_cast<void*>(objects->source)); objects->source_constructed = true; objects->source_uid = c.read<uint64_t>(objects->source + 0x18); prepare_ability(c, objects->source, prefab); prototype = objects->source; }
+                    objects->icon = call<uintptr_t>(c, 0xa0d230, size_t(0x410)); require(objects->icon != 0, "private ability Icon allocation failed");
+                    call<void>(c, 0x56c160, reinterpret_cast<void*>(objects->icon), reinterpret_cast<void*>(prototype), copy ? nullptr : reinterpret_cast<void*>(owner.object)); objects->icon_constructed = true;
+                    if (!remove) {call<void>(c, 0x56cfd0, objects->slot.data(), int32_t(96), int32_t(96), reinterpret_cast<void*>(owner.object)); objects->slot_constructed = true; put(uintptr_t(objects->slot.data()), 0x348, display); put(uintptr_t(objects->slot.data()), 0x34c, level);}
                 }
-                if (create) accepted = call<bool>(c, 0x651990, objects->view.data(), objects->record.data());
-                else if (remove) {call<void>(c, 0x565400, reinterpret_cast<void*>(objects->icon)); accepted = true;}
-                else {call<void>(c, 0x567d70, objects->slot.data(), reinterpret_cast<void*>(objects->icon), 0.f, false); accepted = true;}
+                if (create) accepted = call<bool>(c, 0x6588b0, objects->view.data(), objects->record.data());
+                else if (remove) {call<void>(c, 0x56ba90, reinterpret_cast<void*>(objects->icon)); accepted = true;}
+                else {call<void>(c, 0x56e400, objects->slot.data(), reinterpret_cast<void*>(objects->icon), 0.f, false); accepted = true;}
             });
             native([&] {objects->cleanup(c);}); cleaned = true;
         } catch (const std::exception& failure) {
@@ -536,7 +536,7 @@ bool action(Context& c, const std::string& operation, const Json& args, bool& at
         else if (remove) {
             require(result.size() + 1 == initial.size(), "native ability removal count readback differs");
             for (const auto& a : abilities(c, owner)) require(a.uid != selected.uid, "removed ability UID remains owned");
-            uintptr_t registered = 0; native([&] {registered = call<uintptr_t>(c, 0x47ce20, selected.uid);}); require(!registered, "removed ability UID remains registered");
+            uintptr_t registered = 0; native([&] {registered = call<uintptr_t>(c, 0x481f60, selected.uid);}); require(!registered, "removed ability UID remains registered");
             auto expected = initial; expected.erase(expected.begin() + selected.slot);
             for (size_t i = 0; i < expected.size(); ++i) {expected[i]["handle"]["slot"] = i; require(expected[i] == result[i], "native ability removal changed another owned prototype");}
         } else {

@@ -6,7 +6,7 @@
 
 namespace mt2fw::mt2 {
 namespace {
-constexpr const char* game_sha="bbab2dc68babcc644d0a1679548bf1e334b6c52aea669c3f61f6cb9d45c1aaf6";
+constexpr const char* game_sha="7efd8ee7b97f78362e7a2f8116b327fa6b756bdce23114b68143c4c9d2dd50eb";
 template<size_t N>void copy(char(&output)[N],const std::string& value){auto length=std::min(value.size(),N-1);std::memcpy(output,value.data(),length);output[length]=0;}
 bool output_ok(MT2FW_MT2_RouteReceipt* out){return out&&out->size>=sizeof(*out);}
 bool overlaps(uint64_t a,size_t an,uint64_t b,size_t bn){return a<=b?b-a<an:a-b<bn;}
@@ -41,7 +41,7 @@ bool NativeRoutes::verify_body(uint64_t rva,size_t bytes,const std::string& sha,
 void NativeRoutes::catalog(const std::string& name,uint64_t rva,bool shared){
     std::lock_guard lock(gate_);if(!rva||targets_.contains(name))throw std::runtime_error("Native route catalog target absent or duplicated: "+name);
     for(auto& [key,value]:targets_)if(value.rva==rva)throw std::runtime_error("Native route catalog RVA aliases: "+key);
-    Target value{rva,shared};value.retained=!shared&&rva==0x1264b60;
+    Target value{rva,shared};value.retained=!shared&&rva==0x1270520;
     std::string cause;if(!backend_.pristine||!backend_.pristine(rva,0,value.pristine.data(),value.pristine.size(),cause))throw std::runtime_error("Native route pristine admission failed: "+name+": "+cause);
     for(const auto& [other,peer]:targets_)if(overlaps(rva,32,peer.rva,32)){
         for(size_t i=0;i<32;++i)if(rva+i>=peer.rva&&rva+i-peer.rva<32&&value.pristine[i]!=peer.pristine[rva+i-peer.rva])
@@ -156,7 +156,7 @@ bool NativeRoutes::compose(const Target& target,Bytes& expected,std::string& cau
         if(&peer==omitted||!peer.patch_size||!overlaps(target.rva,32,peer.rva,peer.patch_size))continue;
         bool state=peer.state==MT2FW_MT2_ROUTE_ENABLED||(&peer==retiring&&peer.state==MT2FW_MT2_ROUTE_UNKNOWN);
         if(!state||peer.patch_size>32||!peer.generation||peer.patch_generation!=peer.generation||!peer.detour||!peer.trampoline||
-           (!peer.shared&&!(((peer.rva==0xc0ab50&&peer.building_observer==peer.detour)||(peer.rva==0xc0f0f0&&peer.npc_observer==peer.detour))&&!peer.owner)&&(!peer.created||!peer.owner||peer.owner->service!=this||!peer.owner->plugin))){
+           (!peer.shared&&!(((peer.rva==0xc17290&&peer.building_observer==peer.detour)||(peer.rva==0xc1b830&&peer.npc_observer==peer.detour))&&!peer.owner)&&(!peer.created||!peer.owner||peer.owner->service!=this||!peer.owner->plugin))){
             cause="Adjacent native route has no acknowledged owned generation: "+name;return false;
         }
         for(uint32_t i=0;i<peer.patch_size;++i){auto address=peer.rva+i;if(address<target.rva||address-target.rva>=32)continue;
@@ -216,7 +216,7 @@ bool NativeRoutes::reserve_building_observer(Runtime& runtime,void* detour,std::
     std::lock_guard lock(gate_);
     if(!detour||!runtime.plugins().empty()||!owners_.empty()){cause="Private Building observer requires an empty plugin and route-owner set";return false;}
     auto found=targets_.find("mp.root-building-load-identity.c0ab50");
-    if(found==targets_.end()||found->second.rva!=0xc0ab50||found->second.shared){cause="Private Building observer exact exclusive catalog entry missing";return false;}
+    if(found==targets_.end()||found->second.rva!=0xc17290||found->second.shared){cause="Private Building observer exact exclusive catalog entry missing";return false;}
     auto& target=found->second;
     if(target.building_observer||target.owner||target.created||target.detour||target.trampoline||target.patch_size||target.generation||target.state!=MT2FW_MT2_ROUTE_PRISTINE){cause="Private Building observer target already has an owner or attempted route";return false;}
     if(!validate(target,cause))return false;
@@ -226,7 +226,7 @@ bool NativeRoutes::reserve_npc_observer(Runtime& runtime,void* detour,std::strin
     std::lock_guard lock(gate_);
     if(!detour||!runtime.plugins().empty()||!owners_.empty()){cause="Private NPC observer requires an empty plugin and route-owner set";return false;}
     auto found=targets_.find("mp.npc-array-load-identity.c0f0f0");
-    if(found==targets_.end()||found->second.rva!=0xc0f0f0||found->second.shared){cause="Private NPC observer exact exclusive catalog entry missing";return false;}
+    if(found==targets_.end()||found->second.rva!=0xc1b830||found->second.shared){cause="Private NPC observer exact exclusive catalog entry missing";return false;}
     auto& target=found->second;
     if(target.npc_observer||target.owner||target.created||target.detour||target.trampoline||target.patch_size||target.generation||target.state!=MT2FW_MT2_ROUTE_PRISTINE){cause="Private NPC observer target already has an owner or attempted route";return false;}
     if(!validate(target,cause))return false;
@@ -244,7 +244,7 @@ bool NativeRoutes::publish_shared(const std::string& name,void* detour,void* tra
 bool NativeRoutes::publish_framework_hook(void* target,void* detour,void* trampoline,std::string& cause){
     std::lock_guard lock(gate_);for(auto& [name,value]:targets_)if(image_+value.rva==reinterpret_cast<uintptr_t>(target)){
         if(value.building_observer){
-            if(value.rva!=0xc0ab50||name!="mp.root-building-load-identity.c0ab50"||value.shared||value.owner||value.created||
+            if(value.rva!=0xc17290||name!="mp.root-building-load-identity.c0ab50"||value.shared||value.owner||value.created||
                value.building_observer!=detour||!trampoline||value.generation||value.state!=MT2FW_MT2_ROUTE_PRISTINE){
                 cause="Private Building observer publication does not match its exclusive reservation";return false;
             }
@@ -254,7 +254,7 @@ bool NativeRoutes::publish_framework_hook(void* target,void* detour,void* trampo
             value.state=MT2FW_MT2_ROUTE_UNKNOWN;value.cause="Private Building observer acknowledgement failed: "+cause;return false;
         }
         if(value.npc_observer){
-            if(value.rva!=0xc0f0f0||name!="mp.npc-array-load-identity.c0f0f0"||value.shared||value.owner||value.created||
+            if(value.rva!=0xc1b830||name!="mp.npc-array-load-identity.c0f0f0"||value.shared||value.owner||value.created||
                value.npc_observer!=detour||!trampoline||value.generation||value.state!=MT2FW_MT2_ROUTE_PRISTINE){
                 cause="Private NPC observer publication does not match its exclusive reservation";return false;
             }

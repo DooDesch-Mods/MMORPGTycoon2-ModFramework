@@ -14,9 +14,9 @@ void install(const Json& config){
     if(!config.value("saved_building_identity",false))return;
     isolated();
     std::string body(0x460,'\0');SIZE_T copied=0;
-    if(!ReadProcessMemory(GetCurrentProcess(),reinterpret_cast<void*>(image+0xc0ab50),body.data(),body.size(),&copied)||copied!=body.size())
+    if(!ReadProcessMemory(GetCurrentProcess(),reinterpret_cast<void*>(image+0xc17290),body.data(),body.size(),&copied)||copied!=body.size())
         throw std::runtime_error("Building receipt LoadFromStream body read failed");
-    if(digest(body)!="344763380e642478d438df35309efae03225982400882e631b5ba96fe71f5ba9")
+    if(digest(body)!="4e9934fc7fc9b9b592c52342af4267cf64937b390ce56248f2a5309ee2aa72aa")
         throw std::runtime_error("Building receipt exact LoadFromStream body differs");
     observer=std::make_unique<Core>([](uintptr_t address,size_t size){
         Core::Bytes bytes(size);SIZE_T count=0;
@@ -34,7 +34,7 @@ void install(const Json& config){
         if(std::string_view(state)=="Loading")throw std::runtime_error("Plugin loading is blocked by the private saved Building observer");
         if(previous_notice)previous_notice(manifest,state);
     };
-    hook(reinterpret_cast<void*>(image+0xc0ab50),reinterpret_cast<void*>(&load),reinterpret_cast<void**>(&original_load));installed=true;
+    hook(reinterpret_cast<void*>(image+0xc17290),reinterpret_cast<void*>(&load),reinterpret_cast<void**>(&original_load));installed=true;
 }
 void arm(){if(installed)observer->arm("user/"+fixture_path,fixture_sha);}
 void validate_pin(const std::string& sha){if(installed&&!Core::supported_fixture(sha))throw std::runtime_error("Building identity marker requires one of the two pinned Building fixture SHA256 values");}

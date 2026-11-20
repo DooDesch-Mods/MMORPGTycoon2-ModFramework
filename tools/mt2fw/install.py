@@ -9,7 +9,7 @@ import subprocess
 from datetime import datetime, timezone
 from .packages import PackageError, atomic_json, read_json, confined
 
-EXE_SHA256 = 'bbab2dc68babcc644d0a1679548bf1e334b6c52aea669c3f61f6cb9d45c1aaf6'
+EXE_SHA256 = '7efd8ee7b97f78362e7a2f8116b327fa6b756bdce23114b68143c4c9d2dd50eb'
 RECEIPT = 'mt2fw-install.json'
 
 
@@ -112,7 +112,7 @@ def doctor(game: Path | None = None, profile: Path | None = None) -> dict:
         else:
             result['executable_sha256'] = sha(game / 'MT2.exe')
             if result['executable_sha256'] != EXE_SHA256:
-                result['issues'].append('Unsupported game build; game adapter and mods will stay disabled')
+                result['issues'].append('Game build differs from the supported build; features whose game code changed stay disabled')
         receipt = game / RECEIPT
         if (game / 'WSOCK32.dll').exists() and not receipt.exists():
             result['issues'].append('Existing loader has no framework receipt; automatic overwrite is refused')
@@ -134,8 +134,8 @@ def doctor(game: Path | None = None, profile: Path | None = None) -> dict:
 def install(package: Path, game: Path, profile: Path | None = None) -> dict:
     game = game.resolve()
     require_game_closed(game)
-    if not (game / 'MT2.exe').is_file() or sha(game / 'MT2.exe') != EXE_SHA256:
-        raise PackageError('Select the supported MT2 Steam installation')
+    if not (game / 'MT2.exe').is_file():
+        raise PackageError('Select the MT2 Steam installation')
     manifest = read_json(package / 'framework-package.json')
     expected = manifest['files']
     if not {'WSOCK32.dll', 'MT2Framework.dll'}.issubset(expected):

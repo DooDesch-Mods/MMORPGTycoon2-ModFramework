@@ -49,8 +49,8 @@ enum class EmploymentObservation { RequirePrefix, Raw };
 inline bool observe(Memory& p,uintptr_t state,uintptr_t image,State& out,Local& local,std::string& e,EmploymentObservation employment=EmploymentObservation::RequirePrefix){
     out={};local={};uintptr_t singleton=0;
     if(!at(p,state,0x180,local.lounge,e)||!at(p,state,0x1c0,local.business,e)||
-       !type(p,local.lounge,image+0x16de6c0,e)||!type(p,local.business,image+0x16d97e0,e)||
-       !at(p,image,0x13df290,singleton,e))return false;
+       !type(p,local.lounge,image+0x16e4a60,e)||!type(p,local.business,image+0x16dfb80,e)||
+       !at(p,image,0x13eb290,singleton,e))return false;
     if(singleton!=local.lounge)return fail(e,"Developer actual lounge singleton/GameState differs");
     if(!at(p,local.business,0x4c,out.business_count,e)||!at(p,local.lounge,0x310,out.lounge_count,e)||
        !at(p,local.lounge,0x70,local.data,e)||!array(p,local.lounge,0x70,local.developers,local.capacity,e)||
@@ -58,14 +58,14 @@ inline bool observe(Memory& p,uintptr_t state,uintptr_t image,State& out,Local& 
     if(out.business_count<0||out.business_count>50||out.lounge_count<0||out.lounge_count>50||local.developers.size()!=50||local.indoor==local.outdoor)
         return fail(e,"Developer fixed pool/count/manager owners differ");
     int32_t capacity=0;
-    if(!type(p,local.indoor,image+0x16e47f0,e)||!type(p,local.outdoor,image+0x16e47f0,e)||
+    if(!type(p,local.indoor,image+0x16eab90,e)||!type(p,local.outdoor,image+0x16eab90,e)||
        !array(p,local.indoor,0x38,local.inside,capacity,e)||!array(p,local.outdoor,0x38,local.outside,capacity,e))return false;
     std::set<uintptr_t> members(local.inside.begin(),local.inside.end());
     for(auto value:local.outside)if(!members.insert(value).second)return fail(e,"Developer appears in both native managers");
     if(members!=std::set<uintptr_t>(local.developers.begin(),local.developers.end()))return fail(e,"Developer manager union differs from actual50-entry catalogue");
     std::set<int32_t> ids;int32_t slot=0;
     for(auto address:local.developers){Row row;uint8_t employed=0,active=0,on_map=0;uintptr_t job=0;row.slot=slot++;
-        if(!type(p,address,image+0x17422e0,e)||!at(p,address,0x4c0,row.id,e)||!at(p,address,0x4c4,row.state,e)||
+        if(!type(p,address,image+0x1748680,e)||!at(p,address,0x4c0,row.id,e)||!at(p,address,0x4c4,row.state,e)||
            !at(p,address,0x4d8,employed,e)||!at(p,address,0x4d9,active,e)||!at(p,address,0x368,on_map,e)||!at(p,address,0x4c8,job,e))return false;
         for(size_t i=0;i<3;++i){
             if(!at(p,address,0x110+i*4,row.position[i],e))return false;

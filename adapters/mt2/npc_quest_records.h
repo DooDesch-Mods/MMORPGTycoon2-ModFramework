@@ -71,11 +71,11 @@ inline bool read_daily(npc_census::Memory& memory,uintptr_t image,uintptr_t ques
     const uintptr_t daily=quest+offset;
     if(daily<quest)return reject(error,std::string("Quest ")+label+" address overflows");
     if(!get(memory,daily,0x38,ap,label,error))return false;
-    if(ap!=image+0x1749370)
+    if(ap!=image+0x174f710)
         return reject(error,std::string("Quest ")+label+" history array AP differs");
     uintptr_t daily_ap=0;
     if(!get(memory,daily,0,daily_ap,label,error))return false;
-    if(daily_ap!=image+0x16e4710)
+    if(daily_ap!=image+0x16eaab0)
         return reject(error,std::string("Quest ")+label+" DailyCount AP differs");
     if(!get(memory,daily,0x40,data,label,error)||
        !get(memory,daily,0x48,count,label,error)||
@@ -101,7 +101,7 @@ inline bool read_rating(npc_census::Memory& memory,uintptr_t image,uintptr_t que
        !get(memory,quest,0x1fc,out.convenience,"rating convenience",error)||
        !get(memory,quest,0x200,out.danger,"rating danger",error)||
        !get(memory,quest,0x204,set,"rating set",error))return false;
-    if(ap!=image+0x1787870||set>1||!std::isfinite(out.beauty)||
+    if(ap!=image+0x178dc10||set>1||!std::isfinite(out.beauty)||
        !std::isfinite(out.convenience)||!std::isfinite(out.danger))
         return reject(error,"Quest rating AP, bool or finite values differ");
     out.set=set!=0;return true;
@@ -115,7 +115,7 @@ inline bool manager_lookup(npc_census::Memory& memory,uintptr_t image,uintptr_t 
        !get(memory,manager,0x18,table,"manager table",error)||
        !get(memory,manager,0x20,buckets,"manager buckets",error)||
        !get(memory,manager,0x24,shift,"manager shift",error))return false;
-    if(ap!=image+0x17020b0||!table||buckets<=0||buckets>1000000||
+    if(ap!=image+0x1708450||!table||buckets<=0||buckets>1000000||
        (buckets&(buckets-1))||shift<0||shift>31||
        uint64_t(buckets)!=(uint64_t(1)<<(32-shift))||
        table>UINTPTR_MAX-size_t(buckets)*24)
@@ -155,7 +155,7 @@ template<class Destination>
 bool read(npc_census::Memory& memory,uintptr_t image,uintptr_t npc,
           Destination&& destination_key,State& output,std::string& error){
     error.clear();
-    if(!image||image>UINTPTR_MAX-0x1787870||!npc)
+    if(!image||image>UINTPTR_MAX-0x178dc10||!npc)
         return reject(error,"Quest reader image or NPC address invalid");
     uintptr_t npc_ap=0,manager=0,entries=0,npc_proxy=0,owner_target=0;
     int32_t count=0,capacity=0,npc_type=-1;
@@ -165,8 +165,8 @@ bool read(npc_census::Memory& memory,uintptr_t image,uintptr_t npc,
        !get(memory,npc,0x868,entries,"NPC Quest array",error)||
        !get(memory,npc,0x870,count,"NPC Quest count",error)||
        !get(memory,npc,0x874,capacity,"NPC Quest capacity",error)||
-       !get(memory,image,0x13df410,manager,"QuestManager singleton",error))return false;
-    if(npc_ap!=image+0x1742980||npc_type!=0||!npc_proxy||!manager||
+       !get(memory,image,0x13eb410,manager,"QuestManager singleton",error))return false;
+    if(npc_ap!=image+0x1748d20||npc_type!=0||!npc_proxy||!manager||
        count<0||capacity<count||capacity>100000||
        (count&&!entries)||entries>UINTPTR_MAX-size_t(count)*8)
         return reject(error,"Quest NPC class, type, list or manager differs");
@@ -191,7 +191,7 @@ bool read(npc_census::Memory& memory,uintptr_t image,uintptr_t npc,
            !get(memory,local.quest,0xb8,local.owner,"owner",error)||
            !get(memory,local.quest,0xc0,proxy,"owner weak proxy",error)||
            !get(memory,local.quest,0xf0,local.destination,"destination",error))return false;
-        if(ap!=image+0x174ac10||local.owner!=npc||proxy!=npc_proxy||
+        if(ap!=image+0x1750fb0||local.owner!=npc||proxy!=npc_proxy||
            record.sequence_id<0||!seen_sequences.insert(record.sequence_id).second)
             return reject(error,"Quest AP, NPC owner or sequenceId differs");
         if(!get(memory,proxy,0,weak_target,"owner weak target",error)||
@@ -215,7 +215,7 @@ bool read(npc_census::Memory& memory,uintptr_t image,uintptr_t npc,
         if(task){uintptr_t task_ap=0;uint8_t finished=2;
             if(!get(memory,task,0,task_ap,"task AP",error)||
                !get(memory,task,0xe,finished,"task finished",error))return false;
-            if(task_ap!=image+0x1714ac0||finished>1)
+            if(task_ap!=image+0x171ae60||finished>1)
                 return reject(error,"Quest PathfinderTask AP or finished bool differs");
             local.task=finished?TaskStatus::FinishedWaitingTick:TaskStatus::Pending;
         }
@@ -230,7 +230,7 @@ bool read(npc_census::Memory& memory,uintptr_t image,uintptr_t npc,
         result.records.push_back(std::move(record));result.local.push_back(local);
     }
     uintptr_t after_manager=0,after_entries=0;int32_t after_count=0;
-    if(!get(memory,image,0x13df410,after_manager,"QuestManager reread",error)||
+    if(!get(memory,image,0x13eb410,after_manager,"QuestManager reread",error)||
        !get(memory,npc,0x868,after_entries,"NPC Quest array reread",error)||
        !get(memory,npc,0x870,after_count,"NPC Quest count reread",error))return false;
     if(after_manager!=manager||after_entries!=entries||after_count!=count)

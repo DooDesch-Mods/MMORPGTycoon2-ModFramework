@@ -60,59 +60,59 @@ void check(DWORD exception, const char* operation) {
 }
 DWORD create_arrow(Resource* resource) {
     __try {
-        resource->arrow = reinterpret_cast<void*(*)(size_t)>(image + 0xa02670)(0x1d8);
+        resource->arrow = reinterpret_cast<void*(*)(size_t)>(image + 0xa0d230)(0x1d8);
         if (!resource->arrow) return ERROR_NOT_ENOUGH_MEMORY;
-        reinterpret_cast<void(*)(void*, int)>(image + 0x1fd330)(resource->arrow, 0);
+        reinterpret_cast<void(*)(void*, int)>(image + 0x1ff9e0)(resource->arrow, 0);
     } __except (EXCEPTION_EXECUTE_HANDLER) { return GetExceptionCode(); }
     return 0;
 }
 DWORD create_label(Resource* resource, const char* name) {
     Literal literal{}; bool constructed = false; DWORD exception = 0;
     __try {
-        reinterpret_cast<void(*)(void*, const char*)>(image + 0xa16f10)(&literal, name); constructed = true;
-        resource->label = reinterpret_cast<void*(*)(size_t)>(image + 0xa02670)(0x1b8);
+        reinterpret_cast<void(*)(void*, const char*)>(image + 0xa21c10)(&literal, name); constructed = true;
+        resource->label = reinterpret_cast<void*(*)(size_t)>(image + 0xa0d230)(0x1b8);
         if (!resource->label) exception = ERROR_NOT_ENOUGH_MEMORY;
-        else reinterpret_cast<void(*)(void*, const void*)>(image + 0x632980)(resource->label, &literal);
+        else reinterpret_cast<void(*)(void*, const void*)>(image + 0x639770)(resource->label, &literal);
     } __except (EXCEPTION_EXECUTE_HANDLER) { exception = GetExceptionCode(); }
     if (constructed) {
         __try {
-            reinterpret_cast<void(*)(void*)>(image + 0x11b2b00)(literal.arguments);
-            reinterpret_cast<void(*)(void*)>(image + 0x11bd1e0)(&literal);
+            reinterpret_cast<void(*)(void*)>(image + 0x11be4a0)(literal.arguments);
+            reinterpret_cast<void(*)(void*)>(image + 0x11c8b80)(&literal);
         } __except (EXCEPTION_EXECUTE_HANDLER) { if (!exception) exception = GetExceptionCode(); }
     }
     return exception;
 }
 DWORD erase_object(void* object, bool label) {
-    __try { reinterpret_cast<void(*)(void*)>(image + (label ? 0x632510 : 0x1fb930))(object); }
+    __try { reinterpret_cast<void(*)(void*)>(image + (label ? 0x639300 : 0x1fdfe0))(object); }
     __except (EXCEPTION_EXECUTE_HANDLER) { return GetExceptionCode(); }
     return 0;
 }
 DWORD extract_object(void* object) {
-    __try { reinterpret_cast<void(*)(void*)>(image + 0x97b270)(object); }
+    __try { reinterpret_cast<void(*)(void*)>(image + 0x9845c0)(object); }
     __except (EXCEPTION_EXECUTE_HANDLER) { return GetExceptionCode(); }
     return 0;
 }
 DWORD register_object(void* object) {
-    __try { reinterpret_cast<void(*)(void*, int)>(image + 0x97a9d0)(object, 12); }
+    __try { reinterpret_cast<void(*)(void*, int)>(image + 0x983d20)(object, 12); }
     __except (EXCEPTION_EXECUTE_HANDLER) { return GetExceptionCode(); }
     return 0;
 }
 DWORD update_positions(Resource* resource, const Vec2* point) {
     Vec2 label{point->x + 22.f, point->y + 28.f};
     __try {
-        reinterpret_cast<void(*)(void*, const void*)>(image + 0xceec60)(resource->arrow, point);
-        reinterpret_cast<void(*)(void*, const void*)>(image + 0x631fe0)(resource->label, &label);
-        reinterpret_cast<void(*)(void*, float)>(image + 0x632650)(resource->label, 0.f);
+        reinterpret_cast<void(*)(void*, const void*)>(image + 0xcfa380)(resource->arrow, point);
+        reinterpret_cast<void(*)(void*, const void*)>(image + 0x638dd0)(resource->label, &label);
+        reinterpret_cast<void(*)(void*, float)>(image + 0x639440)(resource->label, 0.f);
     } __except (EXCEPTION_EXECUTE_HANDLER) { return GetExceptionCode(); }
     return 0;
 }
 DWORD native_projection(const std::array<float, 3>* world, Vec2* output, bool* accepted) {
-    __try { *accepted = reinterpret_cast<bool(*)(void*, const void*)>(image + 0x864d60)(output, world->data()); }
+    __try { *accepted = reinterpret_cast<bool(*)(void*, const void*)>(image + 0x86da80)(output, world->data()); }
     __except (EXCEPTION_EXECUTE_HANDLER) { return GetExceptionCode(); }
     return 0;
 }
 void* ui_scene() {
-    auto slot = read<void*>(reinterpret_cast<void*>(image + 0x164b420));
+    auto slot = read<void*>(reinterpret_cast<void*>(image + 0x1650a00));
     auto screen = read<void*>(slot);
     markers::require(read<int>(screen, 0x30) > 12, "Native UI scene 12 is unavailable");
     auto scenes = read<void*>(screen, 0x10);
@@ -184,11 +184,11 @@ void prepare_draw(void* scene) {
         if (!entry.enabled) continue;
         auto projected = project(entry.world); if (!projected.visible) continue;
         auto& resource = resources[key];
-        if (!resource.arrow) { resource.uncertain = true; check(create_arrow(&resource), "Native marker arrow creation"); resource.arrow_ready = true; resource.uncertain = false; passive(resource.arrow, 0x16c1fb0); }
+        if (!resource.arrow) { resource.uncertain = true; check(create_arrow(&resource), "Native marker arrow creation"); resource.arrow_ready = true; resource.uncertain = false; passive(resource.arrow, 0x16c8350); }
         if (resource.label && resource.name != entry.name) {
             resource.uncertain = true; check(erase_object(resource.label, true), "Native marker label replacement"); resource.label = nullptr; resource.label_ready = false; resource.uncertain = false;
         }
-        if (!resource.label) { resource.uncertain = true; check(create_label(&resource, entry.name.c_str()), "Native marker label creation"); resource.label_ready = true; resource.uncertain = false; passive(resource.label, 0x16db040); resource.name = entry.name; }
+        if (!resource.label) { resource.uncertain = true; check(create_label(&resource, entry.name.c_str()), "Native marker label creation"); resource.label_ready = true; resource.uncertain = false; passive(resource.label, 0x16e13e0); resource.name = entry.name; }
         appearance(resource.arrow, entry.color);
         check(update_positions(&resource, &projected.point), "Native marker positioning");
         check(register_object(resource.arrow), "Native marker arrow registration");
@@ -229,7 +229,7 @@ void configure(Runtime& runtime) {
     }
     host = &runtime;
 }
-std::vector<Hook> hooks() { return {{reinterpret_cast<void*>(image + 0x9c9070), reinterpret_cast<void*>(draw), reinterpret_cast<void**>(&original_draw)}}; }
+std::vector<Hook> hooks() { return {{reinterpret_cast<void*>(image + 0x9d2c30), reinterpret_cast<void*>(draw), reinterpret_cast<void**>(&original_draw)}}; }
 Json request(const std::string& operation, const Json& arguments) {
     std::lock_guard lock(mutex);
     markers::require(host != nullptr && !poisoned, "Native world markers unavailable; check Framework log and restart");

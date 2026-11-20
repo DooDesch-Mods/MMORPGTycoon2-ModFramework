@@ -17,12 +17,12 @@ inline void need(bool value,const char* cause){if(!value)throw std::runtime_erro
 template<class R64,class R32,class R8,class W32,class Guard>
 Receipt initialize(uint64_t image,uint64_t game,R64 read64,R32 read32,R8 read8,W32 write32,Guard guard){
     constexpr std::array<float,4> periods{1.0f,15.0f,30.0f,60.0f};
-    guard();const auto manager=read64(image+0x13df350);
+    guard();const auto manager=read64(image+0x13eb350);
     auto inspect=[&](){
-        guard();need(manager&&read64(image+0x13df350)==manager&&read64(game+0x150)==manager&&read64(manager)==image+0x16fdc40,"TickManager owner changed");
+        guard();need(manager&&read64(image+0x13eb350)==manager&&read64(game+0x150)==manager&&read64(manager)==image+0x1703fe0,"TickManager owner changed");
         need(read8(manager+0x28)==0,"TickManager is paused");std::array<Clock,4> clocks{};
         for(size_t i=0;i<clocks.size();++i){auto& c=clocks[i];c.address=read64(manager+8+i*8);
-            need(c.address&&read64(c.address)==image+0x1704c80,"TickClock owner changed");
+            need(c.address&&read64(c.address)==image+0x170b020,"TickClock owner changed");
             for(size_t j=0;j<i;++j)need(clocks[j].address!=c.address,"TickClock owners are not distinct");
             c.data=read64(c.address+8);c.count=read32(c.address+0x10);c.capacity=read32(c.address+0x14);
             c.period=read32(c.address+0x18);c.budget=read32(c.address+0x1c);c.rate=read32(c.address+0x20);c.cursor=read32(c.address+0x24);

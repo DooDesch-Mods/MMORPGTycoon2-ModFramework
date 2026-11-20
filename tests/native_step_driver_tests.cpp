@@ -58,12 +58,12 @@ struct Test {
         observed.phase=StepNativeObservation::Phase::Preload;observed.world_epoch=7;
         observed.game=game;observed.mode=mode;observed.state=state;observed.world=world;observed.map=map;
         observed.witness[0]=42;observed.resume_workers=true;
-        put(image+0x13df8f0,game);put(game,image+0x1743740);put(image+0x13df340,tasks);put(game+0x68,tasks);
-        put(tasks,image+0x16fdaf0);put(tasks+0xf8,uint8_t(1));put(tasks+0xa8,int32_t(0));put(tasks+0x90,int32_t(0));put(tasks+0xc0,int32_t(1));
-        put(game+0x28,mode);put(image+0x13df320,mode);put(mode,image+0x16e6730);put(mode+0x2c4,int32_t(4));
-        put(mode+0x58,state);put(state+0x160,world);put(image+0x13df9c0,world);put(world,image+0x174aef0);
-        put(world+0x158,map);put(image+0x13df8c0,map);put(map,image+0x1742860);put(map+0x47f,uint8_t(1));
-        put(image+0x1c4eb70,timer);put(timer,image+0x16f9b80);put(image+0x16f9ba0,image+step_pins::timer_rva);put(timer+8,uint8_t(1));
+        put(image+0x13eb8f0,game);put(game,image+0x1749ae0);put(image+0x13eb340,tasks);put(game+0x68,tasks);
+        put(tasks,image+0x1703e90);put(tasks+0xf8,uint8_t(1));put(tasks+0xa8,int32_t(0));put(tasks+0x90,int32_t(0));put(tasks+0xc0,int32_t(1));
+        put(game+0x28,mode);put(image+0x13eb320,mode);put(mode,image+0x16ecad0);put(mode+0x2c4,int32_t(4));
+        put(mode+0x58,state);put(state+0x160,world);put(image+0x13eb9c0,world);put(world,image+0x1751290);
+        put(world+0x158,map);put(image+0x13eb8c0,map);put(map,image+0x1748c00);put(map+0x47f,uint8_t(1));
+        put(image+0x1c55b70,timer);put(timer,image+0x16fff20);put(image+0x16fff40,image+step_pins::timer_rva);put(timer+8,uint8_t(1));
         put(game+8,systems);put(game+0x10,int32_t(1));put(systems,timer);put(game+0x1c,uint32_t(0x3d000000));
         NativeStepDriver::Backend backend;backend.image=image;backend.thread=[this]{return thread;};
         backend.read=[this](uintptr_t at,void* out,size_t n){auto* bytes=static_cast<unsigned char*>(out);for(size_t i=0;i<n;++i){auto p=memory.find(at+i);if(p==memory.end())throw std::runtime_error("test missing native memory");bytes[i]=p->second;}};
@@ -112,21 +112,21 @@ struct Test {
 int main(){try{
     {namespace poll=mt2fw::mt2::poll_delay;constexpr uintptr_t image=0x100000000;uint32_t observed=0;unsigned calls=0;
         auto original=[&](uint32_t duration){observed=duration;++calls;};
-        poll::invoke(100,image+0x526ded,101,image,original);check(observed==100,"unarmed polling changed duration");
-        {poll::Scope scope(true,101);poll::invoke(100,image+0x526ded,101,image,original);check(observed==10,"exact owned polling did not select10ms");
-            poll::invoke(100,image+0x526ded,102,image,original);check(observed==100,"foreign thread polling changed duration");
+        poll::invoke(100,image+0x52d20d,101,image,original);check(observed==100,"unarmed polling changed duration");
+        {poll::Scope scope(true,101);poll::invoke(100,image+0x52d20d,101,image,original);check(observed==10,"exact owned polling did not select10ms");
+            poll::invoke(100,image+0x52d20d,102,image,original);check(observed==100,"foreign thread polling changed duration");
             poll::invoke(100,image+0x526eec,101,image,original);check(observed==100,"foreign caller polling changed duration");
             poll::invoke(0,image+0x526eec,101,image,original);check(observed==0,"zero yield changed duration");
-            poll::invoke(99,image+0x526ded,101,image,original);check(observed==99,"foreign argument changed duration");
-            {poll::Scope disabled(false,101);poll::invoke(100,image+0x526ded,101,image,original);check(observed==100,"nested unowned drain inherited polling scope");}
-            check(poll::qualifies(100,image+0x526ded,101,image),"nested scope did not restore ownership");
-            check(raises([&]{poll::invoke(100,image+0x526ded,101,image,[](uint32_t){throw std::runtime_error("original-delay-failure");});},"original-delay-failure"),"polling changed original exception");}
+            poll::invoke(99,image+0x52d20d,101,image,original);check(observed==99,"foreign argument changed duration");
+            {poll::Scope disabled(false,101);poll::invoke(100,image+0x52d20d,101,image,original);check(observed==100,"nested unowned drain inherited polling scope");}
+            check(poll::qualifies(100,image+0x52d20d,101,image),"nested scope did not restore ownership");
+            check(raises([&]{poll::invoke(100,image+0x52d20d,101,image,[](uint32_t){throw std::runtime_error("original-delay-failure");});},"original-delay-failure"),"polling changed original exception");}
         check(!poll::active&&calls==7,"polling scope leaked or original call count changed");
         check(poll::selected.entered==2&&poll::selected.returned==1&&poll::selected.failed==1&&poll::selected.requested_ms==200&&poll::selected.selected_ms==20,"selected wait counters differ");
         check(poll::forwarded.entered==6&&poll::forwarded.returned==6&&!poll::forwarded.failed,"forwarding counters differ");
         check(poll::failure_ready.load()&&std::string(poll::first_failure)=="original-delay-failure","original polling failure cause missing");
         const auto elapsed=poll::selected.elapsed_ns.load();
-        {poll::Scope scope(true,101);poll::invoke(100,image+0x526ded,101,image,original,[]()->uint64_t{static uint64_t value=0;return value+=7;});}
+        {poll::Scope scope(true,101);poll::invoke(100,image+0x52d20d,101,image,original,[]()->uint64_t{static uint64_t value=0;return value+=7;});}
         check(poll::selected.elapsed_ns.load()==elapsed+7&&calls==8,"wait duration used requested milliseconds instead of measured clock span");
     }
     {using namespace step_profile;Trace trace;int calls=0;

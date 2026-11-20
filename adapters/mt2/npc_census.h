@@ -136,7 +136,7 @@ inline bool utf8(const std::string& text) {
         }
         if ((width == 2 && value < 0x80) || (width == 3 && value < 0x800) ||
             (width == 4 && value < 0x10000) ||
-            (value >= 0xd800 && value <= 0xdfff) || value > 0x10ffff)
+            (value >= 0xd800 && value <= 0xdfff) || value > 0x11102f)
             return false;
         i += width;
     }
@@ -159,7 +159,7 @@ inline bool read_name(Memory& memory, uintptr_t npc, std::string& name, std::str
 
 inline bool read_global_random(Memory& memory,uintptr_t image,std::array<uint64_t,4>& out,std::string& error){
     uintptr_t global=0;
-    if(!field(memory,image,0x164b250,global,error))return false;
+    if(!field(memory,image,0x1650830,global,error))return false;
     if(!global)return reject(error,"NPC global random source absent");
     return field(memory,global,0,out,error);
 }
@@ -206,7 +206,7 @@ inline bool read(Memory& memory, uintptr_t image, uintptr_t region,
                 !field(memory, row.local_pointer, 0x110, row.position, error) ||
                 !field(memory, row.local_pointer, 0x11c, row.scale, error) ||
                 !read_name(memory, row.local_pointer, row.name, error)) return false;
-            if (ap != image + 0x1742980 || actual_region != region || row.type != type ||
+            if (ap != image + 0x1748d20 || actual_region != region || row.type != type ||
                 !row.local_uid || !seen_uids.insert(row.local_uid).second ||
                 row.local_tag < 0 || row.local_tag > 99 || row.character_slot < 0 ||
                 row.character_type < 0 || row.level < 0 || row.quest_count < 0 || row.quest_count > 100000)

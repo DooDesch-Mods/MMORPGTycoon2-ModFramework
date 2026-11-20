@@ -61,8 +61,8 @@ uint32_t bits(float value){return std::bit_cast<uint32_t>(value);}
 #include "determinism_presentation_probe.inc"
 #include "determinism_terrain_probe.inc"
 void pause_workers(){
-    const auto tasks=read<uintptr_t>(image+0x13df340);
-    if(read<uintptr_t>(owner+0x68)!=tasks||rva(read<uintptr_t>(tasks))!=0x16fdaf0)
+    const auto tasks=read<uintptr_t>(image+0x13eb340);
+    if(read<uintptr_t>(owner+0x68)!=tasks||rva(read<uintptr_t>(tasks))!=0x1703e90)
         throw std::runtime_error("Determinism Task owner changed before pause");
     if(held_tasks&&held_tasks!=tasks)throw std::runtime_error("Determinism held Task owner changed");
     if(!held_tasks){held_tasks=tasks;resume_tasks=read<uint8_t>(tasks+0xf8)==0;}
@@ -74,7 +74,7 @@ void pause_workers(){
 }
 void release_workers(){
     if(!held_tasks)return;
-    if(read<uintptr_t>(image+0x13df340)!=held_tasks||read<uintptr_t>(owner+0x68)!=held_tasks)
+    if(read<uintptr_t>(image+0x13eb340)!=held_tasks||read<uintptr_t>(owner+0x68)!=held_tasks)
         throw std::runtime_error("Determinism held Task owner changed before release");
     if(resume_tasks){
         original_resume(reinterpret_cast<void*>(held_tasks));
@@ -86,14 +86,14 @@ std::array<uint64_t,4> seed_readback(uintptr_t rng){
     std::array<uint64_t,4> words{};for(unsigned i=0;i<4;++i)words[i]=read<uint64_t>(rng+i*8);return words;
 }
 uintptr_t seed_receiver(){
-    const auto rng=read<uintptr_t>(image+0x164b250);
-    if(rng!=image+0x1c4e7a0)throw std::runtime_error("Determinism seed Default receiver differs");
+    const auto rng=read<uintptr_t>(image+0x1650830);
+    if(rng!=image+0x1c557a0)throw std::runtime_error("Determinism seed Default receiver differs");
     return rng;
 }
 void verify_seed_barrier(){
     if(reset_count!=1||reset_attempted_count!=1||!held_tasks||read<uint8_t>(held_tasks+0xf8)!=1||read<int32_t>(held_tasks+0xa8)||read<int32_t>(held_tasks+0x90))
         throw std::runtime_error("Determinism seed barrier lacks one reset and drained paused workers");
-    if(read<uintptr_t>(image+0x13df340)!=held_tasks||read<uintptr_t>(owner+0x68)!=held_tasks)
+    if(read<uintptr_t>(image+0x13eb340)!=held_tasks||read<uintptr_t>(owner+0x68)!=held_tasks)
         throw std::runtime_error("Determinism Task owner changed across seed barrier");
     const auto rng=seed_receiver();
     if(seed_readback(rng)!=mt2::determinism::Gate::seed_words(seed_input)||read<int32_t>(rng+0x20)!=0)
@@ -129,13 +129,13 @@ Json witness(){
         throw std::runtime_error("Determinism witness requires witnessed fixture and current state4/edit0/save0 World");
     std::string folder;if(!native::read_active_world_folder(folder,cause)||folder!=fs::path(fixture_path).parent_path().filename().string())throw std::runtime_error("Determinism loaded folder differs: "+cause);
     if(software.replica_armed||software.replica_bound)throw std::runtime_error("Determinism witness found active Software replica");
-    const auto game=read<uintptr_t>(image+0x13df8f0);
-    const auto game_ap=game?read<uintptr_t>(game):0,expected_game_ap=image+0x1743730+0x10;
+    const auto game=read<uintptr_t>(image+0x13eb8f0);
+    const auto game_ap=game?read<uintptr_t>(game):0,expected_game_ap=image+0x1749ad0+0x10;
     if(owner!=game||game_ap!=expected_game_ap)throw std::runtime_error("Determinism current game receiver differs: owner_expected="+std::to_string(owner)+" owner_actual="+std::to_string(game)+" ap_expected="+std::to_string(expected_game_ap)+" ap_actual="+std::to_string(game_ap));
-    const auto rng=read<uintptr_t>(image+0x164b250),tasks=read<uintptr_t>(image+0x13df340),ticks=read<uintptr_t>(image+0x13df350),updates=read<uintptr_t>(image+0x13df4a0);
-    if(rng!=image+0x1c4e7a0)throw std::runtime_error("Determinism Default RNG object differs");
+    const auto rng=read<uintptr_t>(image+0x1650830),tasks=read<uintptr_t>(image+0x13eb340),ticks=read<uintptr_t>(image+0x13eb350),updates=read<uintptr_t>(image+0x13eb4a0);
+    if(rng!=image+0x1c557a0)throw std::runtime_error("Determinism Default RNG object differs");
     if(read<uintptr_t>(game+0x68)!=tasks||read<uintptr_t>(game+0x150)!=ticks||read<uintptr_t>(game+0x70)!=updates||
-       rva(read<uintptr_t>(tasks))!=0x16fdaf0||rva(read<uintptr_t>(ticks))!=0x16fdc40||rva(read<uintptr_t>(updates))!=0x1709650)
+       rva(read<uintptr_t>(tasks))!=0x1703e90||rva(read<uintptr_t>(ticks))!=0x1703fe0||rva(read<uintptr_t>(updates))!=0x170f9f0)
         throw std::runtime_error("Determinism scheduler singleton ownership differs");
     const auto random=read<std::array<uint64_t,4>>(rng);
     const auto random_extra=read<int32_t>(rng+0x20);
@@ -338,18 +338,18 @@ void install(){
     const auto marker=root/"diagnostics/determinism.json";if(!fs::exists(marker))return;
     bool owned=false;for(auto part:root){auto text=part.string();std::transform(text.begin(),text.end(),text.begin(),[](unsigned char c){return char(std::tolower(c));});owned|=text=="_mptest";}
     const auto config=read_json(marker);
-    if(!owned||config.value("schema_version",0)!=1||!config.value("enabled",false)||config.value("executable_sha256",std::string())!="bbab2dc68babcc644d0a1679548bf1e334b6c52aea669c3f61f6cb9d45c1aaf6")throw std::runtime_error("Private determinism marker requires exact owned _MPTest profile/build");
+    if(!owned||config.value("schema_version",0)!=1||!config.value("enabled",false)||config.value("executable_sha256",std::string())!="7efd8ee7b97f78362e7a2f8116b327fa6b756bdce23114b68143c4c9d2dd50eb")throw std::runtime_error("Private determinism marker requires exact owned _MPTest profile/build");
     image=reinterpret_cast<uintptr_t>(GetModuleHandleW(nullptr));
     for(const auto& [offset,size,sha]:std::array<std::tuple<uintptr_t,size_t,const char*>,3>{{
-        {0x526240,272,"63648e01ead82806b5d976287890d6653f1e5745387b356aaaeb629d1ea09f87"},
-        {0x526350,160,"0acc0efdcbc9ed4445426d1bd10320d9b5827bf3781840eef1b2e467e2bc2c1a"},
-        {0x9fc090,192,"7a7ab329d2eb747de62d61f791723eef44f3e850a468747f41708e6d08b981e5"}}}){
+        {0x52c650,272,"5c994df3f5ff771524a66cedc502b9a8b792d97931a5016611d7755337a3bc98"},
+        {0x52c760,160,"650d51108b7eb798817a589f6f5c6ce26672656bae839ee1ed4219d3249f31f0"},
+        {0xa06517,192,"7a7ab329d2eb747de62d61f791723eef44f3e850a468747f41708e6d08b981e5"}}}){
         std::string body(size,'\0');SIZE_T copied=0;
         if(!ReadProcessMemory(GetCurrentProcess(),reinterpret_cast<void*>(image+offset),body.data(),size,&copied)||copied!=size||digest(body)!=sha)
             throw std::runtime_error("Exact original Task Pause/Resume or InitWithSeed body differs");
     }
     std::string body(336,'\0');SIZE_T copied=0;
-    if(!ReadProcessMemory(GetCurrentProcess(),reinterpret_cast<void*>(image+0x956730),body.data(),body.size(),&copied)||copied!=body.size()||digest(body)!="dafb71c7578812f1264c7121494d5ceff01d38931467babd20942bbec69eb994")throw std::runtime_error("Exact original coreGame::Go body differs");
+    if(!ReadProcessMemory(GetCurrentProcess(),reinterpret_cast<void*>(image+0x95f890),body.data(),body.size(),&copied)||copied!=body.size()||digest(body)!="b4829af24a4528aac26889a49cf6bafb7353dabacba0ac1b8ef5b521ab4bf298")throw std::runtime_error("Exact original coreGame::Go body differs");
     timer_step::install();
     motion_probe::install(config);
     loading_dispatch::install(config);
@@ -360,8 +360,8 @@ void install(){
     presentation_rng::install(config);
     wait_render::enabled=config.value("wait_render",false);
     building_receipt::install(config);npc_receipt::install(config);rng_trace::install(config);
-    original_pause=reinterpret_cast<Go>(image+0x526240);original_resume=reinterpret_cast<Go>(image+0x526350);
-    original_seed=reinterpret_cast<Seed>(image+0x9fc090);
-    hook(reinterpret_cast<void*>(image+0x956730),reinterpret_cast<void*>(&go),reinterpret_cast<void**>(&original_go));installed=true;
+    original_pause=reinterpret_cast<Go>(image+0x52c650);original_resume=reinterpret_cast<Go>(image+0x52c760);
+    original_seed=reinterpret_cast<Seed>(image+0xa06517);
+    hook(reinterpret_cast<void*>(image+0x95f890),reinterpret_cast<void*>(&go),reinterpret_cast<void**>(&original_go));installed=true;
 }
 }

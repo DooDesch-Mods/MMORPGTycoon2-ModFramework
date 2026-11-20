@@ -8,8 +8,8 @@ int32_t exposed=0;
 std::vector<uintptr_t> retained,eligible,batch;
 size_t cursor=0;
 uint64_t batches=0,admitted=0,completed=0,blocked=0;
-constexpr uintptr_t RetrieveLock=0x528d67,RetrieveUnlock=0x528d9b,PausedUnlock=0x528ed2;
-constexpr uintptr_t RetrieveUnwind=0x5291eb,CompleteUnlock=0x52709c;
+constexpr uintptr_t RetrieveLock=0x52f1e7,RetrieveUnlock=0x52f21b,PausedUnlock=0x52f352;
+constexpr uintptr_t RetrieveUnwind=0x52f66b,CompleteUnlock=0x52d4bc;
 struct Guard {
     void* mutex;
     explicit Guard(uintptr_t tasks):mutex(reinterpret_cast<void*>(tasks+0xf0)){original_lock(mutex);}
@@ -55,12 +55,12 @@ void begin(uintptr_t tasks){
         if(!owners_read){owners=ordered_finish::subscribers();owners_read=true;}
         require(plan(task),"Ordered Run ToonPlan classification differs");
         const auto subscriber=read<uintptr_t>(task+0x20),toon=read<uintptr_t>(task+0x10);
-        require(subscriber&&read<uintptr_t>(subscriber)==image+0x16e75f0,"Ordered Run Subscriber differs");
+        require(subscriber&&read<uintptr_t>(subscriber)==image+0x16ed990,"Ordered Run Subscriber differs");
         const auto id=read<int32_t>(subscriber+0x20);const auto found=owners.find(id);
         require(found!=owners.end()&&found->second==subscriber&&ids.insert(id).second,"Ordered Run saved identity is absent or duplicated");
         const auto brain=read<uintptr_t>(subscriber+0x88);
-        require(brain&&read<uintptr_t>(brain)==image+0x16fdd60&&read<uintptr_t>(brain+0x20)==task&&read<uintptr_t>(brain+0x28)==subscriber&&
-            toon&&read<uintptr_t>(toon)==image+0x1744e90&&read<uintptr_t>(toon+0x940)==subscriber&&read<uintptr_t>(subscriber+0x80)==toon&&read<uintptr_t>(brain+0x18)==toon,
+        require(brain&&read<uintptr_t>(brain)==image+0x1704100&&read<uintptr_t>(brain+0x20)==task&&read<uintptr_t>(brain+0x28)==subscriber&&
+            toon&&read<uintptr_t>(toon)==image+0x174b230&&read<uintptr_t>(toon+0x940)==subscriber&&read<uintptr_t>(subscriber+0x80)==toon&&read<uintptr_t>(brain+0x18)==toon,
             "Ordered Run reciprocal current task/Toon differs");
         ordered.emplace_back(id,task);
     }

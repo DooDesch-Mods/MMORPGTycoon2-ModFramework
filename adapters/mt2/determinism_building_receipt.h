@@ -45,17 +45,17 @@ private:
     void type(uintptr_t p,uintptr_t ap){need(at<uintptr_t>(p)==image+ap,"address point differs at="+std::to_string(p)+" required_rva="+std::to_string(ap));}
     std::string string(uintptr_t p){const auto data=at<uintptr_t>(p),n=at<uint64_t>(p+8);need(n>0&&n<32768,"filename extent invalid");auto b=bytes(data,size_t(n+1));need(b.back()==0,"filename terminator differs");std::string s(b.begin(),b.end()-1);need(s.find('\0')==std::string::npos,"filename contains null");return s;}
     void chain(const Frame& f){
-        need(at<uintptr_t>(image+0x13df320)==bound_mode,"Mode owner changed");type(bound_mode,0x16e6730);
+        need(at<uintptr_t>(image+0x13eb320)==bound_mode,"Mode owner changed");type(bound_mode,0x16ecad0);
         need(at<uintptr_t>(bound_mode+0xd8)==f.context&&f.context==bound_context,"load context differs");
-        need(at<uintptr_t>(f.reader+8)==f.stream,"Reader stream changed");type(f.stream,0x17315c0);
-        need(at<uintptr_t>(f.stream+0x18)==f.file,"Reader file changed");type(f.file,0x1742fd0);
+        need(at<uintptr_t>(f.reader+8)==f.stream,"Reader stream changed");type(f.stream,0x1737960);
+        need(at<uintptr_t>(f.stream+0x18)==f.file,"Reader file changed");type(f.file,0x1749370);
         need(at<int32_t>(f.file+0x70)==5&&string(f.file+8)==path,"Reader source is not the pinned fixture");
     }
     std::vector<Row> rows(uintptr_t array,uintptr_t context){
-        type(array,0x172d7c0);const auto data=at<uintptr_t>(array+8);const auto n=at<int32_t>(array+0x10),cap=at<int32_t>(array+0x14);
+        type(array,0x1733b60);const auto data=at<uintptr_t>(array+8);const auto n=at<int32_t>(array+0x10),cap=at<int32_t>(array+0x14);
         need(n>=0&&n<=3&&cap>=n,"fixture Building array bounds differ");
         std::vector<Row> result;std::set<uintptr_t> pointers;std::set<uint64_t> uids;
-        for(int32_t i=0;i<n;++i){auto p=at<uintptr_t>(data+size_t(i)*8);type(p,0x16d93c0);
+        for(int32_t i=0;i<n;++i){auto p=at<uintptr_t>(data+size_t(i)*8);type(p,0x16df760);
             auto uid=at<uint64_t>(p+0x18);need(uid&&pointers.insert(p).second&&uids.insert(uid).second,"duplicate or zero Building identity");
             const auto actual_context=at<uintptr_t>(p+8);
             need(actual_context==context,"Building context differs address="+std::to_string(p)+" actual="+std::to_string(actual_context)+" required="+std::to_string(context));result.push_back({p,uid});}
@@ -63,7 +63,7 @@ private:
     }
     uint64_t before(uintptr_t array,uintptr_t reader,uintptr_t context,uint64_t thread,bool opened){
         std::lock_guard lock(mutex);if(!armed)return 0;need(failure.empty(),failure);need(!complete,"unexpected Building load after completed receipt");need(opened,"fixture open has no acknowledgement");
-        auto mode=at<uintptr_t>(image+0x13df320);type(mode,0x16e6730);need(context&&at<uintptr_t>(mode+0xd8)==context,"current Mode context differs");
+        auto mode=at<uintptr_t>(image+0x13eb320);type(mode,0x16ecad0);need(context&&at<uintptr_t>(mode+0xd8)==context,"current Mode context differs");
         if(!bound_mode){bound_mode=mode;bound_context=context;}
         Frame f{array,reader,context,at<uintptr_t>(reader+8),0,thread,0};f.file=at<uintptr_t>(f.stream+0x18);chain(f);
         need(at<uint8_t>(reader+0x18)==1&&at<uint8_t>(reader+0x90)==1,"Reader binary record invalid");
@@ -83,19 +83,19 @@ private:
     void fail(const std::string& cause){std::lock_guard lock(mutex);if(failure.empty())failure=cause;}
     Keys current(){
         need(armed&&selected&&failure.empty(),failure.empty()?"receipt is not armed":failure);need(pending.empty()&&stacks.empty(),"native loads remain incomplete");need(arrays.size()==121,"fixture requires121 returned owner arrays actual="+std::to_string(arrays.size()));
-        need(at<uintptr_t>(image+0x13df320)==bound_mode,"completed Mode changed");type(bound_mode,0x16e6730);
+        need(at<uintptr_t>(image+0x13eb320)==bound_mode,"completed Mode changed");type(bound_mode,0x16ecad0);
         const auto completed_context=at<uintptr_t>(bound_mode+0xd8);
         need(completed_context==0,"completed load context was not retired actual="+std::to_string(completed_context)+" required=0");
-        const auto state=at<uintptr_t>(bound_mode+0x58);type(state,0x16de920);need(at<uintptr_t>(image+0x13df2a0)==state,"current GameState differs");
-        const auto world=at<uintptr_t>(state+0x160);type(world,0x174aef0);need(at<uintptr_t>(image+0x13df9c0)==world,"current World differs");
-        const auto map=at<uintptr_t>(world+0x158);type(map,0x1742860);need(at<uintptr_t>(image+0x13df8c0)==map,"current Map differs");if(bound_map)need(bound_map==map,"bound Map changed");
-        const auto shard=map+0x1c0;type(shard,0x174ad20);need(at<int32_t>(shard+0x48)==0,"root shard kind differs");
-        const auto regions=map+0x230;type(regions,0x16f04e0);const auto data=at<uintptr_t>(regions+8);
+        const auto state=at<uintptr_t>(bound_mode+0x58);type(state,0x16e4cc0);need(at<uintptr_t>(image+0x13eb2a0)==state,"current GameState differs");
+        const auto world=at<uintptr_t>(state+0x160);type(world,0x1751290);need(at<uintptr_t>(image+0x13eb9c0)==world,"current World differs");
+        const auto map=at<uintptr_t>(world+0x158);type(map,0x1748c00);need(at<uintptr_t>(image+0x13eb8c0)==map,"current Map differs");if(bound_map)need(bound_map==map,"bound Map changed");
+        const auto shard=map+0x1c0;type(shard,0x17510c0);need(at<int32_t>(shard+0x48)==0,"root shard kind differs");
+        const auto regions=map+0x230;type(regions,0x16f6880);const auto data=at<uintptr_t>(regions+8);
         need(at<int32_t>(regions+0x10)==121&&at<int32_t>(regions+0x14)>=121,"saved Region count differs");
         std::set<int32_t> ids;std::set<uintptr_t> region_pointers,seen_arrays,seen_buildings;std::set<uint64_t> seen_uids;Keys keys;
-        for(size_t i=0;i<121;++i){const auto region=at<uintptr_t>(data+i*8);type(region,0x1787930);const auto id=at<int32_t>(region+0x834);
+        for(size_t i=0;i<121;++i){const auto region=at<uintptr_t>(data+i*8);type(region,0x178dcd0);const auto id=at<int32_t>(region+0x834);
             need(id>=0&&id<=120&&ids.insert(id).second&&region_pointers.insert(region).second,"fixture Region id or uniqueness differs");need(at<uintptr_t>(region+0x70)==shard,"Region root shard differs");
-            const auto manager=at<uintptr_t>(region+0x950);type(manager,0x17183c0);need(at<uintptr_t>(manager+0x450)==shard&&at<uintptr_t>(manager+0x458)==region,"Region manager reciprocal owner differs");
+            const auto manager=at<uintptr_t>(region+0x950);type(manager,0x171e760);need(at<uintptr_t>(manager+0x450)==shard&&at<uintptr_t>(manager+0x458)==region,"Region manager reciprocal owner differs");
             const auto array=manager+0x408;need(seen_arrays.insert(array).second&&arrays.contains(array),"Region manager lacks unique load receipt");// Resolve clears Object+8 after the original final-resolution callback.
             auto live=rows(array,0);
             need(live.size()==size_t(id==selected->region?3:0),"saved fixture owner count differs region="+std::to_string(id));need(live==arrays.at(array),"returned load order/pointer/UID changed");

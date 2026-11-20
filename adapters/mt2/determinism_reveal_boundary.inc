@@ -2,7 +2,7 @@
 // exact fixed-step timer equals five seconds. Native variable dt rarely lands
 // on that value, but 1/64 does; its strict comparison otherwise skips the event.
 namespace reveal {
-constexpr uintptr_t Branch=0x32f91f;
+constexpr uintptr_t Branch=0x3339af;
 bool changed=false,uncertain=false;
 void branch_is(uint8_t opcode){
     require(read<uint8_t>(image+Branch)==opcode&&read<uint8_t>(image+Branch+1)==0x4d,"Reveal completion branch differs");
@@ -21,7 +21,7 @@ void change(uint8_t before,uint8_t after){
     branch_is(after);uncertain=false;
 }
 void held_owner(){
-    require(thread==GetCurrentThreadId()&&held_tasks&&read<uintptr_t>(image+0x13df340)==held_tasks&&
+    require(thread==GetCurrentThreadId()&&held_tasks&&read<uintptr_t>(image+0x13eb340)==held_tasks&&
         read<uintptr_t>(owner+0x68)==held_tasks&&read<uint8_t>(held_tasks+0xf8)==1&&
         read<int32_t>(held_tasks+0xa8)==0&&read<int32_t>(held_tasks+0x90)==0,"Reveal branch requires the held game-thread Task owner");
 }

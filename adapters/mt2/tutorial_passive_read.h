@@ -73,28 +73,28 @@ public:
 };
 struct Type {uintptr_t vtable;const char* name;};
 constexpr Type step_types[]={
-    {0x16fd930,"mmoStepCommand"},{0x17206c0,"mmoStepCompleteTech"},{0x1702e50,"mmoStepCutscene"},
-    {0x16dbe60,"mmoStepFade"},{0x1725e70,"mmoStepHighlightItem"},{0x171c5a0,"mmoStepHighlightUI"},
-    {0x17091e0,"mmoStepLockItems"},{0x16fda00,"mmoStepMessage"},{0x16dbf30,"mmoStepSave"},
-    {0x16e09f0,"mmoStepSound"},{0x16dc000,"mmoStepWait"}};
+    {0x1703cd0,"mmoStepCommand"},{0x1726a60,"mmoStepCompleteTech"},{0x17091f0,"mmoStepCutscene"},
+    {0x16e2200,"mmoStepFade"},{0x172c210,"mmoStepHighlightItem"},{0x1722940,"mmoStepHighlightUI"},
+    {0x170f580,"mmoStepLockItems"},{0x1703da0,"mmoStepMessage"},{0x16e22d0,"mmoStepSave"},
+    {0x16e6d90,"mmoStepSound"},{0x16e23a0,"mmoStepWait"}};
 inline bool guard(Reader& reader,uintptr_t image,std::string& error){
     constexpr unsigned char instance_entry[]={0x41,0x55,0x41,0x54,0x55,0x57,0x56,0x53,0x48,0x83,0xec,0x38,0x48,0x83,0x79,0x58};
     constexpr unsigned char sequence_entry[]={0x41,0x57,0x41,0x56,0x41,0x55,0x41,0x54,0x55,0x57,0x56,0x53,0x48,0x81,0xec,0xa8};
     std::array<unsigned char,16> actual{};
-    if(!reader.bytes(image+0x4f5dc0,actual.data(),actual.size(),error))return false;
+    if(!reader.bytes(image+0x4fbd60,actual.data(),actual.size(),error))return false;
     if(std::memcmp(actual.data(),instance_entry,actual.size()))return fail(error,"tutorial ScenarioSequenceInstance Update code guard differs");
-    if(!reader.bytes(image+0x4fc4a0,actual.data(),actual.size(),error))return false;
-    if(std::memcmp(actual.data(),sequence_entry,actual.size())&&!reader.owned_sequence_entry(image+0x4fc4a0,error))return false;
+    if(!reader.bytes(image+0x502450,actual.data(),actual.size(),error))return false;
+    if(std::memcmp(actual.data(),sequence_entry,actual.size())&&!reader.owned_sequence_entry(image+0x502450,error))return false;
     return true;
 }
 inline bool tutorial(const std::string& id){return id=="initial_tutorial"||id=="leveltwo_tutorial";}
 inline bool instance(Reader& reader,uintptr_t image,uintptr_t owner,const std::string& id,nlohmann::json& row,std::string& error){
-    if(!reader.vtable(owner,image+0x173ce70,error))return false;
+    if(!reader.vtable(owner,image+0x1743210,error))return false;
     uint8_t complete=0;if(!reader.at(owner,0x38,complete,error))return false;
     if(complete>1)return fail(error,"tutorial scenario complete byte invalid");
     uintptr_t history=0,sequence=0;int32_t history_count=0,history_capacity=0;
     if(!reader.array(owner,0x48,max_history,history,history_count,history_capacity,error)||!reader.at(owner,0x58,sequence,error)||
-       !reader.vtable(sequence,image+0x16dbd80,error)||!reader.vtable(sequence+0x18,image+0x16ef9a0,error))return false;
+       !reader.vtable(sequence,image+0x16e2120,error)||!reader.vtable(sequence+0x18,image+0x16f5d40,error))return false;
     if(history_count){std::vector<unsigned char> header(size_t(history_count)*32);if(!reader.bytes(history,header.data(),header.size(),error))return false;}
     uintptr_t steps=0,current=0;int32_t count=0,capacity=0,next=0;uint8_t sequence_complete=0;
     if(!reader.array(sequence,0x20,max_steps,steps,count,capacity,error)||!reader.at(sequence,0x48,current,error)||
@@ -124,11 +124,11 @@ inline bool observe(Memory& port,uintptr_t image,uintptr_t current_state,nlohman
         if(!image||image>std::numeric_limits<uintptr_t>::max()-0x1800000)return fail(error,"tutorial native image unavailable");
         Reader reader(port);if(!guard(reader,image,error))return false;
         uintptr_t state=0,log=0,owned=0;
-        if(!reader.at(image,0x13df2a0,state,error))return false;
+        if(!reader.at(image,0x13eb2a0,state,error))return false;
         if(state!=current_state)return fail(error,"tutorial GameState singleton differs from current world origin");
-        if(!reader.at(image,0x13df330,log,error)||!reader.at(state,0x1e8,owned,error))return false;
+        if(!reader.at(image,0x13eb330,log,error)||!reader.at(state,0x1e8,owned,error))return false;
         if(!log||owned!=log)return fail(error,"tutorial ScenarioLog owner differs from current GameState");
-        if(!reader.vtable(log,image+0x16fd7b0,error)||!reader.vtable(log+0x18,image+0x16ed6c0,error))return false;
+        if(!reader.vtable(log,image+0x1703b50,error)||!reader.vtable(log+0x18,image+0x16f3a60,error))return false;
         uintptr_t active=0,completed=0;int32_t count=0,capacity=0,completed_count=0,completed_capacity=0;
         if(!reader.array(log,0x20,max_scenarios,active,count,capacity,error)||
            !reader.array(log,0x50,max_scenarios,completed,completed_count,completed_capacity,error))return false;
@@ -137,7 +137,7 @@ inline bool observe(Memory& port,uintptr_t image,uintptr_t current_state,nlohman
             if(!reader.at(active,size_t(i)*8,owner,error))return false;
             if(!owner||!owners.insert(owner).second)return fail(error,"tutorial active scenario owner absent or duplicated");
             uintptr_t scenario_type=0;if(!reader.at(owner,0,scenario_type,error))return false;
-            if(scenario_type!=image+0x173ce70&&scenario_type!=image+0x1730e90&&scenario_type!=image+0x17384e0&&scenario_type!=image+0x1720450)
+            if(scenario_type!=image+0x1743210&&scenario_type!=image+0x1737230&&scenario_type!=image+0x173e880&&scenario_type!=image+0x17267f0)
                 return fail(error,"tutorial active scenario native type unsupported");
             if(!reader.string(owner,0x18,id,error))return false;
             if(id.empty()||!seen.insert(id).second)return fail(error,"tutorial active scenario ID absent or duplicated");

@@ -29,7 +29,7 @@ int main(){try{
     Plugin* extra=nullptr;auto lookup=[&](const MT2FW_Host* host){return host==&a.host?&a:host==&b.host?&b:extra&&host==&extra->host?extra:nullptr;};
     constexpr uintptr_t image=0x100000;NativeRoutes routes(lookup);NativeRoutes::Backend hooks;
     std::map<uintptr_t,NativeRoutes::Bytes> code,original;
-    for(auto rva:{uintptr_t(64),uintptr_t(0x1264b60)}){NativeRoutes::Bytes bytes{};bytes.fill(0x90);code[image+rva]=bytes;original[image+rva]=bytes;}
+    for(auto rva:{uintptr_t(64),uintptr_t(0x1270520)}){NativeRoutes::Bytes bytes{};bytes.fill(0x90);code[image+rva]=bytes;original[image+rva]=bytes;}
     int created=0,enabled=0,disabled=0,removed=0;
     hooks.pristine=[&](uint64_t rva,uint32_t offset,void* output,size_t count,std::string& cause){auto found=original.find(image+rva);if(found==original.end()||offset+count>32){cause="unknown pristine route";return false;}std::memcpy(output,found->second.data()+offset,count);return true;};
     hooks.read=[&](uintptr_t address,void* output,size_t count,std::string& cause){auto found=code.find(address);if(found==code.end()||count>32){cause="unknown live route";return false;}std::memcpy(output,found->second.data(),count);return true;};
@@ -38,8 +38,8 @@ int main(){try{
     hooks.prove=[&](void* address,void*,std::string& cause){if(code.at(reinterpret_cast<uintptr_t>(address))[0]==0xe9)return true;cause="wrong owned route";return false;};
     hooks.disable=[&](void* address,std::string&){++disabled;code.at(reinterpret_cast<uintptr_t>(address))=original.at(reinterpret_cast<uintptr_t>(address));return true;};
     hooks.remove=[&](void* address,std::string&){++removed;code.at(reinterpret_cast<uintptr_t>(address))=original.at(reinterpret_cast<uintptr_t>(address));return true;};
-    routes.configure(image,hooks);routes.catalog("ordinary",64);routes.catalog("sized",0x1264b60);
-    NativeOwnership::Snapshot live;live.slot=image+0x1c52a00;live.malloc_slot=image+0x1c52a70;live.current=0x700000;live.malloc_current=0x710000;live.protection=2;
+    routes.configure(image,hooks);routes.catalog("ordinary",64);routes.catalog("sized",0x1270520);
+    NativeOwnership::Snapshot live;live.slot=image+0x1c59a00;live.malloc_slot=image+0x1c59a70;live.current=0x700000;live.malloc_current=0x710000;live.protection=2;
     live.free_export.resolved=live.current;live.malloc_export.resolved=live.malloc_current;
     live.imported_crt.base=0x300000;live.free_provider.base=0x400000;live.malloc_provider.base=0x500000;
     live.free_export.owner=live.free_provider.base;live.malloc_export.owner=live.malloc_provider.base;

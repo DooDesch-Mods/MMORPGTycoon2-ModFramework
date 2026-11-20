@@ -46,7 +46,7 @@ int main(){try{
     for(auto plugin:{&a,&b,&other}){plugin->active=true;plugin->staging=false;plugin->manifest.type="native";}
     a.manifest.id=b.manifest.id="doodesch.multiplayer";other.manifest.id="test.other";
     auto lookup=[&](const MT2FW_Host* host){return host==&a.host?&a:host==&b.host?&b:host==&other.host?&other:nullptr;};
-    constexpr uintptr_t image=0x100000,caller=image+0x4faf6a;
+    constexpr uintptr_t image=0x100000,caller=image+0x500f1a;
     NativeRoutes routes(lookup);NativeOwnership service(image,routes,lookup,{},caller);service.set_game_thread(99);
     MT2FW_MT2_ReleaseV1 api{},second{},unavailable{};
     check(service.query_release(&a.host,1,&api,sizeof(api))==MT2FW_MT2_OK,"exact multiplayer host obtains separate extension");

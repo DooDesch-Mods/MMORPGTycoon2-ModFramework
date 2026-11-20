@@ -20,8 +20,8 @@ void record(uintptr_t tasks){
         !ordered_run::open&&!ordered_run::masked&&!ordered_run::running&&!ordered_run::transfer_uncertain,
         "Completed callbacks lack a returned known native drain generation="+std::to_string(lifecycle.generation)+
         " world_epoch="+std::to_string(bootstrap.world_epoch)+" pending="+std::to_string(pending));
-    require(tasks&&tasks==read<uintptr_t>(owner+0x68)&&tasks==read<uintptr_t>(image+0x13df340)&&
-        read<uintptr_t>(tasks)==image+0x16fdaf0,"Completed callback Task owner differs");
+    require(tasks&&tasks==read<uintptr_t>(owner+0x68)&&tasks==read<uintptr_t>(image+0x13eb340)&&
+        read<uintptr_t>(tasks)==image+0x1703e90,"Completed callback Task owner differs");
     Receipt next;
     next.game=owner;next.mode=read<uintptr_t>(owner+0x28);next.tasks=tasks;
     next.generation=lifecycle.generation;next.world_epoch=bootstrap.world_epoch;next.thread=thread;

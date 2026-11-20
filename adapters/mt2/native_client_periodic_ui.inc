@@ -4,19 +4,19 @@ uint32_t notify_exception=0;
 struct WindowState {uint8_t visible=0,blocked=0,locked=0;int32_t mode=0;} delegated_window,before_window,after_window;
 WindowState inspect_window(uintptr_t window){
     require(window&&read<uintptr_t>(bootstrap.mode+0x90)==window,"Client periodic UI Window no longer belongs to its Mode");
-    require(read<uintptr_t>(window)==image+0x1712570&&read<uintptr_t>(image+0x1712570+0x1d0)==image+0x81ec20,
+    require(read<uintptr_t>(window)==image+0x1718910&&read<uintptr_t>(image+0x1718910+0x1d0)==image+0x827210,
         "Client periodic UI native address point or Show slot differs");
     WindowState value{read<uint8_t>(window+0x45f),read<uint8_t>(window+0x359),read<uint8_t>(window+0x4ec),read<int32_t>(window+0x4e8)};
     require(value.visible<=1&&value.blocked<=1&&value.locked<=1,"Client periodic UI native flags are not Boolean");
     return value;
 }
 uint32_t notify_native(uintptr_t window){
-    __try{reinterpret_cast<void(*)(void*)>(image+0x65f540)(reinterpret_cast<void*>(window));return 0;}
+    __try{reinterpret_cast<void(*)(void*)>(image+0x6665b0)(reinterpret_cast<void*>(window));return 0;}
     __except(EXCEPTION_EXECUTE_HANDLER){return GetExceptionCode();}
 }
 void retain(void* receiver,uintptr_t caller){
     const auto receipt=native_steps->snapshot();
-    require(caller==image+0x65f685,"Client periodic UI delegation is outside original AutosaveWindow SetMode");
+    require(caller==image+0x6666f5,"Client periodic UI delegation is outside original AutosaveWindow SetMode");
     require(receipt.actual_role==MT2FW_MT2_SESSION_CLIENT&&receipt.thread==GetCurrentThreadId()&&
         receipt.phase==MT2FW_MT2_STEP_ENTERED&&control.entered&&timer_step::frame.active&&
         bootstrap.game==owner&&receipt.world_epoch==bootstrap.world_epoch&&receipt.generation==lifecycle.generation,
@@ -83,8 +83,8 @@ void arm(const MT2FW_MT2_SnapshotRequest& request){
 }
 void seal(const MT2FW_MT2_SnapshotRequest& request){state.seal(request);}
 void install(){
-    presentation_rng::verify(0x65f540,80,"3658e333ae91ff25337c4a4e790042f64a4ab6a03857cbad890e135d92be9291");
-    presentation_rng::verify(0x65f590,304,"c3f350e4a5b7521616bb6d973d01dae240538519d7401ff7449de4c4cfcbf44c");
+    presentation_rng::verify(0x6665b0,80,"d3fba1a9c6458c8026246215a39c63def90038d007062b8972d343b10db0813f");
+    presentation_rng::verify(0x666600,304,"6ef581716ba4035dfcba328afabe8c29d13fa6597f30539a2762ae0bd9ef915a");
 }
 void reset(){state={};notify_exception=0;delegated_window=before_window=after_window={};}
 }
