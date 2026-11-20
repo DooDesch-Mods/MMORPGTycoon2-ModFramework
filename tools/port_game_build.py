@@ -1,7 +1,7 @@
 """Port the build-specific literals of the MT2 adapter from one MT2.exe build to another.
 
 Usage:
-    python tools/port_game_build.py OLD_EXE NEW_EXE [--apply] [--report PATH] [--repo DIR] [--accept FILE]
+    python tools/port_game_build.py OLD_EXE NEW_EXE [--apply] [--report PATH] [--repo DIR] [--accept FILE] [--audit]
 
 Maintainer tool, needs `pip install pefile capstone`. Both executables stay local; nothing from them is
 written except addresses, lengths, guard bytes and SHA256 digests that the sources already carry.
@@ -21,6 +21,9 @@ What it does:
 
 - With --accept, functions a reviewer listed in `tools/ports/` move whole: their pins get the new start,
   size and digest although their code changed.
+- --audit checks the function map instead of rewriting: every function start the adapter and tests name,
+  and every accept entry, must map to a new function that reads the mapped .data/.bss globals. Run it on
+  the unported sources, before --apply.
 
 Without --apply it only writes the report.
 """
@@ -77,6 +80,23 @@ class Image:
             b, e = self.funcs[k]
             self._insns[k] = [(a, s, m, o) for a, s, m, o in MD.disasm_lite(bytes(self.img[b:e]), b)]
         return self._insns[k]
+
+
+def rip_target(insn):
+    """Absolute target of the instruction's RIP-relative operand, or None."""
+    a, s, m, o = insn
+    r = RIP.search(o)
+    return a + s + int(r.group(2), 0) * (1 if r.group(1) == '+' else -1) if r else None
+
+
+def calls(img, k):
+    """Direct call targets of function k, in order."""
+    return [int(op, 16) for _, _, m, op in img.insns(k) if m == 'call' and op.startswith('0x')]
+
+
+def data_reads(img, k):
+    """Globals in .data/.bss that function k addresses RIP-relative."""
+    return {t for t in map(rip_target, img.insns(k)) if t is not None and img.section(t) in ('.data', '.bss')}
 
 
 def norm(insn):
@@ -168,10 +188,8 @@ class Port:
 
         RIP-relative function pointers are not counted: they often point at other twins and reinforce a wrong pick.
         """
-        def targets(img, k):
-            return [int(op, 16) for _, _, m, op in img.insns(k) if m == 'call' and op.startswith('0x')]
         hits = 0
-        for t, u in zip(targets(self.o, i), targets(self.n, j)):
+        for t, u in zip(calls(self.o, i), calls(self.n, j)):
             k = self.o.owner(t)
             if k is not None and t == self.o.funcs[k][0] and k in fmap and self.n.funcs[fmap[k]][0] == u:
                 hits += 1
@@ -214,11 +232,8 @@ class Port:
                 and x[3][:3] == other[3][:3]):
             return False
         for z in ins[max(0, i - 3):i + 4]:
-            m = RIP.search(z[3]) if z[2] == 'lea' else None
-            if not m:
-                continue
-            t = z[0] + z[1] + int(m.group(2), 0) * (1 if m.group(1) == '+' else -1)
-            if self.o.section(t) == '.rdata' and SOURCE_PATH.match(bytes(self.o.img[t:t + 160]).split(b'\0')[0]):
+            t = rip_target(z) if z[2] == 'lea' else None
+            if t is not None and self.o.section(t) == '.rdata' and SOURCE_PATH.match(bytes(self.o.img[t:t + 160]).split(b'\0')[0]):
                 return True
         return False
 
@@ -323,15 +338,11 @@ class Port:
             j, amap, _ = p
             new_by_addr = {x[0]: x for x in self.n.insns(j)}
             for ins in self.o.insns(k):
-                m = RIP.search(ins[3])
-                if not m or ins[0] not in amap:
+                t1 = rip_target(ins) if ins[0] in amap else None
+                other = new_by_addr.get(amap[ins[0]]) if t1 is not None else None
+                t2 = rip_target(other) if other else None
+                if t2 is None:
                     continue
-                other = new_by_addr.get(amap[ins[0]])
-                m2 = RIP.search(other[3]) if other else None
-                if not m2:
-                    continue
-                t1 = ins[0] + ins[1] + int(m.group(2), 0) * (1 if m.group(1) == '+' else -1)
-                t2 = other[0] + other[1] + int(m2.group(2), 0) * (1 if m2.group(1) == '+' else -1)
                 if self.o.section(t1) != '.text':
                     pairs[t1][t2] += 1
             # Release disassembly of functions that are done; keeps memory flat.
@@ -624,6 +635,54 @@ def apply(text, edits):
     return ''.join(out)
 
 
+def audit(port, repo):
+    """Report function starts whose new partner does not read the mapped globals, with nearby candidates.
+
+    Byte similarity can pick the wrong template twin: instances share a body and differ only in the global
+    or callee they use. A candidate has the old size, lies within 0x40000 of the mapped start, reads every
+    mapped global and makes the same direct calls in the same order. Returns the number of mismatches.
+    """
+    o, n = port.o, port.n
+    starts = defaultdict(set)  # old function start -> source lines or the accept list
+    for path in sorted(x for d in ('adapters', 'tests') for x in (repo / d).rglob('*') if x.suffix in CODE_SUFFIXES):
+        rel = path.relative_to(repo).as_posix()
+        for i, line in enumerate(path.read_text(encoding='utf-8', errors='replace').splitlines(), 1):
+            for m in HEX.finditer(line):
+                v = int(m.group(1), 16)
+                if v in o.begin_set and o.section(v) == '.text':
+                    starts[v].add(f'{rel}:{i}')
+    for k in port.accepted:
+        starts[o.begins[k]].add('accept list')
+    if port.data_pairs is None:
+        port.build_data_pairs()
+
+    def fmt(xs):
+        return ' '.join(hex(x) if x is not None else 'unmapped' for x in sorted(xs, key=lambda x: x or 0))
+
+    checked = bad = 0
+    for v in sorted(starts):
+        k = o.owner(v)
+        nv, st = port.map_code(v)
+        old = data_reads(o, k)
+        if nv is None or not old:
+            continue
+        checked += 1
+        want = {port.map_data(g)[0] for g in old}
+        got = data_reads(n, n.owner(nv))
+        if want <= got:
+            continue
+        bad += 1
+        size = o.funcs[k][1] - o.funcs[k][0]
+        want_calls = [port.map_code(t)[0] for t in calls(o, k)]
+        lo, hi = bisect.bisect_left(n.begins, nv - 0x40000), bisect.bisect_right(n.begins, nv + 0x40000)
+        cands = [n.begins[j] for j in range(lo, hi) if n.funcs[j][1] - n.funcs[j][0] == size
+                 and want <= data_reads(n, j) and calls(n, j) == want_calls]
+        print(f'mismatch {v:#x} -> {nv:#x} ({st}): expects {fmt(want)}, reads {fmt(got)}; '
+              f'candidates: {fmt(cands) or "none"}; from {", ".join(sorted(starts[v])[:3])}', flush=True)
+    print(f'audit: {len(starts)} function starts, {checked} read globals, {bad} mismatch', flush=True)
+    return bad
+
+
 def main():
     ap = argparse.ArgumentParser(description=__doc__.split('\n')[0])
     ap.add_argument('old_exe')
@@ -632,10 +691,14 @@ def main():
     ap.add_argument('--repo', default=str(ROOT))
     ap.add_argument('--report', default='port-report.tsv')
     ap.add_argument('--accept', help='reviewed functions, one `OLD[=NEW] reason` per line')
+    ap.add_argument('--audit', action='store_true', help='check the function map against the globals each function reads; run on unported sources')
     args = ap.parse_args()
     repo = pathlib.Path(args.repo)
     port = Port(args.old_exe, args.new_exe, args.accept)
     print(f'old {port.o.sha}\nnew {port.n.sha}\nfunctions mapped {len(port.fmap)} of {len(port.o.funcs)}', flush=True)
+    if args.audit:
+        audit(port, repo)
+        return
     rw = Rewriter(port, repo)
     changed = {}
     adapters = sorted(p for p in (repo / 'adapters').rglob('*') if p.suffix in CODE_SUFFIXES + ('.json',))

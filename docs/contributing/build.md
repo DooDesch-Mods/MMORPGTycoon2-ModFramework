@@ -15,6 +15,28 @@ python tools/build.py --smoke
 
 Builds and detailed logs stay under ignored `build/` and `artifacts/`. `--core-only` omits the Windows adapter. `--skip-tests` skips CTest.
 
+`--live` deploys into an owned copy of the game folder, starts `MT2.exe` from it, creates a new world named `MPTestLive<timestamp>` and runs `network.catalogue`, `network.snapshot`, `objects.list`, one native remove and a screenshot capture through `<profile>/diagnostics/request.json`, then exits the game. Every step must pass, and each prints one `info: live ...` line. It refuses a folder under `steamapps`: copy the game folder elsewhere first, so worlds and removals land in the copy's own `mt2fw.json` profile.
+
+```powershell
+python tools/build.py --live --game <owned game copy>
+```
+
+## Port to a new game build
+
+A Steam update changes `MT2.exe`, and the adapter's addresses, pins and guards then refer to the old build. `tools/port_game_build.py` moves them. It needs `pip install pefile capstone` and both executables; keep a copy of the old build before Steam replaces it.
+
+```powershell
+python tools/port_game_build.py <old MT2.exe> <new MT2.exe>
+python tools/port_game_build.py <old MT2.exe> <new MT2.exe> --accept tools/ports/<old>-to-<new>.accept.txt --audit
+python tools/port_game_build.py <old MT2.exe> <new MT2.exe> --accept tools/ports/<old>-to-<new>.accept.txt --apply
+python tools/build.py --check
+python tools/build.py --live --game <owned copy of the new build>
+```
+
+1. The first run writes `port-report.tsv`: every pin, guard and address it could not prove. Read the instruction diff of each changed function. If the change does not touch what the adapter relies on, list it in `tools/ports/<old>-to-<new>.accept.txt` as `OLD[=NEW] reason`; `=NEW` pairs a function the map did not match.
+2. `--audit` checks the function map without rewriting. For every function start the adapter or tests name, and every accept entry, the new function must read the mapped `.data`/`.bss` globals of the old one. Byte similarity alone can pick the wrong template twin. Each mismatch prints the expected and the actual globals and the candidates: functions of the same size within 0x40000 that read the expected globals and make the same direct calls. Pair a candidate in the accept list and run `--audit` again. Run it before `--apply`, while the sources still hold the old addresses.
+3. `--apply` rewrites the sources. Then build, check and run `--live` on an owned copy of the new build.
+
 ## Build documentation
 
 ```powershell
