@@ -5,7 +5,7 @@
 
 namespace mt2fw::mt2 {
 namespace {
-constexpr const char* game_sha="bbab2dc68babcc644d0a1679548bf1e334b6c52aea669c3f61f6cb9d45c1aaf6";
+constexpr const char* game_sha="7efd8ee7b97f78362e7a2f8116b327fa6b756bdce23114b68143c4c9d2dd50eb";
 template<size_t N>void text(char(&output)[N],const std::string& value){auto length=std::min(value.size(),N-1);std::memcpy(output,value.data(),length);output[length]=0;}
 bool output_ok(MT2FW_MT2_FreeReceipt* output){return output&&output->size>=sizeof(*output);}
 }
@@ -146,7 +146,7 @@ MT2FW_MT2_Result MT2FW_CALL NativeOwnership::free_prepare(void* context,MT2FW_MT
     if(service.free_owner_){service.receipt(*output);return MT2FW_MT2_BUSY;}
     Snapshot actual{};std::string cause;auto address=reinterpret_cast<uintptr_t>(replacement);
     if(!service.backend_.prepare(actual,cause)||!service.backend_.replacement(address,cause))return service.failed(*value,"Free import preparation failed: "+cause,output);
-    if(actual.slot!=service.image_+0x1c52a00||actual.malloc_slot!=service.image_+0x1c52a70||!actual.free_export.resolved||!actual.malloc_export.resolved||actual.current!=actual.free_export.resolved||actual.malloc_current!=actual.malloc_export.resolved||!actual.imported_crt.pinned||!actual.free_provider.pinned||!actual.malloc_provider.pinned||actual.free_export.owner!=actual.free_provider.base||actual.malloc_export.owner!=actual.malloc_provider.base||!actual.protection||address==actual.free_export.resolved){service.proof_=actual;service.live_confirmed_=true;return service.failed(*value,"Named free/malloc slots, pinned CRT providers or original exports differ",output);}
+    if(actual.slot!=service.image_+0x1c59a00||actual.malloc_slot!=service.image_+0x1c59a70||!actual.free_export.resolved||!actual.malloc_export.resolved||actual.current!=actual.free_export.resolved||actual.malloc_current!=actual.malloc_export.resolved||!actual.imported_crt.pinned||!actual.free_provider.pinned||!actual.malloc_provider.pinned||actual.free_export.owner!=actual.free_provider.base||actual.malloc_export.owner!=actual.malloc_provider.base||!actual.protection||address==actual.free_export.resolved){service.proof_=actual;service.live_confirmed_=true;return service.failed(*value,"Named free/malloc slots, pinned CRT providers or original exports differ",output);}
     service.proof_=actual;service.initial_protection_=actual.protection;service.replacement_=address;service.free_owner_=value;service.state_=MT2FW_MT2_ROUTE_PREPARED;++service.generation_;service.last_={};service.live_confirmed_=true;service.retained_=false;service.cause_.clear();service.receipt(*output);return MT2FW_MT2_OK;
 }
 MT2FW_MT2_Result MT2FW_CALL NativeOwnership::free_enable(void* context,MT2FW_MT2_FreeReceipt* output){

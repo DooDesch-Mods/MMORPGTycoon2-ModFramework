@@ -40,8 +40,8 @@ ClickNativeReadback read_click_native(uintptr_t image,Read&& read,bool input_onl
     if(!image||image>UINTPTR_MAX-0x1d00000){out.cause="Click native image range invalid";return out;}
     uintptr_t input=0,ap=0,axes=0,cursor=0,screen=0;
     int32_t count=0;
-    if(!field(image,0x13df990,input,"input singleton")||!field(input,0,ap,"input class"))return out;
-    if(ap!=image+0x1749430){out.cause="Click native input class differs";return out;}
+    if(!field(image,0x13eb990,input,"input singleton")||!field(input,0,ap,"input class"))return out;
+    if(ap!=image+0x174f7d0){out.cause="Click native input class differs";return out;}
     if(!field(input,0x7c,out.input_xy,"input normalized XY")||!finite(out.input_xy,"input normalized XY")||
        !field(input,0x50,axes,"input axes")||!field(input,0x58,count,"input axis count"))return out;
     if(count<=27||count>512){out.cause="Click native input axis count outside required 28..512";return out;}
@@ -50,10 +50,10 @@ ClickNativeReadback read_click_native(uintptr_t image,Read&& read,bool input_onl
     if(out.mouse_on_screen>1){out.cause="Click native mouse-on-screen byte is not Boolean";return out;}
     out.input_read=true;
     if(input_only)return out;
-    if(!field(image,0x1c4e3a0,screen,"screen singleton")||!field(screen,0x54,out.screen_size,"screen dimensions"))return out;
+    if(!field(image,0x1c553a0,screen,"screen singleton")||!field(screen,0x54,out.screen_size,"screen dimensions"))return out;
     out.screen_read=true;
-    if(!field(image,0x13df9d0,cursor,"cursor singleton")||!field(cursor,0,ap,"cursor class"))return out;
-    if(ap!=image+0x1786dd0){out.cause="Click native cursor class differs";return out;}
+    if(!field(image,0x13eb9d0,cursor,"cursor singleton")||!field(cursor,0,ap,"cursor class"))return out;
+    if(ap!=image+0x178d170){out.cause="Click native cursor class differs";return out;}
     uintptr_t trap=0,pressed_window=0,focus_window=0,capture=0;
     if(!field(cursor,0x1f0,out.cursor_ui,"cursor UI XY")||
        !field(cursor,0x1f8,out.cursor_world_screen,"cursor world-screen XY")||

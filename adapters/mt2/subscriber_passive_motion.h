@@ -25,7 +25,7 @@ bool motion(Memory& memory,Read& at,uintptr_t image,uintptr_t subscriber,World&&
 
     pose.reset();uintptr_t toon=0;if(!at(subscriber,0x80,toon,e))return false;
     if(!toon)return true;
-    uintptr_t backlink=0;uint8_t logged=0;if(!ap(toon,image,0x1744e90,e)||!at(toon,0x940,backlink,e)||backlink!=subscriber||!at(toon,0x825,logged,e)||logged>1)return fail(e,e.empty()?"Subscriber motion reciprocal native Toon/login differs":e);
+    uintptr_t backlink=0;uint8_t logged=0;if(!ap(toon,image,0x174b230,e)||!at(toon,0x940,backlink,e)||backlink!=subscriber||!at(toon,0x825,logged,e)||logged>1)return fail(e,e.empty()?"Subscriber motion reciprocal native Toon/login differs":e);
     if(!logged)return true;
     Motion value;MotionOwner owner;owner.toon=toon;uintptr_t shard=0,last=0,render=0,callback=0;
     if(!world(owner,e)||!at(toon,0x170,shard,e)||!at(toon,0x178,owner.region,e)||!at(toon,0x9a8,last,e)||!at(owner.region,0x834,value.region,e))return false;
@@ -48,7 +48,7 @@ bool motion(Memory& memory,Read& at,uintptr_t image,uintptr_t subscriber,World&&
 template<class Memory,class Read>
 bool motion_manager(Memory& memory,Read& at,uintptr_t image,uintptr_t region,uintptr_t& manager,std::vector<uintptr_t>& toons,std::string& e){
     uintptr_t data=0;int32_t count=-1,capacity=-1;uint8_t updating=1;
-    if(!at(region,0x9c0,manager,e)||!type(at,manager,image,0x16fde30,e)||!at(manager,0xc8,updating,e)||!at(manager,0x28,data,e)||!at(manager,0x30,count,e)||!at(manager,0x34,capacity,e))return false;
+    if(!at(region,0x9c0,manager,e)||!type(at,manager,image,0x17041d0,e)||!at(manager,0xc8,updating,e)||!at(manager,0x28,data,e)||!at(manager,0x30,count,e)||!at(manager,0x34,capacity,e))return false;
     if(updating||count<0||capacity<count||count>1000000||(count&&(!data||data>UINTPTR_MAX-size_t(count)*sizeof(uintptr_t))))return fail(e,"Subscriber motion ToonManager is updating or array bounds differ");
     toons.clear();toons.resize(size_t(count));
     if(count&&!memory.copy(data,toons.data(),toons.size()*sizeof(uintptr_t),e)){toons.clear();return false;}
@@ -60,7 +60,7 @@ template<class Read,class MotionReader,class Output>
 bool census(Read& at,uintptr_t image,MotionReader&& sample_motion,Output& out,std::string& e){
     out.rows.clear();out.subscribers.clear();out.subscriber_slots.clear();out.needs_owners.clear();
     int32_t count=-1,capacity=-1;
-    if(!at(image,0x13df690,out.subscriber_manager,e)||!type(at,out.subscriber_manager,image,0x1725f40,e)||
+    if(!at(image,0x13eb690,out.subscriber_manager,e)||!type(at,out.subscriber_manager,image,0x172c2e0,e)||
        !at(out.subscriber_manager,0x40,out.subscriber_data,e)||!at(out.subscriber_manager,0x48,count,e)||
        !at(out.subscriber_manager,0x4c,capacity,e)||count<0||capacity<count||count>1000000||
        (count&&(!out.subscriber_data||out.subscriber_data>UINTPTR_MAX-size_t(count)*8)))
@@ -71,7 +71,7 @@ bool census(Read& at,uintptr_t image,MotionReader&& sample_motion,Output& out,st
     std::vector<Entry> entries;
     for(int32_t i=0;i<count;++i){
         Entry entry{};entry.slot=size_t(i);
-        if(!at(out.subscriber_data,entry.slot*8,entry.owner,e)||!type(at,entry.owner,image,0x16e75f0,e)||
+        if(!at(out.subscriber_data,entry.slot*8,entry.owner,e)||!type(at,entry.owner,image,0x16ed990,e)||
            !at(entry.owner,0x20,entry.row.serialized_id,e))return false;
         if(entry.row.serialized_id<0||entry.row.serialized_id>=out.next_id)return fail(e,"economic motion Subscriber ID outside nextID");
         subscriber_needs::Bits bits;

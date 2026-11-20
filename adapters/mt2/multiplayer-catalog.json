@@ -3,7 +3,7 @@
   "targets": [
     {
       "name": "mp.purchase-subscription-price.54ce0",
-      "rva": 347360,
+      "rva": 348640,
       "shared": false,
       "groups": [
         {
@@ -15,7 +15,7 @@
     },
     {
       "name": "mp.purchase-subscription-price.54cf0",
-      "rva": 347376,
+      "rva": 348656,
       "shared": false,
       "groups": [
         {
@@ -27,7 +27,7 @@
     },
     {
       "name": "mp.economic-authority-fence.54d30",
-      "rva": 347440,
+      "rva": 348720,
       "shared": false,
       "groups": [
         {
@@ -39,7 +39,7 @@
     },
     {
       "name": "mp.economic-authority-fence.54d80",
-      "rva": 347520,
+      "rva": 348800,
       "shared": false,
       "groups": [
         {
@@ -51,7 +51,7 @@
     },
     {
       "name": "mp.economic-authority-fence.555a0",
-      "rva": 349600,
+      "rva": 350880,
       "shared": false,
       "groups": [
         {
@@ -63,7 +63,7 @@
     },
     {
       "name": "mp.economic-authority-fence.55c20",
-      "rva": 351264,
+      "rva": 352544,
       "shared": false,
       "groups": [
         {
@@ -75,7 +75,7 @@
     },
     {
       "name": "mp.management-hire-gm.56940",
-      "rva": 354624,
+      "rva": 355904,
       "shared": false,
       "groups": [
         {
@@ -87,7 +87,7 @@
     },
     {
       "name": "mp.management-fire-gm.56a70",
-      "rva": 354928,
+      "rva": 356208,
       "shared": false,
       "groups": [
         {
@@ -99,7 +99,7 @@
     },
     {
       "name": "mp.businessnextdayfinances.57570",
-      "rva": 357744,
+      "rva": 359024,
       "shared": false,
       "groups": [
         {
@@ -111,7 +111,7 @@
     },
     {
       "name": "mp.economic-authority-fence.575d0",
-      "rva": 357840,
+      "rva": 359120,
       "shared": false,
       "groups": [
         {
@@ -123,7 +123,7 @@
     },
     {
       "name": "mp.economic-authority-fence.57620",
-      "rva": 357920,
+      "rva": 359200,
       "shared": false,
       "groups": [
         {
@@ -135,7 +135,7 @@
     },
     {
       "name": "mp.bug-lifecycle-and-saved-identity.58740",
-      "rva": 362304,
+      "rva": 363584,
       "shared": false,
       "groups": [
         {
@@ -147,7 +147,7 @@
     },
     {
       "name": "mp.bug-lifecycle-and-saved-identity.58da0",
-      "rva": 363936,
+      "rva": 365216,
       "shared": false,
       "groups": [
         {
@@ -159,7 +159,7 @@
     },
     {
       "name": "mp.bug-lifecycle-and-saved-identity.59a00",
-      "rva": 367104,
+      "rva": 368384,
       "shared": false,
       "groups": [
         {
@@ -171,7 +171,7 @@
     },
     {
       "name": "mp.bug-lifecycle-and-saved-identity.59fb0",
-      "rva": 368560,
+      "rva": 369840,
       "shared": false,
       "groups": [
         {
@@ -183,7 +183,7 @@
     },
     {
       "name": "mp.bug-lifecycle-and-saved-identity.5d100",
-      "rva": 381184,
+      "rva": 382640,
       "shared": false,
       "groups": [
         {
@@ -195,7 +195,7 @@
     },
     {
       "name": "mp.boss-phase-reorder.93900",
-      "rva": 604416,
+      "rva": 607728,
       "shared": false,
       "groups": [
         {
@@ -207,7 +207,7 @@
     },
     {
       "name": "mp.dungeon-destroy-instance.a28f0",
-      "rva": 665840,
+      "rva": 669168,
       "shared": false,
       "groups": [
         {
@@ -219,7 +219,7 @@
     },
     {
       "name": "mp.dungeon-kick-party-queue.a2fd0",
-      "rva": 667600,
+      "rva": 670928,
       "shared": false,
       "groups": [
         {
@@ -231,7 +231,7 @@
     },
     {
       "name": "mp.dungeon-make-instance.a7670",
-      "rva": 685680,
+      "rva": 689008,
       "shared": false,
       "groups": [
         {
@@ -243,7 +243,7 @@
     },
     {
       "name": "mp.dungeon-desired-instances.a7a00",
-      "rva": 686592,
+      "rva": 689920,
       "shared": false,
       "groups": [
         {
@@ -255,7 +255,7 @@
     },
     {
       "name": "mp.dungeon-process-party-queue.a91e0",
-      "rva": 692704,
+      "rva": 696032,
       "shared": false,
       "groups": [
         {
@@ -267,7 +267,7 @@
     },
     {
       "name": "mp.dungeon-instance-force-players-out.b66e0",
-      "rva": 747232,
+      "rva": 750560,
       "shared": false,
       "groups": [
         {
@@ -279,7 +279,7 @@
     },
     {
       "name": "mp.dungeon-instance-reset.b6b40",
-      "rva": 748352,
+      "rva": 751680,
       "shared": false,
       "groups": [
         {
@@ -291,7 +291,7 @@
     },
     {
       "name": "mp.dungeon-instance-update.b7670",
-      "rva": 751216,
+      "rva": 754544,
       "shared": false,
       "groups": [
         {
@@ -303,7 +303,7 @@
     },
     {
       "name": "mp.control.player-release-control.d3390",
-      "rva": 865168,
+      "rva": 869312,
       "shared": false,
       "groups": [
         {
@@ -315,7 +315,7 @@
     },
     {
       "name": "mp.control.player-update.d4600",
-      "rva": 869888,
+      "rva": 874032,
       "shared": false,
       "groups": [
         {
@@ -327,7 +327,7 @@
     },
     {
       "name": "mp.control.player-take-control.d4cc0",
-      "rva": 871616,
+      "rva": 875760,
       "shared": false,
       "groups": [
         {
@@ -339,7 +339,7 @@
     },
     {
       "name": "mp.dungeon-input-purchase.147a20",
-      "rva": 1341984,
+      "rva": 1346128,
       "shared": false,
       "groups": [
         {
@@ -351,7 +351,7 @@
     },
     {
       "name": "mp.dungeon-gizmo-create.153920",
-      "rva": 1390880,
+      "rva": 1395216,
       "shared": false,
       "groups": [
         {
@@ -363,7 +363,7 @@
     },
     {
       "name": "mp.control.item-activate.207820",
-      "rva": 2127904,
+      "rva": 2138800,
       "shared": false,
       "groups": [
         {
@@ -375,7 +375,7 @@
     },
     {
       "name": "mp.control.item-deactivate.2078a0",
-      "rva": 2128032,
+      "rva": 2138928,
       "shared": false,
       "groups": [
         {
@@ -387,7 +387,7 @@
     },
     {
       "name": "mp.time-activate-update.20e6d0",
-      "rva": 2156240,
+      "rva": 2167488,
       "shared": false,
       "groups": [
         {
@@ -399,7 +399,7 @@
     },
     {
       "name": "mp.time-activate-update.20e8d0",
-      "rva": 2156752,
+      "rva": 2168080,
       "shared": false,
       "groups": [
         {
@@ -411,7 +411,7 @@
     },
     {
       "name": "mp.interventions.boss-manager-update.239ba0",
-      "rva": 2333600,
+      "rva": 2345488,
       "shared": false,
       "groups": [
         {
@@ -423,7 +423,7 @@
     },
     {
       "name": "mp.management-service-price.244f50",
-      "rva": 2379600,
+      "rva": 2391680,
       "shared": false,
       "groups": [
         {
@@ -435,7 +435,7 @@
     },
     {
       "name": "mp.management-service-sync.245000",
-      "rva": 2379776,
+      "rva": 2391856,
       "shared": false,
       "groups": [
         {
@@ -447,13 +447,13 @@
     },
     {
       "name": "objects.create",
-      "rva": 2420016,
+      "rva": 2432112,
       "shared": true,
       "groups": []
     },
     {
       "name": "mp.clockupdate.259450",
-      "rva": 2462800,
+      "rva": 2475280,
       "shared": false,
       "groups": [
         {
@@ -465,7 +465,7 @@
     },
     {
       "name": "mp.control.clock-time-scale.259d70",
-      "rva": 2465136,
+      "rva": 2477616,
       "shared": false,
       "groups": [
         {
@@ -477,7 +477,7 @@
     },
     {
       "name": "mp.hud-native-time-and-calendar.25a190",
-      "rva": 2466192,
+      "rva": 2478672,
       "shared": false,
       "groups": [
         {
@@ -489,7 +489,7 @@
     },
     {
       "name": "mp.tutorial-research-staff-starting-point-authority.25ec40",
-      "rva": 2485312,
+      "rva": 2497856,
       "shared": false,
       "groups": [
         {
@@ -501,7 +501,7 @@
     },
     {
       "name": "mp.tutorial-research-staff-starting-point-authority.25fb10",
-      "rva": 2489104,
+      "rva": 2501648,
       "shared": false,
       "groups": [
         {
@@ -513,7 +513,7 @@
     },
     {
       "name": "mp.tutorial-research-staff-starting-point-authority.262ec0",
-      "rva": 2502336,
+      "rva": 2514880,
       "shared": false,
       "groups": [
         {
@@ -525,7 +525,7 @@
     },
     {
       "name": "mp.building-and-scenery-capture.2cb340",
-      "rva": 2929472,
+      "rva": 2943568,
       "shared": false,
       "groups": [
         {
@@ -537,7 +537,7 @@
     },
     {
       "name": "mp.remove-ownership-observers.2d3f90",
-      "rva": 2965392,
+      "rva": 2979808,
       "shared": false,
       "groups": [
         {
@@ -549,13 +549,13 @@
     },
     {
       "name": "objects.remove",
-      "rva": 2966208,
+      "rva": 2980624,
       "shared": true,
       "groups": []
     },
     {
       "name": "mp.selection-ungroup-selection.2d5d10",
-      "rva": 2972944,
+      "rva": 2987008,
       "shared": false,
       "groups": [
         {
@@ -567,7 +567,7 @@
     },
     {
       "name": "mp.selection-ungroup-single.2d6650",
-      "rva": 2975312,
+      "rva": 2989376,
       "shared": false,
       "groups": [
         {
@@ -579,7 +579,7 @@
     },
     {
       "name": "mp.selection-group.2d7380",
-      "rva": 2978688,
+      "rva": 2992832,
       "shared": false,
       "groups": [
         {
@@ -591,7 +591,7 @@
     },
     {
       "name": "mp.management-logo-apply.2dcc00",
-      "rva": 3001344,
+      "rva": 3015600,
       "shared": false,
       "groups": [
         {
@@ -603,7 +603,7 @@
     },
     {
       "name": "mp.management-purchase-statistic.2de2d0",
-      "rva": 3007184,
+      "rva": 3021440,
       "shared": false,
       "groups": [
         {
@@ -615,7 +615,7 @@
     },
     {
       "name": "mp.softwarecalculaterating.2de360",
-      "rva": 3007328,
+      "rva": 3021584,
       "shared": false,
       "groups": [
         {
@@ -627,7 +627,7 @@
     },
     {
       "name": "mp.softwarecalculatefun.2de6b0",
-      "rva": 3008176,
+      "rva": 3022448,
       "shared": false,
       "groups": [
         {
@@ -639,7 +639,7 @@
     },
     {
       "name": "mp.softwaretick.2de7f0",
-      "rva": 3008496,
+      "rva": 3022768,
       "shared": false,
       "groups": [
         {
@@ -651,7 +651,7 @@
     },
     {
       "name": "mp.softwaretickertick.2de820",
-      "rva": 3008544,
+      "rva": 3022816,
       "shared": false,
       "groups": [
         {
@@ -663,7 +663,7 @@
     },
     {
       "name": "mp.economic-authority-fence.2eb3d0",
-      "rva": 3060688,
+      "rva": 3075024,
       "shared": false,
       "groups": [
         {
@@ -675,7 +675,7 @@
     },
     {
       "name": "mp.subscribernewday.2eb530",
-      "rva": 3061040,
+      "rva": 3075376,
       "shared": false,
       "groups": [
         {
@@ -687,7 +687,7 @@
     },
     {
       "name": "mp.subscriber-retirement.2ef4c0",
-      "rva": 3077312,
+      "rva": 3091648,
       "shared": false,
       "groups": [
         {
@@ -699,7 +699,7 @@
     },
     {
       "name": "mp.region-setpreset.3575d0",
-      "rva": 3503568,
+      "rva": 3522032,
       "shared": false,
       "groups": [
         {
@@ -711,7 +711,7 @@
     },
     {
       "name": "mp.region-properties.36bad0",
-      "rva": 3586768,
+      "rva": 3605728,
       "shared": false,
       "groups": [
         {
@@ -723,7 +723,7 @@
     },
     {
       "name": "mp.subscriberupdateneeds.38f620",
-      "rva": 3733024,
+      "rva": 3752224,
       "shared": false,
       "groups": [
         {
@@ -735,7 +735,7 @@
     },
     {
       "name": "mp.subscriberbraintick.394a20",
-      "rva": 3754528,
+      "rva": 3773728,
       "shared": false,
       "groups": [
         {
@@ -747,7 +747,7 @@
     },
     {
       "name": "mp.needsetset.395ee0",
-      "rva": 3759840,
+      "rva": 3779040,
       "shared": false,
       "groups": [
         {
@@ -759,7 +759,7 @@
     },
     {
       "name": "mp.needsetincrement.395f00",
-      "rva": 3759872,
+      "rva": 3779072,
       "shared": false,
       "groups": [
         {
@@ -771,7 +771,7 @@
     },
     {
       "name": "mp.needsetaddassign.3960a0",
-      "rva": 3760288,
+      "rva": 3779488,
       "shared": false,
       "groups": [
         {
@@ -783,7 +783,7 @@
     },
     {
       "name": "mp.needsetsubtractassign.396120",
-      "rva": 3760416,
+      "rva": 3779616,
       "shared": false,
       "groups": [
         {
@@ -795,7 +795,7 @@
     },
     {
       "name": "mp.interventions.boss-entity-update.397a50",
-      "rva": 3766864,
+      "rva": 3786064,
       "shared": false,
       "groups": [
         {
@@ -807,7 +807,7 @@
     },
     {
       "name": "mp.interventions.boss-tick.399660",
-      "rva": 3774048,
+      "rva": 3793248,
       "shared": false,
       "groups": [
         {
@@ -819,7 +819,7 @@
     },
     {
       "name": "mp.control.character-player-controlled.39aa40",
-      "rva": 3779136,
+      "rva": 3798336,
       "shared": false,
       "groups": [
         {
@@ -831,7 +831,7 @@
     },
     {
       "name": "mp.interventions.character-clear-live-pointers.39d560",
-      "rva": 3790176,
+      "rva": 3809376,
       "shared": false,
       "groups": [
         {
@@ -843,7 +843,7 @@
     },
     {
       "name": "mp.interventions.character-die.39e760",
-      "rva": 3794784,
+      "rva": 3813984,
       "shared": false,
       "groups": [
         {
@@ -855,7 +855,7 @@
     },
     {
       "name": "mp.control.character-set-target.39e950",
-      "rva": 3795280,
+      "rva": 3814480,
       "shared": false,
       "groups": [
         {
@@ -867,7 +867,7 @@
     },
     {
       "name": "mp.interventions.character-on-spawn.39f920",
-      "rva": 3799328,
+      "rva": 3818528,
       "shared": false,
       "groups": [
         {
@@ -879,7 +879,7 @@
     },
     {
       "name": "mp.interventions.character-command.39f9f0",
-      "rva": 3799536,
+      "rva": 3818736,
       "shared": false,
       "groups": [
         {
@@ -891,7 +891,7 @@
     },
     {
       "name": "mp.character-adjust-attribute.39fb80",
-      "rva": 3799936,
+      "rva": 3819136,
       "shared": false,
       "groups": [
         {
@@ -903,7 +903,7 @@
     },
     {
       "name": "mp.toon-attribute-cadence-gate.3a0942",
-      "rva": 3803458,
+      "rva": 3822658,
       "shared": false,
       "groups": [
         {
@@ -917,25 +917,25 @@
         "length": 6,
         "bytes": "0f85380b0000",
         "sha256": "1fe27c6c24055f3c49bfecde8d164be1a9e255e06eb789c11dd31479f49cefce",
-        "game_sha256": "bbab2dc68babcc644d0a1679548bf1e334b6c52aea669c3f61f6cb9d45c1aaf6",
-        "fallthrough_rva": 3803464,
-        "branch_rva": 3806336
+        "game_sha256": "7efd8ee7b97f78362e7a2f8116b327fa6b756bdce23114b68143c4c9d2dd50eb",
+        "fallthrough_rva": 3822664,
+        "branch_rva": 3825536
       },
       "window_guard": {
-        "rva": 3803458,
+        "rva": 3822658,
         "length": 30,
         "bytes": "0f85380b0000f30f1083ec070000f30f108bf0070000f30f10b3b0020000",
         "sha256": "daf271c95120774c9f0da8cf3696e87a1ce61f7053aa60371753fe406104e14b"
       },
       "body_guard": {
-        "rva": 3801936,
+        "rva": 3821136,
         "length": 6816,
-        "sha256": "e994c1ef7cf8ff10fe463e8def99af65798238dce88481dbd3dc82838c828b79"
+        "sha256": "2c83236299d0f9f98cda64d612d4ddf02d3aab8b8543e25b6744c2628e56cfc5"
       }
     },
     {
       "name": "mp.toon-visual-equip.3a1df0",
-      "rva": 3808752,
+      "rva": 3827952,
       "shared": false,
       "groups": [
         {
@@ -947,7 +947,7 @@
     },
     {
       "name": "mp.management-gm-entity-update.3ad520",
-      "rva": 3855648,
+      "rva": 3874848,
       "shared": false,
       "groups": [
         {
@@ -959,7 +959,7 @@
     },
     {
       "name": "mp.management-gm-tick.3adae0",
-      "rva": 3857120,
+      "rva": 3876320,
       "shared": false,
       "groups": [
         {
@@ -971,7 +971,7 @@
     },
     {
       "name": "mp.toon-travel-rotation-gate.3b7b37",
-      "rva": 3898167,
+      "rva": 3917383,
       "shared": false,
       "groups": [
         {
@@ -985,17 +985,17 @@
         "length": 6,
         "bytes": "0f8403060000",
         "sha256": "b62858ba74fc0d1c1d5e372ccff7ec03d7da56e1d853ff3f99d25568bed1be21",
-        "game_sha256": "bbab2dc68babcc644d0a1679548bf1e334b6c52aea669c3f61f6cb9d45c1aaf6",
-        "fallthrough_rva": 3898173,
-        "branch_rva": 3899712
+        "game_sha256": "7efd8ee7b97f78362e7a2f8116b327fa6b756bdce23114b68143c4c9d2dd50eb",
+        "fallthrough_rva": 3917389,
+        "branch_rva": 3918928
       },
       "body_guard": {
-        "rva": 3897520,
+        "rva": 3916736,
         "length": 5120,
-        "sha256": "5227570ec1fc062edf107ffbb456d83234e4fba1e5a70e270e2e107fc2d58500"
+        "sha256": "808046cf7663339aa9d0ecb2bc14b82f3cd853427a69b67c8cf75f484ba31ef2"
       },
       "window_guard": {
-        "rva": 3898167,
+        "rva": 3917383,
         "length": 30,
         "bytes": "0f8403060000488b03f30f1164245c4889d9f30f115c2458f30f11542454",
         "sha256": "d41c365582b8c40f01a4e3e08ceed68d9bb1090aafe2f06af4740f327a3fd8fc"
@@ -1003,7 +1003,7 @@
     },
     {
       "name": "mp.monster-entity-update.3c0750",
-      "rva": 3934032,
+      "rva": 3953248,
       "shared": false,
       "groups": [
         {
@@ -1015,7 +1015,7 @@
     },
     {
       "name": "mp.npc-online-state.3c4800",
-      "rva": 3950592,
+      "rva": 3969808,
       "shared": false,
       "groups": [
         {
@@ -1027,7 +1027,7 @@
     },
     {
       "name": "mp.npc-level-command.3c4c10",
-      "rva": 3951632,
+      "rva": 3970848,
       "shared": false,
       "groups": [
         {
@@ -1039,7 +1039,7 @@
     },
     {
       "name": "mp.interventions.npc-entity-update.3c8d50",
-      "rva": 3968336,
+      "rva": 3987552,
       "shared": false,
       "groups": [
         {
@@ -1051,7 +1051,7 @@
     },
     {
       "name": "mp.npc-camera-gate.3c8db7",
-      "rva": 3968439,
+      "rva": 3987655,
       "shared": false,
       "groups": [
         {
@@ -1065,19 +1065,19 @@
         "length": 9,
         "bytes": "8038000f85b8000000",
         "sha256": "9be443f68b129ad7fd04163b47b7251aec1fe8de1182aa9e153cd9e85b51818c",
-        "game_sha256": "bbab2dc68babcc644d0a1679548bf1e334b6c52aea669c3f61f6cb9d45c1aaf6",
-        "fallthrough_rva": 3968448,
-        "branch_rva": 3968632
+        "game_sha256": "7efd8ee7b97f78362e7a2f8116b327fa6b756bdce23114b68143c4c9d2dd50eb",
+        "fallthrough_rva": 3987664,
+        "branch_rva": 3987848
       },
       "body_guard": {
-        "rva": 3968336,
+        "rva": 3987552,
         "length": 816,
-        "sha256": "7c523b7c20db0d6c39ec594be62865fd48ef1b6891e4956ac692e4c2b019ca12"
+        "sha256": "66305f8db1b8ab372fba5fb7f2ea5bff995d4cd0a8c29b25223e583f200ea0e5"
       }
     },
     {
       "name": "mp.interventions.npc-tick.3c95c0",
-      "rva": 3970496,
+      "rva": 3989712,
       "shared": false,
       "groups": [
         {
@@ -1089,7 +1089,7 @@
     },
     {
       "name": "mp.control.toon-player-controlled.3e4d30",
-      "rva": 4082992,
+      "rva": 4102208,
       "shared": false,
       "groups": [
         {
@@ -1101,7 +1101,7 @@
     },
     {
       "name": "mp.toon-time-normalization.3ea3a0",
-      "rva": 4105120,
+      "rva": 4124336,
       "shared": false,
       "groups": [
         {
@@ -1113,7 +1113,7 @@
     },
     {
       "name": "mp.toon-camera-schedule-gate.3ea462",
-      "rva": 4105314,
+      "rva": 4124530,
       "shared": false,
       "groups": [
         {
@@ -1127,14 +1127,14 @@
         "length": 30,
         "bytes": "80bbc0010000000f847303000080bb08080000000f84660300000f1f4000",
         "sha256": "3d45300ee4bf4b417a337091479e37bfd119ac92bc240759c02710e2b7d0d99f",
-        "game_sha256": "bbab2dc68babcc644d0a1679548bf1e334b6c52aea669c3f61f6cb9d45c1aaf6",
-        "deferred_rva": 4106210,
-        "full_rva": 4105344
+        "game_sha256": "7efd8ee7b97f78362e7a2f8116b327fa6b756bdce23114b68143c4c9d2dd50eb",
+        "deferred_rva": 4125426,
+        "full_rva": 4124560
       }
     },
     {
       "name": "mp.interventions.toon-command.3eb9f0",
-      "rva": 4110832,
+      "rva": 4130048,
       "shared": false,
       "groups": [
         {
@@ -1146,7 +1146,7 @@
     },
     {
       "name": "mp.thought-d1-lifetime.3f0fc0",
-      "rva": 4132800,
+      "rva": 4152016,
       "shared": false,
       "groups": [
         {
@@ -1158,7 +1158,7 @@
     },
     {
       "name": "mp.building-rename.402bf0",
-      "rva": 4205552,
+      "rva": 4224944,
       "shared": false,
       "groups": [
         {
@@ -1170,7 +1170,7 @@
     },
     {
       "name": "mp.building-service-remove.405510",
-      "rva": 4216080,
+      "rva": 4235472,
       "shared": false,
       "groups": [
         {
@@ -1182,7 +1182,7 @@
     },
     {
       "name": "mp.building-fluff.406290",
-      "rva": 4219536,
+      "rva": 4238928,
       "shared": false,
       "groups": [
         {
@@ -1194,7 +1194,7 @@
     },
     {
       "name": "mp.building-user-state.40b200",
-      "rva": 4239872,
+      "rva": 4259264,
       "shared": false,
       "groups": [
         {
@@ -1206,7 +1206,7 @@
     },
     {
       "name": "mp.building-and-scenery-capture.40bb10",
-      "rva": 4242192,
+      "rva": 4261584,
       "shared": false,
       "groups": [
         {
@@ -1218,7 +1218,7 @@
     },
     {
       "name": "mp.district-description.4173b0",
-      "rva": 4289456,
+      "rva": 4309232,
       "shared": false,
       "groups": [
         {
@@ -1230,7 +1230,7 @@
     },
     {
       "name": "mp.district-title-position.4173c0",
-      "rva": 4289472,
+      "rva": 4309248,
       "shared": false,
       "groups": [
         {
@@ -1242,7 +1242,7 @@
     },
     {
       "name": "mp.world.district-cancel.417bf0",
-      "rva": 4291568,
+      "rva": 4311344,
       "shared": false,
       "groups": [
         {
@@ -1254,7 +1254,7 @@
     },
     {
       "name": "mp.world.district-begin.417e20",
-      "rva": 4292128,
+      "rva": 4311904,
       "shared": false,
       "groups": [
         {
@@ -1266,7 +1266,7 @@
     },
     {
       "name": "mp.district-name.418360",
-      "rva": 4293472,
+      "rva": 4313248,
       "shared": false,
       "groups": [
         {
@@ -1278,7 +1278,7 @@
     },
     {
       "name": "mp.world.district-end.418a80",
-      "rva": 4295296,
+      "rva": 4315072,
       "shared": false,
       "groups": [
         {
@@ -1290,7 +1290,7 @@
     },
     {
       "name": "mp.network-leaf-observer.42c8f0",
-      "rva": 4376816,
+      "rva": 4396752,
       "shared": false,
       "groups": [
         {
@@ -1302,7 +1302,7 @@
     },
     {
       "name": "mp.network-leaf-observer.42cb10",
-      "rva": 4377360,
+      "rva": 4397296,
       "shared": false,
       "groups": [
         {
@@ -1314,7 +1314,7 @@
     },
     {
       "name": "mp.network-leaf-observer.42cc10",
-      "rva": 4377616,
+      "rva": 4397552,
       "shared": false,
       "groups": [
         {
@@ -1326,7 +1326,7 @@
     },
     {
       "name": "mp.network-leaf-observer.42cc30",
-      "rva": 4377648,
+      "rva": 4397584,
       "shared": false,
       "groups": [
         {
@@ -1338,7 +1338,7 @@
     },
     {
       "name": "mp.network-leaf-observer.42d570",
-      "rva": 4380016,
+      "rva": 4399952,
       "shared": false,
       "groups": [
         {
@@ -1350,7 +1350,7 @@
     },
     {
       "name": "mp.network-node-ui.42db30",
-      "rva": 4381488,
+      "rva": 4401424,
       "shared": false,
       "groups": [
         {
@@ -1362,7 +1362,7 @@
     },
     {
       "name": "mp.network-pipe-ui.433e80",
-      "rva": 4406912,
+      "rva": 4426848,
       "shared": false,
       "groups": [
         {
@@ -1374,7 +1374,7 @@
     },
     {
       "name": "mp.path-actions.43a1b0",
-      "rva": 4432304,
+      "rva": 4452240,
       "shared": false,
       "groups": [
         {
@@ -1386,7 +1386,7 @@
     },
     {
       "name": "mp.building-and-scenery-capture.448330",
-      "rva": 4490032,
+      "rva": 4510528,
       "shared": false,
       "groups": [
         {
@@ -1398,19 +1398,19 @@
     },
     {
       "name": "game.update",
-      "rva": 4603104,
+      "rva": 4623616,
       "shared": true,
       "groups": []
     },
     {
       "name": "save.command",
-      "rva": 4850832,
+      "rva": 4872576,
       "shared": true,
       "groups": []
     },
     {
       "name": "mp.vip-alert-lifecycle-cleanup.4a0ba0",
-      "rva": 4852640,
+      "rva": 4874384,
       "shared": false,
       "groups": [
         {
@@ -1422,7 +1422,7 @@
     },
     {
       "name": "mp.modeupdate.4a1bb0",
-      "rva": 4856752,
+      "rva": 4878496,
       "shared": false,
       "groups": [
         {
@@ -1434,19 +1434,19 @@
     },
     {
       "name": "ingame.command",
-      "rva": 4861840,
+      "rva": 4883584,
       "shared": true,
       "groups": []
     },
     {
       "name": "title.command",
-      "rva": 4955104,
+      "rva": 4978720,
       "shared": true,
       "groups": []
     },
     {
       "name": "mp.prop-rename.4cf710",
-      "rva": 5043984,
+      "rva": 5067920,
       "shared": false,
       "groups": [
         {
@@ -1458,7 +1458,7 @@
     },
     {
       "name": "mp.remove-ownership-observers.4d05c0",
-      "rva": 5047744,
+      "rva": 5071712,
       "shared": false,
       "groups": [
         {
@@ -1470,7 +1470,7 @@
     },
     {
       "name": "mp.quest-recalculate-rating.4d6a10",
-      "rva": 5073424,
+      "rva": 5097680,
       "shared": false,
       "groups": [
         {
@@ -1482,7 +1482,7 @@
     },
     {
       "name": "mp.quest-display-set-destination.4db150",
-      "rva": 5091664,
+      "rva": 5115920,
       "shared": false,
       "groups": [
         {
@@ -1494,7 +1494,7 @@
     },
     {
       "name": "mp.management-release-kind.4dee30",
-      "rva": 5107248,
+      "rva": 5131504,
       "shared": false,
       "groups": [
         {
@@ -1506,7 +1506,7 @@
     },
     {
       "name": "mp.management-release-host-frame-postresolve.4dfed0",
-      "rva": 5111504,
+      "rva": 5135760,
       "shared": false,
       "groups": [
         {
@@ -1518,7 +1518,7 @@
     },
     {
       "name": "mp.management-release-funds.4ec880",
-      "rva": 5163136,
+      "rva": 5187392,
       "shared": false,
       "groups": [
         {
@@ -1530,7 +1530,7 @@
     },
     {
       "name": "mp.tutorial-intro.4f1940",
-      "rva": 5183808,
+      "rva": 5208576,
       "shared": false,
       "groups": [
         {
@@ -1542,7 +1542,7 @@
     },
     {
       "name": "mp.tutorial-intro.4f2330",
-      "rva": 5186352,
+      "rva": 5210672,
       "shared": false,
       "groups": [
         {
@@ -1554,7 +1554,7 @@
     },
     {
       "name": "mp.tutorial-research-staff-starting-point-authority.4f3b00",
-      "rva": 5192448,
+      "rva": 5216864,
       "shared": false,
       "groups": [
         {
@@ -1566,7 +1566,7 @@
     },
     {
       "name": "mp.tutorial-research-staff-starting-point-authority.4f5900",
-      "rva": 5200128,
+      "rva": 5224608,
       "shared": false,
       "groups": [
         {
@@ -1578,7 +1578,7 @@
     },
     {
       "name": "mp.vip-original-update.4f85b0",
-      "rva": 5211568,
+      "rva": 5236048,
       "shared": false,
       "groups": [
         {
@@ -1590,7 +1590,7 @@
     },
     {
       "name": "mp.tutorial-research-staff-starting-point-authority.4fc4a0",
-      "rva": 5227680,
+      "rva": 5252176,
       "shared": false,
       "groups": [
         {
@@ -1602,7 +1602,7 @@
     },
     {
       "name": "mp.tutorial-research-staff-starting-point-authority.4fceb0",
-      "rva": 5230256,
+      "rva": 5254752,
       "shared": false,
       "groups": [
         {
@@ -1614,7 +1614,7 @@
     },
     {
       "name": "mp.tutorial-research-staff-starting-point-authority.4fd410",
-      "rva": 5231632,
+      "rva": 5256128,
       "shared": false,
       "groups": [
         {
@@ -1626,7 +1626,7 @@
     },
     {
       "name": "mp.tutorial-research-staff-starting-point-authority.4fd870",
-      "rva": 5232752,
+      "rva": 5257248,
       "shared": false,
       "groups": [
         {
@@ -1638,7 +1638,7 @@
     },
     {
       "name": "mp.tutorial-research-staff-starting-point-authority.506010",
-      "rva": 5267472,
+      "rva": 5292384,
       "shared": false,
       "groups": [
         {
@@ -1650,7 +1650,7 @@
     },
     {
       "name": "mp.shard-dip-transition.50a870",
-      "rva": 5286000,
+      "rva": 5310912,
       "shared": false,
       "groups": [
         {
@@ -1662,7 +1662,7 @@
     },
     {
       "name": "mp.campaign-expiry-isactive-observer.518290",
-      "rva": 5341840,
+      "rva": 5367152,
       "shared": false,
       "groups": [
         {
@@ -1674,7 +1674,7 @@
     },
     {
       "name": "mp.remove-ownership-observers.539990",
-      "rva": 5478800,
+      "rva": 5504672,
       "shared": false,
       "groups": [
         {
@@ -1686,7 +1686,7 @@
     },
     {
       "name": "mp.building-history-undo-redo.53ab70",
-      "rva": 5483376,
+      "rva": 5509280,
       "shared": false,
       "groups": [
         {
@@ -1698,7 +1698,7 @@
     },
     {
       "name": "mp.building-history-undo-redo.53aef0",
-      "rva": 5484272,
+      "rva": 5510176,
       "shared": false,
       "groups": [
         {
@@ -1710,7 +1710,7 @@
     },
     {
       "name": "mp.building-and-scenery-capture.53b260",
-      "rva": 5485152,
+      "rva": 5511056,
       "shared": false,
       "groups": [
         {
@@ -1722,7 +1722,7 @@
     },
     {
       "name": "mp.remove-ownership-observers.5449a0",
-      "rva": 5523872,
+      "rva": 5549920,
       "shared": false,
       "groups": [
         {
@@ -1734,13 +1734,13 @@
     },
     {
       "name": "objects.move",
-      "rva": 5631360,
+      "rva": 5657616,
       "shared": true,
       "groups": []
     },
     {
       "name": "mp.ability-membership-remove.565400",
-      "rva": 5657600,
+      "rva": 5683856,
       "shared": false,
       "groups": [
         {
@@ -1752,7 +1752,7 @@
     },
     {
       "name": "mp.ability-membership-dock.567d70",
-      "rva": 5668208,
+      "rva": 5694464,
       "shared": false,
       "groups": [
         {
@@ -1764,7 +1764,7 @@
     },
     {
       "name": "mp.ability-edit-ui.5714c0",
-      "rva": 5706944,
+      "rva": 5733200,
       "shared": false,
       "groups": [
         {
@@ -1776,7 +1776,7 @@
     },
     {
       "name": "mp.dungeon.build-cursor-selection.585270",
-      "rva": 5788272,
+      "rva": 5814832,
       "shared": false,
       "groups": [
         {
@@ -1788,7 +1788,7 @@
     },
     {
       "name": "mp.dungeon.build-cursor-behaviour.5854e0",
-      "rva": 5788896,
+      "rva": 5815456,
       "shared": false,
       "groups": [
         {
@@ -1800,7 +1800,7 @@
     },
     {
       "name": "mp.boss-cursor-release.58b020",
-      "rva": 5812256,
+      "rva": 5838800,
       "shared": false,
       "groups": [
         {
@@ -1812,7 +1812,7 @@
     },
     {
       "name": "mp.building-and-scenery-capture.593cc0",
-      "rva": 5848256,
+      "rva": 5874800,
       "shared": false,
       "groups": [
         {
@@ -1824,7 +1824,7 @@
     },
     {
       "name": "mp.region-properties.5956f0",
-      "rva": 5854960,
+      "rva": 5881504,
       "shared": false,
       "groups": [
         {
@@ -1836,7 +1836,7 @@
     },
     {
       "name": "mp.dungeon-palette-command.59e990",
-      "rva": 5892496,
+      "rva": 5919040,
       "shared": false,
       "groups": [
         {
@@ -1848,7 +1848,7 @@
     },
     {
       "name": "mp.dungeon-tile-drag.59eb00",
-      "rva": 5892864,
+      "rva": 5919408,
       "shared": false,
       "groups": [
         {
@@ -1860,7 +1860,7 @@
     },
     {
       "name": "mp.dungeon-tile-release.5a0db0",
-      "rva": 5901744,
+      "rva": 5928288,
       "shared": false,
       "groups": [
         {
@@ -1872,7 +1872,7 @@
     },
     {
       "name": "mp.dungeon-input-monster-release.5a82e0",
-      "rva": 5931744,
+      "rva": 5958288,
       "shared": false,
       "groups": [
         {
@@ -1884,7 +1884,7 @@
     },
     {
       "name": "mp.dungeon-input-paint-finish.5a9950",
-      "rva": 5937488,
+      "rva": 5964032,
       "shared": false,
       "groups": [
         {
@@ -1896,7 +1896,7 @@
     },
     {
       "name": "mp.dungeon-input-paint-stamp.5aa570",
-      "rva": 5940592,
+      "rva": 5966928,
       "shared": false,
       "groups": [
         {
@@ -1908,7 +1908,7 @@
     },
     {
       "name": "mp.world.district-erase.5ac460",
-      "rva": 5948512,
+      "rva": 5975040,
       "shared": false,
       "groups": [
         {
@@ -1920,7 +1920,7 @@
     },
     {
       "name": "mp.world.district-finish.5ae530",
-      "rva": 5956912,
+      "rva": 5983440,
       "shared": false,
       "groups": [
         {
@@ -1932,7 +1932,7 @@
     },
     {
       "name": "mp.world.district-paint.5aee80",
-      "rva": 5959296,
+      "rva": 5985824,
       "shared": false,
       "groups": [
         {
@@ -1944,7 +1944,7 @@
     },
     {
       "name": "mp.world.district-add.5af370",
-      "rva": 5960560,
+      "rva": 5987088,
       "shared": false,
       "groups": [
         {
@@ -1956,7 +1956,7 @@
     },
     {
       "name": "mp.region-properties.5b9610",
-      "rva": 6002192,
+      "rva": 6028720,
       "shared": false,
       "groups": [
         {
@@ -1968,7 +1968,7 @@
     },
     {
       "name": "mp.modular-b07.5ba2c0",
-      "rva": 6005440,
+      "rva": 6031968,
       "shared": false,
       "groups": [
         {
@@ -1980,7 +1980,7 @@
     },
     {
       "name": "mp.modular-b07.5bad60",
-      "rva": 6008160,
+      "rva": 6034688,
       "shared": false,
       "groups": [
         {
@@ -1992,7 +1992,7 @@
     },
     {
       "name": "mp.modular-b07.5bc0c0",
-      "rva": 6013120,
+      "rva": 6039648,
       "shared": false,
       "groups": [
         {
@@ -2004,7 +2004,7 @@
     },
     {
       "name": "mp.monster-release-capture.5bf3c0",
-      "rva": 6026176,
+      "rva": 6052704,
       "shared": false,
       "groups": [
         {
@@ -2016,7 +2016,7 @@
     },
     {
       "name": "mp.move-purchase-capture.5c25b0",
-      "rva": 6038960,
+      "rva": 6065488,
       "shared": false,
       "groups": [
         {
@@ -2028,7 +2028,7 @@
     },
     {
       "name": "mp.npc-release-capture.5c3ef0",
-      "rva": 6045424,
+      "rva": 6071872,
       "shared": false,
       "groups": [
         {
@@ -2040,7 +2040,7 @@
     },
     {
       "name": "mp.network-node-ui.5c5580",
-      "rva": 6051200,
+      "rva": 6077648,
       "shared": false,
       "groups": [
         {
@@ -2052,7 +2052,7 @@
     },
     {
       "name": "mp.network-pipe-ui.5c7970",
-      "rva": 6060400,
+      "rva": 6086848,
       "shared": false,
       "groups": [
         {
@@ -2064,7 +2064,7 @@
     },
     {
       "name": "mp.world-path-capture.5c97e0",
-      "rva": 6068192,
+      "rva": 6094640,
       "shared": false,
       "groups": [
         {
@@ -2076,7 +2076,7 @@
     },
     {
       "name": "mp.path-actions.5cc2b0",
-      "rva": 6079152,
+      "rva": 6105600,
       "shared": false,
       "groups": [
         {
@@ -2088,7 +2088,7 @@
     },
     {
       "name": "mp.building-and-scenery-capture.5cf440",
-      "rva": 6091840,
+      "rva": 6118288,
       "shared": false,
       "groups": [
         {
@@ -2100,7 +2100,7 @@
     },
     {
       "name": "mp.scenery-brush-finish.5cfdd0",
-      "rva": 6094288,
+      "rva": 6120736,
       "shared": false,
       "groups": [
         {
@@ -2112,7 +2112,7 @@
     },
     {
       "name": "mp.building-and-scenery-capture.5d0600",
-      "rva": 6096384,
+      "rva": 6122832,
       "shared": false,
       "groups": [
         {
@@ -2124,7 +2124,7 @@
     },
     {
       "name": "mp.building-and-scenery-capture.5d4620",
-      "rva": 6112800,
+      "rva": 6139248,
       "shared": false,
       "groups": [
         {
@@ -2136,7 +2136,7 @@
     },
     {
       "name": "mp.scenery-brush-add-paint.5d5070",
-      "rva": 6115440,
+      "rva": 6141888,
       "shared": false,
       "groups": [
         {
@@ -2148,7 +2148,7 @@
     },
     {
       "name": "mp.building-and-scenery-capture.5d64e0",
-      "rva": 6120672,
+      "rva": 6147120,
       "shared": false,
       "groups": [
         {
@@ -2160,7 +2160,7 @@
     },
     {
       "name": "mp.scenery-eraser-finish.5d68f0",
-      "rva": 6121712,
+      "rva": 6148160,
       "shared": false,
       "groups": [
         {
@@ -2172,7 +2172,7 @@
     },
     {
       "name": "mp.scenery-eraser-add-paint.5d7550",
-      "rva": 6124880,
+      "rva": 6151328,
       "shared": false,
       "groups": [
         {
@@ -2184,7 +2184,7 @@
     },
     {
       "name": "mp.region-level.5d8480",
-      "rva": 6128768,
+      "rva": 6155216,
       "shared": false,
       "groups": [
         {
@@ -2196,7 +2196,7 @@
     },
     {
       "name": "mp.terrain-paint.5dfe70",
-      "rva": 6159984,
+      "rva": 6186432,
       "shared": false,
       "groups": [
         {
@@ -2208,7 +2208,7 @@
     },
     {
       "name": "mp.terrain-paint.5e03b0",
-      "rva": 6161328,
+      "rva": 6187776,
       "shared": false,
       "groups": [
         {
@@ -2220,7 +2220,7 @@
     },
     {
       "name": "mp.terrain-paint.5e04b0",
-      "rva": 6161584,
+      "rva": 6188032,
       "shared": false,
       "groups": [
         {
@@ -2232,7 +2232,7 @@
     },
     {
       "name": "mp.terrain-paint.5e06a0",
-      "rva": 6162080,
+      "rva": 6188528,
       "shared": false,
       "groups": [
         {
@@ -2244,7 +2244,7 @@
     },
     {
       "name": "mp.terrain-paint.5e0700",
-      "rva": 6162176,
+      "rva": 6188624,
       "shared": false,
       "groups": [
         {
@@ -2256,7 +2256,7 @@
     },
     {
       "name": "mp.terrain-paint.5e0c20",
-      "rva": 6163488,
+      "rva": 6189936,
       "shared": false,
       "groups": [
         {
@@ -2268,7 +2268,7 @@
     },
     {
       "name": "mp.terrain-height.5e1860",
-      "rva": 6166624,
+      "rva": 6193072,
       "shared": false,
       "groups": [
         {
@@ -2280,7 +2280,7 @@
     },
     {
       "name": "mp.world-path-capture.5ec320",
-      "rva": 6210336,
+      "rva": 6236784,
       "shared": false,
       "groups": [
         {
@@ -2292,7 +2292,7 @@
     },
     {
       "name": "mp.monster-zone-action-capture.5ef6a0",
-      "rva": 6223520,
+      "rva": 6249968,
       "shared": false,
       "groups": [
         {
@@ -2304,7 +2304,7 @@
     },
     {
       "name": "mp.world.zone-press-right.5ef790",
-      "rva": 6223760,
+      "rva": 6250208,
       "shared": false,
       "groups": [
         {
@@ -2316,7 +2316,7 @@
     },
     {
       "name": "mp.monster-zone-action-capture.5f0990",
-      "rva": 6228368,
+      "rva": 6254816,
       "shared": false,
       "groups": [
         {
@@ -2328,7 +2328,7 @@
     },
     {
       "name": "mp.monster-zone-action-capture.5f1510",
-      "rva": 6231312,
+      "rva": 6257760,
       "shared": false,
       "groups": [
         {
@@ -2340,19 +2340,19 @@
     },
     {
       "name": "desktop.destroy",
-      "rva": 6326240,
+      "rva": 6353824,
       "shared": true,
       "groups": []
     },
     {
       "name": "desktop.launch",
-      "rva": 6328416,
+      "rva": 6356000,
       "shared": true,
       "groups": []
     },
     {
       "name": "mp.hud-native-time-and-calendar.62c400",
-      "rva": 6472704,
+      "rva": 6500816,
       "shared": false,
       "groups": [
         {
@@ -2364,7 +2364,7 @@
     },
     {
       "name": "mp.ability-membership-new.651990",
-      "rva": 6625680,
+      "rva": 6654128,
       "shared": false,
       "groups": [
         {
@@ -2376,7 +2376,7 @@
     },
     {
       "name": "mp.building-service-menu.66a790",
-      "rva": 6727568,
+      "rva": 6756704,
       "shared": false,
       "groups": [
         {
@@ -2388,7 +2388,7 @@
     },
     {
       "name": "mp.monster-zone-action-capture.67fb40",
-      "rva": 6814528,
+      "rva": 6843728,
       "shared": false,
       "groups": [
         {
@@ -2400,7 +2400,7 @@
     },
     {
       "name": "mp.character-membership-confirm.684250",
-      "rva": 6832720,
+      "rva": 6861920,
       "shared": false,
       "groups": [
         {
@@ -2412,7 +2412,7 @@
     },
     {
       "name": "mp.character.view-select.689100",
-      "rva": 6852864,
+      "rva": 6882064,
       "shared": false,
       "groups": [
         {
@@ -2424,7 +2424,7 @@
     },
     {
       "name": "mp.character.import-image.689510",
-      "rva": 6853904,
+      "rva": 6883104,
       "shared": false,
       "groups": [
         {
@@ -2436,7 +2436,7 @@
     },
     {
       "name": "mp.character-rename-ui.689e80",
-      "rva": 6856320,
+      "rva": 6885520,
       "shared": false,
       "groups": [
         {
@@ -2448,7 +2448,7 @@
     },
     {
       "name": "mp.boss-phase-create.6961b0",
-      "rva": 6906288,
+      "rva": 6935552,
       "shared": false,
       "groups": [
         {
@@ -2460,7 +2460,7 @@
     },
     {
       "name": "mp.boss-phase-ability-menu.697bf0",
-      "rva": 6913008,
+      "rva": 6942272,
       "shared": false,
       "groups": [
         {
@@ -2472,7 +2472,7 @@
     },
     {
       "name": "mp.boss-phase-command.698960",
-      "rva": 6916448,
+      "rva": 6945712,
       "shared": false,
       "groups": [
         {
@@ -2484,7 +2484,7 @@
     },
     {
       "name": "mp.bug-manual-uicommand.69df50",
-      "rva": 6938448,
+      "rva": 6967888,
       "shared": false,
       "groups": [
         {
@@ -2496,7 +2496,7 @@
     },
     {
       "name": "mp.management-release-celebration-command.69ef10",
-      "rva": 6942480,
+      "rva": 6971920,
       "shared": false,
       "groups": [
         {
@@ -2508,7 +2508,7 @@
     },
     {
       "name": "mp.management-gm-policy.6a1780",
-      "rva": 6952832,
+      "rva": 6982272,
       "shared": false,
       "groups": [
         {
@@ -2520,7 +2520,7 @@
     },
     {
       "name": "mp.dungeon-instance-config-ui.6aea60",
-      "rva": 7006816,
+      "rva": 7036288,
       "shared": false,
       "groups": [
         {
@@ -2532,7 +2532,7 @@
     },
     {
       "name": "mp.costume-edit-ui.6b51c0",
-      "rva": 7033280,
+      "rva": 7062752,
       "shared": false,
       "groups": [
         {
@@ -2544,7 +2544,7 @@
     },
     {
       "name": "mp.tutorial-research-staff-starting-point-authority.6c6660",
-      "rva": 7104096,
+      "rva": 7133824,
       "shared": false,
       "groups": [
         {
@@ -2556,7 +2556,7 @@
     },
     {
       "name": "mp.developer-uicommand.6c7b70",
-      "rva": 7109488,
+      "rva": 7139216,
       "shared": false,
       "groups": [
         {
@@ -2568,7 +2568,7 @@
     },
     {
       "name": "mp.dungeon-light-config.6d40b0",
-      "rva": 7159984,
+      "rva": 7189712,
       "shared": false,
       "groups": [
         {
@@ -2580,7 +2580,7 @@
     },
     {
       "name": "mp.dungeon-sound-ui.6d4ff0",
-      "rva": 7163888,
+      "rva": 7193616,
       "shared": false,
       "groups": [
         {
@@ -2592,7 +2592,7 @@
     },
     {
       "name": "mp.design-rules.6d61a0",
-      "rva": 7168416,
+      "rva": 7198144,
       "shared": false,
       "groups": [
         {
@@ -2604,7 +2604,7 @@
     },
     {
       "name": "mp.management-gm-window-command.6ea5a0",
-      "rva": 7251360,
+      "rva": 7281168,
       "shared": false,
       "groups": [
         {
@@ -2616,18 +2616,18 @@
       "code_guard": {
         "offset": 0,
         "length": 30,
-        "bytes": "5756534883ec404889ce4889d14889d3e8cb322800488378080474744889",
-        "sha256": "b9603a09cc83e4cc8ea5cdc1eee6636938ff11936d7d372918dc687dce9c6f9f"
+        "bytes": "5756534883ec404889ce4889d14889d3e87b502800488378080474744889",
+        "sha256": "59f91c09790ce0d9a782ff92d6b981e112045a9ac81c485f3bc60c752fbf4f75"
       },
       "body_guard": {
-        "rva": 7251360,
+        "rva": 7281168,
         "length": 624,
-        "sha256": "e0ea25a0b830cd94eb7f01163ffc4993ade480f97c4e91d7f78650dad7c73355"
+        "sha256": "200b4dc37700b313069f52dc1541dceb36f34daf6808804ea8cc5764b3bbcec6"
       }
     },
     {
       "name": "mp.gizmo-ui-command.6f4930",
-      "rva": 7293232,
+      "rva": 7323072,
       "shared": false,
       "groups": [
         {
@@ -2639,7 +2639,7 @@
     },
     {
       "name": "mp.management-logo-editor-command.735800",
-      "rva": 7559168,
+      "rva": 7590144,
       "shared": false,
       "groups": [
         {
@@ -2651,19 +2651,19 @@
     },
     {
       "name": "startmenu.elements",
-      "rva": 7586304,
+      "rva": 7617360,
       "shared": true,
       "groups": []
     },
     {
       "name": "startmenu.select",
-      "rva": 7592096,
+      "rva": 7623152,
       "shared": true,
       "groups": []
     },
     {
       "name": "mp.npc-quest-list-ui.759ad0",
-      "rva": 7707344,
+      "rva": 7738704,
       "shared": false,
       "groups": [
         {
@@ -2675,7 +2675,7 @@
     },
     {
       "name": "mp.management-overview-command.76bd40",
-      "rva": 7781696,
+      "rva": 7813216,
       "shared": false,
       "groups": [
         {
@@ -2687,7 +2687,7 @@
     },
     {
       "name": "mp.design-rules.783530",
-      "rva": 7877936,
+      "rva": 7910048,
       "shared": false,
       "groups": [
         {
@@ -2699,7 +2699,7 @@
     },
     {
       "name": "mp.npc-quest-list-ui.78ed30",
-      "rva": 7925040,
+      "rva": 7957680,
       "shared": false,
       "groups": [
         {
@@ -2711,7 +2711,7 @@
     },
     {
       "name": "mp.region-styles.797850",
-      "rva": 7960656,
+      "rva": 7993904,
       "shared": false,
       "groups": [
         {
@@ -2723,7 +2723,7 @@
     },
     {
       "name": "mp.management-release-ui-command.79baa0",
-      "rva": 7977632,
+      "rva": 8010912,
       "shared": false,
       "groups": [
         {
@@ -2735,7 +2735,7 @@
     },
     {
       "name": "mp.management-release-planner-command.79d8b0",
-      "rva": 7985328,
+      "rva": 8018608,
       "shared": false,
       "groups": [
         {
@@ -2747,7 +2747,7 @@
     },
     {
       "name": "mp.path-actions.7b04b0",
-      "rva": 8062128,
+      "rva": 8095568,
       "shared": false,
       "groups": [
         {
@@ -2759,7 +2759,7 @@
     },
     {
       "name": "mp.world.spinner-value.7c2c60",
-      "rva": 8137824,
+      "rva": 8170944,
       "shared": false,
       "groups": [
         {
@@ -2771,7 +2771,7 @@
     },
     {
       "name": "mp.world.spinner-float.7c3840",
-      "rva": 8140864,
+      "rva": 8174112,
       "shared": false,
       "groups": [
         {
@@ -2783,7 +2783,7 @@
     },
     {
       "name": "mp.world.spinner-drag-adjusted.7c3a00",
-      "rva": 8141312,
+      "rva": 8174560,
       "shared": false,
       "groups": [
         {
@@ -2795,7 +2795,7 @@
     },
     {
       "name": "mp.world.spinner-click-adjusted.7c3b90",
-      "rva": 8141712,
+      "rva": 8174960,
       "shared": false,
       "groups": [
         {
@@ -2807,7 +2807,7 @@
     },
     {
       "name": "mp.world.spinner-click.7c3d20",
-      "rva": 8142112,
+      "rva": 8175360,
       "shared": false,
       "groups": [
         {
@@ -2819,7 +2819,7 @@
     },
     {
       "name": "mp.world.spinner-drag.7c3eb0",
-      "rva": 8142512,
+      "rva": 8175760,
       "shared": false,
       "groups": [
         {
@@ -2831,7 +2831,7 @@
     },
     {
       "name": "mp.management-gm-policy.7c9510",
-      "rva": 8164624,
+      "rva": 8198032,
       "shared": false,
       "groups": [
         {
@@ -2843,7 +2843,7 @@
     },
     {
       "name": "mp.management-gm-policy.7c9e70",
-      "rva": 8167024,
+      "rva": 8200592,
       "shared": false,
       "groups": [
         {
@@ -2855,7 +2855,7 @@
     },
     {
       "name": "mp.management-gm-policy.7c9ff0",
-      "rva": 8167408,
+      "rva": 8200976,
       "shared": false,
       "groups": [
         {
@@ -2867,7 +2867,7 @@
     },
     {
       "name": "mp.management-gm-policy.7ca170",
-      "rva": 8167792,
+      "rva": 8201360,
       "shared": false,
       "groups": [
         {
@@ -2879,7 +2879,7 @@
     },
     {
       "name": "mp.management-gm-policy.7ca230",
-      "rva": 8167984,
+      "rva": 8201552,
       "shared": false,
       "groups": [
         {
@@ -2891,7 +2891,7 @@
     },
     {
       "name": "mp.management-statistics-apply.7d2a40",
-      "rva": 8202816,
+      "rva": 8236384,
       "shared": false,
       "groups": [
         {
@@ -2903,7 +2903,7 @@
     },
     {
       "name": "mp.hud-native-time-and-calendar.81ec20",
-      "rva": 8514592,
+      "rva": 8548880,
       "shared": false,
       "groups": [
         {
@@ -2915,7 +2915,7 @@
     },
     {
       "name": "mp.design-rules.8286c0",
-      "rva": 8554176,
+      "rva": 8588464,
       "shared": false,
       "groups": [
         {
@@ -2927,7 +2927,7 @@
     },
     {
       "name": "mp.world.zone-command.82b740",
-      "rva": 8566592,
+      "rva": 8600880,
       "shared": false,
       "groups": [
         {
@@ -2939,7 +2939,7 @@
     },
     {
       "name": "mp.world.color-value.839d30",
-      "rva": 8625456,
+      "rva": 8659904,
       "shared": false,
       "groups": [
         {
@@ -2951,7 +2951,7 @@
     },
     {
       "name": "mp.subscriber-context-lookup.89e0f0",
-      "rva": 9036016,
+      "rva": 9073168,
       "shared": false,
       "groups": [
         {
@@ -2963,7 +2963,7 @@
     },
     {
       "name": "mp.root-building-load-identity.89e770",
-      "rva": 9037680,
+      "rva": 9074832,
       "shared": false,
       "groups": [
         {
@@ -2975,7 +2975,7 @@
     },
     {
       "name": "mp.normal-load-registration.89ea20",
-      "rva": 9038368,
+      "rva": 9075520,
       "shared": false,
       "groups": [
         {
@@ -2987,7 +2987,7 @@
     },
     {
       "name": "mp.bug-lifecycle-and-saved-identity.8acc80",
-      "rva": 9096320,
+      "rva": 9133472,
       "shared": false,
       "groups": [
         {
@@ -2999,7 +2999,7 @@
     },
     {
       "name": "mp.native-opened-file-provenance.95ec00",
-      "rva": 9825280,
+      "rva": 9862496,
       "shared": false,
       "groups": [
         {
@@ -3011,7 +3011,7 @@
     },
     {
       "name": "mp.native-opened-file-provenance.96bbd0",
-      "rva": 9878480,
+      "rva": 9915888,
       "shared": false,
       "groups": [
         {
@@ -3023,7 +3023,7 @@
     },
     {
       "name": "mp.root-building-load-identity.96bf30",
-      "rva": 9879344,
+      "rva": 9916752,
       "shared": false,
       "groups": [
         {
@@ -3035,7 +3035,7 @@
     },
     {
       "name": "mp.render-pool-recursive-lock.9ab8f0",
-      "rva": 10139888,
+      "rva": 10179552,
       "shared": false,
       "groups": [
         {
@@ -3047,7 +3047,7 @@
     },
     {
       "name": "mp.render-pool-recursive-lock.9abca0",
-      "rva": 10140832,
+      "rva": 10180496,
       "shared": false,
       "groups": [
         {
@@ -3059,7 +3059,7 @@
     },
     {
       "name": "mp.render-pool-recursive-lock.9ad1a0",
-      "rva": 10146208,
+      "rva": 10185872,
       "shared": false,
       "groups": [
         {
@@ -3071,7 +3071,7 @@
     },
     {
       "name": "mp.render-pool-recursive-lock.9ad400",
-      "rva": 10146816,
+      "rva": 10186480,
       "shared": false,
       "groups": [
         {
@@ -3083,7 +3083,7 @@
     },
     {
       "name": "mp.render-pool-recursive-lock.9ad570",
-      "rva": 10147184,
+      "rva": 10186848,
       "shared": false,
       "groups": [
         {
@@ -3095,7 +3095,7 @@
     },
     {
       "name": "mp.render-pool-recursive-lock.9ad7d0",
-      "rva": 10147792,
+      "rva": 10187456,
       "shared": false,
       "groups": [
         {
@@ -3107,7 +3107,7 @@
     },
     {
       "name": "mp.render-pool-recursive-lock.9ad940",
-      "rva": 10148160,
+      "rva": 10187824,
       "shared": false,
       "groups": [
         {
@@ -3119,7 +3119,7 @@
     },
     {
       "name": "mp.render-pool-recursive-lock.9af0d0",
-      "rva": 10154192,
+      "rva": 10193856,
       "shared": false,
       "groups": [
         {
@@ -3131,7 +3131,7 @@
     },
     {
       "name": "mp.render-pool-recursive-lock.9af500",
-      "rva": 10155264,
+      "rva": 10194928,
       "shared": false,
       "groups": [
         {
@@ -3143,7 +3143,7 @@
     },
     {
       "name": "mp.screenupdate.9ca0e0",
-      "rva": 10264800,
+      "rva": 10304672,
       "shared": false,
       "groups": [
         {
@@ -3155,7 +3155,7 @@
     },
     {
       "name": "mp.screendrawpipeline.9cb150",
-      "rva": 10269008,
+      "rva": 10308880,
       "shared": false,
       "groups": [
         {
@@ -3167,7 +3167,7 @@
     },
     {
       "name": "mp.native-opened-file-provenance.a02d10",
-      "rva": 10497296,
+      "rva": 10541264,
       "shared": false,
       "groups": [
         {
@@ -3179,7 +3179,7 @@
     },
     {
       "name": "mp.management-gm-policy.b1e010",
-      "rva": 11657232,
+      "rva": 11703088,
       "shared": false,
       "groups": [
         {
@@ -3191,7 +3191,7 @@
     },
     {
       "name": "mp.management-gm-policy.b1e0b0",
-      "rva": 11657392,
+      "rva": 11703248,
       "shared": false,
       "groups": [
         {
@@ -3203,7 +3203,7 @@
     },
     {
       "name": "mp.bug-lifecycle-and-saved-identity.baded0",
-      "rva": 12246736,
+      "rva": 12298128,
       "shared": false,
       "groups": [
         {
@@ -3215,7 +3215,7 @@
     },
     {
       "name": "mp.native-opened-file-provenance.bd7a80",
-      "rva": 12417664,
+      "rva": 12468480,
       "shared": false,
       "groups": [
         {
@@ -3227,7 +3227,7 @@
     },
     {
       "name": "mp.root-building-load-identity.c0ab50",
-      "rva": 12626768,
+      "rva": 12677776,
       "shared": false,
       "groups": [
         {
@@ -3239,7 +3239,7 @@
     },
     {
       "name": "mp.npc-array-load-identity.c0f0f0",
-      "rva": 12644592,
+      "rva": 12695600,
       "shared": false,
       "groups": [
         {
@@ -3251,7 +3251,7 @@
     },
     {
       "name": "mp.bug-lifecycle-and-saved-identity.c2e810",
-      "rva": 12773392,
+      "rva": 12824768,
       "shared": false,
       "groups": [
         {
@@ -3263,7 +3263,7 @@
     },
     {
       "name": "mp.monster-property-save-load.da79e0",
-      "rva": 14318048,
+      "rva": 14365472,
       "shared": false,
       "groups": [
         {
@@ -3275,7 +3275,7 @@
     },
     {
       "name": "mp.monster-property-save-load.da7a10",
-      "rva": 14318096,
+      "rva": 14365520,
       "shared": false,
       "groups": [
         {
@@ -3287,7 +3287,7 @@
     },
     {
       "name": "mp.bug-lifecycle-and-saved-identity.dc17d0",
-      "rva": 14424016,
+      "rva": 14467440,
       "shared": false,
       "groups": [
         {
@@ -3299,7 +3299,7 @@
     },
     {
       "name": "mp.bug-lifecycle-and-saved-identity.dc1800",
-      "rva": 14424064,
+      "rva": 14471440,
       "shared": false,
       "groups": [
         {
@@ -3311,7 +3311,7 @@
     },
     {
       "name": "mp.saved-party.load-stream.dc8400",
-      "rva": 14451712,
+      "rva": 14499088,
       "shared": false,
       "groups": [
         {
@@ -3323,7 +3323,7 @@
     },
     {
       "name": "mp.saved-party.save-stream.dc8430",
-      "rva": 14451760,
+      "rva": 14499136,
       "shared": false,
       "groups": [
         {
@@ -3335,7 +3335,7 @@
     },
     {
       "name": "mp.district-property-load.ddc9c0",
-      "rva": 14535104,
+      "rva": 14582480,
       "shared": false,
       "groups": [
         {
@@ -3347,7 +3347,7 @@
     },
     {
       "name": "mp.district-property-save.ddcee0",
-      "rva": 14536416,
+      "rva": 14583792,
       "shared": false,
       "groups": [
         {
@@ -3359,7 +3359,7 @@
     },
     {
       "name": "mp.network-node-capture.ddda40",
-      "rva": 14539328,
+      "rva": 14586704,
       "shared": false,
       "groups": [
         {
@@ -3371,7 +3371,7 @@
     },
     {
       "name": "mp.saved-boss.load-stream.dde0b0",
-      "rva": 14540976,
+      "rva": 14591040,
       "shared": false,
       "groups": [
         {
@@ -3383,7 +3383,7 @@
     },
     {
       "name": "mp.saved-boss.save-stream.dde0e0",
-      "rva": 14541024,
+      "rva": 14588400,
       "shared": false,
       "groups": [
         {
@@ -3395,7 +3395,7 @@
     },
     {
       "name": "mp.building-array-capture.e0e500",
-      "rva": 14738688,
+      "rva": 14786064,
       "shared": false,
       "groups": [
         {
@@ -3407,7 +3407,7 @@
     },
     {
       "name": "mp.npc-property-save-load.e3aeb0",
-      "rva": 14921392,
+      "rva": 14969248,
       "shared": false,
       "groups": [
         {
@@ -3419,7 +3419,7 @@
     },
     {
       "name": "mp.npc-property-save-load.e3af60",
-      "rva": 14921568,
+      "rva": 14969424,
       "shared": false,
       "groups": [
         {
@@ -3431,7 +3431,7 @@
     },
     {
       "name": "mp.quest-target-property-save-load.e3c0f0",
-      "rva": 14926064,
+      "rva": 14973920,
       "shared": false,
       "groups": [
         {
@@ -3443,7 +3443,7 @@
     },
     {
       "name": "mp.quest-target-property-save-load.e3c6e0",
-      "rva": 14927584,
+      "rva": 14975440,
       "shared": false,
       "groups": [
         {
@@ -3455,7 +3455,7 @@
     },
     {
       "name": "mp.native-free-ownership.1264b60",
-      "rva": 19286880,
+      "rva": 19334432,
       "shared": false,
       "groups": [
         {
@@ -3467,7 +3467,7 @@
     },
     {
       "name": "mp.building-uptime-add.859e30",
-      "rva": 8756784,
+      "rva": 8792912,
       "shared": false,
       "groups": [
         {
@@ -3479,7 +3479,7 @@
     },
     {
       "name": "mp.ordered-tutorial-undo-clear.53a240",
-      "rva": 5481024,
+      "rva": 5506896,
       "shared": false,
       "groups": [
         {
@@ -3491,7 +3491,7 @@
     },
     {
       "name": "mp.ordered-clearance-make-scenery.559ee0",
-      "rva": 5611232,
+      "rva": 5637488,
       "shared": false,
       "groups": [
         {
@@ -3503,7 +3503,7 @@
     },
     {
       "name": "mp.terrain-settlement.map-data",
-      "rva": 3326432,
+      "rva": 3342960,
       "shared": false,
       "groups": [
         {
@@ -3515,7 +3515,7 @@
     },
     {
       "name": "framework.character.preview-get-int.9fc370",
-      "rva": 10470256,
+      "rva": 10512544,
       "shared": true,
       "groups": [
         {
@@ -3531,14 +3531,14 @@
         "sha256": "75e9849e8f684c36d5dc0226a16ff77626e56f7727fe4784c50a29a03df827b6"
       },
       "body_guard": {
-        "rva": 10470256,
+        "rva": 10512544,
         "length": 96,
         "sha256": "7041b7ec325591b8d191a54b3ac8d9bd909ee099283d9d210014af498d160c61"
       }
     },
     {
       "name": "mp.character.preview-attach-weapon.6577d0",
-      "rva": 6649808,
+      "rva": 6678304,
       "shared": false,
       "groups": [
         {
@@ -3554,14 +3554,14 @@
         "sha256": "e392c726dbbb98eba244ab0a04153ee131cfd3449c54a2a46638cdb6b2010e51"
       },
       "body_guard": {
-        "rva": 6649808,
+        "rva": 6678304,
         "length": 1056,
         "sha256": "2bee69e1eaea954f0f772cc46dce5d42eea03606285d951b0062c39aa3a15126"
       }
     },
     {
       "name": "mp.ability-apply-presentation-setup.570900",
-      "rva": 5703936,
+      "rva": 5730192,
       "shared": false,
       "groups": [
         {
@@ -3575,18 +3575,18 @@
         "length": 6,
         "bytes": "56534883ec28",
         "sha256": "e4d2e640858192b8785473b169480665e72378bda382e5b96fdf3317f6bce1bf",
-        "game_sha256": "bbab2dc68babcc644d0a1679548bf1e334b6c52aea669c3f61f6cb9d45c1aaf6",
-        "resume_rva": 5703942
+        "game_sha256": "7efd8ee7b97f78362e7a2f8116b327fa6b756bdce23114b68143c4c9d2dd50eb",
+        "resume_rva": 5730198
       },
       "body_guard": {
-        "rva": 5703936,
+        "rva": 5730192,
         "length": 378,
-        "sha256": "8c17fdc046a0217cfb8e02cd8e6457c8a78e866f9fb3dba2340283a185f59054"
+        "sha256": "eb903b62213a53926dfaaf016da0a0324261a1481c87ade53227f025b5235663"
       }
     },
     {
       "name": "mp.ability-apply-presentation-event.5721f0",
-      "rva": 5710320,
+      "rva": 5736576,
       "shared": false,
       "groups": [
         {
@@ -3600,18 +3600,18 @@
         "length": 8,
         "bytes": "555756534883ec28",
         "sha256": "4692b8a69cc5e88c81eb4e467223072a5f99ba5e40d42d73c8bc37d7499ff4b5",
-        "game_sha256": "bbab2dc68babcc644d0a1679548bf1e334b6c52aea669c3f61f6cb9d45c1aaf6",
-        "resume_rva": 5710328
+        "game_sha256": "7efd8ee7b97f78362e7a2f8116b327fa6b756bdce23114b68143c4c9d2dd50eb",
+        "resume_rva": 5736584
       },
       "body_guard": {
-        "rva": 5710320,
+        "rva": 5736576,
         "length": 419,
-        "sha256": "ddd2f2414946173bed99d51289c42f3c0206168bef220d93646381599a351d87"
+        "sha256": "d9c3a9355df60fa34df0f42597f1eb7e9a7e7d3cbbdc1b7bea6fc1e376d4cbc7"
       }
     },
     {
       "name": "mp.ability-proposal-window-destroy.569550",
-      "rva": 5674320,
+      "rva": 5700576,
       "shared": false,
       "groups": [
         {
@@ -3625,13 +3625,13 @@
         "length": 5,
         "bytes": "534883ec20",
         "sha256": "56d7f101a6c2ee7dc50760d9d7f16cfbbe7a7afb148ed0bfd4f643ecf9b77cee",
-        "game_sha256": "bbab2dc68babcc644d0a1679548bf1e334b6c52aea669c3f61f6cb9d45c1aaf6",
-        "resume_rva": 5674325
+        "game_sha256": "7efd8ee7b97f78362e7a2f8116b327fa6b756bdce23114b68143c4c9d2dd50eb",
+        "resume_rva": 5700581
       },
       "body_guard": {
-        "rva": 5674320,
+        "rva": 5700576,
         "length": 213,
-        "sha256": "834bbdbafdc393bc2e64b7c5a4064aff0f2aea5f34987aea3a3a0f96f9a1be63"
+        "sha256": "7dfb74c4160e5c17933a8f0d8b1e76dfb5562d71268c7aa3531821f10825fe2f"
       }
     }
   ],
@@ -3641,9 +3641,9 @@
       "name": "crt.free",
       "dll": "msvcrt.dll",
       "symbol": "free",
-      "iat_rva": 29698560,
+      "iat_rva": 29727232,
       "sibling_symbol": "malloc",
-      "sibling_iat_rva": 29698672,
+      "sibling_iat_rva": 29727344,
       "service": "MT2FW_MT2_QueryOwnership version 1",
       "phases": "prepare, publish existing disabled observer, enable, disable with original protection, metadata remove",
       "lifetime": "provider modules, files, originals and published native observer state remain process-owned"

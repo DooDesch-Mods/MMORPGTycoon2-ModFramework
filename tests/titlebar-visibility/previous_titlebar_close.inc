@@ -30,7 +30,7 @@ Json previous_titlebar_close(const std::string& owner, const Json& args) {
     require(read(titlebar, 0x280, titlebar_window) && titlebar_window == window.panel,
         "Native app titlebar belongs to another window");
     void* target = nullptr;
-    check(string_call(0x816150, titlebar, "close", &target), "Native app titlebar close lookup");
+    check(string_call(0x81e6c0, titlebar, "close", &target), "Native app titlebar close lookup");
     require(target, "Native app titlebar close button is missing");
     void* target_window = nullptr;
     uint8_t disabled = 0, shown = 0, entity_shown = 0;

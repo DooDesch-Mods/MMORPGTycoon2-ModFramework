@@ -2,7 +2,7 @@
 
 This directory contains original MIT-licensed Framework adapter code. ABI, native ownership and member-layout evidence comes from released Multiplayer REA commit `8a13602`, principally `src/game/region_properties_runtime.inc`, `src/game/mixed_path_reader.h` and `src/game/connected_network_reader.h`. It does not include Multiplayer transport or hook code.
 
-The exact pristine `MT2.exe` SHA256 is `bbab2dc68babcc644d0a1679548bf1e334b6c52aea669c3f61f6cb9d45c1aaf6`. `native_evidence.json` retains complete PE exception-directory function extents and SHA256 digests for directly invoked entries. The common verifier also checks the current owned route composition.
+The evidence was taken on pristine `MT2.exe` SHA256 `bbab2dc68babcc644d0a1679548bf1e334b6c52aea669c3f61f6cb9d45c1aaf6`. `tools/port_game_build.py` moved it to `7efd8ee7b97f78362e7a2f8116b327fa6b756bdce23114b68143c4c9d2dd50eb`. `native_evidence.json` retains complete PE exception-directory function extents and SHA256 digests for directly invoked entries. The common verifier also checks the current owned route composition.
 
 `regions.set_type` uses a fresh private native Lift behavior, its original Press and Release, and its original destructor and sized delete. The only adapter write is the mode byte in that fresh private allocation. The transaction requires the exact saved Region handle, the actual root view Shard, an unowned Region, a different requested type and a hit which resolves to the selected Region. It does not open native UI or patch live Region fields.
 

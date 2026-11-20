@@ -17,7 +17,7 @@ void save_command(void* mode,const void* filename,bool absolute) {
 __declspec(noinline) void save_blocking(void* mode,const void* filename,bool absolute) {
     const auto caller=reinterpret_cast<uintptr_t>(_ReturnAddress());
     if(!running){original_blocking_save(mode,filename,absolute);return;}
-    const auto expected=reinterpret_cast<uintptr_t>(GetModuleHandleW(nullptr))+0x4a2c3a;
+    const auto expected=reinterpret_cast<uintptr_t>(GetModuleHandleW(nullptr))+0x4a812a;
     if(caller!=expected){if(prepare_save())original_blocking_save(mode,filename,absolute);return;}
     InitialSaveScope scope;
     try {

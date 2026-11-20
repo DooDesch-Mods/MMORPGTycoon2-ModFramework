@@ -19,7 +19,7 @@ Json app_icon_state_json(const AppIconState& state) {
         {"dragging",state.dragging!=0},{"click_armed",state.armed!=0},{"last_click_ms",state.click_ms}};
 }
 DWORD app_icon_mouse_down(void* cursor, bool* down) {
-    __try { *down = reinterpret_cast<bool(*)(const void*)>(image+0x5853e0)(cursor); }
+    __try { *down = reinterpret_cast<bool(*)(const void*)>(image+0x58bba0)(cursor); }
     __except(EXCEPTION_EXECUTE_HANDLER) { return GetExceptionCode(); } return 0;
 }
 DWORD app_icon_event(uintptr_t rva, void* icon, void* cursor, const std::array<float,2>& point) {
@@ -64,13 +64,13 @@ Json probe_app_icon(const std::string& owner, const Json& args) {
     }
     void* cursor=nullptr; uintptr_t cursor_class=0; void* trap=nullptr; void* clicked=nullptr;
     std::array<float,2> cursor_before{}, desktop_size{};
-    require(read(reinterpret_cast<void*>(image),0x13df9d0,cursor) && read(cursor,0,cursor_class) && cursor_class==image+0x1786dd0 &&
+    require(read(reinterpret_cast<void*>(image),0x13eb9d0,cursor) && read(cursor,0,cursor_class) && cursor_class==image+0x178d170 &&
         read(cursor,0x1d8,trap) && read(cursor,0x1c0,clicked) && read(cursor,0x1f0,cursor_before) && read(current_desktop,0x138,desktop_size),
         "App icon native cursor/geometry differs");
     bool down=false; const auto idle=app_icon_mouse_down(cursor,&down);
     require(!idle && !down && !trap && !clicked, "App icon diagnostic requires an idle uncaptured cursor; exception="+std::to_string(idle));
     void* slot=nullptr; void* clock=nullptr; uint64_t micros=0;
-    require(read(reinterpret_cast<void*>(image),0x164b160,slot) && read(slot,0,clock) && read(clock,0x20,micros), "App icon native click clock is unreadable");
+    require(read(reinterpret_cast<void*>(image),0x1650740,slot) && read(slot,0,clock) && read(clock,0x20,micros), "App icon native click clock is unreadable");
     const auto now=micros/1000;
     const auto elapsed=now>=before.click_ms?now-before.click_ms:0;
     require(!before.armed || (now>=before.click_ms && elapsed>499), "App icon first-click interval measured_ms="+std::to_string(elapsed)+" required_ms>499");
@@ -84,19 +84,19 @@ Json probe_app_icon(const std::string& owner, const Json& args) {
     const std::array<float,2> drop{press[0]+delta,press[1]};
     result["cursor_fields_written"]=false; result["cursor_screen_before"]=cursor_before;
     result["native_event"]=drag?"mmoDesktopIcon::Press/Drag/Release":"mmoDesktopIcon::Press/Release";
-    const auto press_code=app_icon_event(0x6094b0,target_icon,cursor,press);
+    const auto press_code=app_icon_event(0x610070,target_icon,cursor,press);
     DWORD drag_code=0,release_code=0; bool moved_started=!drag; std::string cause;
     std::optional<AppIconState> pressed;
     try { require(still_owned(), "App icon owner changed after Press"); pressed=app_icon_state(target_icon,retained_binding.record); result["after_press"]=app_icon_state_json(*pressed); }
     catch(const std::exception& error) { cause=error.what(); }
     const bool drag_attempted=drag && !press_code && pressed && still_owned() && app.launches==launches && errors==command_errors;
     if(drag_attempted) {
-        drag_code=app_icon_event(0x608bd0,target_icon,cursor,drop);
+        drag_code=app_icon_event(0x60f790,target_icon,cursor,drop);
         try { require(still_owned(), "App icon owner changed during Drag"); const auto during=app_icon_state(target_icon,retained_binding.record); moved_started=during.dragging; result["during_drag"]=app_icon_state_json(during); }
         catch(const std::exception& error) { cause+=std::string("; drag read: ")+error.what(); }
     }
     const bool release_owned=still_owned();
-    if(release_owned) release_code=app_icon_event(0x607a60,target_icon,cursor,drag_attempted?drop:press);
+    if(release_owned) release_code=app_icon_event(0x60e620,target_icon,cursor,drag_attempted?drop:press);
     else cause+="; app icon owner changed before Release";
     std::optional<AppIconState> after;
     if(release_owned) try { require(still_owned(), "App icon owner changed after Release"); after=app_icon_state(target_icon,retained_binding.record); result["after"]=app_icon_state_json(*after); }
@@ -134,11 +134,11 @@ void* wizard_child(void* parent, void* window, uintptr_t address_point) {
     require(found,"Wizard icon ancestor has no expected original child"); return found;
 }
 DWORD wizard_icon_name(void* manager, int index, void** output) {
-    __try { *output=reinterpret_cast<void*(*)(const void*,int)>(image+0x8576a0)(static_cast<unsigned char*>(manager)+8,index); }
+    __try { *output=reinterpret_cast<void*(*)(const void*,int)>(image+0x8603c0)(static_cast<unsigned char*>(manager)+8,index); }
     __except(EXCEPTION_EXECUTE_HANDLER) { return GetExceptionCode(); } return 0;
 }
 DWORD wizard_select_icon(void* list, void* selector) {
-    __try { reinterpret_cast<void(*)(void*,void*)>(image+0x6c0f80)(list,selector); }
+    __try { reinterpret_cast<void(*)(void*,void*)>(image+0x6c8360)(list,selector); }
     __except(EXCEPTION_EXECUTE_HANDLER) { return GetExceptionCode(); } return 0;
 }
 Json probe_wizard_icon(const std::string& target, void* window, const Json& args) {
@@ -146,14 +146,14 @@ Json probe_wizard_icon(const std::string& target, void* window, const Json& args
     auto* name_page=native_pane(window,"desktop_newgame_name_displayname");
     require(read(window,0x548,carousel) && carousel==native_pane(window,"multi") &&
         read(carousel,0x428,current_page) && current_page==name_page,"Wizard icon selection requires the original Name page");
-    require(wizard_class(name_page,0x1745a80),"Wizard Name page class differs");
-    void* group=nullptr; check(string_call(0x816150,name_page,"Icon",&group),"Wizard Name page icon group lookup");
+    require(wizard_class(name_page,0x174be20),"Wizard Name page class differs");
+    void* group=nullptr; check(string_call(0x81e6c0,name_page,"Icon",&group),"Wizard Name page icon group lookup");
     void* owner=nullptr; uint8_t shown=0;
-    require(wizard_class(group,0x1745a80) && read(group,0x280,owner) && owner==window && read(group,0x69,shown) && shown==1,
+    require(wizard_class(group,0x174be20) && read(group,0x280,owner) && owner==window && read(group,0x69,shown) && shown==1,
         "Wizard icon group class, owner or visibility differs");
-    auto* container=wizard_child(group,window,0x171bf80);
-    auto* scroll=wizard_child(container,window,0x16e6e10);
-    auto* list=wizard_child(scroll,window,0x1718d60);
+    auto* container=wizard_child(group,window,0x1722320);
+    auto* scroll=wizard_child(container,window,0x16ed1b0);
+    auto* list=wizard_child(scroll,window,0x171f100);
     void* items=nullptr; int count=0; int capacity=0;
     require(read(list,0x320,items) && read(list,0x328,count) && read(list,0x32c,capacity) && count>0 && count<=256 &&
         capacity>=count && capacity<=1024 && readable(items,size_t(count)*sizeof(void*)),"Wizard original icon list storage differs");
@@ -162,14 +162,14 @@ Json probe_wizard_icon(const std::string& target, void* window, const Json& args
     void* selector=nullptr;
     for(int i=0;i<count;++i) {
         void* item=nullptr; void* back=nullptr; void* parent=nullptr;
-        require(read(items,size_t(i)*sizeof(void*),item) && wizard_class(item,0x17301a0) &&
+        require(read(items,size_t(i)*sizeof(void*),item) && wizard_class(item,0x1736540) &&
             read(item,0x588,back) && back==list && read(item,0x278,parent) && parent==list && read(item,0x280,owner) && owner==window,
             "Wizard original icon member identity or owner differs");
         if(i==ordinal) selector=item;
     }
     uint8_t disabled=1; int index=-1; void* manager=nullptr; int icon_count=0;
     require(read(selector,0x46d,disabled) && !disabled && read(selector,0x69,shown) && shown==1 && read(selector,0x590,index) &&
-        read(reinterpret_cast<void*>(image),0x13df7e0,manager) && read(manager,0x38,icon_count) &&
+        read(reinterpret_cast<void*>(image),0x13eb7e0,manager) && read(manager,0x38,icon_count) &&
         icon_count>0 && icon_count<=4096 && index>=0 && index<icon_count,"Wizard selected icon enabled state or original index differs");
     void* native_name=nullptr; check(wizard_icon_name(manager,index,&native_name),"Wizard original icon name query");
     std::string expected,before,name;
@@ -187,7 +187,7 @@ Json probe_wizard_icon(const std::string& target, void* window, const Json& args
     if(code) { result["cause"]="Wizard original icon selection exception="+std::to_string(code); log_error(result.at("cause").get<std::string>()); return result; }
     void* registered=nullptr; void* selected_icon=nullptr; uint8_t selected_flag=0; std::string after;
     const auto lookup=window_lookup(&registered,"NewGame");
-    const bool confirmed=!lookup && registered==window && wizard_class(window,0x1707fb0) &&
+    const bool confirmed=!lookup && registered==window && wizard_class(window,0x170e350) &&
         read(list,0x330,selected_icon) && selected_icon==selector && read(selector,0x585,selected_flag) && selected_flag==1 &&
         text(static_cast<unsigned char*>(window)+0x590,after) && after==expected;
     result.update({{"confirmed",confirmed},{"icon_after",after},{"result",confirmed?"confirmed":"unknown"}});
@@ -196,7 +196,7 @@ Json probe_wizard_icon(const std::string& target, void* window, const Json& args
 }
 DWORD wizard_game_type(void* window, int ordinal, void** output) {
     __try {
-        auto** item=reinterpret_cast<void**(*)(void*,int)>(image+0xb3c000)(static_cast<unsigned char*>(window)+0x4f8,ordinal);
+        auto** item=reinterpret_cast<void**(*)(void*,int)>(image+0xb48860)(static_cast<unsigned char*>(window)+0x4f8,ordinal);
         *output=item?*item:nullptr;
     } __except(EXCEPTION_EXECUTE_HANDLER) { return GetExceptionCode(); } return 0;
 }
@@ -221,12 +221,12 @@ Json probe_wizard_type(const std::string& target, void* window, const Json& args
     if(args.value("observe",false)) return result;
     if(!before.empty()) { result.update({{"result","preserved_existing_selection"},{"selection_preserved",true}}); return result; }
     const std::string command="MessageTo WindowName \"NewGame\" SetCreateGameType \""+expected+"\"";
-    const auto code=string_call(0x770300,window,command.c_str());
+    const auto code=string_call(0x777e20,window,command.c_str());
     result.update({{"native_attempted",true},{"native_returned",code==0},{"exception_code",code},{"result","unknown"}});
     if(code) { result["cause"]="Wizard original game-type command exception="+std::to_string(code); log_error(result.at("cause").get<std::string>()); return result; }
     void* registered=nullptr; std::string after;
     const auto lookup=window_lookup(&registered,"NewGame");
-    const bool confirmed=!lookup && registered==window && wizard_class(window,0x1707fb0) &&
+    const bool confirmed=!lookup && registered==window && wizard_class(window,0x170e350) &&
         text(static_cast<unsigned char*>(window)+0x5b0,after) && after==expected;
     result.update({{"confirmed",confirmed},{"type_after",after},{"result",confirmed?"confirmed":"unknown"}});
     if(!confirmed) { result["cause"]="Wizard original game-type command did not confirm exact selected identifier; registry_exception="+std::to_string(lookup); log_error(result.at("cause").get<std::string>()); }
@@ -235,7 +235,7 @@ Json probe_wizard_type(const std::string& target, void* window, const Json& args
 Json probe_wizard_state(const std::string& target, void* window) {
     void* carousel=nullptr; void* registered_carousel=nullptr; void* current=nullptr; void* owner=nullptr;
     require(read(window,0x548,carousel) && carousel,"Wizard state Carousel link is unreadable or absent");
-    check(string_call(0x81d860,window,"multi",&registered_carousel),"Wizard state original Carousel lookup");
+    check(string_call(0x825e50,window,"multi",&registered_carousel),"Wizard state original Carousel lookup");
     require(registered_carousel==carousel && read(carousel,0x280,owner) && owner==window,"Wizard state Carousel identity or owner differs");
     require(read(carousel,0x428,current) && current,"Wizard state current page is unreadable or absent");
     require(read(current,0x280,owner) && owner==window,"Wizard state current page owner differs");
@@ -244,7 +244,7 @@ Json probe_wizard_state(const std::string& target, void* window) {
         "desktop_newgame_summary_displayname"};
     int matches=0,page=0;
     for(size_t index=0;index<pages.size();++index) {
-        void* found=nullptr; check(string_call(0x81d860,window,pages[index],&found),std::string("Wizard state original page lookup ")+pages[index]);
+        void* found=nullptr; check(string_call(0x825e50,window,pages[index],&found),std::string("Wizard state original page lookup ")+pages[index]);
         if(found==current) { ++matches; page=int(index)+1; }
     }
     require(matches==1,"Wizard state current page match is ambiguous or missing; matched="+std::to_string(matches)+" required=1");
@@ -263,12 +263,12 @@ Json probe_wizard_state(const std::string& target, void* window) {
 }
 struct WizardAffinityCode {uintptr_t rva;size_t size;const char* sha;};
 constexpr WizardAffinityCode wizard_affinity_codes[]{
-    {0x674780,1008,"5505cdfa2a51f468b54c61cc5f79ab121499fb4c841f69a84d3a7ab4e6715f2c"},
-    {0x7d3fc0,240,"cd5ee00e3fdf3625ac209600ae90cb9ac8b39d5f0a7a72e2a6e08ee5f50edfd0"},
-    {0x7d31e0,3472,"dd06563be8826fce57ef99d9dc27ba22fd34f2e74824cc06d75061880253c6af"},
-    {0x7d1720,1376,"aa55d20f93f082e6669525cd3c22e67b910d4a288a2bee1d8f9439c9e7b1925e"},
-    {0x75b870,5888,"345c976eaecce2bf982550b0aab1b1994cc800273b2355eb4ecd9a198ad22983"},
-    {0x75dc80,2544,"d3cfce799b94322cb54f1565282633078d8ef2fa2f0b5390ed939333db3d85af"},
+    {0x67b950,1024,"65e549fef81f782bdcf69b0ab5512d8792b77cb76ea8e48a3265543f550afd62"},
+    {0x7dc2e0,240,"5b3fbf8edaccd00aa43045c6803bfcf4da2eae477dded2ecc1defff2089a676d"},
+    {0x7db500,3472,"f6220a70c22036583ce2f122fed969332582e00a5f37dbcd94adb8b39ae53488"},
+    {0x7d9a40,1376,"dcc0ca478940d78805ba942c308d2b7cede9173f3a589fbfa71e569a8e1eba62"},
+    {0x7632f0,5888,"63c3b928687585aada87068a915e50311eb2a76fd2110988fa5e508887b3876a"},
+    {0x765700,2544,"241acc5789aa7b3e07a8fed74fe3133d8ca7bc5dcab99e9f36f5dc8484412592"},
 };
 struct WizardAffinityState {
     void* page=nullptr; void* view=nullptr;
@@ -298,15 +298,15 @@ void wizard_affinity_code_guards() {
     }
 }
 WizardAffinityState wizard_affinity_state(void* window) {
-    require(wizard_class(window,0x1707fb0),"Wizard affinity NewGame class differs");
+    require(wizard_class(window,0x170e350),"Wizard affinity NewGame class differs");
     WizardAffinityState state;void* carousel=nullptr;void* current=nullptr;void* owner=nullptr;uint8_t shown=0,editable=0;
     state.page=native_pane(window,"desktop_newgame_affinity_displayname");
-    require(wizard_class(state.page,0x1745a80) && read(window,0x548,carousel) && carousel==native_pane(window,"multi") &&
+    require(wizard_class(state.page,0x174be20) && read(window,0x548,carousel) && carousel==native_pane(window,"multi") &&
         read(carousel,0x280,owner) && owner==window && read(carousel,0x428,current) && current==state.page &&
         read(state.page,0x280,owner) && owner==window && read(state.page,0x69,shown) && shown==1,
         "Wizard affinity requires its actual visible owned Player Appeal page");
     state.view=native_pane(window,"statistics_view");
-    require(wizard_class(state.view,0x17157a0) && read(state.view,0x31c,editable) && editable==1,
+    require(wizard_class(state.view,0x171bb40) && read(state.view,0x31c,editable) && editable==1,
         "Wizard affinity StatisticsView class/editable differs");
     wizard_affinity_descendant(state.view,state.page,window);
     require(read(state.view,0x314,state.first) && read(state.view,0x318,state.last) &&
@@ -326,12 +326,12 @@ WizardAffinityState wizard_affinity_state(void* window) {
             "Wizard affinity statistic value is outside the diagnostic bound");
         state.displayed[ordinal]=state.base[ordinal]+state.allocation[ordinal];assigned+=state.allocation[ordinal];
         auto*& item=state.items[ordinal];auto*& button=state.buttons[ordinal];int32_t actual=-1;
-        require(read(items,ordinal*sizeof(void*),item) && wizard_class(item,0x1715540) && read(item,0x340,actual) && actual==index &&
-            read(item,0x330,button) && wizard_class(button,0x16e3ec0),"Wizard affinity item/index/up-button class differs");
+        require(read(items,ordinal*sizeof(void*),item) && wizard_class(item,0x171b8e0) && read(item,0x340,actual) && actual==index &&
+            read(item,0x330,button) && wizard_class(button,0x16ea260),"Wizard affinity item/index/up-button class differs");
         for(size_t previous=0;previous<ordinal;++previous)require(state.items[previous]!=item && state.buttons[previous]!=button,
             "Wizard affinity item or up-button is duplicated");
         wizard_affinity_descendant(item,state.view,window);
-        void* child=nullptr;check(string_call(0x816150,item,"up",&child),"Wizard affinity original up-button lookup");
+        void* child=nullptr;check(string_call(0x81e6c0,item,"up",&child),"Wizard affinity original up-button lookup");
         void* parent=nullptr;uint8_t disabled=2;std::string command;
         require(child==button && read(button,0x278,parent) && parent==item && read(button,0x280,owner) && owner==window &&
             read(button,0x69,shown) && shown==1 && read(button,0x46d,disabled) && disabled<=1 &&
@@ -356,7 +356,7 @@ Json wizard_affinity_json(const WizardAffinityState& state) {
 }
 int wizard_affinity_next_disabled(void* window) {
     auto* next=native_pane(window,"Next");void* owner=nullptr;uint8_t disabled=2;
-    require(wizard_class(next,0x16e3ec0) && read(next,0x280,owner) && owner==window &&
+    require(wizard_class(next,0x16ea260) && read(next,0x280,owner) && owner==window &&
         read(next,0x46d,disabled) && disabled<=1,"Wizard affinity Next button class/owner/state differs");
     return disabled;
 }
@@ -435,8 +435,8 @@ Json probe_wizard(const std::string& target, const Json& args) {
     if(action=="close") {
         void* titlebar=nullptr; void* window_owner=nullptr;
         require(read(window,0x3b8,titlebar) && titlebar && read(titlebar,0x280,window_owner) && window_owner==window, "Wizard titlebar owner differs");
-        lookup_code=string_call(0x816150,titlebar,pane.c_str(),&button);
-    } else lookup_code=string_call(0x81d860,window,pane.c_str(),&button);
+        lookup_code=string_call(0x81e6c0,titlebar,pane.c_str(),&button);
+    } else lookup_code=string_call(0x825e50,window,pane.c_str(),&button);
     void* button_owner=nullptr; uint8_t disabled=1,shown=0; std::string command;
     const bool owner_read=button && read(button,0x280,button_owner);
     const bool disabled_read=button && read(button,0x46d,disabled);

@@ -47,12 +47,12 @@ void NativeStepDriver::reset_after_world_exit(){
     game_=tasks_=0;timer_calls_=update_calls_=passive_dt_=0;pause_attempted_=false;receipt_=nullptr;failure_.clear();
 }
 void NativeStepDriver::current_game(uintptr_t game)const{
-    require(game&&read<uintptr_t>(native_.image+0x13df8f0)==game&&read<uintptr_t>(game)==native_.image+0x1743740,
+    require(game&&read<uintptr_t>(native_.image+0x13eb8f0)==game&&read<uintptr_t>(game)==native_.image+0x1749ae0,
         "Step current Game singleton/address point changed");
 }
 uintptr_t NativeStepDriver::scheduler(uintptr_t game)const{
-    current_game(game);const auto tasks=read<uintptr_t>(native_.image+0x13df340);
-    require(tasks&&read<uintptr_t>(game+0x68)==tasks&&read<uintptr_t>(tasks)==native_.image+0x16fdaf0,"Step Task owner/address point changed");
+    current_game(game);const auto tasks=read<uintptr_t>(native_.image+0x13eb340);
+    require(tasks&&read<uintptr_t>(game+0x68)==tasks&&read<uintptr_t>(tasks)==native_.image+0x1703e90,"Step Task owner/address point changed");
     return tasks;
 }
 void NativeStepDriver::held(uintptr_t tasks)const{
@@ -76,14 +76,14 @@ StepNativeObservation NativeStepDriver::validate_loaded(StepNativeObservation ac
         std::any_of(actual.witness.begin(),actual.witness.end(),[](unsigned char b){return b!=0;}),
         "Step loaded bootstrap witness is unavailable: "+actual.cause);
     current_game(actual.game);
-    require(actual.mode&&read<uintptr_t>(actual.game+0x28)==actual.mode&&read<uintptr_t>(native_.image+0x13df320)==actual.mode&&
-        read<uintptr_t>(actual.mode)==native_.image+0x16e6730&&read<int32_t>(actual.mode+0x2c4)==4,
+    require(actual.mode&&read<uintptr_t>(actual.game+0x28)==actual.mode&&read<uintptr_t>(native_.image+0x13eb320)==actual.mode&&
+        read<uintptr_t>(actual.mode)==native_.image+0x16ecad0&&read<int32_t>(actual.mode+0x2c4)==4,
         "Step loaded Mode singleton/state changed");
     require(actual.state&&read<uintptr_t>(actual.mode+0x58)==actual.state&&actual.world&&read<uintptr_t>(actual.state+0x160)==actual.world&&
-        read<uintptr_t>(native_.image+0x13df9c0)==actual.world&&read<uintptr_t>(actual.world)==native_.image+0x174aef0,
+        read<uintptr_t>(native_.image+0x13eb9c0)==actual.world&&read<uintptr_t>(actual.world)==native_.image+0x1751290,
         "Step loaded GameState/World identity changed");
-    require(actual.map&&read<uintptr_t>(actual.world+0x158)==actual.map&&read<uintptr_t>(native_.image+0x13df8c0)==actual.map&&
-        read<uintptr_t>(actual.map)==native_.image+0x1742860&&read<uint8_t>(actual.map+0x47f)==1,"Step loaded Map/readiness changed");
+    require(actual.map&&read<uintptr_t>(actual.world+0x158)==actual.map&&read<uintptr_t>(native_.image+0x13eb8c0)==actual.map&&
+        read<uintptr_t>(actual.map)==native_.image+0x1748c00&&read<uint8_t>(actual.map+0x47f)==1,"Step loaded Map/readiness changed");
     const auto task=scheduler(actual.game);
     if(entered){
         // Immutable intent may be retained while the one original Go owns its
@@ -151,8 +151,8 @@ void NativeStepDriver::timer_update(void* receiver,float incoming,uintptr_t call
     ++timer_calls_;receipt_->timer_calls=timer_calls_;native_.original_timer(receiver,incoming);
     require(caller==native_.image+step_pins::timer_return_rva&&timer_calls_==1,"Step Timer caller/count differs");
     current_game(game_);const auto timer=reinterpret_cast<uintptr_t>(receiver);
-    require(timer&&read<uintptr_t>(native_.image+0x1c4eb70)==timer&&read<uintptr_t>(timer)==native_.image+0x16f9b80&&
-        read<uintptr_t>(native_.image+0x16f9ba0)==native_.image+step_pins::timer_rva&&read<uint8_t>(timer+8)==1,"Step Timer singleton/dispatch changed");
+    require(timer&&read<uintptr_t>(native_.image+0x1c55b70)==timer&&read<uintptr_t>(timer)==native_.image+0x16fff20&&
+        read<uintptr_t>(native_.image+0x16fff40)==native_.image+step_pins::timer_rva&&read<uint8_t>(timer+8)==1,"Step Timer singleton/dispatch changed");
     const auto systems=read<uintptr_t>(game_+8);const auto count=read<int32_t>(game_+0x10);
     require(systems&&count>0&&count<=64,"Step active system array bounds changed");
     unsigned found=0;for(int32_t i=0;i<count;++i)found+=read<uintptr_t>(systems+size_t(i)*8)==timer;

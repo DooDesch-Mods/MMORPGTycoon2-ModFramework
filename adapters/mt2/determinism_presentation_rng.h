@@ -7,8 +7,8 @@
 namespace mt2fw::mt2::determinism::presentation {
 enum class Site : unsigned { Other, Window, Meter };
 inline Site site(uintptr_t return_rva) noexcept {
-    if(return_rva==0x81b40f)return Site::Window;
-    if(return_rva==0x8410fb)return Site::Meter;
+    if(return_rva==0x8239ff)return Site::Window;
+    if(return_rva==0x8497bb)return Site::Meter;
     return Site::Other;
 }
 struct RandomState { std::array<uint64_t,4> s{};int32_t p=0; };
@@ -21,7 +21,7 @@ struct Selection { void* source;Counters* count=nullptr; };
 struct BuildingWidgetQuery {
     bool active=false;
     bool matches(uintptr_t helper,uintptr_t caller)const noexcept {
-        return active&&helper==0x9fcf20&&caller==0xda6f2;
+        return active&&helper==0xa078e0&&caller==0xdb722;
     }
 };
 template<class Initialize>
@@ -43,7 +43,7 @@ Selection select_building_widget(bool armed,uint64_t generation,const BuildingWi
 struct RespawnQuery {
     bool active=false;
     bool matches(uintptr_t helper,uintptr_t caller) const noexcept {
-        return active&&helper==0x9fc370&&caller==0x24e7e8;
+        return active&&helper==0xa068a0&&caller==0x251728;
     }
 };
 template<class Initialize>
@@ -66,11 +66,11 @@ Selection select_respawn(bool armed,uint64_t generation,const RespawnQuery& quer
 struct SceneryPattern {
     bool active=false;
     static bool constructor(uintptr_t caller) noexcept {
-        return caller==0x5d3717||caller==0x5d4045||caller==0x5d3f2d;
+        return caller==0x5d9e67||caller==0x5da795||caller==0x5da67d;
     }
     bool matches(uintptr_t helper,uintptr_t caller) const noexcept {
-        return active&&helper==0x9fc3d0&&
-            (caller==0x9fa7da||caller==0x9fa7ef||caller==0x9fa805);
+        return active&&helper==0xa06920&&
+            (caller==0xa04c2a||caller==0xa04c3f||caller==0xa04c55);
     }
 };
 template<class Initialize>
@@ -93,7 +93,7 @@ Selection select_scenery_pattern(bool armed,uint64_t generation,const SceneryPat
 struct BlueprintPuppet {
     bool active=false;
     bool matches(uintptr_t helper,uintptr_t caller) const noexcept {
-        return active&&helper==0x9fc4b0&&caller==0x3b41da;
+        return active&&helper==0xa06a60&&caller==0x3b8cea;
     }
 };
 template<class Initialize>
@@ -114,7 +114,7 @@ Selection select_blueprint_puppet(bool armed,uint64_t generation,const Blueprint
 // Running characters choose a visible jump animation and its next delay.
 // These two exact calls do not select movement or gameplay outcomes.
 inline bool character_jump_site(uintptr_t helper,uintptr_t caller) noexcept {
-    return (helper==0x9fc370&&caller==0x3a1757)||(helper==0x9fc4b0&&caller==0x3a1777);
+    return (helper==0xa068a0&&caller==0x3a6257)||(helper==0xa06a60&&caller==0x3a6277);
 }
 template<class Initialize>
 Selection select_character_jump(bool armed,uint64_t generation,uintptr_t helper,uintptr_t caller,
@@ -133,22 +133,22 @@ Selection select_character_jump(bool armed,uint64_t generation,uintptr_t helper,
 // Each return address is paired with its exact helper; nearby or unknown calls
 // retain their receiver. The packed vector helper consumes two transitions.
 inline unsigned digital_site(uintptr_t helper,uintptr_t caller) noexcept {
-    if(helper==0x9fc370&&caller==0x16cb10)return 0;
-    if(helper==0x9fc3d0&&caller==0x16d1b8)return 1;
-    if(helper==0x9fc370&&caller==0x179151)return 2;
-    if(helper==0x9fc3d0&&caller==0x179139)return 3;
-    if(helper==0x9fc430&&caller==0x16df49)return 4;
-    if(helper==0x9fc690&&caller==0x16df64)return 5;
-    if(helper==0x9fc4b0&&caller==0x167753)return 6;
-    if(helper==0x9fc370&&caller==0x16c277)return 7;
-    if(helper==0x9fc4b0&&caller==0x16e12e)return 8;
-    if(helper==0x9fc690&&caller==0x16e149)return 9;
-    if(helper==0x9fc4b0&&caller==0x16e166)return 10;
-    if(helper==0x9fc690&&caller==0x16e1ff)return 11;
-    if(helper==0x9fc4b0&&caller==0x16e21c)return 12;
-    if(helper==0x9fc4b0&&caller==0x16fc07)return 13;
-    if(helper==0x9fc4b0&&caller==0x16fe59)return 14;
-    if(helper==0x9fc4b0&&caller==0x16fe74)return 15;
+    if(helper==0xa068a0&&caller==0x16e430)return 0;
+    if(helper==0xa06920&&caller==0x16ead8)return 1;
+    if(helper==0xa068a0&&caller==0x17ab71)return 2;
+    if(helper==0xa06920&&caller==0x17ab59)return 3;
+    if(helper==0xa069b0&&caller==0x16f919)return 4;
+    if(helper==0xa06cb0&&caller==0x16f934)return 5;
+    if(helper==0xa06a60&&caller==0x169073)return 6;
+    if(helper==0xa068a0&&caller==0x16db97)return 7;
+    if(helper==0xa06a60&&caller==0x16fafe)return 8;
+    if(helper==0xa06cb0&&caller==0x16fb19)return 9;
+    if(helper==0xa06a60&&caller==0x16fb36)return 10;
+    if(helper==0xa06cb0&&caller==0x16fbcf)return 11;
+    if(helper==0xa06a60&&caller==0x16fbec)return 12;
+    if(helper==0xa06a60&&caller==0x1715d7)return 13;
+    if(helper==0xa06a60&&caller==0x171829)return 14;
+    if(helper==0xa06a60&&caller==0x171844)return 15;
     return 16;
 }
 // The original algorithm receives a separate object only at the two shader calls.

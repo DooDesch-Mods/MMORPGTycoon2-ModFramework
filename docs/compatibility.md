@@ -4,15 +4,17 @@ title: Compatibility and status
 
 # Compatibility and status
 
-Framework **0.4.0** and later provide Lua API **1.3.0** and native ABI **1**. It supports only Windows x64 with Steam and the exact verified MT2 executable:
+Framework **0.4.0** and later provide Lua API **1.3.0** and native ABI **1**. It supports Windows x64 with Steam. The adapter targets this MT2 executable (Steam build 26719430):
 
 ```text
-bbab2dc68babcc644d0a1679548bf1e334b6c52aea669c3f61f6cb9d45c1aaf6
+7efd8ee7b97f78362e7a2f8116b327fa6b756bdce23114b68143c4c9d2dd50eb
 ```
 
-Unsupported game builds leave the adapter and mods disabled and report the cause. A signature match alone never establishes compatibility. The installer preserves unknown loaders and original game archives.
+On another executable, the Framework logs a warning and still loads. Each hook and gameplay operation checks the exact game code it uses before it runs. A feature whose code changed stays disabled and reports the cause. The installer preserves unknown loaders and original game archives.
 
-The runtime does not resolve internal game functions through the executable's symbol table. The adapter uses addresses and byte checks for the verified build. Symbols have helped with reverse engineering, so removing them makes future adapter work harder. A changed executable, including one with only its symbol table removed, still needs compatibility checks and an adapter update before support is enabled.
+On build 26719430, the Multiplayer step and determinism routes are not ported yet and stay disabled.
+
+The runtime does not resolve internal game functions through the executable's symbol table. The adapter uses addresses and byte checks for the target build. Symbols have helped with reverse engineering, so removing them makes future adapter work harder. `tools/port_game_build.py` moves addresses and checks to a new build and reports the functions that need review.
 
 ## Runtime versions for native mods
 

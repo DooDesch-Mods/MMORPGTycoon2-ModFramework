@@ -1,6 +1,6 @@
 // Native Save queues a local save-list scan after its writer has completed.
 namespace save_cache {
-constexpr uintptr_t AddressPoint=0x1789180,GlobalTask=0x1a3c048;
+constexpr uintptr_t AddressPoint=0x178f520,GlobalTask=0x1a43048;
 struct Context {uintptr_t tasks=0,task=0,snapshot=0;unsigned pumps=0;};
 thread_local Context* current=nullptr;
 uint64_t attempts=0,returns=0;
@@ -26,14 +26,14 @@ void owner_check(uintptr_t tasks){
     require(!control.entered&&!timer_step::frame.active&&control.phase==mt2::determinism::Gate::Phase::Held,
         "Save cache settlement escaped held capture");
     timer_step::current_game();
-    require(read<uintptr_t>(owner+0x28)==active_mode&&read<uintptr_t>(active_mode)==image+0x16e6730&&
-        read<int32_t>(active_mode+0x30c)==0&&tasks==read<uintptr_t>(owner+0x68)&&tasks==read<uintptr_t>(image+0x13df340)&&
-        read<uintptr_t>(tasks)==image+0x16fdaf0&&!pending&&!uncertain,"Save cache native owner or pending gameplay differs");
+    require(read<uintptr_t>(owner+0x28)==active_mode&&read<uintptr_t>(active_mode)==image+0x16ecad0&&
+        read<int32_t>(active_mode+0x30c)==0&&tasks==read<uintptr_t>(owner+0x68)&&tasks==read<uintptr_t>(image+0x13eb340)&&
+        read<uintptr_t>(tasks)==image+0x1703e90&&!pending&&!uncertain,"Save cache native owner or pending gameplay differs");
 }
 void header(uintptr_t task,bool finished){
     require(task&&read<uintptr_t>(task)==image+AddressPoint&&read<int32_t>(task+8)==2&&read<uint8_t>(task+0xc)==0&&
         read<uint8_t>(task+0xd)==(finished?1:0)&&read<uint8_t>(task+0xe)==0&&
-        read<uintptr_t>(image+AddressPoint+0x10)==image+0x7a2780&&read<uintptr_t>(image+AddressPoint+0x18)==image+0xc367a0,
+        read<uintptr_t>(image+AddressPoint+0x10)==image+0x7aa980&&read<uintptr_t>(image+AddressPoint+0x18)==image+0xc43050,
         "Save cache task identity/type/lifecycle differs");
 }
 void queues(uintptr_t tasks,uintptr_t task,size_t admitted){

@@ -34,13 +34,13 @@ bool same_paint_shape(Context& c,uintptr_t left,uintptr_t right){
 }
 void destroy_paint_shape(Context& c,std::unique_ptr<PaintShape>& shape){
     if(!shape)return;
-    try{if(shape->constructed){paint_native([&]{paint_call<void>(c,0xf15a0,shape->bytes.data());});shape->constructed=false;}
+    try{if(shape->constructed){paint_native([&]{paint_call<void>(c,0xf2610,shape->bytes.data());});shape->constructed=false;}
         else need(!shape->started,"Terrain polygon constructor has an uncertain native lifetime");}
     catch(const std::exception& error){uncertain_shapes.push_back(std::move(shape));throw std::runtime_error(std::string(error.what())+"; native polygon storage retained");}
 }
 std::unique_ptr<PaintShape> region_paint_shape(Context& c,uintptr_t region,int32_t style){
     need(uncertain_shapes.size()<16,"Terrain native polygon retention budget exhausted");auto shape=std::make_unique<PaintShape>();shape->started=true;
-    try{paint_native([&]{paint_call<void*>(c,0x362450,shape->bytes.data(),reinterpret_cast<void*>(region+0x78),style);shape->constructed=true;});return shape;}
+    try{paint_native([&]{paint_call<void*>(c,0x366cb0,shape->bytes.data(),reinterpret_cast<void*>(region+0x78),style);shape->constructed=true;});return shape;}
     catch(const std::exception& error){uncertain_shapes.push_back(std::move(shape));throw std::runtime_error(std::string(error.what())+"; native contour storage retained");}
 }
 Json terrain_contour_page(Context& c,const Json& args){
@@ -63,8 +63,8 @@ std::unique_ptr<PaintShape> make_paint_shape(Context& c,const PaintStamp& stamp)
     need(uncertain_shapes.size()<16,"Terrain native polygon retention budget exhausted");auto shape=std::make_unique<PaintShape>();std::vector<PaintView> paths;
     for(const auto& points:stamp.paths){auto begin=uintptr_t(points.data());paths.push_back({begin,begin+points.size()*16,begin+points.size()*16});}
     auto begin=uintptr_t(paths.data());PaintView view{begin,begin+paths.size()*24,begin+paths.size()*24};shape->started=true;
-    try{paint_native([&]{paint_call<void>(c,0xf1810,shape->bytes.data());shape->constructed=true;auto data=c.read<uintptr_t>(uintptr_t(shape->bytes.data())+0x18);
-            need(data!=0,"Native terrain polygon constructor returned no data");paint_call<void>(c,0xf7ed0,reinterpret_cast<void*>(data),&view);paint_call<void>(c,0xf3b60,shape->bytes.data());});
+    try{paint_native([&]{paint_call<void>(c,0xf2880,shape->bytes.data());shape->constructed=true;auto data=c.read<uintptr_t>(uintptr_t(shape->bytes.data())+0x18);
+            need(data!=0,"Native terrain polygon constructor returned no data");paint_call<void>(c,0xf8f40,reinterpret_cast<void*>(data),&view);paint_call<void>(c,0xf4bd0,shape->bytes.data());});
         auto native_paths=paint_paths(c,uintptr_t(shape->bytes.data()));need(paint_span(native_paths,24,128)==stamp.paths.size(),"Native terrain polygon path count differs after assignment");
         for(size_t i=0;i<stamp.paths.size();++i){auto vertices=c.read<PaintView>(native_paths.begin+i*24);need(paint_span(vertices,16,16384)==stamp.paths[i].size(),"Native terrain polygon vertex count differs");
             std::vector<PaintPoint> points(stamp.paths[i].size());c.read_bytes(vertices.begin,points.data(),points.size()*16);need(points==stamp.paths[i],"Native terrain polygon assignment changed requested coordinates");}
@@ -81,20 +81,20 @@ Json paint_terrain(Context& c,const Json& args,bool& attempted){
     try{
         for(int32_t i=0;i<4;++i)before[size_t(i)]=region_paint_shape(c,region.object,i);
         for(const auto& stamp:stamps)receiver->shapes.push_back(make_paint_shape(c,stamp));
-        receiver->started=true;attempted=true;paint_native([&]{paint_call<void>(c,0x5e0ed0,receiver->bytes.data());receiver->constructed=true;
+        receiver->started=true;attempted=true;paint_native([&]{paint_call<void>(c,0x5e7620,receiver->bytes.data());receiver->constructed=true;
             *reinterpret_cast<uintptr_t*>(brush+0x218)=region.object;*reinterpret_cast<int32_t*>(brush+0x150)=int32_t(style);*reinterpret_cast<float*>(brush+0x664)=0;
-            Text text{label.data(),label.size()};paint_call<void>(c,0x5e03b0,receiver->bytes.data(),&text);graph=c.read<uintptr_t>(brush+0x658);cost=paint_call<int32_t>(c,0x5dfdf0,receiver->bytes.data());});
+            Text text{label.data(),label.size()};paint_call<void>(c,0x5e6b00,receiver->bytes.data(),&text);graph=c.read<uintptr_t>(brush+0x658);cost=paint_call<int32_t>(c,0x5e6540,receiver->bytes.data());});
         need(graph!=0&&cost==0,"Native terrain StartEdit graph or zero-cost contract differs");
         for(size_t i=0;i<stamps.size();++i){paint_native([&]{std::memcpy(reinterpret_cast<void*>(brush+0x208),stamps[i].position.data(),12);
-                *reinterpret_cast<float*>(brush+0x660)=stamps[i].radius;paint_call<void>(c,0x5dfe70,receiver->bytes.data(),receiver->shapes[i]->bytes.data());});}
-        paint_native([&]{paint_call<void>(c,0x5e0c20,receiver->bytes.data(),static_cast<void*>(nullptr));receiver->finished=true;});
+                *reinterpret_cast<float*>(brush+0x660)=stamps[i].radius;paint_call<void>(c,0x5e65c0,receiver->bytes.data(),receiver->shapes[i]->bytes.data());});}
+        paint_native([&]{paint_call<void>(c,0x5e7370,receiver->bytes.data(),static_cast<void*>(nullptr));receiver->finished=true;});
         need(!c.read<uintptr_t>(brush+0x658)&&!c.read<uintptr_t>(brush+0x670),"Native terrain completion retained its edit or graph");
         auto now=height_history(c);need(now.at("manager")==history.at("manager")&&!now.at("undo").empty()&&now.at("undo").back()==graph&&now.at("redo").empty(),"Terrain native Undo owner or graph differs");
         auto expected=history.at("undo");expected.push_back(graph);if(expected.size()>20)expected.erase(expected.begin());need(now.at("undo")==expected,"Terrain native Undo append or trim differs");
-        ap(c,graph,0x16e32d0);ap(c,graph+0x18,0x16e2dc0);ap(c,graph+0x48,0x1748c50);
+        ap(c,graph,0x16e9670);ap(c,graph+0x18,0x16e9160);ap(c,graph+0x48,0x174eff0);
         auto count=c.read<int32_t>(graph+0x28),capacity=c.read<int32_t>(graph+0x2c);auto data=c.read<uintptr_t>(graph+0x20);
         need(count>0&&count<=1000000&&capacity>=count&&data&&c.read<uint8_t>(graph+0x10c)==1&&!c.read<int32_t>(graph+0x58),"Terrain native inverse graph is invalid, unlocked or pending deletion");
-        size_t found=0;for(int32_t i=0;i<count;++i){auto operation=c.read<uintptr_t>(data+size_t(i)*8);if(c.read<uintptr_t>(operation)!=c.image+0x1723330)continue;
+        size_t found=0;for(int32_t i=0;i<count;++i){auto operation=c.read<uintptr_t>(data+size_t(i)*8);if(c.read<uintptr_t>(operation)!=c.image+0x17296d0)continue;
             need(c.read<uintptr_t>(operation+0xb8)==region.object,"Terrain inverse belongs to another Region");
             for(size_t n=0;n<4;++n)need(same_paint_shape(c,uintptr_t(before[n]->bytes.data()),operation+0xc0+n*0x70),"Terrain native inverse does not retain the original contours");++found;}
         need(found==1,"Terrain native Undo requires exactly one contour inverse");
@@ -102,7 +102,7 @@ Json paint_terrain(Context& c,const Json& args,bool& attempted){
         for(int32_t i=0;i<4;++i){after[size_t(i)]=region_paint_shape(c,region.object,i);if(!same_paint_shape(c,uintptr_t(before[size_t(i)]->bytes.data()),uintptr_t(after[size_t(i)]->bytes.data())))changed=true;}
     }catch(const std::exception& error){failure=error.what();}
     auto cleanup=[&](const char* operation,auto&& function){try{function();}catch(const std::exception& error){if(!failure.empty())failure+="; ";failure+=std::string(operation)+": "+error.what();}};
-    if(receiver->constructed&&receiver->finished)cleanup("Terrain brush destructor",[&]{paint_native([&]{paint_call<void>(c,0x5e0fd0,receiver->bytes.data());});receiver->constructed=false;});
+    if(receiver->constructed&&receiver->finished)cleanup("Terrain brush destructor",[&]{paint_native([&]{paint_call<void>(c,0x5e7720,receiver->bytes.data());});receiver->constructed=false;});
     if(receiver->constructed||receiver->started&&!receiver->finished){if(!failure.empty())failure+="; ";failure+="uncertain native terrain edit receiver retained";uncertain_paint.push_back(std::move(receiver));}
     if(receiver)for(auto& shape:receiver->shapes)cleanup("Terrain stamp cleanup",[&]{destroy_paint_shape(c,shape);});
     for(auto& shape:before)cleanup("Terrain prior contour cleanup",[&]{destroy_paint_shape(c,shape);});for(auto& shape:after)cleanup("Terrain resulting contour cleanup",[&]{destroy_paint_shape(c,shape);});

@@ -6,7 +6,7 @@
 namespace p=mt2fw::mt2::determinism::presentation;
 using Selection=p::Selection;int global_source=1,local_source=2;p::Counters counts;
 bool route=true,fail_original=false;unsigned original_calls=0,finished=0;
-Selection choose(uintptr_t helper,uintptr_t,void* source){if(route&&helper==0x9fcf20){++counts.attempted;return {&local_source,&counts};}return {source};}
+Selection choose(uintptr_t helper,uintptr_t,void* source){if(route&&helper==0xa078e0){++counts.attempted;return {&local_source,&counts};}return {source};}
 Selection(*select_source)(uintptr_t,uintptr_t,void*)=choose;
 uintptr_t begin(uintptr_t,uintptr_t,void*){return 1;}
 void finish_buffer(uintptr_t,void*,unsigned){++finished;}

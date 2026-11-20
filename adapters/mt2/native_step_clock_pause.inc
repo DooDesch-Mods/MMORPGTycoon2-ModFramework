@@ -8,7 +8,7 @@ uint32_t last_selected=0;
 float last_incoming=1.0f;
 bool installed=false;
 void set_call(void* receiver,float incoming,uintptr_t caller){
-    if(caller!=image+0x4a1c7d||!control.entered||control.phase!=Control::Phase::Stepping){
+    if(caller!=image+0x4a716d||!control.entered||control.phase!=Control::Phase::Stepping){
         original(receiver,incoming);return;
     }
     require(thread&&thread==GetCurrentThreadId()&&timer_step::frame.active,
@@ -21,8 +21,8 @@ void set_call(void* receiver,float incoming,uintptr_t caller){
         receipt.tick!=last_tick||receipt.invocation!=last_invocation,"Ordered Clock pause repeated within one admitted Step");
     // This accessor retains the independent SavesInProgress == 0 guard.
     const auto mode=snapshot_prepare::mode();
-    const auto clock=read<uintptr_t>(image+0x13df9a0),state=read<uintptr_t>(mode+0x58);
-    require(clock&&clock==reinterpret_cast<uintptr_t>(receiver)&&read<uintptr_t>(clock)==image+0x17499d0&&
+    const auto clock=read<uintptr_t>(image+0x13eb9a0),state=read<uintptr_t>(mode+0x58);
+    require(clock&&clock==reinterpret_cast<uintptr_t>(receiver)&&read<uintptr_t>(clock)==image+0x174fd70&&
         state&&read<uintptr_t>(state+0x158)==clock,"Ordered Clock pause current owner differs");
     require(incoming==0.0f||incoming==1.0f,"Ordered Clock local pause argument differs from native boolean scale");
     last_selected=read<uint32_t>(clock+0x58);last_incoming=incoming;
@@ -31,7 +31,7 @@ void set_call(void* receiver,float incoming,uintptr_t caller){
     // Local menu modality must not suspend one peer's admitted simulation tick.
     // User Pause/speed remains the separate selected scale at Clock +0x58.
     original(receiver,1.0f);++returned;
-    require(snapshot_prepare::mode()==mode&&read<uintptr_t>(image+0x13df9a0)==clock&&
+    require(snapshot_prepare::mode()==mode&&read<uintptr_t>(image+0x13eb9a0)==clock&&
         read<uintptr_t>(state+0x158)==clock,"Ordered Clock pause owner changed during original setter");
     require(read<float>(clock+0x5c)==1.0f,"Ordered Clock pause original setter readback differs");
     require(read<uint32_t>(clock+0x58)==last_selected,"Ordered Clock pause changed selected user speed");
@@ -45,13 +45,13 @@ Json status(){return {{"attempted",attempted},{"returned",returned},{"local_paus
 void install(){
     if(installed)return;
     for(const auto& [rva,size,sha]:std::array<std::tuple<uintptr_t,size_t,const char*>,2>{{
-        {0x4a1bb0,5088,"933bbb87425a467d54e25ba1290fd55c0232e72a68d07c2039d7822f8d691b89"},
-        {0x259b70,176,"e04b7a6083ecc1404c416b50fd098114afd5a6f69d270f8190f0f24cda619efd"}
+        {0x4a70a0,5088,"889f8e62727788ecc562f11485419b093cafb50de7164941e5bfc93aef24f757"},
+        {0x25cc30,176,"3187c202bc83557ec587c7c0d61ee912529bb90877270ff5d6755ada0339eada"}
     }}){std::string cause;const bool valid=native_routes->verify_body(rva,size,sha,cause);
         require(valid,"Ordered Clock pause native body differs RVA="+std::to_string(rva)+": "+cause);}
     const char* key="framework.step.clock-pause";
-    native_routes->catalog(key,0x259b70,true);native_services->reserve(key);
-    auto* target=reinterpret_cast<void*>(image+0x259b70);auto* detour=reinterpret_cast<void*>(&set);
+    native_routes->catalog(key,0x25cc30,true);native_services->reserve(key);
+    auto* target=reinterpret_cast<void*>(image+0x25cc30);auto* detour=reinterpret_cast<void*>(&set);
     hook(target,detour,reinterpret_cast<void**>(&original));const auto enabled=MH_EnableHook(target);
     require(enabled==MH_OK,std::string("Ordered Clock pause hook enable failed: ")+MH_StatusToString(enabled));
     std::string cause;const bool published=native_routes->publish_framework_hook(target,detour,reinterpret_cast<void*>(original),cause);

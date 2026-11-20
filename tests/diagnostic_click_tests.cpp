@@ -22,10 +22,10 @@ struct NativeFixture {
         std::memcpy(output,found->second.data(),size);return true;
     }
     NativeFixture(){
-        put(image+0x13df990,input);put(input,uintptr_t(image+0x1749430));put(input+0x50,axes);put(input+0x58,int32_t(34));put(input+0x124,uint8_t(0));
+        put(image+0x13eb990,input);put(input,uintptr_t(image+0x174f7d0));put(input+0x50,axes);put(input+0x58,int32_t(34));put(input+0x124,uint8_t(0));
         put(input+0x7c,std::array<float,2>{-0.2f,0.7f});put(axes+27*0x70+0x60,std::array<uint8_t,2>{1,0});
-        put(image+0x1c4e3a0,screen);put(screen+0x54,std::array<int32_t,2>{1280,720});
-        put(image+0x13df9d0,cursor);put(cursor,uintptr_t(image+0x1786dd0));
+        put(image+0x1c553a0,screen);put(screen+0x54,std::array<int32_t,2>{1280,720});
+        put(image+0x13eb9d0,cursor);put(cursor,uintptr_t(image+0x178d170));
         put(cursor+0x1f0,std::array<float,2>{582,688});put(cursor+0x1f8,std::array<float,2>{-0.3f,0.9f});
         put(cursor+0x1e4,std::array<float,3>{1,2,3});put(cursor+0x174,std::array<uint8_t,3>{0,0,0});
         put(cursor+0x214,std::array<uint8_t,2>{0,0});

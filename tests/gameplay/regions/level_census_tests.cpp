@@ -16,7 +16,7 @@ int main(){try{
     Memory memory;constexpr uintptr_t image=0x100000,region=0x10000;
     constexpr uintptr_t managers[]{0x20000,0x30000,0x40000},actors[]{0x50000,0x60000,0x70000};
     constexpr size_t owner[]{0xc8,0x80,0xf0},first[]{0x40,0x40,0x20},offset[]{0x998,0x988,0x968};
-    constexpr uintptr_t manager_ap[]{0x16e6aa0,0x1714100,0x16fe170},actor_ap[]{0x1742980,0x16c0770,0x1745ce0};
+    constexpr uintptr_t manager_ap[]{0x16ece40,0x171a4a0,0x1704510},actor_ap[]{0x1748d20,0x16c6b10,0x174c080};
     constexpr int buckets[]{3,1,4};
     for(size_t family=0;family<3;++family){
         memory.put(region+offset[family],managers[family]);memory.put(managers[family],image+manager_ap[family]);memory.put(managers[family]+owner[family],region);

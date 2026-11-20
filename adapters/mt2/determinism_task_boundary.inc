@@ -18,13 +18,13 @@ bool load_ready(){
     }
     require(world.in_game_state<=4,"Task boundary unexpected native load state");
     const auto mode=read<uintptr_t>(owner+0x28);
-    require(mode&&mode==read<uintptr_t>(image+0x13df320)&&read<uintptr_t>(mode)==image+0x16e6730,"Task boundary Mode singleton/address point changed");
+    require(mode&&mode==read<uintptr_t>(image+0x13eb320)&&read<uintptr_t>(mode)==image+0x16ecad0,"Task boundary Mode singleton/address point changed");
     const auto state=read<uintptr_t>(mode+0x58);
     require(state,"Task boundary GameState is absent after native init");
     const auto world_owner=read<uintptr_t>(state+0x160);
-    require(world_owner&&world_owner==read<uintptr_t>(image+0x13df9c0)&&read<uintptr_t>(world_owner)==image+0x174aef0,"Task boundary World singleton/address point changed");
+    require(world_owner&&world_owner==read<uintptr_t>(image+0x13eb9c0)&&read<uintptr_t>(world_owner)==image+0x1751290,"Task boundary World singleton/address point changed");
     const auto map=read<uintptr_t>(world_owner+0x158);
-    require(map&&map==read<uintptr_t>(image+0x13df8c0)&&read<uintptr_t>(map)==image+0x1742860,"Task boundary Map singleton/address point changed");
+    require(map&&map==read<uintptr_t>(image+0x13eb8c0)&&read<uintptr_t>(map)==image+0x1748c00,"Task boundary Map singleton/address point changed");
     last_map_state=read<int32_t>(map+0x3d4);
     const auto ready=read<uint8_t>(map+0x47f);
     require(ready<=1,"Task boundary Map load-ready flag is invalid");
@@ -45,8 +45,8 @@ uintptr_t receiver(void* game){
         "Task boundary lacks an admitted loading or stepping outer frame");
     require(owner==reinterpret_cast<uintptr_t>(game)&&timer_step::frame.game==owner,"Task boundary Game receiver changed");
     timer_step::current_game();
-    const auto tasks=read<uintptr_t>(image+0x13df340);
-    require(tasks&&read<uintptr_t>(owner+0x68)==tasks&&read<uintptr_t>(tasks)==image+0x16fdaf0,"Task boundary Task singleton/address point changed");
+    const auto tasks=read<uintptr_t>(image+0x13eb340);
+    require(tasks&&read<uintptr_t>(owner+0x68)==tasks&&read<uintptr_t>(tasks)==image+0x1703e90,"Task boundary Task singleton/address point changed");
     require(!held_tasks&&read<uint8_t>(tasks+0xf8)==0,"Task boundary requires released workers");
     require(read<int32_t>(tasks+0xc0)>=0,"Task boundary finished count is negative");
     return tasks;
@@ -75,12 +75,12 @@ Json status(){return {{"enabled",enabled},{"loading_skipped",loading_skipped},{"
 void install(const Json& config){
     enabled=config.value("task_barrier",false);if(!enabled)return;
     for(const auto& [offset,size,sha]:std::array<std::tuple<uintptr_t,size_t,const char*>,2>{{
-        {0x526d50,480,"666f4cac19d8d04df16bdff53afbcc87899ad708f157aeae5674cf284a4540fa"},
-        {0x525ae0,112,"ffb5c39d83679b65d6d17eed0f5e6031cd7cd967efd3bff784713138a5940046"}}}){
+        {0x52d170,480,"f1d69fa40fbf68371e1c5cfccd34e93320ba7316f75ac1e97313b061695e9897"},
+        {0x52bed0,112,"f44484b481451f86a7bf86a02a9e4b2ce07b70ce73fbf9ecc751e6ec4d5dd03b"}}}){
         std::string body(size,'\0');SIZE_T copied=0;
         if(!ReadProcessMemory(GetCurrentProcess(),reinterpret_cast<void*>(image+offset),body.data(),size,&copied)||copied!=size||digest(body)!=sha)
             throw std::runtime_error("Exact original Task FinishAllTasks/AllTasksAreDone body differs");
     }
-    finish_all=reinterpret_cast<Finish>(image+0x526d50);all_done=reinterpret_cast<Done>(image+0x525ae0);
+    finish_all=reinterpret_cast<Finish>(image+0x52d170);all_done=reinterpret_cast<Done>(image+0x52bed0);
 }
 }

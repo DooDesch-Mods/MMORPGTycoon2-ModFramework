@@ -95,8 +95,8 @@ void prepare(MT2FW_MT2_RecoveryReceipt& value){
     held();callback_ownership();
     require(!loading_dispatch::pending,"Recovery preparation has deferred loading callbacks");
     async_save::retire();
-    const auto active=snapshot_prepare::mode(),state=read<uintptr_t>(active+0x58),clock=read<uintptr_t>(image+0x13df9a0);
-    require(clock&&read<uintptr_t>(clock)==image+0x17499d0&&read<uintptr_t>(state+0x158)==clock,
+    const auto active=snapshot_prepare::mode(),state=read<uintptr_t>(active+0x58),clock=read<uintptr_t>(image+0x13eb9a0);
+    require(clock&&read<uintptr_t>(clock)==image+0x174fd70&&read<uintptr_t>(state+0x158)==clock,
         "Recovery selected Clock native owner differs");
     const auto scheduler=held_tasks;held();
     value.selected_clock_bits=read<uint32_t>(clock+0x58);

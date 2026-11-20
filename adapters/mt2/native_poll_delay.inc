@@ -8,7 +8,7 @@ __declspec(noinline) void SDLCALL entry(Uint32 milliseconds);
 void proof(){
     std::string cause;
     require(native_routes->prove_framework_hook(key,reinterpret_cast<void*>(&entry),reinterpret_cast<void*>(original),cause),"Ordered polling route changed: "+cause);
-    require(read<uintptr_t>(image+0x1c52028)==resolved,"Ordered polling SDL_Delay IAT identity changed");
+    require(read<uintptr_t>(image+0x1c59028)==resolved,"Ordered polling SDL_Delay IAT identity changed");
 }
 __declspec(noinline) void SDLCALL entry(Uint32 milliseconds){
     const auto caller=reinterpret_cast<uintptr_t>(_ReturnAddress());
@@ -24,13 +24,13 @@ Json status(){
 void install(){
     if(installed)return;
     for(const auto& [rva,size,sha]:std::array<std::tuple<uintptr_t,size_t,const char*>,2>{{
-        {0x526d50,466,"37568995d5b181f89f60bd9c0bc43b04f3336bb19f2164edafc945489dac34fa"},
-        {0xa7f528,6,"0b7794983a054d6f460d751a2aaeb1907af6a6496e2f6283eae932cd5c9118bf"}}}){
+        {0x52d170,466,"538daa5b8b0c2013c8fadc3453c6873a98c69d1547dfaab8efe389d406cc1782"},
+        {0xa8a648,6,"8b130197ced64c20544d5d5453cc6667b00afa90d13c7c99bf61a62e56c4f21b"}}}){
         std::string cause;require(native_routes->verify_body(rva,size,sha,cause),"Ordered polling native bytes differ RVA="+std::to_string(rva)+": "+cause);
     }
     auto module=GetModuleHandleW(L"SDL3.dll");require(module!=nullptr,"Ordered polling SDL3 module is absent");
     resolved=reinterpret_cast<uintptr_t>(GetProcAddress(module,"SDL_Delay"));
-    require(resolved&&read<uintptr_t>(image+0x1c52028)==resolved,"Ordered polling SDL_Delay import/export identity differs");
+    require(resolved&&read<uintptr_t>(image+0x1c59028)==resolved,"Ordered polling SDL_Delay import/export identity differs");
     HMODULE pinned=nullptr;
     require(GetModuleHandleExW(GET_MODULE_HANDLE_EX_FLAG_FROM_ADDRESS|GET_MODULE_HANDLE_EX_FLAG_PIN,reinterpret_cast<LPCWSTR>(resolved),&pinned)&&pinned==module,
         "Ordered polling SDL_Delay provider module pin differs");

@@ -30,7 +30,7 @@ template<class T> bool read(const void* object,size_t offset,T& output) {
     return false;
 }
 DWORD string_call(uintptr_t rva,void*,const char* name,void** output) {
-    require(rva==0x81d860,"Unexpected native lookup target"); ++lookups;
+    require(rva==0x825e50,"Unexpected native lookup target"); ++lookups;
     if(lookup_failure==name) return 123;
     auto found=panes.find(name); *output=found==panes.end()?nullptr:found->second; return 0;
 }

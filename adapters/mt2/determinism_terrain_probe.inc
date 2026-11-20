@@ -157,7 +157,7 @@ Json texture_content(const Json& binding){
         {"channels",channels},{"sample_grid",grid}};
 }
 Json generator_state(){
-    const auto map=presentation_probe::typed(read<uintptr_t>(image+0x13df8c0),0x1742860);
+    const auto map=presentation_probe::typed(read<uintptr_t>(image+0x13eb8c0),0x1748c00);
     const auto data=read<uintptr_t>(map+0x1a8);require(data!=0,"Terrain content MapData absent");
     const auto gpu=read<uintptr_t>(data+8);require(gpu!=0,"Terrain content MapData_GPU absent");
     const auto blender=read<uintptr_t>(gpu+0x398);require(blender!=0,"Terrain content color blender absent");
@@ -260,7 +260,7 @@ void begin(){
     if(!enabled||control.attempted!=selected_step||control.phase!=mt2::determinism::Gate::Phase::Stepping)return;
     require(!attempted&&!observing,"Terrain probe selected frame was already attempted");attempted=true;
     require(thread==GetCurrentThreadId()&&control.entered,"Terrain probe requires entered game-thread frame");
-    auto map=presentation_probe::typed(read<uintptr_t>(image+0x13df8c0),0x1742860);
+    auto map=presentation_probe::typed(read<uintptr_t>(image+0x13eb8c0),0x1748c00);
     map_flag_4a0=presentation_probe::flag(map+0x4a0);
     require(read<int32_t>(map+0x3d4)==7&&presentation_probe::flag(map+0x47f)==1&&presentation_probe::flag(map+0x488)==0,
         "Terrain probe selected frame requires ready map state 7 with completed rez");
@@ -282,22 +282,22 @@ void install(const Json& config){
     require(config.value("presentation_probe",false),"Terrain probe requires private presentation probe");
     require(config.contains("terrain_probe_step")&&config.at("terrain_probe_step").is_number_unsigned(),"Terrain probe requires explicit unsigned frame index");
     selected_step=config.at("terrain_probe_step").get<uint64_t>();require(selected_step>0,"Terrain probe frame index must be positive");
-    presentation_rng::verify(0x9d8600,6048,"14930cf7bca1a63b5cc098feea46149d371ed092c2c6b1217d9538a54d01e648");
-    presentation_rng::verify(0x9cd480,16,"c08284fc39d8e46ba538628fc6b6ef689099dd976e46300226badd0aef62233c");
-    presentation_rng::verify(0x32fd30,1088,"e28e495258186807f024b764b44d8abe13d2aa9d612d871f683869a7440ec87a");
-    presentation_rng::verify(0x9d6140,9408,"decd984108da1dce7b662dd298a70de16c803bfe97ca73ce36c18c9734a3808d");
-    presentation_rng::verify(0x9dd970,624,"e365e318415cf8c21dba61b3e61c8730f672dd2696a86d422449f26047e70ba2");
-    presentation_rng::verify(0x9bb5c0,3472,"fdefdd38c6fc5005954efd5b3b7bd7054b4f8243e3a7067c5d6a0f244bed0a84");
-    presentation_rng::verify(0x9be1b0,3744,"6c79f2f2d36b0deb3a5b2b24e67956e8d3fa89b9f716e6165a4660071c264c86");
-    presentation_rng::verify(0x9bf050,7136,"73b5d8110fcd06ee67a8c8920c455d5bbb08545cfd9e4bf69b60e1cd82700254");
-    presentation_rng::verify(0x9cd470,16,"900895f2ed8006c8decb5e65aa7b4d4a33e00c9496934b039f7b9fa906945e95");
-    presentation_rng::verify(0x32e890,5264,"5e6f092c80fc48bbb0fedc56b386af43f47040ccf3829989c25d9e97a2852db7");
-    presentation_rng::verify(0x336f70,240,"e5d2ab70e87d8560cb9377eff2f4aa90f304e9a7964711d9f80485643cc37b89");
-    presentation_rng::verify(0x33b0f0,32,"7358c59298d3334bbf47c5b357aeb3c2f9ae6a42f9e4e37637b124a0519abecb");
-    presentation_rng::verify(0x33c690,1168,"8e16898e542a4079d6c0f4a9979086d2d6c18b844e3798e88e9010f9a86e7035");
-    presentation_rng::verify(0x1e85c0,912,"e25cedfc984b7d01c370901a89cae7d348a64ab39366e08c543d56a6bd0fbd06");
-    presentation_rng::verify(0x1e8d00,928,"d9348e70b127f775af2a21addf20472c8a926d95024c8aaa2a488d1137d8e623");
-    hook(reinterpret_cast<void*>(image+0x9d8600),reinterpret_cast<void*>(&prepare),reinterpret_cast<void**>(&original));
-    hook(reinterpret_cast<void*>(image+0x9be1b0),reinterpret_cast<void*>(&flush),reinterpret_cast<void**>(&original_flush));
+    presentation_rng::verify(0x9e2790,6048,"14930cf7bca1a63b5cc098feea46149d371ed092c2c6b1217d9538a54d01e648");
+    presentation_rng::verify(0x9d7080,16,"c08284fc39d8e46ba538628fc6b6ef689099dd976e46300226badd0aef62233c");
+    presentation_rng::verify(0x333dc0,1088,"74e8140f708a1728a0c6e9fed4fa9d856489d8e3da90a09d12c32f4a9e029c77");
+    presentation_rng::verify(0x9e02d0,9408,"0905551f7b02dd6a2ed24718404bbd8b11a9b441d1b3e978633bfca308c6ffa5");
+    presentation_rng::verify(0x9e7c30,624,"fb509debee9059810d481dd56a9024dcdfa2bd48f1c31501394aea743840a881");
+    presentation_rng::verify(0x9c5180,3472,"fdefdd38c6fc5005954efd5b3b7bd7054b4f8243e3a7067c5d6a0f244bed0a84");
+    presentation_rng::verify(0x9c7d70,3744,"6c79f2f2d36b0deb3a5b2b24e67956e8d3fa89b9f716e6165a4660071c264c86");
+    presentation_rng::verify(0x9c8c10,7136,"2fe92d8034753939be40f87eb7dd7806c95c4bf8338731ec8c9ce4805b04bd75");
+    presentation_rng::verify(0x9d7070,16,"900895f2ed8006c8decb5e65aa7b4d4a33e00c9496934b039f7b9fa906945e95");
+    presentation_rng::verify(0x332920,5264,"55ca106d58de5c32fdc1fc661706a1ecf3662ef4144040141475375e8dbb43c4");
+    presentation_rng::verify(0x33b070,240,"79f6e32d4023be3dab2da003ef361a4ce7262b7b08708429584bf96446992e1a");
+    presentation_rng::verify(0x33f1f0,32,"7358c59298d3334bbf47c5b357aeb3c2f9ae6a42f9e4e37637b124a0519abecb");
+    presentation_rng::verify(0x340790,1168,"4ad5ed7c82a5b9abc997ca92c81b8e43ffe204ed8aa7ae9f33d5ade39c6ee994");
+    presentation_rng::verify(0x1eaa00,912,"e25cedfc984b7d01c370901a89cae7d348a64ab39366e08c543d56a6bd0fbd06");
+    presentation_rng::verify(0x1eb170,928,"d9348e70b127f775af2a21addf20472c8a926d95024c8aaa2a488d1137d8e623");
+    hook(reinterpret_cast<void*>(image+0x9e2790),reinterpret_cast<void*>(&prepare),reinterpret_cast<void**>(&original));
+    hook(reinterpret_cast<void*>(image+0x9c7d70),reinterpret_cast<void*>(&flush),reinterpret_cast<void**>(&original_flush));
 }
 }

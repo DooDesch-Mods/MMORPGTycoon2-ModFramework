@@ -10,12 +10,12 @@ Json words(uintptr_t p,std::initializer_list<uintptr_t> offsets){
 Json snapshot(){
     if(!enabled)return nullptr;
     require(thread==GetCurrentThreadId()&&held_tasks,"Presentation probe requires quiescent game-thread witness");
-    auto map=typed(read<uintptr_t>(image+0x13df8c0),0x1742860);
-    auto rez=typed(read<uintptr_t>(map+0x2a0),0x171c7b0);
-    require(rez==read<uintptr_t>(image+0x13df590),"Presentation probe WorldRez singleton differs");
-    auto digital=typed(read<uintptr_t>(owner+0x58),0x1706140);
-    auto view=typed(read<uintptr_t>(image+0x13df650),0x1748620);
-    auto system=read<uintptr_t>(image+0x1c4eb40);require(system,"Presentation probe System absent");
+    auto map=typed(read<uintptr_t>(image+0x13eb8c0),0x1748c00);
+    auto rez=typed(read<uintptr_t>(map+0x2a0),0x1722b50);
+    require(rez==read<uintptr_t>(image+0x13eb590),"Presentation probe WorldRez singleton differs");
+    auto digital=typed(read<uintptr_t>(owner+0x58),0x170c4e0);
+    auto view=typed(read<uintptr_t>(image+0x13eb650),0x174e9c0);
+    auto system=read<uintptr_t>(image+0x1c55b40);require(system,"Presentation probe System absent");
     auto screen=read<uintptr_t>(system+0x70);require(screen,"Presentation probe Screen absent");
     auto count=read<int32_t>(screen+0x30);require(count>=26&&count<=64,"Presentation probe scene count differs");
     auto list=read<uintptr_t>(screen+0x10);require(list,"Presentation probe scene list absent");
@@ -53,14 +53,14 @@ void install(const Json& config){
     enabled=config.value("presentation_probe",false);if(!enabled)return;
     require(config.value("bootstrap_boundary",false),"Presentation probe requires bootstrap boundary");
     // Exact bodies establish the field layouts; this observer installs no hooks.
-    presentation_rng::verify(0x32e890,5264,"5e6f092c80fc48bbb0fedc56b386af43f47040ccf3829989c25d9e97a2852db7");
-    presentation_rng::verify(0x322490,288,"7f05128d33541dc1d03ae9ea27c4a6e3da40bb02cdb5c002d06e0da067ddfd1d");
-    presentation_rng::verify(0x3225c0,32,"8f361392a5393725d5922aabe260e3e250732ca8cddb3295c5cda719c4939e88");
-    presentation_rng::verify(0x16ec90,1680,"643ac19c973724ac97c29a001a686188811f86638284668deb49d986c6dd126b");
-    presentation_rng::verify(0x16f4e0,2608,"e2ae82831a421c13459f20498381209beaf2b0620c356110c12efb2fbbf71a07");
-    presentation_rng::verify(0x481c10,416,"7fee0c0355ebf9137a279ce78f2bd4821d7b7c90c8cb26e9969aed6fc5839249");
-    presentation_rng::verify(0x481db0,656,"265e384e2af25a903cfe58183e33a484e8c6a8aeb9aa3dc239ff3875af5e588f");
-    presentation_rng::verify(0x9ca3a0,80,"a18e9111c7c1ea1143c06644859585a09386cc712d80995b295c66f11e559ced");
-    presentation_rng::verify(0x9c9070,880,"4cf61560e5223f1a9193b9f1af4685d40caa1bce41ea7511690b529052c1823e");
+    presentation_rng::verify(0x332920,5264,"55ca106d58de5c32fdc1fc661706a1ecf3662ef4144040141475375e8dbb43c4");
+    presentation_rng::verify(0x326230,288,"7f05128d33541dc1d03ae9ea27c4a6e3da40bb02cdb5c002d06e0da067ddfd1d");
+    presentation_rng::verify(0x326370,32,"371cc002ea95f63763c4ffb315190eed21f17c525eb2429c60dad8dbb7df8663");
+    presentation_rng::verify(0x170660,1680,"239d75e38efbe874ebfae1b99a88a14cdf57551b3986ecb0214a1a768574cded");
+    presentation_rng::verify(0x170eb0,2608,"01960afef08d26d400395426e7a2a96690d57145f83ffec40edc1f82b7bc0db5");
+    presentation_rng::verify(0x486d70,416,"7fee0c0355ebf9137a279ce78f2bd4821d7b7c90c8cb26e9969aed6fc5839249");
+    presentation_rng::verify(0x486f30,656,"265e384e2af25a903cfe58183e33a484e8c6a8aeb9aa3dc239ff3875af5e588f");
+    presentation_rng::verify(0x9d3f60,80,"35b5eea29601158eebeb53137155f4b564a454e8231884781e246825df535a03");
+    presentation_rng::verify(0x9d2c30,880,"67927fcbd1b078e2a29d402a4af4c6096d592c2dc3029d17bb2be45854a48ae0");
 }
 }

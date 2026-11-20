@@ -4,7 +4,7 @@ namespace {
 bool terminal_pins_checked=false;
 void terminal_verify(){
     for(const auto& pin:terminal_pins){
-        if(pin.rva==0x81ec20){
+        if(pin.rva==0x827210){
             // Window::Show has an acknowledged Multiplayer HUD hook. Recheck its
             // current patch and detour ownership even after static pins passed.
             std::string cause;
@@ -37,7 +37,7 @@ NativeWindow& terminal_window(){
 bool terminal_button(const std::string& id){return id=="leave"||id=="chat_send"||id=="report"||id=="report_back"||id=="report_send"||id=="report_auto";}
 bool terminal_button_available(NativeWindow& app,const std::string& id){
     auto* target=native_pane(app.panel,id);uintptr_t table=0;uint8_t disabled=1,shown=0,visible=0;
-    require(read(target,0,table)&&table==image+0x16e3ec0&&read(target,0x46d,disabled)&&disabled<=1&&
+    require(read(target,0,table)&&table==image+0x16ea260&&read(target,0x46d,disabled)&&disabled<=1&&
         read(target,0x69,shown)&&shown<=1&&read(target,0x2b4,visible)&&visible<=1,"Terminal panel button owner or state is unreadable");
     return !disabled&&shown&&visible;
 }
@@ -50,26 +50,26 @@ void terminal_queue(NativeWindow& app,const std::string& id){
 }
 DWORD terminal_reveal(void* target){
     __try{
-        reinterpret_cast<void(*)(void*,bool,bool)>(image+0x81ec20)(target,true,true);
-        reinterpret_cast<void(*)(void*)>(image+0x81e010)(target);
+        reinterpret_cast<void(*)(void*,bool,bool)>(image+0x827210)(target,true,true);
+        reinterpret_cast<void(*)(void*)>(image+0x826600)(target);
     }__except(EXCEPTION_EXECUTE_HANDLER){return GetExceptionCode();}return 0;
 }
 void terminal_field(NativeWindow& app,void* field){
     bool owned=false;for(const char* id:{"chat_input","report_comment"})if(native_pane(app.panel,id)==field)owned=true;
     uintptr_t table=0,binding=0;uint8_t visible=0;size_t command_size=0;
-    require(owned&&read(field,0,table)&&table==image+0x1703290&&read(field,0x4a0,binding)&&!binding&&
+    require(owned&&read(field,0,table)&&table==image+0x1709630&&read(field,0x4a0,binding)&&!binding&&
         read(field,0x3e8,command_size)&&!command_size&&read(field,0x69,visible)&&visible==1&&
         read(field,0x2b4,visible)&&visible==1&&read(field,0x3d8,visible)&&visible==1,
         "Terminal input has an external binding, command, hidden or non-editable owner");
 }
 DWORD terminal_focus_call(void* window,void* field){
-    __try{reinterpret_cast<void(*)(void*,void*)>(image+0x81ada0)(window,field);}
+    __try{reinterpret_cast<void(*)(void*,void*)>(image+0x823390)(window,field);}
     __except(EXCEPTION_EXECUTE_HANDLER){return GetExceptionCode();}return 0;
 }
 DWORD terminal_key_call(void* input,const SDL_Event* event,void* field){
     __try{
-        if(event)reinterpret_cast<void(*)(void*,const SDL_Event*)>(image+0x9e9d90)(input,event);
-        reinterpret_cast<void(*)(void*,float)>(image+0x7f2580)(field,0.f);
+        if(event)reinterpret_cast<void(*)(void*,const SDL_Event*)>(image+0x9f4190)(input,event);
+        reinterpret_cast<void(*)(void*,float)>(image+0x7fac20)(field,0.f);
     }__except(EXCEPTION_EXECUTE_HANDLER){return GetExceptionCode();}return 0;
 }
 void terminal_events(NativeWindow& app,const terminal_panel::Native& n,const terminal_panel::Owner& owner){
@@ -116,7 +116,7 @@ void terminal_events(NativeWindow& app,const terminal_panel::Native& n,const ter
                 if(id=="chat_input"||id=="report_comment"){
                     auto* field=reinterpret_cast<void*>(target);terminal_field(app,field);
                     void* input=nullptr;void* handler=nullptr;void* previous=nullptr;
-                    require(read(reinterpret_cast<void*>(image),0x13df990,input)&&read(input,0xb0,handler)&&read(app.panel,0x3c0,previous),"Terminal focused input owner unreadable");
+                    require(read(reinterpret_cast<void*>(image),0x13eb990,input)&&read(input,0xb0,handler)&&read(app.panel,0x3c0,previous),"Terminal focused input owner unreadable");
                     if(previous){std::set<uintptr_t> tree;terminal_panel::inspect_tree(n,owner,owner.panel,tree);require(tree.contains(reinterpret_cast<uintptr_t>(previous)),"Terminal previous focus is outside its owned pane tree");}
                     if(handler){require(previous&&handler==static_cast<unsigned char*>(previous)+0x2c8,"Terminal cannot replace a foreign native StringMode handler");terminal_field(app,previous);}
                     check(terminal_focus_call(app.panel,field),"Terminal native input focus");
@@ -133,11 +133,11 @@ void terminal_events(NativeWindow& app,const terminal_panel::Native& n,const ter
         bool editable=false;for(const char* id:{"chat_input","report_comment"})if(native_pane(app.panel,id)==field)editable=true;
         if(!editable)continue;
         terminal_field(app,field);void* native_input=nullptr;void* handler=nullptr;uintptr_t table=0;uint8_t active=0,paused=0;
-        require(read(reinterpret_cast<void*>(image),0x13df990,native_input)&&read(native_input,0,table)&&table==image+0x1749430&&
+        require(read(reinterpret_cast<void*>(image),0x13eb990,native_input)&&read(native_input,0,table)&&table==image+0x174f7d0&&
             read(native_input,0xb0,handler)&&handler==static_cast<unsigned char*>(field)+0x2c8&&
             read(native_input,0xa6,active)&&active==1&&read(native_input,0xa9,paused)&&paused==0,
             "Terminal text delivery lacks its exact active native StringMode handler");
-        if(event.type==SDL_EVENT_TEXT_INPUT){check(string_call(0x9e97d0,native_input,captured.text.c_str()),"Terminal native text event");check(terminal_key_call(native_input,nullptr,field),"Terminal native text refresh");}
+        if(event.type==SDL_EVENT_TEXT_INPUT){check(string_call(0x9f3bd0,native_input,captured.text.c_str()),"Terminal native text event");check(terminal_key_call(native_input,nullptr,field),"Terminal native text refresh");}
         else check(terminal_key_call(native_input,&event,field),"Terminal native editing key");
     }
     require(batch.error.empty(),batch.error);
@@ -161,11 +161,11 @@ Json terminal_activate(const Json& args){
         size_t maximum=0;for(const auto& item:app.widgets)if(item.at("id")==id&&item.at("type")=="input")maximum=native_input::limit(item);
         require(maximum,"Terminal input is not registered");auto* field=native_pane(app.panel,id);
         uintptr_t table=0,binding=0;uint8_t visible=0;size_t command_size=0;
-        require(read(field,0,table)&&table==image+0x1703290&&read(field,0x4a0,binding)&&!binding&&
+        require(read(field,0,table)&&table==image+0x1709630&&read(field,0x4a0,binding)&&!binding&&
             read(field,0x3e8,command_size)&&!command_size&&read(field,0x69,visible)&&visible==1&&
             read(field,0x2b4,visible)&&visible==1,"Terminal text field has an external binding, command or hidden owner");
         auto value=args.at("text").get<std::string>();native_input::validate(value,maximum);
-        check(string_call(0x7f1630,field,value.c_str()),"Terminal local input text");
+        check(string_call(0x7f9b70,field,value.c_str()),"Terminal local input text");
         std::string actual;require(text(static_cast<unsigned char*>(field)+0x2d0,actual)&&actual==value,"Terminal local input readback differs");
         return {{"accepted",true},{"readback_matches",true},{"bytes",actual.size()}};
     }
@@ -179,14 +179,14 @@ bool terminal_draw(uint64_t lease,uintptr_t native_window,int width,int height,c
         if(terminal_draw_receipt.blocked){error=terminal_draw_receipt.error;return false;}
         uintptr_t resolved=0;uint32_t bound=0;std::string hash,cause;
         require(native::read_resolver_receipt(resolved,bound,hash,cause),cause);
-        require(resolved==image&&bound==thread&&hash=="bbab2dc68babcc644d0a1679548bf1e334b6c52aea669c3f61f6cb9d45c1aaf6","Terminal executable/thread resolver differs");
+        require(resolved==image&&bound==thread,"Terminal image/thread resolver differs");
         terminal_verify();
         auto n=terminal_panel::native_calls(image,[](uintptr_t at,void* out,size_t size){
             require(readable(reinterpret_cast<void*>(at),size),"Terminal native owner read is unavailable");std::memcpy(out,reinterpret_cast<void*>(at),size);
         });
         terminal_panel::Owner o;o.image=image;o.mode=reinterpret_cast<uintptr_t>(mode);o.panel=o.registered_panel=reinterpret_cast<uintptr_t>(app.panel);
         o.thread=thread;o.current_thread=GetCurrentThreadId();o.window=native_window;o.width=width;o.height=height;o.mode_index=mode_index;
-        require(read(reinterpret_cast<void*>(image),0x13df8f0,o.game)&&read(reinterpret_cast<void*>(image),0x1c4e3a0,o.screen),"Terminal Game/Screen owner read failed");
+        require(read(reinterpret_cast<void*>(image),0x13eb8f0,o.game)&&read(reinterpret_cast<void*>(image),0x1c553a0,o.screen),"Terminal Game/Screen owner read failed");
         terminal_panel::inspect(n,o,false);
         uint8_t suppress=1;uintptr_t child=0;
         require(read(app.panel,0x378,suppress)&&!suppress&&read(app.panel,0x3e0,child)&&!child,"Terminal window has modal suppression or a rez child");

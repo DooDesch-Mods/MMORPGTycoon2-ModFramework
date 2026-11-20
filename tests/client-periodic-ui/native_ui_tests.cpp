@@ -60,7 +60,7 @@ struct Fixture {
         auto& step=steps.value;step={};step.actual_role=MT2FW_MT2_SESSION_CLIENT;step.phase=MT2FW_MT2_STEP_ENTERED;
         step.lease=5;step.session=11;step.world_epoch=9;step.generation=3;step.thread=7;step.tick=20479;step.invocation=123;
         memory[owner+0x28]=bootstrap.mode;memory[bootstrap.mode+0x90]=window;memory[bootstrap.mode+0x30c]=0;
-        memory[window]=image+0x1712570;memory[image+0x1712570+0x1d0]=image+0x81ec20;
+        memory[window]=image+0x1718910;memory[image+0x1718910+0x1d0]=image+0x827210;
         memory[window+0x45f]=1;memory[window+0x359]=1;memory[window+0x4ec]=1;memory[window+0x4e8]=0;
         arm.size=sizeof(arm);arm.operation=MT2FW_MT2_SNAPSHOT_ARM_PERIODIC;arm.lease=5;arm.session=11;
         arm.world_epoch=9;arm.tick=20612;arm.invocation=124;arm.order=7;arm.peer_mask=3;
@@ -68,7 +68,7 @@ struct Fixture {
         sealed=arm;sealed.operation=MT2FW_MT2_SNAPSHOT_SEAL;sealed.invocation=0;sealed.witness_sha256[0]=42;
         release=sealed;release.operation=MT2FW_MT2_SNAPSHOT_RELEASE;release.ack_mask=3;
     }
-    void retain(){ui::retain(reinterpret_cast<void*>(bootstrap.mode),image+0x65f685);}
+    void retain(){ui::retain(reinterpret_cast<void*>(bootstrap.mode),image+0x6666f5);}
     void ready(){
         retain();memory[window+0x4e8]=1;control.phase=Control::Phase::Held;control.entered=false;timer_step::frame.active=false;
         auto& step=steps.value;step.phase=MT2FW_MT2_STEP_HELD;step.completed_tick=arm.tick;step.callbacks_inflight=1;step.workers_held=1;

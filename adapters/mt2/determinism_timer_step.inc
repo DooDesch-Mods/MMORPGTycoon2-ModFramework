@@ -12,12 +12,12 @@ struct Frame {
 thread_local Frame frame;
 void require(bool value,const char* cause){if(!value)throw std::runtime_error(cause);}
 void current_game(){
-    require(frame.game&&read<uintptr_t>(image+0x13df8f0)==frame.game,"Fixed timestep current Game owner differs");
-    require(read<uintptr_t>(frame.game)==image+0x1743740,"Fixed timestep Game address point differs");
+    require(frame.game&&read<uintptr_t>(image+0x13eb8f0)==frame.game,"Fixed timestep current Game owner differs");
+    require(read<uintptr_t>(frame.game)==image+0x1749ae0,"Fixed timestep Game address point differs");
 }
 void timer_owner(uintptr_t receiver){
-    current_game();require(receiver&&read<uintptr_t>(image+0x1c4eb70)==receiver,"Fixed timestep Timer singleton differs");
-    require(read<uintptr_t>(receiver)==image+0x16f9b80&&read<uintptr_t>(image+0x16f9ba0)==image+0xa36300,"Fixed timestep Timer type/dispatch differs");
+    current_game();require(receiver&&read<uintptr_t>(image+0x1c55b70)==receiver,"Fixed timestep Timer singleton differs");
+    require(read<uintptr_t>(receiver)==image+0x16fff20&&read<uintptr_t>(image+0x16fff40)==image+0xa413b0,"Fixed timestep Timer type/dispatch differs");
     require(read<uint8_t>(receiver+8)==1,"Fixed timestep Timer system is not active");
     const auto data=read<uintptr_t>(frame.game+8);const auto count=read<int32_t>(frame.game+0x10);
     require(count>0&&count<=64&&data,"Fixed timestep active system array bounds differ");
@@ -37,7 +37,7 @@ void update_call(void* receiver,float incoming,uintptr_t caller){
     ++frame.calls;++frame.updates_entered;
     original_update(receiver,incoming);
     ++frame.updates_returned;
-    require(caller==image+0x95675f,"Fixed timestep Timer was not called by the admitted coreGame::Go system loop");
+    require(caller==image+0x95f8bf,"Fixed timestep Timer was not called by the admitted coreGame::Go system loop");
     require(frame.calls==1,"Fixed timestep outer frame called Timer more than once");
     timer_owner(reinterpret_cast<uintptr_t>(receiver));
     frame.last_measured=read<uint32_t>(frame.game+0x1c);
@@ -56,7 +56,7 @@ void finish(){
 void abandon(){frame.active=false;}
 void restore_held(){
     require(!frame.active&&frame.passive_pending,"Fixed timestep passive restoration lacks a completed outer boundary");current_game();
-    require(held_tasks&&read<uintptr_t>(image+0x13df340)==held_tasks&&read<uintptr_t>(frame.game+0x68)==held_tasks,"Fixed timestep held Task owner differs");
+    require(held_tasks&&read<uintptr_t>(image+0x13eb340)==held_tasks&&read<uintptr_t>(frame.game+0x68)==held_tasks,"Fixed timestep held Task owner differs");
     require(read<uint8_t>(held_tasks+0xf8)==1&&read<int32_t>(held_tasks+0xa8)==0&&read<int32_t>(held_tasks+0x90)==0,"Fixed timestep passive restoration requires paused/drained workers");
     write(frame.game+0x1c,frame.passive);frame.passive_pending=false;++frame.restored;
 }
@@ -66,9 +66,9 @@ Json status(){return {{"outer_entered",frame.entered},{"outer_returned",frame.re
     {"active",frame.active},{"passive_restore_pending",frame.passive_pending}};}
 void install(){
     std::string body(0x340,'\0');SIZE_T copied=0;
-    if(!ReadProcessMemory(GetCurrentProcess(),reinterpret_cast<void*>(image+0xa36300),body.data(),body.size(),&copied)||copied!=body.size())
+    if(!ReadProcessMemory(GetCurrentProcess(),reinterpret_cast<void*>(image+0xa413b0),body.data(),body.size(),&copied)||copied!=body.size())
         throw std::runtime_error("Fixed timestep Timer body read failed");
-    require(digest(body)=="2442e3fc5884b09357a378bdeed30fa487466e4d69c36c864254857dc030c334","Fixed timestep exact Timer Update body differs");
-    hook(reinterpret_cast<void*>(image+0xa36300),reinterpret_cast<void*>(&update),reinterpret_cast<void**>(&original_update));
+    require(digest(body)=="8cdf76ec96c73b9c4745d27f7329f80f90cc33e7ebd2a3a862105d2994ae02f5","Fixed timestep exact Timer Update body differs");
+    hook(reinterpret_cast<void*>(image+0xa413b0),reinterpret_cast<void*>(&update),reinterpret_cast<void**>(&original_update));
 }
 }

@@ -5,12 +5,12 @@
 #include <stdexcept>
 namespace mt2fw::game::native {
 std::array<unsigned char,1536> game_bytes{},mode_bytes{};
-constexpr uintptr_t game_slot=0x13df8f0,mode_slot=0x13df320;
+constexpr uintptr_t game_slot=0x13eb8f0,mode_slot=0x13eb320;
 bool bound=true,game_type=true,mode_type=true,folder_readable=true;
 std::string native_folder="Fresh";
 void* singleton(uintptr_t slot){return slot==game_slot?game_bytes.data():mode_bytes.data();}
 bool check_thread(std::string& error){if(!bound){error="wrong thread";return false;}return true;}
-bool has_vtable(const void* pointer,uintptr_t type){return (pointer==game_bytes.data()&&type==0x1743730&&game_type)||(pointer==mode_bytes.data()&&type==0x16e6720&&mode_type);}
+bool has_vtable(const void* pointer,uintptr_t type){return (pointer==game_bytes.data()&&type==0x1749ad0&&game_type)||(pointer==mode_bytes.data()&&type==0x16ecac0&&mode_type);}
 template<class T> bool read_at(const void* pointer,size_t offset,T& value){if(pointer!=game_bytes.data()&&pointer!=mode_bytes.data())return false;std::memcpy(&value,static_cast<const unsigned char*>(pointer)+offset,sizeof(T));return true;}
 template<class T> void write(void* pointer,size_t offset,T value){std::memcpy(static_cast<unsigned char*>(pointer)+offset,&value,sizeof(T));}
 bool read_game_string(const void* pointer,size_t offset,std::string& result){if(pointer!=game_bytes.data()||offset!=0x470||!folder_readable)return false;result=native_folder;return true;}

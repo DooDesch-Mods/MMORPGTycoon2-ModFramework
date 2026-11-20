@@ -52,12 +52,12 @@ DWORD titlebar_lookup_error = 0;
 DWORD string_call(uintptr_t rva, void* receiver, const char* value, void** output) {
     require(std::string(value) == "close", "plain original close ID");
     *output = nullptr;
-    if (rva == 0x81d860) {
+    if (rva == 0x825e50) {
         require(receiver == window_bytes.data(), "exact Window::FindPane receiver");
         ++window_lookups;
         return 0;
     }
-    require(rva == 0x816150 && receiver == titlebar_bytes.data(), "exact titlebar mmoView::FindPane receiver");
+    require(rva == 0x81e6c0 && receiver == titlebar_bytes.data(), "exact titlebar mmoView::FindPane receiver");
     ++titlebar_lookups;
     if (!close_missing && !titlebar_lookup_error) *output = button_bytes.data();
     return titlebar_lookup_error;

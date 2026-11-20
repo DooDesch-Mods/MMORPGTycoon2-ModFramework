@@ -14,9 +14,9 @@ void install(const Json& config){
     if(!config.value("saved_npc_identity",false))return;
     isolated();
     std::string body(0x4e0,'\0');SIZE_T copied=0;
-    if(!ReadProcessMemory(GetCurrentProcess(),reinterpret_cast<void*>(image+0xc0f0f0),body.data(),body.size(),&copied)||copied!=body.size())
+    if(!ReadProcessMemory(GetCurrentProcess(),reinterpret_cast<void*>(image+0xc1b830),body.data(),body.size(),&copied)||copied!=body.size())
         throw std::runtime_error("NPC receipt LoadFromStream body read failed");
-    if(digest(body)!="9399e3917850b0b81639314bedc5fdac979ca944b314804594f4bae720970fbe")
+    if(digest(body)!="f24f1cec4f4c9b609f462438cf1ac6cc668954ade1620898259787d437c165d4")
         throw std::runtime_error("NPC receipt exact LoadFromStream body differs");
     observer=std::make_unique<Core>([](uintptr_t address,size_t size){
         Core::Bytes bytes(size);SIZE_T count=0;
@@ -34,7 +34,7 @@ void install(const Json& config){
         if(std::string_view(state)=="Loading")throw std::runtime_error("Plugin loading is blocked by the private saved NPC observer");
         if(previous_notice)previous_notice(manifest,state);
     };
-    hook(reinterpret_cast<void*>(image+0xc0f0f0),reinterpret_cast<void*>(&load),reinterpret_cast<void**>(&original_load));installed=true;
+    hook(reinterpret_cast<void*>(image+0xc1b830),reinterpret_cast<void*>(&load),reinterpret_cast<void**>(&original_load));installed=true;
 }
 void arm(){if(installed)observer->arm("user/"+fixture_path,fixture_sha);}
 void validate_pin(const std::string& sha){if(installed&&sha!=Core::fixture)throw std::runtime_error("NPC identity marker requires the exact populated fixture SHA256");}

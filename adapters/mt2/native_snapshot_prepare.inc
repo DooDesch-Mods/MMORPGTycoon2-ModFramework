@@ -29,14 +29,14 @@ uintptr_t mode(){
     timer_step::current_game();
     require(thread==GetCurrentThreadId()&&owner==timer_step::frame.game,"Snapshot native Game/thread differs");
     const auto value=read<uintptr_t>(owner+0x28);
-    require(value&&value==bootstrap.mode&&read<uintptr_t>(value)==image+0x16e6730,"Snapshot active Mode differs");
+    require(value&&value==bootstrap.mode&&read<uintptr_t>(value)==image+0x16ecad0,"Snapshot active Mode differs");
     require(read<int32_t>(value+0x30c)==0,"Snapshot requires idle native Save count actual="+std::to_string(read<int32_t>(value+0x30c))+" required=0");
     return value;
 }
 uintptr_t clock(){
-    const auto value=read<uintptr_t>(image+0x13df9a0);
+    const auto value=read<uintptr_t>(image+0x13eb9a0);
     const auto state=read<uintptr_t>(mode()+0x58);
-    require(value&&read<uintptr_t>(value)==image+0x17499d0&&read<uintptr_t>(state+0x158)==value,"Snapshot Clock current owner differs");
+    require(value&&read<uintptr_t>(value)==image+0x174fd70&&read<uintptr_t>(state+0x158)==value,"Snapshot Clock current owner differs");
     require(read<uint32_t>(value+0x58)==0,"Snapshot requires explicitly paused selected Clock scale");
     return value;
 }
@@ -91,7 +91,7 @@ void after_go(){
 void prepare_native(const std::function<void(void*)>& finish){
     const auto active=mode();const auto native_clock=clock();
     const auto shards=read<uintptr_t>(active+0x30);
-    require(shards&&read<uintptr_t>(shards)==image+0x1702b00,"Snapshot ShardManager original owner differs");
+    require(shards&&read<uintptr_t>(shards)==image+0x1708ea0,"Snapshot ShardManager original owner differs");
     const auto tasks_now=tasks();
     require(read<uint8_t>(tasks_now+0xf8)==0&&finish_all&&all_done,"Snapshot preparation scheduler is not released");
     const auto context=SDL_GL_GetCurrentContext();const auto window=SDL_GL_GetCurrentWindow();
@@ -137,19 +137,19 @@ void settle_cache(){
         " returned="+std::to_string(loading_dispatch::save_cache::returns));
 }
 void flush_call(void* receiver,uintptr_t caller){
-    if(!mt2::PreparedSaveScope::current||caller!=image+0x4a0435){original_flush(receiver);return;}
+    if(!mt2::PreparedSaveScope::current||caller!=image+0x4a5925){original_flush(receiver);return;}
     capture_owner();auto& prepared=*mt2::PreparedSaveScope::current;
     const auto* blocking=mt2::BlockingSaveScope::current;
     require(blocking&&!blocking->previous&&blocking->mode==prepared_mode&&blocking->thread==thread,
         "Snapshot repeated flush lacks exact original blocking Save ownership");
     require(read<int32_t>(prepared_mode+0x30c)==0&&read<uintptr_t>(prepared_mode+0x30)==reinterpret_cast<uintptr_t>(receiver)&&
-        read<uintptr_t>(reinterpret_cast<uintptr_t>(receiver))==image+0x1702b00,"Snapshot repeated flush native receiver or save count differs");
+        read<uintptr_t>(reinterpret_cast<uintptr_t>(receiver))==image+0x1708ea0,"Snapshot repeated flush native receiver or save count differs");
     require(prepared.saves==0&&prepared.flushes==0,"Snapshot capture attempted more than one original Save");
     ++prepared.saves;++prepared.flushes;
 }
 __declspec(noinline) void flush_entry(void* receiver){flush_call(receiver,reinterpret_cast<uintptr_t>(_ReturnAddress()));}
 bool preserve_resume(void* receiver,uintptr_t caller){
-    if(!mt2::PreparedSaveScope::current||caller!=image+0x49f7c9)return false;
+    if(!mt2::PreparedSaveScope::current||caller!=image+0x4a4cb9)return false;
     capture_owner();auto& prepared=*mt2::PreparedSaveScope::current;
     require(prepared.saves==1,"Snapshot original Save Resume capture saves differs actual="+std::to_string(prepared.saves)+" required=1");
     require(prepared.flushes==1,"Snapshot original Save Resume prepared flush count differs actual="+std::to_string(prepared.flushes)+" required=1");
@@ -202,7 +202,7 @@ void operation(const Request& request,MT2FW_MT2_SnapshotCaptureFn callback,void*
             "Client Save cache already has native work; no duplicate rebuild");
         client_cache_attempted=true;
         loading_dispatch::save_cache::ExportScope scope(prepared_mode,prepared_tasks,thread);
-        reinterpret_cast<void(*)()>(image+0x7a1560)();
+        reinterpret_cast<void(*)()>(image+0x7a9760)();
         loading_dispatch::save_cache::settle(original_resume,original_pause,cache_finish);
         same(request);client_cache_returned=true;
         runtime->log("steps","info","Client Save publication cache completed order="+std::to_string(certificate.order)+
@@ -240,17 +240,17 @@ void reset(){
 void install(){
     if(installed)return;
     for(const auto& [offset,size,sha]:std::array<std::tuple<uintptr_t,size_t,const char*>,5>{{
-        {0x4a1b40,112,"c80fa0bc8b35c00fab500b78432fd2d09b3ba3075e3b09ac79c1851c3d58017f"},
-        {0x4a03a0,240,"c6d3f9d5af47b7fe217d9c22a65ccc584ef802fd11ffbec2172dc9c132e2e29d"},
-        {0x509a50,80,"f894bf9c1351b89ccda495a4d7b68b08969beef8e75371ccdb3f64a038aa285a"},
-        {0x259b70,176,"e04b7a6083ecc1404c416b50fd098114afd5a6f69d270f8190f0f24cda619efd"},
-        {0x49f6f0,352,"1d6dbe7daea4a371deb7e108f1284a0840c5f5d3cf3bcd925c1a2618b7c5ef5f"}
+        {0x4a7030,112,"17e53a55db00beb68c573217f8bdb1571a3454632b8536bb78bb36de86213503"},
+        {0x4a5890,240,"a0ac35c02e09cd01eec8a086290acc5e34b2cac9abc8f41535f6f492a5ff8c39"},
+        {0x50fba0,80,"7678ad9cf62e573887396bc4a7c4b5a4d361edcc72621b067123dc31b3083779"},
+        {0x25cc30,176,"3187c202bc83557ec587c7c0d61ee912529bb90877270ff5d6755ada0339eada"},
+        {0x4a4be0,352,"7f893889e8620536e62ff7e6fc69b594776ef539e9ae035e2552102e3a6509b5"}
     }}){
         std::string cause;const bool valid=native_routes->verify_body(offset,size,sha,cause);
         require(valid,"Snapshot original body pin differs rva="+std::to_string(offset)+" bytes="+std::to_string(size)+": "+cause);
     }
-    native_routes->catalog("framework.save.prepare-flush",0x509a50,true);native_services->reserve("framework.save.prepare-flush");
-    const auto target=reinterpret_cast<void*>(image+0x509a50);
+    native_routes->catalog("framework.save.prepare-flush",0x50fba0,true);native_services->reserve("framework.save.prepare-flush");
+    const auto target=reinterpret_cast<void*>(image+0x50fba0);
     const auto detour=reinterpret_cast<void*>(&flush_entry);
     hook(target,detour,reinterpret_cast<void**>(&original_flush));
     // Configuration runs after startup's one-time activation and publication.
@@ -259,17 +259,17 @@ void install(){
     std::string cause;
     const bool published=native_routes->publish_framework_hook(target,detour,reinterpret_cast<void*>(original_flush),cause);
     require(published,"Snapshot prepare flush hook publication failed: "+cause);
-    {std::string cause;const bool valid=native_routes->verify_body(0x7a1560,128,"4c368f3bc7df3f53042d01ee8864e301b1b2e664b80e13c29c0c4322b3bc48f7",cause);
-        require(valid,"Save cache native body pin differs rva=0x7a1560: "+cause);}
-    {std::string cause;const bool valid=native_routes->verify_body(0x7a2780,15024,"946864dffc3375187db8cede00297d5f82f97763385df383dcb582b05fd8c0f0",cause);
-        require(valid,"Save cache native body pin differs rva=0x7a2780: "+cause);}
-    {std::string cause;const bool valid=native_routes->verify_body(0xc367a0,16,"499f1f307c1cb989f968a6b7fcaec591e1828877223d0b0e7e8e8b76cde8c9ca",cause);
-        require(valid,"Save cache native body pin differs rva=0xc367a0: "+cause);}
-    {std::string cause;const bool valid=native_routes->verify_body(0x526d50,480,"666f4cac19d8d04df16bdff53afbcc87899ad708f157aeae5674cf284a4540fa",cause);
-        require(valid,"Save cache native body pin differs rva=0x526d50: "+cause);}
-    {std::string cause;const bool valid=native_routes->verify_body(0x526b00,432,"12ca52a501a074d6459b697bf9df2d8c4a7322bed76270b0cfe9dc33b91bd016",cause);
-        require(valid,"Save cache native body pin differs rva=0x526b00: "+cause);}
-    cache_finish=reinterpret_cast<Go>(image+0x526d50);
-    set_pause=reinterpret_cast<ClockSet>(image+0x259b70);installed=true;
+    {std::string cause;const bool valid=native_routes->verify_body(0x7a9760,128,"0666531d9531fe42d6e608ae25e63f6d2fb8d81dc8b591aa5f633cd9eb3191fe",cause);
+        require(valid,"Save cache native body pin differs rva=0x7a9760: "+cause);}
+    {std::string cause;const bool valid=native_routes->verify_body(0x7aa980,15024,"5014d0f56e89561c6581aab14f340301cbfc7863c86752859bd9da3a42d6d227",cause);
+        require(valid,"Save cache native body pin differs rva=0x7aa980: "+cause);}
+    {std::string cause;const bool valid=native_routes->verify_body(0xc43050,16,"499f1f307c1cb989f968a6b7fcaec591e1828877223d0b0e7e8e8b76cde8c9ca",cause);
+        require(valid,"Save cache native body pin differs rva=0xc43050: "+cause);}
+    {std::string cause;const bool valid=native_routes->verify_body(0x52d170,480,"f1d69fa40fbf68371e1c5cfccd34e93320ba7316f75ac1e97313b061695e9897",cause);
+        require(valid,"Save cache native body pin differs rva=0x52d170: "+cause);}
+    {std::string cause;const bool valid=native_routes->verify_body(0x52cf20,432,"db5e9cc494cc1f60c38e250084967df1e2bebe2f84a2bb18f1fd3a02430aa176",cause);
+        require(valid,"Save cache native body pin differs rva=0x52cf20: "+cause);}
+    cache_finish=reinterpret_cast<Go>(image+0x52d170);
+    set_pause=reinterpret_cast<ClockSet>(image+0x25cc30);installed=true;
 }
 }

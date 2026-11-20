@@ -112,11 +112,11 @@ void log_error(const std::string& cause) {
 DWORD string_call(uintptr_t rva, void* receiver, const char* value, void** output = nullptr) {
     String input{}; bool constructed = false; DWORD error = 0;
     __try {
-        reinterpret_cast<void(*)(void*, const char*)>(image + 0x49e090)(&input, value); constructed = true;
+        reinterpret_cast<void(*)(void*, const char*)>(image + 0x4a3580)(&input, value); constructed = true;
         if (output) *output = reinterpret_cast<void*(*)(void*, const void*)>(image + rva)(receiver, &input);
         else reinterpret_cast<void(*)(void*, const void*)>(image + rva)(receiver, &input);
     } __except (EXCEPTION_EXECUTE_HANDLER) { error = GetExceptionCode(); }
-    if (constructed) { __try { reinterpret_cast<void(*)(void*)>(image + 0x11bd1e0)(&input); }
+    if (constructed) { __try { reinterpret_cast<void(*)(void*)>(image + 0x11c8b80)(&input); }
         __except (EXCEPTION_EXECUTE_HANDLER) { if (!error) error = GetExceptionCode(); } }
     return error;
 }
@@ -126,43 +126,43 @@ void check(DWORD code, const std::string& operation) {
 DWORD window_lookup(void** output, const char* name = "mt2fw_mods") {
     String input{}; bool constructed = false; DWORD error = 0;
     __try {
-        reinterpret_cast<void(*)(void*, const char*)>(image + 0x49e090)(&input, name); constructed = true;
-        *output = reinterpret_cast<void*(*)(const void*)>(image + 0x81aa90)(&input);
+        reinterpret_cast<void(*)(void*, const char*)>(image + 0x4a3580)(&input, name); constructed = true;
+        *output = reinterpret_cast<void*(*)(const void*)>(image + 0x823080)(&input);
     } __except (EXCEPTION_EXECUTE_HANDLER) { error = GetExceptionCode(); }
-    if (constructed) { __try { reinterpret_cast<void(*)(void*)>(image + 0x11bd1e0)(&input); }
+    if (constructed) { __try { reinterpret_cast<void(*)(void*)>(image + 0x11c8b80)(&input); }
         __except (EXCEPTION_EXECUTE_HANDLER) { if (!error) error = GetExceptionCode(); } }
     return error;
 }
 DWORD show(void* window, bool visible) {
-    __try { reinterpret_cast<void(*)(void*, bool, bool)>(image + 0x81ec20)(window, visible, false); }
+    __try { reinterpret_cast<void(*)(void*, bool, bool)>(image + 0x827210)(window, visible, false); }
     __except (EXCEPTION_EXECUTE_HANDLER) { return GetExceptionCode(); } return 0;
 }
 DWORD disable(void* pane, bool disabled) {
-    __try { reinterpret_cast<void(*)(void*, bool)>(image + 0x670e00)(pane, disabled); }
+    __try { reinterpret_cast<void(*)(void*, bool)>(image + 0x677fd0)(pane, disabled); }
     __except (EXCEPTION_EXECUTE_HANDLER) { return GetExceptionCode(); } return 0;
 }
 DWORD text_label(void* pane, const char* value) {
     Literal input{}; bool constructed = false; DWORD error = 0;
     __try {
-        reinterpret_cast<void(*)(void*, const char*)>(image + 0xa16f10)(&input, value); constructed = true;
-        reinterpret_cast<void(*)(void*, const void*)>(image + 0x7f80a0)(pane, &input);
+        reinterpret_cast<void(*)(void*, const char*)>(image + 0xa21c10)(&input, value); constructed = true;
+        reinterpret_cast<void(*)(void*, const void*)>(image + 0x8005f0)(pane, &input);
     } __except (EXCEPTION_EXECUTE_HANDLER) { error = GetExceptionCode(); }
     // Literal construction leaves the localization argument vector empty.
-    if (constructed) { __try { reinterpret_cast<void(*)(void*)>(image + 0x11bd1e0)(&input); }
+    if (constructed) { __try { reinterpret_cast<void(*)(void*)>(image + 0x11c8b80)(&input); }
         __except (EXCEPTION_EXECUTE_HANDLER) { if (!error) error = GetExceptionCode(); } }
     return error;
 }
 DWORD toggle_row(void* pane, bool selected) {
-    __try { reinterpret_cast<void(*)(void*, bool)>(image + 0x670d30)(pane, selected); }
+    __try { reinterpret_cast<void(*)(void*, bool)>(image + 0x677f00)(pane, selected); }
     __except (EXCEPTION_EXECUTE_HANDLER) { return GetExceptionCode(); } return 0;
 }
 void* pane(const std::string& id) {
     void* result = nullptr;
-    check(string_call(0x81d860, panel, id.c_str(), &result), "Pane lookup " + id);
+    check(string_call(0x825e50, panel, id.c_str(), &result), "Pane lookup " + id);
     require(result != nullptr, "Pane missing: " + id); return result;
 }
 void* native_pane(void* window, const std::string& id) {
-    void* result = nullptr; check(string_call(0x81d860, window, id.c_str(), &result), "Native app pane " + id);
+    void* result = nullptr; check(string_call(0x825e50, window, id.c_str(), &result), "Native app pane " + id);
     require(result, "Native app pane missing: " + id); return result;
 }
 void native_shown(void* target, bool value) {
@@ -209,8 +209,8 @@ void refresh() {
     if (!labels.contains("#materials")) {
         for (size_t slot = 0; slot < 6; ++slot) {
             auto id = "mod" + std::to_string(slot);
-            check(string_call(0x670ef0, pane(id), "mt2fw_ui_library"), "Mod row material " + id);
-            check(string_call(0x671030, pane(id), "mt2fw_ui_selected"), "Selected row material " + id);
+            check(string_call(0x6780c0, pane(id), "mt2fw_ui_library"), "Mod row material " + id);
+            check(string_call(0x678200, pane(id), "mt2fw_ui_selected"), "Selected row material " + id);
         }
         labels["#materials"] = "ready";
     }
@@ -328,7 +328,7 @@ void mount_assets() {
     assets_ready = true;
 }
 DWORD delete_record(void* record) {
-    __try { reinterpret_cast<void(*)(void*)>(image + 0xbfb4b0)(record); }
+    __try { reinterpret_cast<void(*)(void*)>(image + 0xc07bc0)(record); }
     __except (EXCEPTION_EXECUTE_HANDLER) { return GetExceptionCode(); } return 0;
 }
 DWORD make_icon(void* desktop, void** output, void** record, bool* handed_off,
@@ -336,7 +336,7 @@ DWORD make_icon(void* desktop, void** output, void** record, bool* handed_off,
     String filename{}; RecordStorage file{}, source{};
     bool named = false, opened = false, parsed = false; DWORD error = 0;
     __try {
-        *record = reinterpret_cast<void*(*)(void*)>(image + 0xd8f2a0)(nullptr);
+        *record = reinterpret_cast<void*(*)(void*)>(image + 0xd9aa80)(nullptr);
         if (!*record) return ERROR_NOT_ENOUGH_MEMORY;
         int shell = 6; std::memcpy(static_cast<unsigned char*>(*record) + 0x38, &shell, sizeof(shell));
         float width = 0; std::memcpy(&width, static_cast<unsigned char*>(desktop) + 0x138, sizeof(width));
@@ -344,38 +344,38 @@ DWORD make_icon(void* desktop, void** output, void** record, bool* handed_off,
         if (initial_position) std::memcpy(position, initial_position, sizeof(position));
         else if (position_valid && position_owner == desktop) std::memcpy(position, retained_position.data(), sizeof(position));
         std::memcpy(static_cast<unsigned char*>(*record) + 0x3c, position, sizeof(position));
-        reinterpret_cast<void(*)(void*, const char*)>(image + 0x49e090)(&filename, entry_path); named = true;
-        reinterpret_cast<void(*)(void*, const void*, int)>(image + 0x95ec00)(&file, &filename, 0); opened = true;
-        reinterpret_cast<void(*)(void*)>(image + 0x9667c0)(&source); parsed = true;
-        if (!reinterpret_cast<bool(*)(void*, void*)>(image + 0x95ddb0)(&file, &source)) error = ERROR_INVALID_DATA;
-        else { *handed_off = true; *output = reinterpret_cast<void*(*)(void*, void*, void*)>(image + 0x5fdd60)(desktop, &source, *record); }
+        reinterpret_cast<void(*)(void*, const char*)>(image + 0x4a3580)(&filename, entry_path); named = true;
+        reinterpret_cast<void(*)(void*, const void*, int)>(image + 0x967d60)(&file, &filename, 0); opened = true;
+        reinterpret_cast<void(*)(void*)>(image + 0x96f9e0)(&source); parsed = true;
+        if (!reinterpret_cast<bool(*)(void*, void*)>(image + 0x966f10)(&file, &source)) error = ERROR_INVALID_DATA;
+        else { *handed_off = true; *output = reinterpret_cast<void*(*)(void*, void*, void*)>(image + 0x6048d0)(desktop, &source, *record); }
     } __except (EXCEPTION_EXECUTE_HANDLER) { error = GetExceptionCode(); }
-    if (parsed) { __try { reinterpret_cast<void(*)(void*)>(image + 0x9676a0)(&source); } __except (EXCEPTION_EXECUTE_HANDLER) { if (!error) error = GetExceptionCode(); } }
-    if (opened) { __try { reinterpret_cast<void(*)(void*)>(image + 0x962170)(&file); } __except (EXCEPTION_EXECUTE_HANDLER) { if (!error) error = GetExceptionCode(); } }
-    if (named) { __try { reinterpret_cast<void(*)(void*)>(image + 0x11bd1e0)(&filename); } __except (EXCEPTION_EXECUTE_HANDLER) { if (!error) error = GetExceptionCode(); } }
+    if (parsed) { __try { reinterpret_cast<void(*)(void*)>(image + 0x9708c0)(&source); } __except (EXCEPTION_EXECUTE_HANDLER) { if (!error) error = GetExceptionCode(); } }
+    if (opened) { __try { reinterpret_cast<void(*)(void*)>(image + 0x96b2d0)(&file); } __except (EXCEPTION_EXECUTE_HANDLER) { if (!error) error = GetExceptionCode(); } }
+    if (named) { __try { reinterpret_cast<void(*)(void*)>(image + 0x11c8b80)(&filename); } __except (EXCEPTION_EXECUTE_HANDLER) { if (!error) error = GetExceptionCode(); } }
     return error;
 }
 DWORD icon_layout(void* desktop, void* icon, bool place = true) {
     __try {
-        if (place) reinterpret_cast<void(*)(void*, void*)>(image + 0x5fe5f0)(desktop, icon);
-        reinterpret_cast<void(*)(void*)>(image + 0x81a330)(desktop);
+        if (place) reinterpret_cast<void(*)(void*, void*)>(image + 0x605160)(desktop, icon);
+        reinterpret_cast<void(*)(void*)>(image + 0x822920)(desktop);
     }
     __except (EXCEPTION_EXECUTE_HANDLER) { return GetExceptionCode(); } return 0;
 }
 DWORD icon_text_key(void* pane, const void* key) {
-    __try { reinterpret_cast<void(*)(void*, const void*)>(image + 0x7f46e0)(pane, key); }
+    __try { reinterpret_cast<void(*)(void*, const void*)>(image + 0x7fcb80)(pane, key); }
     __except (EXCEPTION_EXECUTE_HANDLER) { return GetExceptionCode(); } return 0;
 }
 bool icon_identity(void* icon, const Binding& binding) {
     uintptr_t vtable = 0; void* record = nullptr; void* array = nullptr; int count = 0;
-    if (!read(icon, 0, vtable) || vtable != image + 0x16fb650 || !read(icon, 0x318, record) || record != binding.record ||
+    if (!read(icon, 0, vtable) || vtable != image + 0x17019f0 || !read(icon, 0x318, record) || record != binding.record ||
         !read(binding.desktop, 0x4f0, array) || !read(binding.desktop, 0x4f8, count) || count < 1 || count > 4096 || !readable(array, size_t(count) * sizeof(void*))) return false;
     for (int index = 0; index < count; ++index) { void* candidate = nullptr; if (!read(array, size_t(index) * sizeof(void*), candidate)) return false; if (candidate == icon) return true; }
     return false;
 }
 void* entry(bool title) {
     void* icon = nullptr;
-    check(string_call(0x816150, current_desktop, "mt2fw_mods_entry", &icon), "Desktop entry lookup");
+    check(string_call(0x81e6c0, current_desktop, "mt2fw_mods_entry", &icon), "Desktop entry lookup");
     if (!icon) for (const auto& [candidate, binding] : icons) if (binding.desktop == current_desktop && binding.app_owner.empty()) {
         require(icon == nullptr, "Multiple Mods icons in the current Desktop"); icon = candidate;
     }
@@ -393,10 +393,10 @@ void* entry(bool title) {
         void* picture = nullptr; void* title_pane = nullptr; void* begin = nullptr; void* end = nullptr;
         require(read(icon, 0x3c0, picture) && picture && read(icon, 0x3c8, title_pane) && title_pane &&
             read(icon, 0x3a0, begin) && read(icon, 0x3a8, end) && begin == end, "Desktop icon presentation links differ");
-        check(string_call(0x11bfce0, static_cast<unsigned char*>(icon) + 0x360, "Mods"), "Icon name");
-        check(string_call(0x11bfce0, static_cast<unsigned char*>(icon) + 0x380, "Mods"), "Icon display name");
+        check(string_call(0x11cb680, static_cast<unsigned char*>(icon) + 0x360, "Mods"), "Icon name");
+        check(string_call(0x11cb680, static_cast<unsigned char*>(icon) + 0x380, "Mods"), "Icon display name");
         check(icon_text_key(title_pane, static_cast<unsigned char*>(icon) + 0x380), "Icon text key");
-        check(string_call(0x771f90, picture, "mt2fw_desktop_mods"), "Icon material");
+        check(string_call(0x779ab0, picture, "mt2fw_desktop_mods"), "Icon material");
         check(icon_layout(current_desktop, icon), "Native icon placement");
         runtime->log("framework", "info", "Mods app registered on the native game Desktop");
     }
@@ -505,11 +505,11 @@ void sync_app_icons(bool title) {
                 void* picture = nullptr; void* label = nullptr;
                 require(read(app.icon, 0x3c0, picture) && picture && read(app.icon, 0x3c8, label) && label,
                     "Desktop app presentation links differ");
-                check(string_call(0x11bfce0, static_cast<unsigned char*>(app.icon) + 0x360, app.title.c_str()), "Desktop app name");
-                check(string_call(0x11bfce0, static_cast<unsigned char*>(app.icon) + 0x380, app.title.c_str()), "Desktop app display name");
+                check(string_call(0x11cb680, static_cast<unsigned char*>(app.icon) + 0x360, app.title.c_str()), "Desktop app name");
+                check(string_call(0x11cb680, static_cast<unsigned char*>(app.icon) + 0x380, app.title.c_str()), "Desktop app display name");
                 check(icon_text_key(label, static_cast<unsigned char*>(app.icon) + 0x380), "Desktop app text key");
                 auto material = app.image_path.empty() ? "mt2fw_desktop_mods" : app_icon_image(owner, app.image_path);
-                check(string_call(0x771f90, picture, material.c_str()), "Desktop app icon material");
+                check(string_call(0x779ab0, picture, material.c_str()), "Desktop app icon material");
                 check(icon_layout(current_desktop, app.icon, created), "Native app icon placement");
                 app.icon_material = material; app.presentation_dirty = false;
             }
@@ -531,8 +531,8 @@ void sync_app_icons(bool title) {
 }
 DWORD activate_native(void* target, bool icon) {
     __try {
-        if (icon) reinterpret_cast<void(*)(void*, void*, const void*)>(image + 0x609490)(target, nullptr, nullptr);
-        else reinterpret_cast<void(*)(void*)>(image + 0x674780)(target);
+        if (icon) reinterpret_cast<void(*)(void*, void*, const void*)>(image + 0x610050)(target, nullptr, nullptr);
+        else reinterpret_cast<void(*)(void*)>(image + 0x67b950)(target);
     } __except (EXCEPTION_EXECUTE_HANDLER) { return GetExceptionCode(); } return 0;
 }
 #include "native_app_close.inc"
@@ -544,11 +544,11 @@ DWORD menu_element(MenuElement* item, bool construct) {
     DWORD error = 0;
     __try {
         if (construct) {
-            reinterpret_cast<void(*)(void*, const char*)>(image + 0x49e090)(&item->key, "mt2fw_mods");
-            reinterpret_cast<void(*)(void*, const char*)>(image + 0xa16f10)(&item->label, "Mods...");
+            reinterpret_cast<void(*)(void*, const char*)>(image + 0x4a3580)(&item->key, "mt2fw_mods");
+            reinterpret_cast<void(*)(void*, const char*)>(image + 0xa21c10)(&item->label, "Mods...");
         } else {
-            reinterpret_cast<void(*)(void*)>(image + 0x11bd1e0)(&item->label);
-            reinterpret_cast<void(*)(void*)>(image + 0x11bd1e0)(&item->key);
+            reinterpret_cast<void(*)(void*)>(image + 0x11c8b80)(&item->label);
+            reinterpret_cast<void(*)(void*)>(image + 0x11c8b80)(&item->key);
         }
     } __except (EXCEPTION_EXECUTE_HANDLER) { error = GetExceptionCode(); }
     return error;
@@ -605,14 +605,14 @@ void configure(Runtime& owner, const fs::path& root, Details open_details, std::
     image = reinterpret_cast<uintptr_t>(GetModuleHandleW(nullptr));
 }
 std::vector<Hook> hooks() {
-    constexpr unsigned char launch_bytes[]{0x41,0x54,0x55,0x57,0x56,0x53,0x48,0x81,0xec,0xf0,0,0,0};
+    constexpr unsigned char launch_bytes[]{0x41,0x54,0x55,0x57,0x56,0x53,0x48,0x81,0xec,0xf0,0x00,0x00,0x00};
     constexpr unsigned char destroy_bytes[]{0x56,0x53,0x48,0x83,0xec,0x28};
-    require(readable(reinterpret_cast<void*>(image + 0x609060), sizeof(launch_bytes)) && !std::memcmp(reinterpret_cast<void*>(image + 0x609060), launch_bytes, sizeof(launch_bytes)), "Desktop icon launch entry differs");
-    require(readable(reinterpret_cast<void*>(image + 0x6087e0), sizeof(destroy_bytes)) && !std::memcmp(reinterpret_cast<void*>(image + 0x6087e0), destroy_bytes, sizeof(destroy_bytes)), "Desktop icon destructor entry differs");
-    return {{reinterpret_cast<void*>(image + 0x609060), reinterpret_cast<void*>(&launch), reinterpret_cast<void**>(&original_launch)},
-            {reinterpret_cast<void*>(image + 0x6087e0), reinterpret_cast<void*>(&destroy), reinterpret_cast<void**>(&original_destroy)},
-            {reinterpret_cast<void*>(image + 0x73c200), reinterpret_cast<void*>(&menu_elements), reinterpret_cast<void**>(&original_elements)},
-            {reinterpret_cast<void*>(image + 0x73d8a0), reinterpret_cast<void*>(&menu_select), reinterpret_cast<void**>(&original_select)}};
+    require(readable(reinterpret_cast<void*>(image + 0x60fc20), sizeof(launch_bytes)) && !std::memcmp(reinterpret_cast<void*>(image + 0x60fc20), launch_bytes, sizeof(launch_bytes)), "Desktop icon launch entry differs");
+    require(readable(reinterpret_cast<void*>(image + 0x60f3a0), sizeof(destroy_bytes)) && !std::memcmp(reinterpret_cast<void*>(image + 0x60f3a0), destroy_bytes, sizeof(destroy_bytes)), "Desktop icon destructor entry differs");
+    return {{reinterpret_cast<void*>(image + 0x60fc20), reinterpret_cast<void*>(&launch), reinterpret_cast<void**>(&original_launch)},
+            {reinterpret_cast<void*>(image + 0x60f3a0), reinterpret_cast<void*>(&destroy), reinterpret_cast<void**>(&original_destroy)},
+            {reinterpret_cast<void*>(image + 0x743b50), reinterpret_cast<void*>(&menu_elements), reinterpret_cast<void**>(&original_elements)},
+            {reinterpret_cast<void*>(image + 0x7451f0), reinterpret_cast<void*>(&menu_select), reinterpret_cast<void**>(&original_select)}};
 }
 void frame(bool use_german) {
     if (!fault.empty()) return;
@@ -621,7 +621,7 @@ void frame(bool use_german) {
         if (!thread) {
             uintptr_t resolved = 0; uint32_t bound = 0; std::string hash, error;
             require(native::read_resolver_receipt(resolved, bound, hash, error), error);
-            require(resolved == image && bound == GetCurrentThreadId() && hash == "bbab2dc68babcc644d0a1679548bf1e334b6c52aea669c3f61f6cb9d45c1aaf6", "Native Desktop exact-build/thread receipt differs");
+            require(resolved == image && bound == GetCurrentThreadId(), "Native Desktop image/thread receipt differs");
             thread = bound;
         }
         require(thread == GetCurrentThreadId(), "Desktop frame changed game thread");
@@ -632,18 +632,18 @@ void frame(bool use_german) {
         if (!active) { wizard.reset_epoch(); mode = nullptr; panel = nullptr; mode_index = -1; panel_open = false; labels.clear(); return; }
         if (!assets_ready) mount_assets();
         void* game = nullptr; void* next_mode = nullptr; void* active_mode = nullptr; void* desktop = nullptr; uintptr_t vtable = 0;
-        require(read(reinterpret_cast<void*>(image), 0x13df8f0, game) && read(game, title ? 0x350 : 0x358, next_mode) &&
+        require(read(reinterpret_cast<void*>(image), 0x13eb8f0, game) && read(game, title ? 0x350 : 0x358, next_mode) &&
             read(game, 0x28, active_mode) && next_mode && next_mode == active_mode, "Mods active mode owner differs");
         if (mode != next_mode || mode_index != world.active_mode_index) {
             wizard.reset_epoch();
             mode = next_mode; mode_index = world.active_mode_index; panel = nullptr; append_attempted = false; panel_open = false; labels.clear(); dirty = true;
         }
-        require(read(game, 0x1e8, desktop) && read(desktop, 0, vtable) && vtable == image + 0x16c02d0, "Native Desktop owner/class differs");
+        require(read(game, 0x1e8, desktop) && read(desktop, 0, vtable) && vtable == image + 0x16c6670, "Native Desktop owner/class differs");
         if (current_desktop != desktop) { current_desktop = desktop; icon_attempted = false; }
         check(window_lookup(&panel), "Window registry lookup");
         if (!panel) {
             require(!append_attempted, "Mods window append already attempted; no replay"); append_attempted = true;
-            check(string_call(0xbbe090, static_cast<unsigned char*>(mode) + (title ? 0x40 : 0x98), "mt2fw_ui/mods.win"), "Native Mods window append");
+            check(string_call(0xbca950, static_cast<unsigned char*>(mode) + (title ? 0x40 : 0x98), "mt2fw_ui/mods.win"), "Native Mods window append");
             check(window_lookup(&panel), "New window registry lookup"); require(panel != nullptr, "Native Mods window registration was not acknowledged");
             set_open(false); labels.clear(); dirty = true;
         }
@@ -757,7 +757,7 @@ Json activate(const Json& args) {
             bool input = false;size_t maximum=128; for(auto& item:app.widgets)if(item.at("id")==widget&&item.at("type")=="input"){input=true;maximum=native_input::limit(item);}
             require(input,"Native app diagnostic text target is not an input");
             auto value=args.at("text").get<std::string>();native_input::validate(value,maximum);
-            check(string_call(0x7f1630,target,value.c_str()),"Native app diagnostic text");
+            check(string_call(0x7f9b70,target,value.c_str()),"Native app diagnostic text");
             std::string actual;require(text(static_cast<unsigned char*>(target)+0x2d0,actual)&&actual==value,"Native app diagnostic text readback differs");
             return {{"native_event","mmoTextEditPane::SetText"},{"accepted",true},{"readback_matches",true},{"bytes",actual.size()}};
         }
@@ -834,10 +834,10 @@ Json new_world(const Json& args) {
                 "New Game requires idle Title with no pending mode transition");
             void* game = nullptr; void* title = nullptr; void* active_mode = nullptr; void* window = nullptr; void* registered = nullptr;
             uintptr_t title_class = 0, window_class = 0; uint8_t visible = 0, pending = 1;
-            require(read(reinterpret_cast<void*>(image), 0x13df8f0, game) && read(game, 0x350, title) &&
+            require(read(reinterpret_cast<void*>(image), 0x13eb8f0, game) && read(game, 0x350, title) &&
                 read(game, 0x28, active_mode) && title == mode && title == active_mode && read(title, 0, title_class) &&
-                title_class == image + 0x16dfbb0 && read(title, 0xd0, pending) && !pending &&
-                read(title, 0x20, window) && window && read(window, 0, window_class) && window_class == image + 0x1707fb0,
+                title_class == image + 0x16e5f50 && read(title, 0xd0, pending) && !pending &&
+                read(title, 0x20, window) && window && read(window, 0, window_class) && window_class == image + 0x170e350,
                 "New Game Title/window ownership differs");
             check(window_lookup(&registered, "NewGame"), "New Game window registry");
             require(registered == window && read(window, 0x45f, visible) && visible <= 1,
@@ -981,14 +981,14 @@ Json native_window(const Json& args) {
     }
     bool desired = args.value("open", false);
     if (!window.panel && desired) {
-        check(string_call(0xbbe090, static_cast<unsigned char*>(mode) + (mode_index == 2 ? 0x40 : 0x98), ("mt2fw_native/" + window.path).c_str()), "Append native app window");
+        check(string_call(0xbca950, static_cast<unsigned char*>(mode) + (mode_index == 2 ? 0x40 : 0x98), ("mt2fw_native/" + window.path).c_str()), "Append native app window");
         check(window_lookup(&window.panel, window.name.c_str()), "Native app registry lookup"); require(window.panel, "Native app window registration not acknowledged");
         check(show(window.panel, false), "Initialize native app visibility");
         for (auto& item : window.widgets) if (item.at("type") == "button" && item.at("style") != "button") {
             auto name = item.at("id").get<std::string>(); auto* target = native_pane(window.panel,name);
             const char* normal = item.at("style") == "tab" ? "TabNormalBackground" : "PanelButtonBackground";
-            check(string_call(0x670ef0,target,normal), "Native app button material");
-            check(string_call(0x671030,target,"ButtonBackgroundActive"), "Native app selected material");
+            check(string_call(0x6780c0,target,normal), "Native app button material");
+            check(string_call(0x678200,target,"ButtonBackgroundActive"), "Native app selected material");
         }
     }
     Json events{{"ready", true},{"open",desired},{"visible",nullptr},{"visibility_known",false},{"suspended",window.suspended},{"clicked",Json::array()},{"values",Json::object()}};
@@ -1018,14 +1018,14 @@ Json native_window(const Json& args) {
             if(!window.values.contains(name) || window.values[name] != value) { check(text_label(type == "button" ? native_pane(window.panel,name+"_label") : target,value.c_str()),"Native app text"); window.values[name] = value; }
         } else if(type == "input") {
             auto value = item.value("value",std::string());
-            if(!window.values.contains(name) || window.values[name] != value) { check(string_call(0x7f1630,target,value.c_str()),"Native app input value"); window.values[name] = value; }
+            if(!window.values.contains(name) || window.values[name] != value) { check(string_call(0x7f9b70,target,value.c_str()),"Native app input value"); window.values[name] = value; }
             std::string actual; require(text(static_cast<unsigned char*>(target)+0x2d0,actual) && actual.size() <= 4096,"Native app input unreadable");
             auto maximum=native_input::limit(item);auto bounded=native_input::prefix(actual,maximum);
-            if(bounded!=actual){check(string_call(0x7f1630,target,bounded.c_str()),"Native app input byte limit");std::string readback;require(text(static_cast<unsigned char*>(target)+0x2d0,readback)&&readback==bounded,"Native app bounded input readback differs");actual=std::move(bounded);}
+            if(bounded!=actual){check(string_call(0x7f9b70,target,bounded.c_str()),"Native app input byte limit");std::string readback;require(text(static_cast<unsigned char*>(target)+0x2d0,readback)&&readback==bounded,"Native app bounded input readback differs");actual=std::move(bounded);}
             if(actual != value) { events["values"][name] = actual; window.values[name] = actual; }
         } else if(type == "image") {
             auto value = item.value("path",std::string());
-            if(!value.empty() && (!window.values.contains(name) || window.values[name] != value)) { check(string_call(0x771f90,target,app_icon_image(owner,value).c_str()),"Native app image material"); window.values[name] = value; }
+            if(!value.empty() && (!window.values.contains(name) || window.values[name] != value)) { check(string_call(0x779ab0,target,app_icon_image(owner,value).c_str()),"Native app image material"); window.values[name] = value; }
         }
     }
     events["clicked"] = std::move(window.clicked); window.clicked = Json::array(); return events;

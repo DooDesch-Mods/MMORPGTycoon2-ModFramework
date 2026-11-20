@@ -30,7 +30,7 @@ inline void failure(const char* cause) noexcept{
     }
 }
 inline bool qualifies(uint32_t requested,uintptr_t caller,uint64_t thread,uintptr_t image) noexcept{
-    return active&&active->thread&&thread==active->thread&&image&&caller==image+0x526ded&&requested==100;
+    return active&&active->thread&&thread==active->thread&&image&&caller==image+0x52d20d&&requested==100;
 }
 inline uint64_t now() noexcept{
     return uint64_t(std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::steady_clock::now().time_since_epoch()).count());

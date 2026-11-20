@@ -101,7 +101,7 @@ void NativeServices::character_preview_select(uintptr_t caller,void* receiver,in
     const auto thread=preview_thread_.load(std::memory_order_acquire),image=preview_image_.load(std::memory_order_acquire);
     if(!image||!thread||thread_id()!=thread||caller<image)return;
     const auto rva=caller-image;
-    if((rva!=0x9061c&&rva!=0x321ac0)||reinterpret_cast<uintptr_t>(receiver)!=image+0x1c4e7a0)return;
+    if((rva!=0x9130c&&rva!=0x325860)||reinterpret_cast<uintptr_t>(receiver)!=image+0x1c557a0)return;
     MT2FW_MT2_CharacterPreviewIntSelector callback=nullptr;void* user=nullptr;bool recursive=false,failed=false;
     {std::lock_guard lock(preview_gate_);
         if(!preview_.owner||!preview_.owner->alive.load()||!preview_.owner->plugin->active)return;
@@ -116,7 +116,7 @@ void NativeServices::character_preview_select(uintptr_t caller,void* receiver,in
     if(failed)character_preview_fail(lease,"Character preview registration remains failed");
     if(recursive)character_preview_fail(lease,"Character preview selector reentered");
     uintptr_t actual=0;SIZE_T copied=0;
-    if(!ReadProcessMemory(GetCurrentProcess(),reinterpret_cast<void*>(image+0x164b250),&actual,sizeof(actual),&copied)||copied!=sizeof(actual)||actual!=reinterpret_cast<uintptr_t>(receiver)){
+    if(!ReadProcessMemory(GetCurrentProcess(),reinterpret_cast<void*>(image+0x1650830),&actual,sizeof(actual),&copied)||copied!=sizeof(actual)||actual!=reinterpret_cast<uintptr_t>(receiver)){
         {std::lock_guard lock(preview_gate_);preview_.in_selector=false;}
         character_preview_fail(lease,"Character preview Default pointer slot differs");
     }
@@ -135,6 +135,6 @@ void NativeServices::character_preview_select(uintptr_t caller,void* receiver,in
     if(selection.size!=sizeof(selection)||selection.source_bytes!=MT2FW_MT2_PREVIEW_RANDOM_BYTES||!std::memchr(selection.cause,0,sizeof(selection.cause)))
         character_preview_fail(lease,"Character preview selector returned malformed OK output");
     char cause[160]{};
-    if(!preview_storage(selection.source,actual,image+0x164b250,cause))character_preview_fail(lease,cause);
+    if(!preview_storage(selection.source,actual,image+0x1650830,cause))character_preview_fail(lease,cause);
     lease->source=selection.source;
 }

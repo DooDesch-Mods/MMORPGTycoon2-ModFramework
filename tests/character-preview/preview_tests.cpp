@@ -33,7 +33,7 @@ void need(bool okay,const char* message){++checks;if(!okay)throw std::runtime_er
 Selection existing_select(uintptr_t,uintptr_t,void* source){return existing_source?Selection{existing_source,&existing_count}:Selection{source};}
 Selection(*select_source)(uintptr_t,uintptr_t,void*)=existing_select;
 size_t begin(uintptr_t helper,uintptr_t caller,void* source){++trace_begins;before_source=source;before_word=static_cast<Random*>(source)->words[0];
-    fields_ok=fields_ok&&helper==0x9fc370&&caller==fake_caller;
+    fields_ok=fields_ok&&helper==0xa068a0&&caller==fake_caller;
     pin_observations=pin_observations&&((active_plugin->native_pins!=0)==expected_pin);return 1;}
 void finish(size_t,int){++trace_finishes;after_word=static_cast<Random*>(before_source)->words[0];
     pin_observations=pin_observations&&((active_plugin->native_pins!=0)==expected_pin)&&shutdowns==0;
@@ -65,7 +65,7 @@ MT2FW_MT2_Result MT2FW_CALL selector(void*,const MT2FW_MT2_CharacterPreviewIntCa
     case Mode::BadBytes:out->source_bytes=39;break;
     case Mode::BadPointer:out->source=reinterpret_cast<void*>(1);break;
     case Mode::Shared:out->source=shared;break;
-    case Mode::Slot:out->source=reinterpret_cast<void*>(image+0x164b250);break;
+    case Mode::Slot:out->source=reinterpret_cast<void*>(image+0x1650830);break;
     case Mode::NoAccess:out->source=inaccessible;break;
     case Mode::Unbind:unbind_result=api.character_preview_int_unbind(api.v1.context,token);break;
     case Mode::Retire:active_plugin->native_shutdown_pending=true;active_runtime->disable(*active_plugin,"synthetic mid-call retirement");break;
@@ -79,8 +79,8 @@ struct Fixture {
     fs::path root=test_root();Runtime runtime{root};Plugin plugin{&runtime},foreign{&runtime};
     Fixture(){
         image=reinterpret_cast<uintptr_t>(VirtualAlloc(nullptr,0x1d00000,MEM_COMMIT|MEM_RESERVE,PAGE_READWRITE));need(image!=0,"allocate owned synthetic image");
-        shared=reinterpret_cast<Random*>(image+0x1c4e7a0);*shared=Random{};*reinterpret_cast<uintptr_t*>(image+0x164b250)=reinterpret_cast<uintptr_t>(shared);
-        fake_caller=image+0x9061c;local=Random{};unrelated_random=Random{};mode=Mode::Select;proof_ok=true;fields_ok=true;
+        shared=reinterpret_cast<Random*>(image+0x1c557a0);*shared=Random{};*reinterpret_cast<uintptr_t*>(image+0x1650830)=reinterpret_cast<uintptr_t>(shared);
+        fake_caller=image+0x9130c;local=Random{};unrelated_random=Random{};mode=Mode::Select;proof_ok=true;fields_ok=true;
         callbacks=originals=trace_begins=trace_finishes=shutdowns=0;original_cpp=original_seh=trace_seh=false;existing_source=nullptr;existing_count.completed=0;
         expected_pin=true;pin_observations=true;unbind_result=MT2FW_MT2_FAILED;
         active_plugin=&plugin;active_runtime=&runtime;plugin.manifest.id="doodesch.multiplayer";foreign.manifest.id="test.foreign";
@@ -107,14 +107,14 @@ void basic_api(){Fixture f;MT2FW_MT2_ServiceV1 v1{};need(native_services->query(
     MT2FW_MT2_Result worker_result=MT2FW_MT2_OK;std::thread worker([&]{worker_result=api.character_preview_int_unbind(api.v1.context,token);});worker.join();
     need(worker_result==MT2FW_MT2_UNAVAILABLE,"wrong-thread mutation rejected");
     need(api.character_preview_int_unbind(api.v1.context,token)==MT2FW_MT2_OK,"owner unregisters idle selector");}
-void selections(){for(uintptr_t rva:{uintptr_t(0x9061c),uintptr_t(0x321ac0)}){Fixture f;f.bind();fake_caller=image+rva;
+void selections(){for(uintptr_t rva:{uintptr_t(0x9130c),uintptr_t(0x325860)}){Fixture f;f.bind();fake_caller=image+rva;
         int value=-777;need(invoke_pod(shared,97,&value)==0&&value==12,"original selected result preserved");
         need(callbacks==1&&originals==1&&trace_begins==1&&trace_finishes==1&&shared->words[0]==11&&local.words[0]==12,"private selection does not advance shared source");
         need(before_source==&local&&before_word==11&&after_word==12&&pin_observations&&fields_ok&&!f.plugin.native_pins,"actual final source and lease surround trace");}
     {Fixture f;f.bind();mode=Mode::Pass;int value=-777;need(invoke_pod(shared,97,&value)==0&&value==12&&shared->words[0]==12&&local.words[0]==11,"UNAVAILABLE alone is unchanged passthrough");need(callbacks==1&&originals==1&&pin_observations&&!f.plugin.native_pins,"passthrough still releases callback lease");}}
 void guards(){
     {Fixture f;f.bind();fake_caller=image+0x9061d;expected_pin=false;int value=0;need(!invoke_pod(shared,97,&value)&&callbacks==0&&originals==1&&pin_observations,"other caller passes without selector");}
-    {Fixture f;f.bind();expected_pin=false;*reinterpret_cast<uintptr_t*>(image+0x164b250)=0;int value=0;need(!invoke_pod(&unrelated_random,97,&value)&&callbacks==0&&originals==1,"other receiver passes without reading shared slot");}
+    {Fixture f;f.bind();expected_pin=false;*reinterpret_cast<uintptr_t*>(image+0x1650830)=0;int value=0;need(!invoke_pod(&unrelated_random,97,&value)&&callbacks==0&&originals==1,"other receiver passes without reading shared slot");}
     {Fixture f;f.bind();expected_pin=false;int value=0;DWORD exception=0;std::thread worker([&]{exception=invoke_pod(shared,97,&value);});worker.join();need(!exception&&callbacks==0&&originals==1&&pin_observations,"other thread passes unchanged");}
     {Fixture f;f.bind();existing_source=&unrelated_random;expected_pin=false;int value=0;need(!invoke_pod(shared,97,&value)&&callbacks==0&&before_source==&unrelated_random&&existing_count.completed==1,"existing Framework selection precedes preview override");}}
 void failures(){
@@ -129,7 +129,7 @@ void failures(){
         need(f.runtime.logs().back().message==cause,"first failure cause remains intact");
     }
     need(VirtualFree(inaccessible,0,MEM_RELEASE)!=0,"release owned inaccessible source fixture");inaccessible=nullptr;
-    {Fixture f;f.bind();*reinterpret_cast<uintptr_t*>(image+0x164b250)=0;int value=-777;need(invoke_pod(shared,97,&value)==MT2FW_MT2_CHARACTER_PREVIEW_ABORT&&!callbacks&&!originals&&!f.plugin.native_pins,"changed Default slot aborts before callback or original");}
+    {Fixture f;f.bind();*reinterpret_cast<uintptr_t*>(image+0x1650830)=0;int value=-777;need(invoke_pod(shared,97,&value)==MT2FW_MT2_CHARACTER_PREVIEW_ABORT&&!callbacks&&!originals&&!f.plugin.native_pins,"changed Default slot aborts before callback or original");}
 }
 void unwinds(){
     {Fixture f;f.bind();original_seh=true;int value=-777;need(invoke_pod(shared,97,&value)==original_fault&&value==-777,"original SEH remains original");need(originals==1&&trace_begins==1&&!trace_finishes&&!f.plugin.native_pins,"original SEH releases owner pin");}
