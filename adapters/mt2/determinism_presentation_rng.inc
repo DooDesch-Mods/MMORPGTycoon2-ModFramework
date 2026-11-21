@@ -12,7 +12,6 @@ std::array<core::Counters,16> digital_counts;
 constexpr std::array<const char*,16> digital_names={"dottedDirection","dottedLength","solidDirection","solidLength","lineDepth","lineXY","dotRefresh","dotOffset","blockInnerRadius","blockRingXY","blockRingDepth","blockXY","blockDepth","cameraRotationTarget","cameraDirectionX","cameraDirectionY"};
 std::array<core::Counters,2> counts;
 thread_local core::Local local;
-thread_local core::Local respawn_local;
 thread_local core::Local building_widget_local;
 thread_local core::BuildingWidgetQuery building_widget_scope;
 core::Counters building_widget_count;
@@ -21,18 +20,6 @@ BuildingWidgetOwner building_widget_owner=nullptr;
 using GetPadEntrance=void*(*)(void*,const void*,int,int);
 GetPadEntrance original_get_pad_entrance=nullptr;
 bool building_widget_installed=false;
-thread_local core::RespawnQuery respawn_query;
-core::Counters respawn_count;
-using FindRespawn=void*(*)(void*);
-FindRespawn original_find_respawn=nullptr;
-bool respawn_installed=false;
-__declspec(noinline) void* find_respawn(void* manager){
-    const auto caller=reinterpret_cast<uintptr_t>(_ReturnAddress());
-    const bool previous=respawn_query.active;
-    respawn_query.active=armed.load(std::memory_order_acquire)&&caller==image+0x5c3dc5;
-    __try {return original_find_respawn(manager);}
-    __finally {respawn_query.active=previous;}
-}
 thread_local core::Local puppet_local;
 thread_local core::BlueprintPuppet puppet_scope;
 core::Counters puppet_count;
@@ -99,8 +86,8 @@ void verify_digital(){
     verify(0x170eb0,2608,"01960afef08d26d400395426e7a2a96690d57145f83ffec40edc1f82b7bc0db5");
     verify(0x16d830,1760,"a6166024bd3173e40ec626688af27c01752ecd87f2f03f9a97e07e25c487ce93");
     verify(0x16e3f0,208,"1c3ac6900715f0dc752d25b111d2f42d123c40dac632c221702cd30b004b274b");
-    verify(0x16e4c0,2864,"b3e0fea6b120660dd31a5d6bd884ef4fae5849749df94db9f87cc9c53df482a0");
-    verify(0x17a610,3776,"aa67dd1bb03f54e7c61c60e00b41caebe731c4f1fffdbec03e44ac0fafc261f1");
+    verify(0x16e4c0,3040,"4bfce55dba844b51b5d96183bac758e537d147b9c208188ab2e18f13efa889c2");
+    verify(0x17a610,3856,"70d7feb2b3e47993fa8b2191493ffe58f02087af0dc83deebfaa1da038241132");
     verify(0x16f8f0,240,"2612d82a8f6620a8d2e84360783e51d124dcdc71b9a9a76c370c726b6b02997d");
     verify(0x169020,112,"4661bcdd9ba9ff1fe6c65f85621c52cf2d77e9aecee824bfa4ea9e8c6f44a81f");
 }
@@ -113,18 +100,6 @@ core::Selection select_digital(uintptr_t helper,uintptr_t caller,void* source){
         }catch(const std::exception& problem){std::lock_guard lock(building_widget_failure_mutex);if(building_widget_failure.empty())building_widget_failure=problem.what();throw;}
         return core::select_building_widget(true,generation.load(std::memory_order_acquire),building_widget_scope,
             helper,caller_rva,source,reinterpret_cast<void*>(image+0x1c557a0),building_widget_local,building_widget_count,
-            [](void* target,uint64_t seed){original_seed(target,seed);});
-    }
-    if(respawn_installed&&armed.load(std::memory_order_acquire)&&respawn_query.matches(helper,caller_rva)){
-        try{
-            if(read<uintptr_t>(image+0x1650830)!=image+0x1c557a0)
-                throw std::runtime_error("NPC validity RNG Default object differs");
-        }catch(const std::exception& problem){
-            std::lock_guard lock(failure_mutex);if(failure.empty())failure=problem.what();
-            throw;
-        }
-        return core::select_respawn(true,generation.load(std::memory_order_acquire),respawn_query,
-            helper,caller_rva,source,reinterpret_cast<void*>(image+0x1c557a0),respawn_local,respawn_count,
             [](void* target,uint64_t seed){original_seed(target,seed);});
     }
     if(puppet_installed&&armed.load(std::memory_order_acquire)&&puppet_scope.matches(helper,caller_rva)){
@@ -185,7 +160,7 @@ core::Selection select_digital(uintptr_t helper,uintptr_t caller,void* source){
 void verify_callers(){
     verify(0x823800,1056,"691c6c37dd91e81a65cc345bb1bff9ceec3a1b161c5eb5c3949757eed1c90bc2");
     verify(0x8496d0,336,"1d769709877af7bc542c2a940cca47628aa5e4ad056516e47a2eedac197fc99d");
-    verify(0xa06510,192,"7a7ab329d2eb747de62d61f791723eef44f3e850a468747f41708e6d08b981e5");
+    verify(0xa06510,240,"bc363d294fbe60db8a6d564e9adeea6187051b306efa10c8b88064155fe8da1c");
 }
 __declspec(noinline) float get_float(void* source,float limit){
     const auto caller=reinterpret_cast<uintptr_t>(_ReturnAddress());
@@ -214,7 +189,7 @@ void install(const Json& config){
     if(!config.value("presentation_rng",false))return;
     if(digital_enabled)verify_digital();
     verify_callers();
-    verify(0xa069b0,128,"5f2e7755f953a9e5755c9af6e38b4b86c8c134223a76525845487a3187ca39e0");
+    verify(0xa069b0,176,"21ffc7dcfd7a41a3cf567bbc6e451f4202f5773d0e6baac23072e9072c52a09a");
     original_seed=reinterpret_cast<Seed>(image+0xa06510);
     hook(reinterpret_cast<void*>(image+0xa069b0),reinterpret_cast<void*>(&get_float),reinterpret_cast<void**>(&original_float));
     if(config.value("rng_trace",false)){
@@ -228,12 +203,6 @@ void install(const Json& config){
             hook(reinterpret_cast<void*>(image+0x40d680),reinterpret_cast<void*>(&get_pad_entrance),reinterpret_cast<void**>(&original_get_pad_entrance));
             building_widget_installed=true;
         }
-        verify(0x2516d0,208,"08fb0d7c91beda6565b2e3789927f0bfda78f007b626a57dbe758bfa13f640cc");
-        verify(0x5ca510,368,"462f80355467d9fb90a4d2c9c6278fc83f7aa8645ea5a2741d1cbf79960ef614");
-        verify(0x5ca960,992,"3c3b07e135df49694e3e6e1529f75da93a882b0f293f967e70034c6417986aea");
-        hook(reinterpret_cast<void*>(image+0x2516d0),reinterpret_cast<void*>(&find_respawn),
-            reinterpret_cast<void**>(&original_find_respawn));
-        respawn_installed=true;
         verify(0x34b60,192,"882fb64f69170f94d00a9d976932c162434eac97e5f354dd5fb1e23f0fb7b5fa");
         verify(0x4053f0,672,"cc8439a8360821887c2f717e058a9b31ad46cdc370d6619678c966d1eda491e9");
         verify(0x3b87e0,1536,"f94aa85df15091fa474d2d8f7992c789a46891e3689b2873051236bdcd1c16b9");
@@ -257,7 +226,7 @@ void install(const Json& config){
         verify(0x3a4e50,6816,"2c83236299d0f9f98cda64d612d4ddf02d3aab8b8543e25b6744c2628e56cfc5");
         character_jump_installed=true;
     }
-    if(digital_enabled||respawn_installed||puppet_installed||scenery_pattern_installed||character_jump_installed||building_widget_installed)rng_trace::select_source=&select_digital;
+    if(digital_enabled||puppet_installed||scenery_pattern_installed||character_jump_installed||building_widget_installed)rng_trace::select_source=&select_digital;
     installed=true;
 }
 void arm(){
@@ -277,8 +246,6 @@ void check_building_widget(){
 }
 void check(){
     {std::lock_guard lock(failure_mutex);if(!failure.empty())throw std::runtime_error(failure);}
-    if(respawn_count.attempted.load()!=respawn_count.completed.load())
-        throw std::runtime_error("NPC validity RNG call has no confirmed completion; no replay");
     if(puppet_count.attempted.load()!=puppet_count.completed.load())
         throw std::runtime_error("Blueprint Puppet RNG call has no confirmed completion; no replay");
     if(scenery_pattern_count.attempted.load()!=scenery_pattern_count.completed.load())
@@ -300,9 +267,6 @@ Json status(){
     for(size_t i=0;i<digital_counts.size();++i){const auto& c=digital_counts[i];rows.push_back({
         {"site",digital_names[i]},{"matched",c.matched.load()},{"nondefault",c.nondefault.load()},
         {"initialized",c.initialized.load()},{"attempted",c.attempted.load()},{"completed",c.completed.load()}});}
-    rows.push_back({{"site","npcValidityRespawn"},{"matched",respawn_count.matched.load()},
-        {"nondefault",respawn_count.nondefault.load()},{"initialized",respawn_count.initialized.load()},
-        {"attempted",respawn_count.attempted.load()},{"completed",respawn_count.completed.load()}});
     rows.push_back({{"site","blueprintPuppet"},{"matched",puppet_count.matched.load()},
         {"nondefault",puppet_count.nondefault.load()},{"initialized",puppet_count.initialized.load()},
         {"attempted",puppet_count.attempted.load()},{"completed",puppet_count.completed.load()}});
@@ -317,6 +281,6 @@ Json status(){
         {"attempted",building_widget_count.attempted.load()},{"completed",building_widget_count.completed.load()}});
     std::string cause;{std::lock_guard lock(failure_mutex);cause=failure;}
     return {{"installed",installed},{"armed",armed.load()},{"generation",generation.load()},{"error",cause},
-        {"digital_enabled",digital_enabled},{"respawn_query_installed",respawn_installed},{"blueprint_puppet_installed",puppet_installed},{"scenery_pattern_installed",scenery_pattern_installed},{"character_jump_installed",character_jump_installed},{"scope","two exact Character jump animation calls; exact Scenery pattern Perlin constructor; exact Blueprint Puppet constructor; exact NPC validity respawn query; two shader constructors; optional sixteen exact visual line/dot/block/camera-target calls in eight functions"},{"sites",rows}};
+        {"digital_enabled",digital_enabled},{"blueprint_puppet_installed",puppet_installed},{"scenery_pattern_installed",scenery_pattern_installed},{"character_jump_installed",character_jump_installed},{"scope","two exact Character jump animation calls; exact Scenery pattern Perlin constructor; exact Blueprint Puppet constructor; two shader constructors; optional sixteen exact visual line/dot/block/camera-target calls in eight functions"},{"sites",rows}};
 }
 }

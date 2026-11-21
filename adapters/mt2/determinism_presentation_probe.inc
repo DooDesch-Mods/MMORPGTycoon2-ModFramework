@@ -54,12 +54,12 @@ void install(const Json& config){
     require(config.value("bootstrap_boundary",false),"Presentation probe requires bootstrap boundary");
     // Exact bodies establish the field layouts; this observer installs no hooks.
     presentation_rng::verify(0x332920,5264,"55ca106d58de5c32fdc1fc661706a1ecf3662ef4144040141475375e8dbb43c4");
-    presentation_rng::verify(0x326230,288,"7f05128d33541dc1d03ae9ea27c4a6e3da40bb02cdb5c002d06e0da067ddfd1d");
+    presentation_rng::verify(0x326230,304,"ab4e68b58f78612098adb424b91be006e23b6c128c151bbfb54c61b77652c688");
     presentation_rng::verify(0x326370,32,"371cc002ea95f63763c4ffb315190eed21f17c525eb2429c60dad8dbb7df8663");
     presentation_rng::verify(0x170660,1680,"239d75e38efbe874ebfae1b99a88a14cdf57551b3986ecb0214a1a768574cded");
     presentation_rng::verify(0x170eb0,2608,"01960afef08d26d400395426e7a2a96690d57145f83ffec40edc1f82b7bc0db5");
-    presentation_rng::verify(0x486d70,416,"7fee0c0355ebf9137a279ce78f2bd4821d7b7c90c8cb26e9969aed6fc5839249");
-    presentation_rng::verify(0x486f30,656,"265e384e2af25a903cfe58183e33a484e8c6a8aeb9aa3dc239ff3875af5e588f");
+    presentation_rng::verify(0x486d70,448,"720e1591a5983c671bb7798dee3dc3425ed5d2061dfe066147ac9c90ef3d6867");
+    presentation_rng::verify(0x486f30,720,"4b1a782291893f161b214ddec124b56901c22a7fcd6d3bd50dda5f47df81bf07");
     presentation_rng::verify(0x9d3f60,80,"35b5eea29601158eebeb53137155f4b564a454e8231884781e246825df535a03");
     presentation_rng::verify(0x9d2c30,880,"67927fcbd1b078e2a29d402a4af4c6096d592c2dc3029d17bb2be45854a48ae0");
 }

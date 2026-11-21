@@ -282,21 +282,21 @@ void install(const Json& config){
     require(config.value("presentation_probe",false),"Terrain probe requires private presentation probe");
     require(config.contains("terrain_probe_step")&&config.at("terrain_probe_step").is_number_unsigned(),"Terrain probe requires explicit unsigned frame index");
     selected_step=config.at("terrain_probe_step").get<uint64_t>();require(selected_step>0,"Terrain probe frame index must be positive");
-    presentation_rng::verify(0x9e2790,6048,"14930cf7bca1a63b5cc098feea46149d371ed092c2c6b1217d9538a54d01e648");
+    presentation_rng::verify(0x9e2790,6128,"7b3b15fad720b2a44a7ac4664b326a4e12eb246cbf44ff20420d0f941a8cf465");
     presentation_rng::verify(0x9d7080,16,"c08284fc39d8e46ba538628fc6b6ef689099dd976e46300226badd0aef62233c");
     presentation_rng::verify(0x333dc0,1088,"74e8140f708a1728a0c6e9fed4fa9d856489d8e3da90a09d12c32f4a9e029c77");
     presentation_rng::verify(0x9e02d0,9408,"0905551f7b02dd6a2ed24718404bbd8b11a9b441d1b3e978633bfca308c6ffa5");
     presentation_rng::verify(0x9e7c30,624,"fb509debee9059810d481dd56a9024dcdfa2bd48f1c31501394aea743840a881");
-    presentation_rng::verify(0x9c5180,3472,"fdefdd38c6fc5005954efd5b3b7bd7054b4f8243e3a7067c5d6a0f244bed0a84");
-    presentation_rng::verify(0x9c7d70,3744,"6c79f2f2d36b0deb3a5b2b24e67956e8d3fa89b9f716e6165a4660071c264c86");
+    presentation_rng::verify(0x9c5180,3472,"3409e24ad87ae7fa55241e8b992825da3b19ce56dd33e9e93dff56788a113bf4");
+    presentation_rng::verify(0x9c7d70,3744,"d97647d1983ed89326b627a45d518bce92780c864a7a4f16e57d831d6b7d9430");
     presentation_rng::verify(0x9c8c10,7136,"2fe92d8034753939be40f87eb7dd7806c95c4bf8338731ec8c9ce4805b04bd75");
     presentation_rng::verify(0x9d7070,16,"900895f2ed8006c8decb5e65aa7b4d4a33e00c9496934b039f7b9fa906945e95");
     presentation_rng::verify(0x332920,5264,"55ca106d58de5c32fdc1fc661706a1ecf3662ef4144040141475375e8dbb43c4");
     presentation_rng::verify(0x33b070,240,"79f6e32d4023be3dab2da003ef361a4ce7262b7b08708429584bf96446992e1a");
     presentation_rng::verify(0x33f1f0,32,"7358c59298d3334bbf47c5b357aeb3c2f9ae6a42f9e4e37637b124a0519abecb");
     presentation_rng::verify(0x340790,1168,"4ad5ed7c82a5b9abc997ca92c81b8e43ffe204ed8aa7ae9f33d5ade39c6ee994");
-    presentation_rng::verify(0x1eaa00,912,"e25cedfc984b7d01c370901a89cae7d348a64ab39366e08c543d56a6bd0fbd06");
-    presentation_rng::verify(0x1eb170,928,"d9348e70b127f775af2a21addf20472c8a926d95024c8aaa2a488d1137d8e623");
+    presentation_rng::verify(0x1eaa00,928,"c4da122c6ed0f789d35740546bdf5ee96c8654abd63aa12617bf520f6cbfbdc1");
+    presentation_rng::verify(0x1eb170,960,"b9e342b27ccaed27aafaefde79e767cf125b6121836b3974a138c8018849bbe6");
     hook(reinterpret_cast<void*>(image+0x9e2790),reinterpret_cast<void*>(&prepare),reinterpret_cast<void**>(&original));
     hook(reinterpret_cast<void*>(image+0x9c7d70),reinterpret_cast<void*>(&flush),reinterpret_cast<void**>(&original_flush));
 }
