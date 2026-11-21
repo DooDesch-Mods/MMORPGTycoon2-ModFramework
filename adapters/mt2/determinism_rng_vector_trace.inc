@@ -77,15 +77,15 @@ __declspec(noinline) void* get_vector3_cone(void* output,void* source,const void
 bool vector_consumers_installed=false;
 void install_vector_consumers(){
     for(const auto& [offset,size,sha]:std::array<std::tuple<uintptr_t,size_t,const char*>,9>{{
-        {0xa06b30,336,"eecbd3cb2b6c7142e5d21463585b165cbcaaa0c2499f485175c7015091673194"},
-        {0xa06e50,240,"54e095e5bb5f6613c1bb91786e258c59b7142996db49e3099e144bc37ba40ec8"},
-        {0xa06fe0,544,"8783a9091768ffc5f55e2b39d5e4a83c6ed6f98d201ea628e16a4beb9fcbafeb"},
-        {0xa072c0,448,"424988fd3f3ec857c612f4392e0ec8a60b8c64454db1e1793ad3fe75ffd1b92e"},
-        {0xa07530,368,"10228e9b1fea081fe076af6f307e8500b58400ff4e81ecac662ef21edbf27ad7"},
-        {0xa07780,240,"910b468e1fbfd0eba64ff063f8752af242ea09ac364597aa41310eee8b2d202c"},
-        {0xa078e0,368,"6a619b096d2c022f22f50d9bdda3254ae130b167dd2781eedf2d50cd2e821b65"},
-        {0xa07b60,608,"c5cc6107c774310bd29707bf28d123600c396db1a7b943fe464c2e137c709c8e"},
-        {0xa07e60,432,"05f261b26a492f81e1c2fbaaed9a2f4f84d92e35b8e37942cdb71be71468354a"}}}){
+        {0xa06b30,384,"af8022ace9b9d186975edadb9b4fec491360b5f71b14b6526ce8c4574c67d486"},
+        {0xa06e50,400,"154613813003df2864b74088907346110af31dd6661cc9d9d5a184cd236a3d78"},
+        {0xa06fe0,736,"85de43e5c49a072b4577a2166d8629aa66b41f3d9ba8269a7f17d9a2347a5115"},
+        {0xa072c0,624,"1dcc9ee3bb9a29c1cb2f772809a7dc959363d66e9882dca12655d6fc37881df5"},
+        {0xa07530,592,"ee59c3c14529bb0de6caf5f900043f13f8824c12ceb461e3c8e03cf408f40974"},
+        {0xa07780,352,"46dd461e0938f38861160d8f0b44abd68620d46e6fa3b6ba0abd1120aaf45277"},
+        {0xa078e0,640,"69d91d7416bbd9414853da8700b4b1b7f82a329a3e1753b0d881fb3c401446f0"},
+        {0xa07b60,768,"efad788a044c2cd9685ae43425160ebc9b3a274f6bd842cfe5157fc4a25852f4"},
+        {0xa07e60,512,"ed1cad49cc75bbfac58f74e84e81f8b97f22114cdac7fe30d74e653498d9ec8c"}}}){
         std::string bytes(size,'\0');SIZE_T copied=0;
         if(!ReadProcessMemory(GetCurrentProcess(),reinterpret_cast<void*>(image+offset),bytes.data(),size,&copied)||copied!=size||digest(bytes)!=sha)
             throw std::runtime_error("Default RNG vector consumer original bytes differ rva="+std::to_string(offset));

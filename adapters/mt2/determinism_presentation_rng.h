@@ -38,28 +38,6 @@ Selection select_building_widget(bool armed,uint64_t generation,const BuildingWi
     }
     ++count.attempted;return {&local.random,&count};
 }
-// The NPC validity query tests only whether a respawn exists. Keep its native
-// selection algorithm, but give its exact RNG call a presentation source.
-struct RespawnQuery {
-    bool active=false;
-    bool matches(uintptr_t helper,uintptr_t caller) const noexcept {
-        return active&&helper==0xa068a0&&caller==0x251728;
-    }
-};
-template<class Initialize>
-Selection select_respawn(bool armed,uint64_t generation,const RespawnQuery& query,
-    uintptr_t helper,uintptr_t caller,void* source,void* expected,Local& local,
-    Counters& count,Initialize&& initialize){
-    if(!armed||!query.matches(helper,caller))return {source};
-    ++count.matched;
-    if(source!=expected){++count.nondefault;return {source};}
-    if(!generation)throw std::runtime_error("NPC validity RNG generation is zero");
-    if(local.generation!=generation){
-        initialize(&local.random,uint64_t{0x4d54324e504356});
-        local.generation=generation;++count.initialized;
-    }
-    ++count.attempted;return {&local.random,&count};
-}
 
 // Scenery preview patterns become explicit captured stroke transforms. Their
 // Perlin coefficients belong to that local cursor, not the gameplay RNG.

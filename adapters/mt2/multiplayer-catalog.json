@@ -1530,7 +1530,7 @@
     },
     {
       "name": "mp.tutorial-intro.4f1940",
-      "rva": 5208576,
+      "rva": 5208128,
       "shared": false,
       "groups": [
         {
@@ -3287,7 +3287,7 @@
     },
     {
       "name": "mp.bug-lifecycle-and-saved-identity.dc17d0",
-      "rva": 14467440,
+      "rva": 14471392,
       "shared": false,
       "groups": [
         {
@@ -3371,7 +3371,7 @@
     },
     {
       "name": "mp.saved-boss.load-stream.dde0b0",
-      "rva": 14591040,
+      "rva": 14588352,
       "shared": false,
       "groups": [
         {

@@ -2,6 +2,19 @@
 
 The Vortex extension has its own repository, [MMORPGTycoon2-Vortex](https://github.com/DooDesch-Mods/MMORPGTycoon2-Vortex), and its own changelog. Its releases up to 0.2.0 were published here as `vortex-v*` tags.
 
+## 0.6.2
+
+Lua API 1.3.0 and native ABI 1 are unchanged. Existing mods keep working.
+
+### Fixed
+
+- The Multiplayer step routes run on game build 26719430. The Multiplayer plugin can use this Framework release.
+- The experimental gameplay operation `development.set_active` no longer calls the wrong game function on build 26719430.
+
+### Changed
+
+- The NPC respawn query no longer gets its own presentation random source. Build 26719430 no longer makes this call.
+
 ## 0.6.1
 
 Lua API 1.3.0 and native ABI 1 are unchanged. Existing mods keep working.
